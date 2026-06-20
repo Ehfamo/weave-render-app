@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as FeedRouteImport } from './routes/feed'
+import { Route as CreatorsRouteImport } from './routes/creators'
 import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PromptIdRouteImport } from './routes/prompt.$id'
@@ -18,6 +19,11 @@ import { Route as CollectionsIdRouteImport } from './routes/collections.$id'
 const FeedRoute = FeedRouteImport.update({
   id: '/feed',
   path: '/feed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorsRoute = CreatorsRouteImport.update({
+  id: '/creators',
+  path: '/creators',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CollectionsRoute = CollectionsRouteImport.update({
@@ -44,6 +50,7 @@ const CollectionsIdRoute = CollectionsIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/collections': typeof CollectionsRouteWithChildren
+  '/creators': typeof CreatorsRoute
   '/feed': typeof FeedRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/prompt/$id': typeof PromptIdRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/collections': typeof CollectionsRouteWithChildren
+  '/creators': typeof CreatorsRoute
   '/feed': typeof FeedRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/prompt/$id': typeof PromptIdRoute
@@ -59,19 +67,33 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/collections': typeof CollectionsRouteWithChildren
+  '/creators': typeof CreatorsRoute
   '/feed': typeof FeedRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/prompt/$id': typeof PromptIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/collections' | '/feed' | '/collections/$id' | '/prompt/$id'
+  fullPaths:
+    | '/'
+    | '/collections'
+    | '/creators'
+    | '/feed'
+    | '/collections/$id'
+    | '/prompt/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/collections' | '/feed' | '/collections/$id' | '/prompt/$id'
+  to:
+    | '/'
+    | '/collections'
+    | '/creators'
+    | '/feed'
+    | '/collections/$id'
+    | '/prompt/$id'
   id:
     | '__root__'
     | '/'
     | '/collections'
+    | '/creators'
     | '/feed'
     | '/collections/$id'
     | '/prompt/$id'
@@ -80,6 +102,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CollectionsRoute: typeof CollectionsRouteWithChildren
+  CreatorsRoute: typeof CreatorsRoute
   FeedRoute: typeof FeedRoute
   PromptIdRoute: typeof PromptIdRoute
 }
@@ -91,6 +114,13 @@ declare module '@tanstack/react-router' {
       path: '/feed'
       fullPath: '/feed'
       preLoaderRoute: typeof FeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creators': {
+      id: '/creators'
+      path: '/creators'
+      fullPath: '/creators'
+      preLoaderRoute: typeof CreatorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/collections': {
@@ -139,6 +169,7 @@ const CollectionsRouteWithChildren = CollectionsRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CollectionsRoute: CollectionsRouteWithChildren,
+  CreatorsRoute: CreatorsRoute,
   FeedRoute: FeedRoute,
   PromptIdRoute: PromptIdRoute,
 }

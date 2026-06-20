@@ -1,10 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowRight, Flame, Heart, MessageCircle, Play, Share2 } from "lucide-react";
-import { CATEGORIES, PROMPTS, ROWS } from "@/lib/prompts";
+import { ArrowRight, Flame, Heart, MessageCircle, Play, Share2, Sparkles } from "lucide-react";
+import { CATEGORIES, COLLECTIONS, CREATORS, PROMPTS, ROWS } from "@/lib/prompts";
 import { Header } from "@/components/xeomx/Header";
 import { Row } from "@/components/xeomx/Row";
 import { PromptCard } from "@/components/xeomx/PromptCard";
+import { CollectionCard } from "@/components/xeomx/CollectionCard";
+import { CreatorCard } from "@/components/xeomx/CreatorCard";
+import { TickerMarquee } from "@/components/xeomx/Marquee";
+import { SignalBadge } from "@/components/xeomx/Signal";
 import heroImg from "@/assets/hero.jpg";
 import cover1 from "@/assets/cover-1.jpg";
 
@@ -40,6 +44,16 @@ function Index() {
   const featured = PROMPTS[0];
   const isFiltering = query.length > 0 || cat !== "All";
 
+  const tickerItems = [
+    "🔥 ai-sigil · 18.4k copies today",
+    "⚡ neon-splash · rising fast",
+    "🏆 baroque-muse · top 1%",
+    "🚀 void-astronaut · viral score 95",
+    "💎 magenta-cathedral · 1,820 watching",
+    "✨ visor-oracle · 7.1k copies",
+    "🎬 monolith-corridor · 2.1k remixes",
+  ];
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header query={query} onSearch={setQuery} />
@@ -73,16 +87,18 @@ function Index() {
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <Link
-                to="/prompt/$id"
-                params={{ id: featured.id }}
+                to="/feed"
                 className="group inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium text-white transition hover:opacity-95"
                 style={{ background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)" }}
               >
-                <Play className="h-4 w-4 fill-white" /> Watch the prompt
+                <Play className="h-4 w-4 fill-white" /> Open viral feed
               </Link>
-              <button className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/70 px-5 py-3 text-sm font-medium text-foreground backdrop-blur transition hover:border-gold/40">
-                Browse library <ArrowRight className="h-4 w-4" />
-              </button>
+              <Link
+                to="/collections"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/70 px-5 py-3 text-sm font-medium text-foreground backdrop-blur transition hover:border-gold/40"
+              >
+                Browse collections <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
 
             <dl className="mt-10 grid max-w-md grid-cols-3 gap-6 border-t border-border/60 pt-6 text-left">
@@ -116,6 +132,9 @@ function Index() {
           </Link>
         </div>
       </section>
+
+      {/* LIVE TICKER */}
+      <TickerMarquee items={tickerItems} />
 
       {/* CATEGORY FILTER */}
       <div className="sticky top-[57px] z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl">
@@ -167,6 +186,46 @@ function Index() {
               <Row key={row.title} title={row.title} tag={row.tag} ids={row.ids} />
             ))}
 
+            {/* COLLECTIONS RAIL */}
+            <section className="px-4 sm:px-8">
+              <div className="mb-6 flex items-end justify-between">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.28em] text-gold/80">Curated · structured paths</p>
+                  <h2 className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+                    Prompt <span className="text-gradient-gold italic">collections</span>
+                  </h2>
+                </div>
+                <Link to="/collections" className="hidden text-sm text-muted-foreground transition hover:text-foreground sm:inline">
+                  See all →
+                </Link>
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2">
+                {COLLECTIONS.slice(0, 4).map((c) => (
+                  <CollectionCard key={c.id} c={c} />
+                ))}
+              </div>
+            </section>
+
+            {/* CREATORS RAIL */}
+            <section className="px-4 sm:px-8">
+              <div className="mb-6 flex items-end justify-between">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.28em] text-magenta/80">Creator economy</p>
+                  <h2 className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+                    Elite <span className="text-gradient-magenta">prompt engineers</span>
+                  </h2>
+                </div>
+                <Link to="/creators" className="hidden text-sm text-muted-foreground transition hover:text-foreground sm:inline">
+                  See all →
+                </Link>
+              </div>
+              <div className="scrollbar-hidden -mx-4 flex gap-4 overflow-x-auto px-4 pb-2 sm:-mx-8 sm:px-8">
+                {CREATORS.map((c) => (
+                  <CreatorCard key={c.handle} c={c} />
+                ))}
+              </div>
+            </section>
+
             {/* VIRAL FEED */}
             <section className="px-4 sm:px-8">
               <div className="mb-6 flex items-end justify-between">
@@ -176,9 +235,9 @@ function Index() {
                     Viral <span className="text-gradient-magenta">prompts</span>
                   </h2>
                 </div>
-                <a href="#" className="hidden text-sm text-muted-foreground transition hover:text-foreground sm:inline">
+                <Link to="/feed" className="hidden text-sm text-muted-foreground transition hover:text-foreground sm:inline">
                   Open full feed →
-                </a>
+                </Link>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -192,6 +251,7 @@ function Index() {
                     <div className="relative aspect-[9/14] overflow-hidden">
                       <img src={p.cover} alt={p.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+                      <div className="absolute left-3 top-3"><SignalBadge signal={p.signal ?? null} score={p.viralScore} /></div>
                       <div className="absolute right-3 top-3 flex flex-col gap-2">
                         {[Heart, MessageCircle, Share2].map((Icon, i) => (
                           <span key={i} className="grid h-10 w-10 place-items-center rounded-full border border-foreground/20 bg-background/40 backdrop-blur transition hover:border-magenta/60">
@@ -212,6 +272,36 @@ function Index() {
                     </div>
                   </Link>
                 ))}
+              </div>
+            </section>
+
+            {/* RANKING ENGINE BLOCK */}
+            <section className="mx-4 overflow-hidden rounded-3xl border border-border bg-surface/40 p-8 sm:mx-8 sm:p-12">
+              <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.28em] text-gold/80">Ranking engine</p>
+                  <h2 className="mt-2 font-display text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
+                    Algorithmic discovery, not endless lists.
+                  </h2>
+                  <p className="mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
+                    Every prompt is ranked live: views ×1, copies ×5, saves ×4, shares ×6, remixes ×7. The best work surfaces. Creators get paid.
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {[
+                    ["12,480", "Prompts indexed"],
+                    ["1.4M", "Renders / month"],
+                    ["98", "Top viral score"],
+                    ["284k", "Active creators"],
+                    ["$0", "Cost to copy"],
+                    ["70%", "Creator share"],
+                  ].map(([v, l]) => (
+                    <div key={l} className="rounded-2xl border border-border bg-background/40 p-4">
+                      <p className="font-display text-2xl font-semibold tracking-tight">{v}</p>
+                      <p className="mt-1 text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{l}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </section>
 

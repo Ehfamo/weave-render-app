@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowRight, Flame, Heart, MessageCircle, Play, Share2, Sparkles } from "lucide-react";
+import { ArrowRight, Flame, Heart, MessageCircle, Play, Share2 } from "lucide-react";
 import { CATEGORIES, COLLECTIONS, CREATORS, PROMPTS, ROWS } from "@/lib/prompts";
 import { Header } from "@/components/xeomx/Header";
 import { Row } from "@/components/xeomx/Row";

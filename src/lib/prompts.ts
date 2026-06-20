@@ -414,27 +414,109 @@ export const getPrompt = (id: string) => PROMPTS.find((p) => p.id === id);
 
 export const ROWS: { title: string; tag: string; ids: string[] }[] = [
   {
+    title: "For You · AI Personalized",
+    tag: "Tuned to your taste",
+    ids: ["ai-sigil", "void-astronaut", "neon-splash", "monolith-corridor", "visor-oracle", "baroque-muse"],
+  },
+  {
+    title: "Trending in your field",
+    tag: "Top 1% velocity",
+    ids: ["neon-splash", "ai-sigil", "visor-oracle", "neon-jewel", "liquid-alchemy", "monolith-corridor"],
+  },
+  {
+    title: "High-conversion prompts",
+    tag: "Most copied this week",
+    ids: ["ai-sigil", "neon-splash", "void-astronaut", "monolith-corridor", "neon-jewel", "liquid-alchemy"],
+  },
+  {
+    title: "Elite creator picks",
+    tag: "Curated by @nocturne",
+    ids: ["baroque-muse", "visor-oracle", "obsidian-couture", "velvet-bloom", "ember-portrait-7"],
+  },
+  {
     title: "XeomX Originals",
     tag: "Curated by editors",
     ids: ["baroque-muse", "neon-jewel", "velvet-bloom", "gold-particles", "neon-splash", "cyberpunk-dusk"],
   },
   {
-    title: "Trending this week",
-    tag: "Top 1% velocity",
-    ids: ["neon-splash", "gold-particles", "neon-jewel", "baroque-muse", "velvet-bloom"],
-  },
-  {
-    title: "Premium drops",
-    tag: "Members only",
-    ids: ["baroque-muse", "neon-jewel", "velvet-bloom", "cyberpunk-dusk"],
-  },
-  {
-    title: "Coming soon",
+    title: "Coming soon · Locked drops",
     tag: "Tier 01 — Founders",
-    ids: ["cyberpunk-dusk", "baroque-muse", "neon-jewel"],
+    ids: ["cyberpunk-dusk", "magenta-cathedral", "stained-future", "void-astronaut"],
   },
 ];
 
 export const CATEGORIES = ["All", "Portrait", "Fashion", "Atmosphere", "Sci-Fi", "Texture"];
+
+export type Collection = {
+  id: string;
+  title: string;
+  subtitle: string;
+  count: number;
+  cover: string;
+  ids: string[];
+  badge: string;
+};
+
+export const COLLECTIONS: Collection[] = [
+  {
+    id: "saas-in-10",
+    title: "Build a SaaS in 10 prompts",
+    subtitle: "From idea to launch — engineered prompt chain",
+    count: 10,
+    cover: cover11,
+    ids: ["ai-sigil", "monolith-corridor", "neon-splash", "void-astronaut"],
+    badge: "Pro path",
+  },
+  {
+    id: "10x-marketer",
+    title: "Become a 10x marketer",
+    subtitle: "Hooks, headlines, funnels — battle-tested",
+    count: 14,
+    cover: cover2,
+    ids: ["neon-splash", "neon-jewel", "visor-oracle", "obsidian-couture"],
+    badge: "Hot",
+  },
+  {
+    id: "automation-mastery",
+    title: "AI automation mastery",
+    subtitle: "Agents, workflows, chained reasoning",
+    count: 12,
+    cover: cover16,
+    ids: ["ai-sigil", "monolith-corridor", "void-astronaut", "magenta-cathedral"],
+    badge: "Series A",
+  },
+  {
+    id: "editorial-aesthetic",
+    title: "Editorial aesthetic codex",
+    subtitle: "Vogue-grade visual prompts, every one cinematic",
+    count: 18,
+    cover: cover14,
+    ids: ["baroque-muse", "visor-oracle", "neon-jewel", "obsidian-couture", "ember-portrait-7"],
+    badge: "Curated",
+  },
+];
+
+export const getCollection = (id: string) => COLLECTIONS.find((c) => c.id === id);
+
+export type Creator = {
+  handle: string;
+  name: string;
+  tier: "Founder" | "Elite" | "Rising";
+  followers: string;
+  copies: string;
+  cover: string;
+  bio: string;
+};
+
+export const CREATORS: Creator[] = [
+  { handle: "@nocturne", name: "Noir Atelier", tier: "Founder", followers: "284k", copies: "1.4M", cover: cover1, bio: "Baroque editorial · Vogue-grade prompts." },
+  { handle: "@maryikai", name: "Marya Ikai", tier: "Elite", followers: "192k", copies: "910k", cover: cover2, bio: "Selective color editorial. Iconic only." },
+  { handle: "@kernel", name: "Kernel Lab", tier: "Founder", followers: "421k", copies: "2.1M", cover: cover11, bio: "Cyber-baroque sigils & brand systems." },
+  { handle: "@ghostnet", name: "Ghostnet", tier: "Elite", followers: "168k", copies: "780k", cover: cover15, bio: "Cosmic Kubrick. Lonely vastness." },
+  { handle: "@atelier", name: "Atelier 9", tier: "Rising", followers: "84k", copies: "320k", cover: cover5, bio: "Texture-first. Velvet, gold, surface." },
+  { handle: "@kubrickai", name: "Kubrick.ai", tier: "Elite", followers: "212k", copies: "1.0M", cover: cover16, bio: "Symmetric monoliths. Sacred minimal." },
+];
+
+export const TOP_PROMPT_IDS = ["ai-sigil", "void-astronaut", "baroque-muse", "neon-splash", "monolith-corridor", "visor-oracle", "neon-jewel", "liquid-alchemy"];
 
 export const _covers = covers;

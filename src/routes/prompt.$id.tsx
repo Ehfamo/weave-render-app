@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, Bookmark, Check, Copy, Crown, Heart, Lock, Share2, Sparkles } from "lucide-react";
-import { getPrompt, PROMPTS } from "@/lib/prompts";
+import { getPrompt, PROMPTS, type Prompt } from "@/lib/prompts";
 import { Header } from "@/components/xeomx/Header";
 import { PromptCard } from "@/components/xeomx/PromptCard";
 
@@ -43,7 +43,7 @@ export const Route = createFileRoute("/prompt/$id")({
 });
 
 function Detail() {
-  const { prompt } = Route.useLoaderData();
+  const { prompt } = Route.useLoaderData() as { prompt: Prompt };
   const [copied, setCopied] = useState(false);
   const locked = prompt.state === "soon";
 

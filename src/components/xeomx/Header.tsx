@@ -15,15 +15,18 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
-          {["Discover", "Viral", "Premium", "Drops"].map((l) => (
-            <a
-              key={l}
-              href="#"
-              className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground"
-            >
-              {l}
-            </a>
-          ))}
+          <Link to="/" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }} activeOptions={{ exact: true }}>
+            Discover
+          </Link>
+          <Link to="/feed" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
+            Viral feed
+          </Link>
+          <Link to="/collections" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
+            Collections
+          </Link>
+          <Link to="/creators" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
+            Creators
+          </Link>
         </nav>
 
         <div className="ml-auto flex flex-1 items-center gap-3 sm:flex-none">

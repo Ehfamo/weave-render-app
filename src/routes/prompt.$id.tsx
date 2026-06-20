@@ -1,9 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, Bookmark, Check, Copy, Crown, Heart, Lock, Share2, Sparkles } from "lucide-react";
+import { ArrowLeft, Bookmark, Check, Copy, Crown, Heart, Lock, Share2, Shuffle, Sparkles, TrendingUp } from "lucide-react";
 import { getPrompt, PROMPTS, type Prompt } from "@/lib/prompts";
 import { Header } from "@/components/xeomx/Header";
 import { PromptCard } from "@/components/xeomx/PromptCard";
+import { SignalBadge } from "@/components/xeomx/Signal";
 
 export const Route = createFileRoute("/prompt/$id")({
   loader: ({ params }) => {
@@ -54,7 +55,13 @@ function Detail() {
     setTimeout(() => setCopied(false), 1600);
   };
 
-  const related = PROMPTS.filter((p) => p.id !== prompt.id).slice(0, 4);
+  const relatedIds = prompt.related ?? [];
+  const related = (relatedIds.length
+    ? relatedIds.map((id) => PROMPTS.find((p) => p.id === id)).filter(Boolean)
+    : PROMPTS.filter((p) => p.id !== prompt.id).slice(0, 4)) as Prompt[];
+
+  const engine = prompt.engine ?? null;
+  const fmt = (n?: number) => (n ? (n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 0 : 1) + "k" : String(n)) : "—");
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -105,6 +112,23 @@ function Detail() {
                 <span>❤ {prompt.likes}</span>
                 <span>·</span>
                 <span>Updated this week</span>
+                <SignalBadge signal={prompt.signal ?? null} score={prompt.viralScore} />
+              </div>
+
+              {/* Live engagement metrics */}
+              <div className="mt-6 grid grid-cols-4 gap-2">
+                {[
+                  { label: "Copies", value: fmt(prompt.copies), Icon: Copy },
+                  { label: "Saves", value: fmt(prompt.saves), Icon: Bookmark },
+                  { label: "Shares", value: fmt(prompt.shares), Icon: Share2 },
+                  { label: "Remixes", value: fmt(prompt.remixes), Icon: Shuffle },
+                ].map(({ label, value, Icon }) => (
+                  <div key={label} className="rounded-xl border border-border bg-surface/40 p-3">
+                    <Icon className="h-3.5 w-3.5 text-magenta" />
+                    <p className="mt-1.5 font-display text-lg leading-none">{value}</p>
+                    <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{label}</p>
+                  </div>
+                ))}
               </div>
 
               {/* Prompt focus box */}
@@ -152,13 +176,73 @@ function Detail() {
         </div>
       </section>
 
+      {/* Prompt Engine — Role / Context / Instructions / Output / Constraints */}
+      {engine ? (
+        <section className="mx-auto max-w-[1200px] px-4 pb-16 sm:px-8">
+          <div className="mb-6 flex items-end justify-between">
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.28em] text-gold/80">Prompt engine</p>
+              <h2 className="mt-1 font-display text-2xl font-semibold tracking-tight sm:text-3xl">Engineered breakdown</h2>
+            </div>
+            <span className="hidden text-[11px] uppercase tracking-[0.22em] text-muted-foreground sm:inline">RCIOC framework</span>
+          </div>
+          <div className="grid gap-3 lg:grid-cols-5">
+            {([
+              ["Role", engine.role],
+              ["Context", engine.context],
+              ["Instructions", engine.instructions],
+              ["Output", engine.output],
+              ["Constraints", engine.constraints],
+            ] as const).map(([k, v]) => (
+              <div key={k} className="rounded-2xl border border-border bg-surface/50 p-5">
+                <p className="text-[10px] uppercase tracking-[0.28em] text-magenta">{k}</p>
+                <p className="mt-3 text-sm leading-relaxed text-foreground/90">{v}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {/* AI Result Preview */}
+      <section className="mx-auto max-w-[1200px] px-4 pb-16 sm:px-8">
+        <div className="mb-6 flex items-end justify-between">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.28em] text-magenta/80">AI result preview</p>
+            <h2 className="mt-1 font-display text-2xl font-semibold tracking-tight sm:text-3xl">Sample renders</h2>
+          </div>
+          <span className="hidden text-[11px] uppercase tracking-[0.22em] text-muted-foreground sm:inline">Simulated · 3 variations</span>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {[0, 1, 2].map((i) => {
+            const variant = related[i] ?? prompt;
+            return (
+              <div key={i} className="group relative overflow-hidden rounded-2xl border border-border">
+                <img src={variant.cover} alt="" className="aspect-[4/5] w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+                <div className="absolute inset-x-3 bottom-3 flex items-center justify-between">
+                  <span className="rounded-full border border-border/60 bg-background/60 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground backdrop-blur">
+                    Variant {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="rounded-full border border-gold/40 bg-gold/10 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-gold backdrop-blur">
+                    Render
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
       {/* Related */}
       <section className="mx-auto max-w-[1400px] px-4 pb-20 sm:px-8">
         <div className="mb-6 flex items-end justify-between">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.28em] text-magenta/80">If you liked this</p>
-            <h2 className="mt-1 font-display text-2xl font-semibold tracking-tight sm:text-3xl">More from the library</h2>
+            <p className="text-[11px] uppercase tracking-[0.28em] text-magenta/80">Related intelligence feed</p>
+            <h2 className="mt-1 font-display text-2xl font-semibold tracking-tight sm:text-3xl">Similar · trending · remixed</h2>
           </div>
+          <span className="hidden items-center gap-1 text-[11px] uppercase tracking-[0.22em] text-muted-foreground sm:inline-flex">
+            <TrendingUp className="h-3 w-3" /> Algo-ranked
+          </span>
         </div>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
           {related.map((p) => (

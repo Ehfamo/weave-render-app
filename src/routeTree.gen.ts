@@ -9,9 +9,28 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as FeedRouteImport } from './routes/feed'
+import { Route as CreatorsRouteImport } from './routes/creators'
+import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PromptIdRouteImport } from './routes/prompt.$id'
+import { Route as CollectionsIdRouteImport } from './routes/collections.$id'
 
+const FeedRoute = FeedRouteImport.update({
+  id: '/feed',
+  path: '/feed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorsRoute = CreatorsRouteImport.update({
+  id: '/creators',
+  path: '/creators',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CollectionsRoute = CollectionsRouteImport.update({
+  id: '/collections',
+  path: '/collections',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -22,35 +41,95 @@ const PromptIdRoute = PromptIdRouteImport.update({
   path: '/prompt/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CollectionsIdRoute = CollectionsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => CollectionsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/collections': typeof CollectionsRouteWithChildren
+  '/creators': typeof CreatorsRoute
+  '/feed': typeof FeedRoute
+  '/collections/$id': typeof CollectionsIdRoute
   '/prompt/$id': typeof PromptIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/collections': typeof CollectionsRouteWithChildren
+  '/creators': typeof CreatorsRoute
+  '/feed': typeof FeedRoute
+  '/collections/$id': typeof CollectionsIdRoute
   '/prompt/$id': typeof PromptIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/collections': typeof CollectionsRouteWithChildren
+  '/creators': typeof CreatorsRoute
+  '/feed': typeof FeedRoute
+  '/collections/$id': typeof CollectionsIdRoute
   '/prompt/$id': typeof PromptIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/prompt/$id'
+  fullPaths:
+    | '/'
+    | '/collections'
+    | '/creators'
+    | '/feed'
+    | '/collections/$id'
+    | '/prompt/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/prompt/$id'
-  id: '__root__' | '/' | '/prompt/$id'
+  to:
+    | '/'
+    | '/collections'
+    | '/creators'
+    | '/feed'
+    | '/collections/$id'
+    | '/prompt/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/collections'
+    | '/creators'
+    | '/feed'
+    | '/collections/$id'
+    | '/prompt/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CollectionsRoute: typeof CollectionsRouteWithChildren
+  CreatorsRoute: typeof CreatorsRoute
+  FeedRoute: typeof FeedRoute
   PromptIdRoute: typeof PromptIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/feed': {
+      id: '/feed'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof FeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creators': {
+      id: '/creators'
+      path: '/creators'
+      fullPath: '/creators'
+      preLoaderRoute: typeof CreatorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collections': {
+      id: '/collections'
+      path: '/collections'
+      fullPath: '/collections'
+      preLoaderRoute: typeof CollectionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -65,11 +144,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PromptIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/collections/$id': {
+      id: '/collections/$id'
+      path: '/$id'
+      fullPath: '/collections/$id'
+      preLoaderRoute: typeof CollectionsIdRouteImport
+      parentRoute: typeof CollectionsRoute
+    }
   }
 }
 
+interface CollectionsRouteChildren {
+  CollectionsIdRoute: typeof CollectionsIdRoute
+}
+
+const CollectionsRouteChildren: CollectionsRouteChildren = {
+  CollectionsIdRoute: CollectionsIdRoute,
+}
+
+const CollectionsRouteWithChildren = CollectionsRoute._addFileChildren(
+  CollectionsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CollectionsRoute: CollectionsRouteWithChildren,
+  CreatorsRoute: CreatorsRoute,
+  FeedRoute: FeedRoute,
   PromptIdRoute: PromptIdRoute,
 }
 export const routeTree = rootRouteImport

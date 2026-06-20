@@ -4,8 +4,19 @@ import cover3 from "@/assets/cover-3.jpg";
 import cover4 from "@/assets/cover-4.jpg";
 import cover5 from "@/assets/cover-5.jpg";
 import cover6 from "@/assets/cover-6.jpg";
+import cover7 from "@/assets/cover-7.jpg";
+import cover8 from "@/assets/cover-8.jpg";
+import cover9 from "@/assets/cover-9.jpg";
+import cover10 from "@/assets/cover-10.jpg";
+import cover11 from "@/assets/cover-11.jpg";
+import cover12 from "@/assets/cover-12.jpg";
+import cover13 from "@/assets/cover-13.jpg";
+import cover14 from "@/assets/cover-14.jpg";
+import cover15 from "@/assets/cover-15.jpg";
+import cover16 from "@/assets/cover-16.jpg";
 
 export type PromptState = "free" | "premium" | "soon";
+export type ViralSignal = "trending" | "rising" | "top1" | "viral" | null;
 
 export type Prompt = {
   id: string;
@@ -18,9 +29,25 @@ export type Prompt = {
   likes: string;
   prompt: string;
   breakdown: { label: string; value: string }[];
+  // Engine breakdown (Role / Context / Instructions / Output / Constraints)
+  engine?: {
+    role: string;
+    context: string;
+    instructions: string;
+    output: string;
+    constraints: string;
+  };
+  copies?: number;
+  saves?: number;
+  shares?: number;
+  remixes?: number;
+  viralScore?: number;
+  signal?: ViralSignal;
+  tagline?: string;
+  related?: string[];
 };
 
-const covers = [cover1, cover2, cover3, cover4, cover5, cover6];
+const covers = [cover1, cover2, cover3, cover4, cover5, cover6, cover7, cover8, cover9, cover10, cover11, cover12, cover13, cover14, cover15, cover16];
 
 export const PROMPTS: Prompt[] = [
   {

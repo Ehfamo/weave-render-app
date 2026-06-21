@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Bookmark, Heart, Sparkles, TrendingUp, Plus, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -141,6 +141,3 @@ function Card({ title, empty }: { title: string; empty: string }) {
     </div>
   );
 }
-
-// suppress unused import warning if useState removed
-void useState;

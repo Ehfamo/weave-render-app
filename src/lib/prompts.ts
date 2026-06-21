@@ -14,6 +14,11 @@ import cover13 from "@/assets/cover-13.jpg";
 import cover14 from "@/assets/cover-14.jpg";
 import cover15 from "@/assets/cover-15.jpg";
 import cover16 from "@/assets/cover-16.jpg";
+import cr1 from "@/assets/Photo of model women (1).webp";
+import cr2 from "@/assets/Photo of model women.webp";
+import cr3 from "@/assets/A menacing plus-size model hell goddess.webp";
+import cr4 from "@/assets/Drine shot of a full body A beautiful futuristic b.webp";
+import cr5 from "@/assets/4k photo_selfie of 25 year old punk girl_looks lik.webp";
 
 export type PromptState = "free" | "premium" | "soon";
 export type ViralSignal = "trending" | "rising" | "top1" | "viral" | null;
@@ -29,7 +34,6 @@ export type Prompt = {
   likes: string;
   prompt: string;
   breakdown: { label: string; value: string }[];
-  // Engine breakdown (Role / Context / Instructions / Output / Constraints)
   engine?: {
     role: string;
     context: string;
@@ -59,8 +63,7 @@ export const PROMPTS: Prompt[] = [
     author: "@nocturne",
     views: "1.2M",
     likes: "84.3k",
-    prompt:
-      "Cinematic baroque portrait of a young woman, painterly chiaroscuro lighting, gilded velvet drapery, intricate ornate detail, shot on Hasselblad, 85mm, ultra detailed skin texture, Rembrandt key light, deep amber palette, museum quality.",
+    prompt: "Cinematic baroque portrait of a young woman, painterly chiaroscuro lighting, gilded velvet drapery, intricate ornate detail, shot on Hasselblad, 85mm, ultra detailed skin texture, Rembrandt key light, deep amber palette, museum quality.",
     breakdown: [
       { label: "Style", value: "Baroque, painterly, editorial" },
       { label: "Lighting", value: "Chiaroscuro / Rembrandt" },
@@ -87,8 +90,7 @@ export const PROMPTS: Prompt[] = [
     author: "@maryikai",
     views: "880k",
     likes: "61.2k",
-    prompt:
-      "High contrast monochrome editorial portrait, single hot pink neon paint splash through hair, dramatic studio lighting, fashion magazine cover, sculpted shadows, glossy skin, Vogue Italia.",
+    prompt: "High contrast monochrome editorial portrait, single hot pink neon paint splash through hair, dramatic studio lighting, fashion magazine cover, sculpted shadows, glossy skin, Vogue Italia.",
     breakdown: [
       { label: "Style", value: "Monochrome editorial w/ accent" },
       { label: "Accent", value: "Neon Magenta #FF1F8F" },
@@ -115,23 +117,14 @@ export const PROMPTS: Prompt[] = [
     author: "@ember",
     views: "412k",
     likes: "29.8k",
-    prompt:
-      "Vast cinematic landscape at dusk, swarms of glowing gold particles rising over silhouetted mountains, volumetric god rays, dust motes, IMAX wide format, deep amber and obsidian palette.",
+    prompt: "Vast cinematic landscape at dusk, swarms of glowing gold particles rising over silhouetted mountains, volumetric god rays, dust motes, IMAX wide format, deep amber and obsidian palette.",
     breakdown: [
       { label: "Format", value: "IMAX 1.43:1" },
       { label: "Lighting", value: "Volumetric god rays" },
       { label: "Palette", value: "Amber · Obsidian" },
       { label: "Render", value: "Octane, 8k" },
     ],
-    engine: {
-      role: "You are a cinematographer for Denis Villeneuve.",
-      context: "Establishing shot of a mythic dusk landscape.",
-      instructions: "Wide IMAX framing. Particle swarms catch low sun. Layer god rays through dust.",
-      output: "1.43:1, 8k, deep amber/obsidian palette only.",
-      constraints: "No characters. No buildings. No saturation spikes outside amber.",
-    },
     copies: 5120, saves: 4030, shares: 1280, remixes: 410, viralScore: 84, signal: "rising",
-    tagline: "Cinematic dusk in one prompt.",
     related: ["monolith-corridor", "void-astronaut", "velvet-bloom"],
   },
   {
@@ -151,7 +144,6 @@ export const PROMPTS: Prompt[] = [
       { label: "Status", value: "Coming soon" },
     ],
     copies: 0, saves: 2410, shares: 320, remixes: 0, viralScore: 91, signal: "viral",
-    tagline: "Tier 01 drop · 2,410 watching.",
     related: ["void-astronaut", "monolith-corridor", "ai-sigil"],
   },
   {
@@ -163,16 +155,14 @@ export const PROMPTS: Prompt[] = [
     author: "@atelier",
     views: "260k",
     likes: "18.4k",
-    prompt:
-      "Macro abstract: deep maroon velvet with molten gold ink bloom, baroque painterly texture, satin fibers visible, museum lit, perfect for hero backdrops.",
+    prompt: "Macro abstract: deep maroon velvet with molten gold ink bloom, baroque painterly texture, satin fibers visible, museum lit, perfect for hero backdrops.",
     breakdown: [
       { label: "Style", value: "Macro abstract" },
       { label: "Material", value: "Velvet · Gold leaf" },
       { label: "Use", value: "Hero backdrop" },
       { label: "Resolution", value: "8192 × 10240" },
     ],
-    copies: 3210, saves: 2640, shares: 410, remixes: 180, viralScore: 76,
-    signal: null,
+    copies: 3210, saves: 2640, shares: 410, remixes: 180, viralScore: 76, signal: null,
     related: ["liquid-alchemy", "baroque-muse", "gold-particles"],
   },
   {
@@ -184,8 +174,7 @@ export const PROMPTS: Prompt[] = [
     author: "@maryikai",
     views: "640k",
     likes: "44.1k",
-    prompt:
-      "Monochrome high fashion portrait, vivid hot pink couture jewelry — beaded necklace and chandelier earrings — selective color, dramatic side light, glossy editorial skin.",
+    prompt: "Monochrome high fashion portrait, vivid hot pink couture jewelry, selective color, dramatic side light, glossy editorial skin.",
     breakdown: [
       { label: "Style", value: "Selective color editorial" },
       { label: "Subject", value: "Couture jewelry" },
@@ -204,21 +193,13 @@ export const PROMPTS: Prompt[] = [
     author: "@kernel",
     views: "1.8M",
     likes: "112k",
-    prompt:
-      "Holographic AI sigil floating in dark space, intersecting magenta and gold light beams forming geometric octagonal frame, refracted glass shards, volumetric haze, editorial luxury tech aesthetic.",
+    prompt: "Holographic AI sigil floating in dark space, intersecting magenta and gold light beams forming geometric octagonal frame, refracted glass shards, volumetric haze, editorial luxury tech aesthetic.",
     breakdown: [
       { label: "Style", value: "Cyber-baroque holographic" },
       { label: "Lighting", value: "Refracted neon beams" },
       { label: "Use", value: "Brand hero / album art" },
       { label: "Render", value: "Octane volumetric, 8k" },
     ],
-    engine: {
-      role: "You are a luxury tech art director designing a brand sigil.",
-      context: "Hero key art for an AI manifesto.",
-      instructions: "Construct an octagonal geometric sigil from neon beams. Refract through glass shards.",
-      output: "4:5, ultra dark obsidian background, magenta + gold only.",
-      constraints: "No legible text. No human figures. No flat 2D logos.",
-    },
     copies: 18420, saves: 11200, shares: 6210, remixes: 3140, viralScore: 99, signal: "viral",
     tagline: "#1 most-remixed prompt of the month.",
     related: ["void-astronaut", "monolith-corridor", "cyberpunk-dusk"],
@@ -232,21 +213,13 @@ export const PROMPTS: Prompt[] = [
     author: "@kubrickai",
     views: "720k",
     likes: "52.7k",
-    prompt:
-      "Brutalist obsidian colonnade, single shaft of magenta neon light cutting vertically, gold inlaid floor reflections, atmospheric volumetric fog, symmetric one-point perspective, cinematic.",
+    prompt: "Brutalist obsidian colonnade, single shaft of magenta neon light cutting vertically, gold inlaid floor reflections, atmospheric volumetric fog, symmetric one-point perspective, cinematic.",
     breakdown: [
       { label: "Style", value: "Brutalist neon-baroque" },
       { label: "Composition", value: "Symmetric one-point" },
       { label: "Lighting", value: "Single neon shaft + fog" },
       { label: "Use", value: "Hero / interlude / cover" },
     ],
-    engine: {
-      role: "You are Kubrick's lighting director on a sci-fi epic.",
-      context: "Interior establishing shot, mythic and minimal.",
-      instructions: "One vertical magenta neon. Symmetric obsidian columns. Gold-stripe floor reflections.",
-      output: "4:5, deep blacks, no clipping in highlights.",
-      constraints: "No people. No additional light sources. No clutter.",
-    },
     copies: 8420, saves: 5310, shares: 2110, remixes: 880, viralScore: 92, signal: "rising",
     related: ["gold-particles", "ai-sigil", "void-astronaut"],
   },
@@ -259,8 +232,7 @@ export const PROMPTS: Prompt[] = [
     author: "@atelier",
     views: "510k",
     likes: "37.6k",
-    prompt:
-      "Macro photograph of liquid mercury blending with molten gold and neon pink ink in zero gravity, abstract fluid art, ultra detailed surface tension, dark moody lighting, museum quality.",
+    prompt: "Macro photograph of liquid mercury blending with molten gold and neon pink ink in zero gravity, abstract fluid art, ultra detailed surface tension, dark moody lighting, museum quality.",
     breakdown: [
       { label: "Style", value: "Fluid macro abstract" },
       { label: "Materials", value: "Mercury · Gold · Magenta ink" },
@@ -279,8 +251,7 @@ export const PROMPTS: Prompt[] = [
     author: "@ghostnet",
     views: "1.1M",
     likes: "78.4k",
-    prompt:
-      "A solitary astronaut floating in deep space, surrounded by symmetric magenta nebulae and gold asteroid debris, Kubrick-style centered composition, ultra detailed suit reflections, cosmic horror serenity.",
+    prompt: "A solitary astronaut floating in deep space, surrounded by symmetric magenta nebulae and gold asteroid debris, Kubrick-style centered composition, ultra detailed suit reflections, cosmic horror serenity.",
     breakdown: [
       { label: "Style", value: "Cosmic Kubrick" },
       { label: "Composition", value: "Centered symmetric" },
@@ -288,7 +259,6 @@ export const PROMPTS: Prompt[] = [
       { label: "Render", value: "Octane, 8k" },
     ],
     copies: 9810, saves: 7220, shares: 3410, remixes: 1240, viralScore: 95, signal: "top1",
-    tagline: "The astronaut everyone is remixing.",
     related: ["ai-sigil", "monolith-corridor", "cyberpunk-dusk"],
   },
   {
@@ -300,8 +270,7 @@ export const PROMPTS: Prompt[] = [
     author: "@nocturne",
     views: "830k",
     likes: "59.1k",
-    prompt:
-      "Mysterious woman wearing a glowing translucent cyber visor, cyber-baroque jewelry, flowing magenta silk, golden particle dust, dramatic chiaroscuro studio lighting, editorial magazine cover.",
+    prompt: "Mysterious woman wearing a glowing translucent cyber visor, cyber-baroque jewelry, flowing magenta silk, golden particle dust, dramatic chiaroscuro studio lighting, editorial magazine cover.",
     breakdown: [
       { label: "Style", value: "Cyber-baroque editorial" },
       { label: "Wardrobe", value: "Magenta silk · Gold jewelry" },
@@ -328,7 +297,6 @@ export const PROMPTS: Prompt[] = [
       { label: "Status", value: "Coming soon" },
     ],
     copies: 0, saves: 1820, shares: 240, remixes: 0, viralScore: 87, signal: "viral",
-    tagline: "Tier 02 · 1,820 watching.",
     related: ["monolith-corridor", "void-astronaut", "ai-sigil"],
   },
   {
@@ -340,8 +308,7 @@ export const PROMPTS: Prompt[] = [
     author: "@ember",
     views: "320k",
     likes: "22.9k",
-    prompt:
-      "Editorial portrait bathed in ember orange rim light, deep obsidian background, painterly skin, single tear catching neon highlight, cinematic close-up.",
+    prompt: "Editorial portrait bathed in ember orange rim light, deep obsidian background, painterly skin, single tear catching neon highlight, cinematic close-up.",
     breakdown: [
       { label: "Style", value: "Editorial cinematic" },
       { label: "Light", value: "Ember rim · obsidian fill" },
@@ -360,14 +327,13 @@ export const PROMPTS: Prompt[] = [
     author: "@ember",
     views: "190k",
     likes: "12.4k",
-    prompt:
-      "Endless obsidian dunes under a magenta moon, lone wanderer silhouette, gold dust drift, IMAX cinematography, sublime negative space.",
+    prompt: "Endless obsidian dunes under a magenta moon, lone wanderer silhouette, gold dust drift, IMAX cinematography, sublime negative space.",
     breakdown: [
       { label: "Style", value: "Mythic minimalism" },
       { label: "Palette", value: "Obsidian · Magenta · Gold" },
       { label: "Use", value: "Atmospheric backdrop" },
     ],
-    copies: 1840, saves: 1310, shares: 420, remixes: 110, viralScore: 68,
+    copies: 1840, saves: 1310, shares: 420, remixes: 110, viralScore: 68, signal: null,
     related: ["gold-particles", "monolith-corridor", "void-astronaut"],
   },
   {
@@ -379,8 +345,7 @@ export const PROMPTS: Prompt[] = [
     author: "@atelier",
     views: "470k",
     likes: "31.5k",
-    prompt:
-      "Avant-garde couture model, sculpted obsidian gown, gold filigree mask, hard rim light, museum gallery setting, Balenciaga editorial.",
+    prompt: "Avant-garde couture model, sculpted obsidian gown, gold filigree mask, hard rim light, museum gallery setting, Balenciaga editorial.",
     breakdown: [
       { label: "Style", value: "Avant-garde couture" },
       { label: "Wardrobe", value: "Obsidian gown · gold mask" },
@@ -398,8 +363,7 @@ export const PROMPTS: Prompt[] = [
     author: "@kubrickai",
     views: "240k",
     likes: "16.8k",
-    prompt:
-      "Stained-glass cathedral window depicting an AI deity, magenta and gold leadwork, sun beams scattering through to dust-filled cathedral, sublime religious-tech mood.",
+    prompt: "Stained-glass cathedral window depicting an AI deity, magenta and gold leadwork, sun beams scattering through to dust-filled cathedral, sublime religious-tech mood.",
     breakdown: [
       { label: "Style", value: "Sacred cyber-baroque" },
       { label: "Subject", value: "AI deity stained glass" },
@@ -413,36 +377,12 @@ export const PROMPTS: Prompt[] = [
 export const getPrompt = (id: string) => PROMPTS.find((p) => p.id === id);
 
 export const ROWS: { title: string; tag: string; ids: string[] }[] = [
-  {
-    title: "For You · AI Personalized",
-    tag: "Tuned to your taste",
-    ids: ["ai-sigil", "void-astronaut", "neon-splash", "monolith-corridor", "visor-oracle", "baroque-muse"],
-  },
-  {
-    title: "Trending in your field",
-    tag: "Top 1% velocity",
-    ids: ["neon-splash", "ai-sigil", "visor-oracle", "neon-jewel", "liquid-alchemy", "monolith-corridor"],
-  },
-  {
-    title: "High-conversion prompts",
-    tag: "Most copied this week",
-    ids: ["ai-sigil", "neon-splash", "void-astronaut", "monolith-corridor", "neon-jewel", "liquid-alchemy"],
-  },
-  {
-    title: "Elite creator picks",
-    tag: "Curated by @nocturne",
-    ids: ["baroque-muse", "visor-oracle", "obsidian-couture", "velvet-bloom", "ember-portrait-7"],
-  },
-  {
-    title: "XeomX Originals",
-    tag: "Curated by editors",
-    ids: ["baroque-muse", "neon-jewel", "velvet-bloom", "gold-particles", "neon-splash", "cyberpunk-dusk"],
-  },
-  {
-    title: "Coming soon · Locked drops",
-    tag: "Tier 01 — Founders",
-    ids: ["cyberpunk-dusk", "magenta-cathedral", "stained-future", "void-astronaut"],
-  },
+  { title: "For You · AI Personalized", tag: "Tuned to your taste", ids: ["ai-sigil", "void-astronaut", "neon-splash", "monolith-corridor", "visor-oracle", "baroque-muse"] },
+  { title: "Trending in your field", tag: "Top 1% velocity", ids: ["neon-splash", "ai-sigil", "visor-oracle", "neon-jewel", "liquid-alchemy", "monolith-corridor"] },
+  { title: "High-conversion prompts", tag: "Most copied this week", ids: ["ai-sigil", "neon-splash", "void-astronaut", "monolith-corridor", "neon-jewel", "liquid-alchemy"] },
+  { title: "Elite creator picks", tag: "Curated by @nocturne", ids: ["baroque-muse", "visor-oracle", "obsidian-couture", "velvet-bloom", "ember-portrait-7"] },
+  { title: "XeomX Originals", tag: "Curated by editors", ids: ["baroque-muse", "neon-jewel", "velvet-bloom", "gold-particles", "neon-splash", "cyberpunk-dusk"] },
+  { title: "Coming soon · Locked drops", tag: "Tier 01 — Founders", ids: ["cyberpunk-dusk", "magenta-cathedral", "stained-future", "void-astronaut"] },
 ];
 
 export const CATEGORIES = ["All", "Portrait", "Fashion", "Atmosphere", "Sci-Fi", "Texture"];
@@ -458,42 +398,10 @@ export type Collection = {
 };
 
 export const COLLECTIONS: Collection[] = [
-  {
-    id: "saas-in-10",
-    title: "Build a SaaS in 10 prompts",
-    subtitle: "From idea to launch — engineered prompt chain",
-    count: 10,
-    cover: cover11,
-    ids: ["ai-sigil", "monolith-corridor", "neon-splash", "void-astronaut"],
-    badge: "Pro path",
-  },
-  {
-    id: "10x-marketer",
-    title: "Become a 10x marketer",
-    subtitle: "Hooks, headlines, funnels — battle-tested",
-    count: 14,
-    cover: cover2,
-    ids: ["neon-splash", "neon-jewel", "visor-oracle", "obsidian-couture"],
-    badge: "Hot",
-  },
-  {
-    id: "automation-mastery",
-    title: "AI automation mastery",
-    subtitle: "Agents, workflows, chained reasoning",
-    count: 12,
-    cover: cover16,
-    ids: ["ai-sigil", "monolith-corridor", "void-astronaut", "magenta-cathedral"],
-    badge: "Series A",
-  },
-  {
-    id: "editorial-aesthetic",
-    title: "Editorial aesthetic codex",
-    subtitle: "Vogue-grade visual prompts, every one cinematic",
-    count: 18,
-    cover: cover14,
-    ids: ["baroque-muse", "visor-oracle", "neon-jewel", "obsidian-couture", "ember-portrait-7"],
-    badge: "Curated",
-  },
+  { id: "saas-in-10", title: "Build a SaaS in 10 prompts", subtitle: "From idea to launch — engineered prompt chain", count: 10, cover: cr1, ids: ["ai-sigil", "monolith-corridor", "neon-splash", "void-astronaut"], badge: "Pro path" },
+  { id: "10x-marketer", title: "Become a 10x marketer", subtitle: "Hooks, headlines, funnels — battle-tested", count: 14, cover: cr2, ids: ["neon-splash", "neon-jewel", "visor-oracle", "obsidian-couture"], badge: "Hot" },
+  { id: "automation-mastery", title: "AI automation mastery", subtitle: "Agents, workflows, chained reasoning", count: 12, cover: cr3, ids: ["ai-sigil", "monolith-corridor", "void-astronaut", "magenta-cathedral"], badge: "Series A" },
+  { id: "editorial-aesthetic", title: "Editorial aesthetic codex", subtitle: "Vogue-grade visual prompts, every one cinematic", count: 18, cover: cr4, ids: ["baroque-muse", "visor-oracle", "neon-jewel", "obsidian-couture", "ember-portrait-7"], badge: "Curated" },
 ];
 
 export const getCollection = (id: string) => COLLECTIONS.find((c) => c.id === id);
@@ -509,11 +417,11 @@ export type Creator = {
 };
 
 export const CREATORS: Creator[] = [
-  { handle: "@nocturne", name: "Noir Atelier", tier: "Founder", followers: "284k", copies: "1.4M", cover: cover1, bio: "Baroque editorial · Vogue-grade prompts." },
-  { handle: "@maryikai", name: "Marya Ikai", tier: "Elite", followers: "192k", copies: "910k", cover: cover2, bio: "Selective color editorial. Iconic only." },
-  { handle: "@kernel", name: "Kernel Lab", tier: "Founder", followers: "421k", copies: "2.1M", cover: cover11, bio: "Cyber-baroque sigils & brand systems." },
-  { handle: "@ghostnet", name: "Ghostnet", tier: "Elite", followers: "168k", copies: "780k", cover: cover15, bio: "Cosmic Kubrick. Lonely vastness." },
-  { handle: "@atelier", name: "Atelier 9", tier: "Rising", followers: "84k", copies: "320k", cover: cover5, bio: "Texture-first. Velvet, gold, surface." },
+  { handle: "@nocturne", name: "Noir Atelier", tier: "Founder", followers: "284k", copies: "1.4M", cover: cr1, bio: "Baroque editorial · Vogue-grade prompts." },
+  { handle: "@maryikai", name: "Marya Ikai", tier: "Elite", followers: "192k", copies: "910k", cover: cr2, bio: "Selective color editorial. Iconic only." },
+  { handle: "@kernel", name: "Kernel Lab", tier: "Founder", followers: "421k", copies: "2.1M", cover: cr3, bio: "Cyber-baroque sigils & brand systems." },
+  { handle: "@ghostnet", name: "Ghostnet", tier: "Elite", followers: "168k", copies: "780k", cover: cr4, bio: "Cosmic Kubrick. Lonely vastness." },
+  { handle: "@atelier", name: "Atelier 9", tier: "Rising", followers: "84k", copies: "320k", cover: cr5, bio: "Texture-first. Velvet, gold, surface." },
   { handle: "@kubrickai", name: "Kubrick.ai", tier: "Elite", followers: "212k", copies: "1.0M", cover: cover16, bio: "Symmetric monoliths. Sacred minimal." },
 ];
 

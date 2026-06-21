@@ -6,24 +6,39 @@ import { Header } from "@/components/xeomx/Header";
 import { PromptCard } from "@/components/xeomx/PromptCard";
 import { SignalBadge } from "@/components/xeomx/Signal";
 
+const SITE_URL = "https://xeomx.com";
+
 export const Route = createFileRoute("/prompt/$id")({
   loader: ({ params }) => {
     const prompt = getPrompt(params.id);
     if (!prompt) throw notFound();
     return { prompt };
   },
-  head: ({ loaderData }) => ({
-    meta: loaderData
-      ? [
-          { title: `${loaderData.prompt.title} — XeomX` },
-          { name: "description", content: loaderData.prompt.prompt.slice(0, 150) },
-          { property: "og:title", content: `${loaderData.prompt.title} — XeomX` },
-          { property: "og:description", content: loaderData.prompt.prompt.slice(0, 150) },
-          { property: "og:image", content: loaderData.prompt.cover },
-          { name: "twitter:image", content: loaderData.prompt.cover },
-        ]
-      : [],
-  }),
+  head: ({ loaderData }) => {
+    if (!loaderData) return { meta: [] };
+    const { prompt } = loaderData;
+    const absoluteCover = prompt.cover.startsWith("http")
+      ? prompt.cover
+      : `${SITE_URL}${prompt.cover}`;
+    return {
+      meta: [
+        { title: `${prompt.title} — XeomX` },
+        { name: "description", content: prompt.prompt.slice(0, 150) },
+        { property: "og:title", content: `${prompt.title} — XeomX` },
+        { property: "og:description", content: prompt.prompt.slice(0, 150) },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: `${SITE_URL}/prompt/${prompt.id}` },
+        { property: "og:image", content: absoluteCover },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:site", content: "@xeomxai" },
+        { name: "twitter:title", content: `${prompt.title} — XeomX` },
+        { name: "twitter:description", content: prompt.prompt.slice(0, 150) },
+        { name: "twitter:image", content: absoluteCover },
+      ],
+    };
+  },
   notFoundComponent: () => (
     <div className="grid min-h-screen place-items-center bg-background px-4 text-center">
       <div>
@@ -67,7 +82,6 @@ function Detail() {
     <div className="min-h-screen bg-background text-foreground">
       <Header />
 
-      {/* Cinematic backdrop */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
           <img src={prompt.cover} alt="" className="h-full w-full object-cover opacity-40 blur-2xl scale-110" />
@@ -80,7 +94,6 @@ function Detail() {
           </Link>
 
           <div className="mt-8 grid gap-10 lg:grid-cols-[420px_minmax(0,1fr)] lg:gap-14">
-            {/* Poster */}
             <div className="relative overflow-hidden rounded-3xl border border-border shadow-[var(--shadow-card)]">
               <img src={prompt.cover} alt={prompt.title} className="aspect-[4/5] w-full object-cover" />
               <div className="absolute left-4 top-4 flex items-center gap-2">
@@ -100,7 +113,6 @@ function Detail() {
               </div>
             </div>
 
-            {/* Detail */}
             <div>
               <p className="text-[11px] uppercase tracking-[0.28em] text-magenta/80">{prompt.category} · {prompt.author}</p>
               <h1 className="mt-3 font-display text-4xl font-semibold leading-[0.98] tracking-tight sm:text-5xl lg:text-6xl">
@@ -115,7 +127,6 @@ function Detail() {
                 <SignalBadge signal={prompt.signal ?? null} score={prompt.viralScore} />
               </div>
 
-              {/* Live engagement metrics */}
               <div className="mt-6 grid grid-cols-4 gap-2">
                 {[
                   { label: "Copies", value: fmt(prompt.copies), Icon: Copy },
@@ -131,7 +142,6 @@ function Detail() {
                 ))}
               </div>
 
-              {/* Prompt focus box */}
               <div className="glass mt-8 rounded-2xl p-5">
                 <div className="mb-4 flex items-center justify-between">
                   <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">The prompt</span>
@@ -162,7 +172,6 @@ function Detail() {
                 </button>
               </div>
 
-              {/* Breakdown */}
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
                 {prompt.breakdown.map((b) => (
                   <div key={b.label} className="rounded-2xl border border-border bg-surface/50 p-4">
@@ -176,7 +185,6 @@ function Detail() {
         </div>
       </section>
 
-      {/* Prompt Engine — Role / Context / Instructions / Output / Constraints */}
       {engine ? (
         <section className="mx-auto max-w-[1200px] px-4 pb-16 sm:px-8">
           <div className="mb-6 flex items-end justify-between">
@@ -203,7 +211,6 @@ function Detail() {
         </section>
       ) : null}
 
-      {/* AI Result Preview */}
       <section className="mx-auto max-w-[1200px] px-4 pb-16 sm:px-8">
         <div className="mb-6 flex items-end justify-between">
           <div>
@@ -233,7 +240,6 @@ function Detail() {
         </div>
       </section>
 
-      {/* Related */}
       <section className="mx-auto max-w-[1400px] px-4 pb-20 sm:px-8">
         <div className="mb-6 flex items-end justify-between">
           <div>

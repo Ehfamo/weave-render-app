@@ -9,6 +9,7 @@ import { CollectionCard } from "@/components/xeomx/CollectionCard";
 import { CreatorCard } from "@/components/xeomx/CreatorCard";
 import { TickerMarquee } from "@/components/xeomx/Marquee";
 import { SignalBadge } from "@/components/xeomx/Signal";
+import { ConnectSection } from "@/components/xeomx/ConnectSection";
 import heroImg from "@/assets/hero.jpg";
 import cover1 from "@/assets/cover-1.jpg";
 
@@ -336,8 +337,13 @@ function Index() {
         )}
       </main>
 
-      <footer className="mt-12 border-t border-border/60 px-4 py-10 text-center text-xs text-muted-foreground sm:px-8">
-        <p>© 2026 XeomX — The cinema of prompts.</p>
+      {!isFiltering && <ConnectSection />}
+
+      <footer className="mt-16 border-t border-border/60 px-4 py-10 sm:px-8">
+        <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-3 text-xs text-muted-foreground sm:flex-row">
+          <p>© 2026 XeomX — The cinema of prompts.</p>
+          <p className="tracking-[0.22em] uppercase">Built for creators · powered by intelligence</p>
+        </div>
       </footer>
     </div>
   );

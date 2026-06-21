@@ -84,11 +84,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "XeomX — Cinematic AI Prompt Marketplace" },
       { property: "og:description", content: "Discover, remix and own the world's most cinematic AI prompts. Netflix-style discovery, viral feed, premium drops." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { property: "og:url", content: "https://xeomx.com" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f3ac660c-5be5-4a24-a16e-26d0e29e3731/id-preview-1192bc07--41d00db9-b84f-46e8-93a0-82cedb23d459.lovable.app-1781992326521.png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@xeomxai" },
+      { name: "twitter:creator", content: "@xeomxai" },
       { name: "twitter:title", content: "XeomX — Cinematic AI Prompt Marketplace" },
       { name: "twitter:description", content: "Discover, remix and own the world's most cinematic AI prompts. Netflix-style discovery, viral feed, premium drops." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f3ac660c-5be5-4a24-a16e-26d0e29e3731/id-preview-1192bc07--41d00db9-b84f-46e8-93a0-82cedb23d459.lovable.app-1781992326521.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f3ac660c-5be5-4a24-a16e-26d0e29e3731/id-preview-1192bc07--41d00db9-b84f-46e8-93a0-82cedb23d459.lovable.app-1781992326521.png" },
     ],
     links: [
@@ -126,7 +130,6 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster richColors closeButton position="top-right" />
     </QueryClientProvider>

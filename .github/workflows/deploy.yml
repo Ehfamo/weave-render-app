@@ -28,14 +28,12 @@ jobs:
         run: npm install
       - name: Build
         run: npm run build
-      - name: List output
-        run: ls -la && ls -la dist || true && ls -la .output || true
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .output/public
+          path: dist/client
 
   deploy:
     environment:

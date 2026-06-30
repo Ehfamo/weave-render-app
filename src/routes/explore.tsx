@@ -146,11 +146,11 @@ function ExplorePage() {
             <div>
               <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Coming Soon</h4>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/explore/$slug" params={{ slug: "studio-canvas" }} className="transition hover:text-foreground">Studio Canvas</Link></li>
-                <li><Link to="/explore/$slug" params={{ slug: "agent-store" }} className="transition hover:text-foreground">Agent Store</Link></li>
-                <li><Link to="/explore/$slug" params={{ slug: "ai-compare" }} className="transition hover:text-foreground">AI Compare Arena</Link></li>
-                <li><Link to="/explore/$slug" params={{ slug: "academy" }} className="transition hover:text-foreground">Academy</Link></li>
-                <li><Link to="/explore/$slug" params={{ slug: "founders" }} className="transition hover:text-foreground">Founders Access</Link></li>
+                <li><Link to="/explore_/$slug" params={{ slug: "studio-canvas" }} className="transition hover:text-foreground">Studio Canvas</Link></li>
+                <li><Link to="/explore_/$slug" params={{ slug: "agent-store" }} className="transition hover:text-foreground">Agent Store</Link></li>
+                <li><Link to="/explore_/$slug" params={{ slug: "ai-compare" }} className="transition hover:text-foreground">AI Compare Arena</Link></li>
+                <li><Link to="/explore_/$slug" params={{ slug: "academy" }} className="transition hover:text-foreground">Academy</Link></li>
+                <li><Link to="/explore_/$slug" params={{ slug: "founders" }} className="transition hover:text-foreground">Founders Access</Link></li>
               </ul>
             </div>
             <div>

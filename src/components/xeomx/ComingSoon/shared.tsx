@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Loader2, CheckCircle } from "lucide-react";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 export function BackToExplore() {
   return (
@@ -20,32 +19,21 @@ export function NotifyForm({ label = "Notify Me", sectionSlug = "" }: { label?: 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || loading || done) return;
-    setLoading(true);
-    setError("");
 
     const key = `xeomx_waitlist_${sectionSlug || "general"}`;
-    if (typeof window !== "undefined") {
-      const lastSubmit = localStorage.getItem(key);
-      if (lastSubmit && Date.now() - parseInt(lastSubmit) < 60000) {
-        setError("Please wait a moment before submitting again.");
-        setLoading(false);
-        return;
-      }
+    const last = typeof window !== "undefined" ? localStorage.getItem(key) : null;
+    if (last && Date.now() - parseInt(last) < 60000) {
+      setError("Please wait a moment before submitting again.");
+      return;
     }
 
-    try {
-      const { error: err } = await supabase
-        .from("waitlist")
-        .insert({ email: email.toLowerCase().trim(), section: sectionSlug || "general" });
-      if (err && err.code !== "23505") throw err;
-      if (typeof window !== "undefined") localStorage.setItem(key, Date.now().toString());
-      setDone(true);
-      setEmail("");
-    } catch {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    setError("");
+    await new Promise((r) => setTimeout(r, 800));
+    if (typeof window !== "undefined") localStorage.setItem(key, Date.now().toString());
+    setDone(true);
+    setEmail("");
+    setLoading(false);
   };
 
   if (done) {

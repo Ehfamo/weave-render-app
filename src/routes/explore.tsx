@@ -100,9 +100,9 @@ function ExplorePage() {
               <h2 className="mt-1 font-display text-2xl font-bold sm:text-3xl">Core platform</h2>
             </div>
           </div>
-          <div className="scrollbar-hidden flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 sm:grid sm:snap-none sm:grid-cols-3 sm:overflow-visible">
+          <div className="scrollbar-hidden flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 sm:grid sm:snap-none sm:grid-cols-3 sm:overflow-visible sm:[&>*]:w-auto">
             {filteredCore.map((s, i) => (
-              <div key={s.slug} className="snap-start sm:w-full [&>a]:sm:w-full [&>a]:sm:max-w-none">
+              <div key={s.slug} className="snap-start sm:w-full">
                 <ExploreCard section={s} index={i} core />
               </div>
             ))}

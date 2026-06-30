@@ -10,7 +10,7 @@ export function ExploreCard({ section, index = 0, core = false }: { section: Exp
     <Link
       to={href as string}
       style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}
-      className={`group relative flex h-full min-h-[180px] w-[260px] shrink-0 flex-col justify-between rounded-2xl border p-5 transition-all duration-300 animate-fade-in hover:-translate-y-1 hover:scale-[1.03] sm:w-[280px] ${
+      className={`group relative flex h-full min-h-[160px] w-[72vw] max-w-[280px] shrink-0 flex-col justify-between rounded-2xl border p-5 transition-all duration-300 animate-fade-in hover:-translate-y-1 hover:scale-[1.03] sm:min-h-[180px] sm:w-[280px] ${
         core
           ? 'border-amber-300/40 bg-surface/60 backdrop-blur-xl hover:border-amber-300/70 hover:shadow-[0_10px_40px_-10px_oklch(0.81_0.13_80/0.45)]'
           : 'glass hover:border-amber-300/40 hover:shadow-[0_10px_40px_-10px_oklch(0.81_0.13_80/0.35)]'

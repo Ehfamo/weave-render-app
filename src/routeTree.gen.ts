@@ -17,6 +17,7 @@ import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PromptIdRouteImport } from './routes/prompt.$id'
+import { Route as ExploreSlugRouteImport } from './routes/explore_.$slug'
 import { Route as CollectionsIdRouteImport } from './routes/collections.$id'
 
 const FeedRoute = FeedRouteImport.update({
@@ -59,6 +60,11 @@ const PromptIdRoute = PromptIdRouteImport.update({
   path: '/prompt/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExploreSlugRoute = ExploreSlugRouteImport.update({
+  id: '/explore_/$slug',
+  path: '/explore/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CollectionsIdRoute = CollectionsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/collections/$id': typeof CollectionsIdRoute
+  '/explore/$slug': typeof ExploreSlugRoute
   '/prompt/$id': typeof PromptIdRoute
 }
 export interface FileRoutesByTo {
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/collections/$id': typeof CollectionsIdRoute
+  '/explore/$slug': typeof ExploreSlugRoute
   '/prompt/$id': typeof PromptIdRoute
 }
 export interface FileRoutesById {
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/collections/$id': typeof CollectionsIdRoute
+  '/explore_/$slug': typeof ExploreSlugRoute
   '/prompt/$id': typeof PromptIdRoute
 }
 export interface FileRouteTypes {
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/feed'
     | '/collections/$id'
+    | '/explore/$slug'
     | '/prompt/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/feed'
     | '/collections/$id'
+    | '/explore/$slug'
     | '/prompt/$id'
   id:
     | '__root__'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/feed'
     | '/collections/$id'
+    | '/explore_/$slug'
     | '/prompt/$id'
   fileRoutesById: FileRoutesById
 }
@@ -143,6 +155,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   ExploreRoute: typeof ExploreRoute
   FeedRoute: typeof FeedRoute
+  ExploreSlugRoute: typeof ExploreSlugRoute
   PromptIdRoute: typeof PromptIdRoute
 }
 
@@ -204,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PromptIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/explore_/$slug': {
+      id: '/explore_/$slug'
+      path: '/explore/$slug'
+      fullPath: '/explore/$slug'
+      preLoaderRoute: typeof ExploreSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/collections/$id': {
       id: '/collections/$id'
       path: '/$id'
@@ -234,6 +254,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   ExploreRoute: ExploreRoute,
   FeedRoute: FeedRoute,
+  ExploreSlugRoute: ExploreSlugRoute,
   PromptIdRoute: PromptIdRoute,
 }
 export const routeTree = rootRouteImport

@@ -8,7 +8,7 @@ export function ExploreCard({ section, index = 0, core = false }: { section: Exp
   const href = section.phase === 'live' ? getCoreLink(section.slug) : `/explore/${section.slug}`;
   return (
     <Link
-      to={href}
+      to={href as string}
       style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}
       className={`group relative flex h-full min-h-[180px] w-[260px] shrink-0 flex-col justify-between rounded-2xl border p-5 transition-all duration-300 animate-fade-in hover:-translate-y-1 hover:scale-[1.03] sm:w-[280px] ${
         core

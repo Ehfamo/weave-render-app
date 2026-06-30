@@ -339,10 +339,52 @@ function Index() {
 
       {!isFiltering && <ConnectSection />}
 
-      <footer className="mt-16 border-t border-border/60 px-4 py-10 sm:px-8">
-        <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-3 text-xs text-muted-foreground sm:flex-row">
-          <p>© 2026 XeomX — The cinema of prompts.</p>
-          <p className="tracking-[0.22em] uppercase">Built for creators · powered by intelligence</p>
+      <footer className="mt-16 border-t border-border/60 bg-surface/30">
+        <div className="mx-auto max-w-[1400px] px-4 py-12 sm:px-8">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="grid h-7 w-7 place-items-center rounded-lg" style={{ background: "var(--gradient-magenta)" }}>
+                  <svg className="h-3.5 w-3.5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </span>
+                <span className="font-display text-base font-bold">XeomX</span>
+              </div>
+              <p className="mt-3 text-xs leading-relaxed text-muted-foreground">The cinematic AI super-platform. Built for creators who move fast.</p>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Platform</h4>
+              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+                <li><Link to="/" className="transition hover:text-foreground">Discover</Link></li>
+                <li><Link to="/feed" className="transition hover:text-foreground">Viral Feed</Link></li>
+                <li><Link to="/collections" className="transition hover:text-foreground">Collections</Link></li>
+                <li><Link to="/creators" className="transition hover:text-foreground">Creators</Link></li>
+                <li><Link to="/explore" className="transition hover:text-foreground">Explore Universe</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Coming Soon</h4>
+              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+                <li><Link to="/explore_/$slug" params={{ slug: "studio-canvas" }} className="transition hover:text-foreground">Studio Canvas</Link></li>
+                <li><Link to="/explore_/$slug" params={{ slug: "agent-store" }} className="transition hover:text-foreground">Agent Store</Link></li>
+                <li><Link to="/explore_/$slug" params={{ slug: "ai-compare" }} className="transition hover:text-foreground">AI Compare Arena</Link></li>
+                <li><Link to="/explore_/$slug" params={{ slug: "academy" }} className="transition hover:text-foreground">Academy</Link></li>
+                <li><Link to="/explore_/$slug" params={{ slug: "founders" }} className="transition hover:text-foreground">Founders Access</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Legal</h4>
+              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+                <li><span className="cursor-not-allowed opacity-50">Terms of Service</span></li>
+                <li><span className="cursor-not-allowed opacity-50">Privacy Policy</span></li>
+                <li><span className="cursor-not-allowed opacity-50">Cookie Policy</span></li>
+                <li><span className="cursor-not-allowed opacity-50">Refund Policy</span></li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border/60 pt-6 sm:flex-row">
+            <p className="text-xs text-muted-foreground">© 2026 XeomX. All rights reserved.</p>
+            <p className="text-xs text-muted-foreground">Built for the AI era · <span className="text-gradient-gold">64 sections</span> · Powered by intelligence</p>
+          </div>
         </div>
       </footer>
     </div>

@@ -47,7 +47,7 @@ export function Vision({ section }: { section: ExploreSection }) {
         <div className="rounded-3xl border border-white/10 bg-surface/40 p-6 backdrop-blur">
           <h3 className="font-display text-xl font-bold">Be part of the future</h3>
           <p className="mt-1 text-sm text-muted-foreground">Get notified when {section.name} enters early preview.</p>
-          <div className="mt-4"><NotifyForm /></div>
+          <div className="mt-4"><NotifyForm sectionSlug={section.slug} /></div>
         </div>
       </div>
     </div>

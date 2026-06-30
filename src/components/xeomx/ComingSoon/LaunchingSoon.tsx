@@ -42,7 +42,7 @@ export function LaunchingSoon({ section }: { section: ExploreSection }) {
         <div className="rounded-3xl border border-amber-300/20 bg-surface/40 p-6 backdrop-blur">
           <h3 className="font-display text-xl font-bold">Join the waitlist</h3>
           <p className="mt-1 text-sm text-muted-foreground">Be first in line when {section.name} goes live.</p>
-          <div className="mt-4"><NotifyForm label="Join Waitlist" /></div>
+          <div className="mt-4"><NotifyForm label="Join Waitlist" sectionSlug={section.slug} /></div>
         </div>
       </div>
     </div>

@@ -41,7 +41,7 @@ export function InDevelopment({ section }: { section: ExploreSection }) {
         <div className="rounded-3xl border border-white/10 bg-surface/40 p-6 backdrop-blur">
           <h3 className="font-display text-xl font-bold">Get notified at launch</h3>
           <p className="mt-1 text-sm text-muted-foreground">We'll let you know the moment {section.name} ships.</p>
-          <div className="mt-4"><NotifyForm /></div>
+          <div className="mt-4"><NotifyForm sectionSlug={section.slug} /></div>
         </div>
       </div>
     </div>

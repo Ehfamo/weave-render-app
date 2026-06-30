@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as FeedRouteImport } from './routes/feed'
+import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CreatorsRouteImport } from './routes/creators'
 import { Route as CollectionsRouteImport } from './routes/collections'
@@ -21,6 +22,11 @@ import { Route as CollectionsIdRouteImport } from './routes/collections.$id'
 const FeedRoute = FeedRouteImport.update({
   id: '/feed',
   path: '/feed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExploreRoute = ExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/collections': typeof CollectionsRouteWithChildren
   '/creators': typeof CreatorsRoute
   '/dashboard': typeof DashboardRoute
+  '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/prompt/$id': typeof PromptIdRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/collections': typeof CollectionsRouteWithChildren
   '/creators': typeof CreatorsRoute
   '/dashboard': typeof DashboardRoute
+  '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/prompt/$id': typeof PromptIdRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/collections': typeof CollectionsRouteWithChildren
   '/creators': typeof CreatorsRoute
   '/dashboard': typeof DashboardRoute
+  '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/prompt/$id': typeof PromptIdRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/collections'
     | '/creators'
     | '/dashboard'
+    | '/explore'
     | '/feed'
     | '/collections/$id'
     | '/prompt/$id'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/collections'
     | '/creators'
     | '/dashboard'
+    | '/explore'
     | '/feed'
     | '/collections/$id'
     | '/prompt/$id'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/collections'
     | '/creators'
     | '/dashboard'
+    | '/explore'
     | '/feed'
     | '/collections/$id'
     | '/prompt/$id'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   CollectionsRoute: typeof CollectionsRouteWithChildren
   CreatorsRoute: typeof CreatorsRoute
   DashboardRoute: typeof DashboardRoute
+  ExploreRoute: typeof ExploreRoute
   FeedRoute: typeof FeedRoute
   PromptIdRoute: typeof PromptIdRoute
 }
@@ -140,6 +153,13 @@ declare module '@tanstack/react-router' {
       path: '/feed'
       fullPath: '/feed'
       preLoaderRoute: typeof FeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explore': {
+      id: '/explore'
+      path: '/explore'
+      fullPath: '/explore'
+      preLoaderRoute: typeof ExploreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -212,6 +232,7 @@ const rootRouteChildren: RootRouteChildren = {
   CollectionsRoute: CollectionsRouteWithChildren,
   CreatorsRoute: CreatorsRoute,
   DashboardRoute: DashboardRoute,
+  ExploreRoute: ExploreRoute,
   FeedRoute: FeedRoute,
   PromptIdRoute: PromptIdRoute,
 }

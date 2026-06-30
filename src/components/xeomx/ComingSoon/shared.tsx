@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2, CheckCircle } from "lucide-react";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export function BackToExplore() {
   return (
@@ -9,22 +11,57 @@ export function BackToExplore() {
   );
 }
 
-export function NotifyForm({ label = "Notify Me" }: { label?: string }) {
+export function NotifyForm({ label = "Notify Me", sectionSlug = "" }: { label?: string; sectionSlug?: string }) {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || loading || done) return;
+    setLoading(true);
+    setError("");
+
+    const key = `xeomx_waitlist_${sectionSlug || "general"}`;
+    if (typeof window !== "undefined") {
+      const lastSubmit = localStorage.getItem(key);
+      if (lastSubmit && Date.now() - parseInt(lastSubmit) < 60000) {
+        setError("Please wait a moment before submitting again.");
+        setLoading(false);
+        return;
+      }
+    }
+
+    try {
+      const { error: err } = await supabase
+        .from("waitlist")
+        .insert({ email: email.toLowerCase().trim(), section: sectionSlug || "general" });
+      if (err && err.code !== "23505") throw err;
+      if (typeof window !== "undefined") localStorage.setItem(key, Date.now().toString());
+      setDone(true);
+      setEmail("");
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (done) {
+    return (
+      <div className="flex items-center gap-3 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-5 py-4">
+        <CheckCircle className="h-5 w-5 text-emerald-300" />
+        <span className="text-sm text-emerald-200">You're on the list! We'll reach out when it's ready.</span>
+      </div>
+    );
+  }
+
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        const fd = new FormData(e.currentTarget);
-        const email = String(fd.get("email") ?? "");
-        if (email) {
-          (e.currentTarget as HTMLFormElement).reset();
-          alert(`You're on the list. We'll reach out at ${email}.`);
-        }
-      }}
-      className="flex flex-col gap-3 sm:flex-row"
-    >
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row">
       <input
-        name="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
         type="email"
         required
         placeholder="you@domain.com"
@@ -32,11 +69,13 @@ export function NotifyForm({ label = "Notify Me" }: { label?: string }) {
       />
       <button
         type="submit"
-        className="rounded-full px-6 py-3 text-sm font-semibold text-black transition hover:opacity-90"
+        disabled={loading}
+        className="flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-70"
         style={{ background: "var(--gradient-gold)", boxShadow: "var(--shadow-glow)" }}
       >
-        {label}
+        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : label}
       </button>
+      {error && <p className="w-full text-xs text-destructive">{error}</p>}
     </form>
   );
 }

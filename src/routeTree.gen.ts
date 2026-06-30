@@ -10,17 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as FeedRouteImport } from './routes/feed'
+import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CreatorsRouteImport } from './routes/creators'
 import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PromptIdRouteImport } from './routes/prompt.$id'
+import { Route as ExploreSlugRouteImport } from './routes/explore_.$slug'
 import { Route as CollectionsIdRouteImport } from './routes/collections.$id'
 
 const FeedRoute = FeedRouteImport.update({
   id: '/feed',
   path: '/feed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExploreRoute = ExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -53,6 +60,11 @@ const PromptIdRoute = PromptIdRouteImport.update({
   path: '/prompt/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExploreSlugRoute = ExploreSlugRouteImport.update({
+  id: '/explore_/$slug',
+  path: '/explore/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CollectionsIdRoute = CollectionsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -65,8 +77,10 @@ export interface FileRoutesByFullPath {
   '/collections': typeof CollectionsRouteWithChildren
   '/creators': typeof CreatorsRoute
   '/dashboard': typeof DashboardRoute
+  '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/collections/$id': typeof CollectionsIdRoute
+  '/explore/$slug': typeof ExploreSlugRoute
   '/prompt/$id': typeof PromptIdRoute
 }
 export interface FileRoutesByTo {
@@ -75,8 +89,10 @@ export interface FileRoutesByTo {
   '/collections': typeof CollectionsRouteWithChildren
   '/creators': typeof CreatorsRoute
   '/dashboard': typeof DashboardRoute
+  '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/collections/$id': typeof CollectionsIdRoute
+  '/explore/$slug': typeof ExploreSlugRoute
   '/prompt/$id': typeof PromptIdRoute
 }
 export interface FileRoutesById {
@@ -86,8 +102,10 @@ export interface FileRoutesById {
   '/collections': typeof CollectionsRouteWithChildren
   '/creators': typeof CreatorsRoute
   '/dashboard': typeof DashboardRoute
+  '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/collections/$id': typeof CollectionsIdRoute
+  '/explore_/$slug': typeof ExploreSlugRoute
   '/prompt/$id': typeof PromptIdRoute
 }
 export interface FileRouteTypes {
@@ -98,8 +116,10 @@ export interface FileRouteTypes {
     | '/collections'
     | '/creators'
     | '/dashboard'
+    | '/explore'
     | '/feed'
     | '/collections/$id'
+    | '/explore/$slug'
     | '/prompt/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -108,8 +128,10 @@ export interface FileRouteTypes {
     | '/collections'
     | '/creators'
     | '/dashboard'
+    | '/explore'
     | '/feed'
     | '/collections/$id'
+    | '/explore/$slug'
     | '/prompt/$id'
   id:
     | '__root__'
@@ -118,8 +140,10 @@ export interface FileRouteTypes {
     | '/collections'
     | '/creators'
     | '/dashboard'
+    | '/explore'
     | '/feed'
     | '/collections/$id'
+    | '/explore_/$slug'
     | '/prompt/$id'
   fileRoutesById: FileRoutesById
 }
@@ -129,7 +153,9 @@ export interface RootRouteChildren {
   CollectionsRoute: typeof CollectionsRouteWithChildren
   CreatorsRoute: typeof CreatorsRoute
   DashboardRoute: typeof DashboardRoute
+  ExploreRoute: typeof ExploreRoute
   FeedRoute: typeof FeedRoute
+  ExploreSlugRoute: typeof ExploreSlugRoute
   PromptIdRoute: typeof PromptIdRoute
 }
 
@@ -140,6 +166,13 @@ declare module '@tanstack/react-router' {
       path: '/feed'
       fullPath: '/feed'
       preLoaderRoute: typeof FeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explore': {
+      id: '/explore'
+      path: '/explore'
+      fullPath: '/explore'
+      preLoaderRoute: typeof ExploreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -184,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PromptIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/explore_/$slug': {
+      id: '/explore_/$slug'
+      path: '/explore/$slug'
+      fullPath: '/explore/$slug'
+      preLoaderRoute: typeof ExploreSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/collections/$id': {
       id: '/collections/$id'
       path: '/$id'
@@ -212,7 +252,9 @@ const rootRouteChildren: RootRouteChildren = {
   CollectionsRoute: CollectionsRouteWithChildren,
   CreatorsRoute: CreatorsRoute,
   DashboardRoute: DashboardRoute,
+  ExploreRoute: ExploreRoute,
   FeedRoute: FeedRoute,
+  ExploreSlugRoute: ExploreSlugRoute,
   PromptIdRoute: PromptIdRoute,
 }
 export const routeTree = rootRouteImport

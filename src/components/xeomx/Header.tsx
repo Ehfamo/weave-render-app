@@ -2,6 +2,9 @@ import { Link } from "@tanstack/react-router";
 import { Search, Sparkles, LogOut, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { LanguageSwitcher } from "@/components/xeomx/LanguageSwitcher";
+// @ts-expect-error - paraglide generated messages
+import { m } from "@/paraglide/messages.js";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,19 +35,19 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
 
         <nav className="hidden items-center gap-1 lg:flex">
           <Link to="/" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }} activeOptions={{ exact: true }}>
-            Discover
+            {m.nav_discover()}
           </Link>
           <Link to="/feed" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
-            Viral feed
+            {m.nav_feed()}
           </Link>
           <Link to="/collections" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
-            Collections
+            {m.nav_collections()}
           </Link>
           <Link to="/creators" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
-            Creators
+            {m.nav_creators()}
           </Link>
           <Link to="/explore" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
-            Explore
+            {m.nav_explore()}
           </Link>
         </nav>
 
@@ -54,10 +57,11 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
             <input
               value={query ?? ""}
               onChange={(e) => onSearch?.(e.target.value)}
-              placeholder="Search prompts, styles, creators…"
+              placeholder={m.search_placeholder()}
               className="w-full rounded-full border border-border bg-surface/60 py-2 pl-9 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-magenta/50 focus:outline-none focus:ring-2 focus:ring-magenta/30"
             />
           </label>
+          <LanguageSwitcher />
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -77,12 +81,12 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard" className="flex items-center gap-2">
-                    <LayoutDashboard className="h-4 w-4" /> Dashboard
+                    <LayoutDashboard className="h-4 w-4" /> {m.nav_dashboard()}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => supabase.auth.signOut()}>
-                  <LogOut className="h-4 w-4" /> Sign out
+                  <LogOut className="h-4 w-4" /> {m.nav_sign_out()}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -92,14 +96,14 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
                 to="/auth"
                 className="hidden rounded-full border border-border bg-surface/60 px-4 py-2 text-sm text-foreground transition hover:border-magenta/40 sm:inline-flex"
               >
-                Sign in
+                {m.nav_sign_in()}
               </Link>
               <Link
                 to="/auth"
                 className="rounded-full px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
                 style={{ background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)" }}
               >
-                Go Pro
+                {m.nav_go_pro()}
               </Link>
             </>
           )}

@@ -3,6 +3,8 @@ import { useMemo, useState } from "react";
 import { ArrowRight, Flame, Heart, MessageCircle, Play, Share2 } from "lucide-react";
 import { CATEGORIES, COLLECTIONS, CREATORS, PROMPTS, ROWS } from "@/lib/prompts";
 import { Header } from "@/components/xeomx/Header";
+// @ts-expect-error - paraglide generated messages
+import { m } from "@/paraglide/messages.js";
 import { Row } from "@/components/xeomx/Row";
 import { PromptCard } from "@/components/xeomx/PromptCard";
 import { CollectionCard } from "@/components/xeomx/CollectionCard";
@@ -76,12 +78,12 @@ function Index() {
         <div className="relative mx-auto flex max-w-[1400px] flex-col gap-8 px-4 pb-20 pt-16 sm:px-8 sm:pt-24 lg:flex-row lg:items-end lg:gap-16 lg:pb-32 lg:pt-32">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-gold">
-              <Flame className="h-3 w-3" /> Featured drop · 048
+              <Flame className="h-3 w-3" /> {m.hero_eyebrow()}
             </span>
             <h1 className="mt-5 font-display text-5xl font-semibold leading-[0.95] tracking-tight sm:text-6xl lg:text-7xl">
-              The cinema of <span className="text-gradient-gold italic">prompts</span>,
+              {m.hero_title_line_1()}
               <br />
-              streamed like <span className="text-gradient-magenta">Netflix</span>.
+              {m.hero_title_line_2()}
             </h1>
             <p className="mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
               {featured.title} — a {featured.category.toLowerCase()} prompt by {featured.author}. Open it, copy it, render it. Or scroll the viral feed below.
@@ -92,21 +94,21 @@ function Index() {
                 className="group inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium text-white transition hover:opacity-95"
                 style={{ background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)" }}
               >
-                <Play className="h-4 w-4 fill-white" /> Open viral feed
+                <Play className="h-4 w-4 fill-white" /> {m.hero_cta_feed()}
               </Link>
               <Link
                 to="/collections"
                 className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/70 px-5 py-3 text-sm font-medium text-foreground backdrop-blur transition hover:border-gold/40"
               >
-                Browse collections <ArrowRight className="h-4 w-4" />
+                {m.hero_cta_collections()} <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
 
             <dl className="mt-10 grid max-w-md grid-cols-3 gap-6 border-t border-border/60 pt-6 text-left">
               {[
-                ["12,480", "Prompts"],
-                ["1.4M", "Renders/mo"],
-                ["Tier 01", "Live drop"],
+                ["12,480", m.hero_stat_prompts()],
+                ["1.4M", m.hero_stat_renders()],
+                ["Tier 01", m.hero_stat_drop()],
               ].map(([v, l]) => (
                 <div key={l}>
                   <dt className="font-display text-2xl font-semibold tracking-tight">{v}</dt>
@@ -349,16 +351,16 @@ function Index() {
                 </span>
                 <span className="font-display text-base font-bold">XeomX</span>
               </div>
-              <p className="mt-3 text-xs leading-relaxed text-muted-foreground">The cinematic AI super-platform. Built for creators who move fast.</p>
+              <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{m.footer_tagline()}</p>
             </div>
             <div>
-              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Platform</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.footer_platform()}</h4>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/" className="transition hover:text-foreground">Discover</Link></li>
-                <li><Link to="/feed" className="transition hover:text-foreground">Viral Feed</Link></li>
-                <li><Link to="/collections" className="transition hover:text-foreground">Collections</Link></li>
-                <li><Link to="/creators" className="transition hover:text-foreground">Creators</Link></li>
-                <li><Link to="/explore" className="transition hover:text-foreground">Explore Universe</Link></li>
+                <li><Link to="/" className="transition hover:text-foreground">{m.nav_discover()}</Link></li>
+                <li><Link to="/feed" className="transition hover:text-foreground">{m.nav_feed()}</Link></li>
+                <li><Link to="/collections" className="transition hover:text-foreground">{m.nav_collections()}</Link></li>
+                <li><Link to="/creators" className="transition hover:text-foreground">{m.nav_creators()}</Link></li>
+                <li><Link to="/explore" className="transition hover:text-foreground">{m.nav_explore()}</Link></li>
               </ul>
             </div>
             <div>
@@ -382,7 +384,7 @@ function Index() {
             </div>
           </div>
           <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border/60 pt-6 sm:flex-row">
-            <p className="text-xs text-muted-foreground">© 2026 XeomX. All rights reserved.</p>
+            <p className="text-xs text-muted-foreground">{m.footer_rights()}</p>
             <p className="text-xs text-muted-foreground">Built for the AI era · <span className="text-gradient-gold">64 sections</span> · Powered by intelligence</p>
           </div>
         </div>

@@ -3,11 +3,13 @@ import { Bookmark, Copy, Crown, Lock, Play, Share2, Shuffle, Sparkles } from "lu
 import { useState } from "react";
 import type { Prompt } from "@/lib/prompts";
 import { SignalBadge } from "./Signal";
+// @ts-expect-error - paraglide generated messages
+import { m } from "@/paraglide/messages.js";
 
 const stateChip = {
-  free: { label: "Free", className: "bg-foreground/10 text-foreground border border-foreground/15", icon: Sparkles },
-  premium: { label: "Premium", className: "bg-[var(--gradient-gold)] text-[oklch(0.18_0.02_60)] border border-gold/40", icon: Crown },
-  soon: { label: "Coming soon", className: "bg-magenta/15 text-magenta border border-magenta/30", icon: Lock },
+  free: { labelKey: "common_free" as const, className: "bg-foreground/10 text-foreground border border-foreground/15", icon: Sparkles },
+  premium: { labelKey: "common_premium" as const, className: "bg-[var(--gradient-gold)] text-[oklch(0.18_0.02_60)] border border-gold/40", icon: Crown },
+  soon: { labelKey: "common_coming_soon" as const, className: "bg-magenta/15 text-magenta border border-magenta/30", icon: Lock },
 } as const;
 
 export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm" | "md" | "lg" }) {
@@ -74,7 +76,7 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
             style={prompt.state === "premium" ? { background: "var(--gradient-gold)" } : undefined}
           >
             <Icon className="h-3 w-3" />
-            {chip.label}
+            {m[chip.labelKey]()}
           </span>
           <div className="flex flex-col items-end gap-1.5">
             <span className="rounded-full border border-border/60 bg-background/60 px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-muted-foreground backdrop-blur">
@@ -120,7 +122,7 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
             {prompt.title}
           </h3>
           <p className="text-xs text-muted-foreground">
-            {prompt.author} · {prompt.views} views
+            {prompt.author} · {prompt.views} {m.prompt_views()}
           </p>
           <div className="flex items-center gap-3 pt-1 text-[11px] text-muted-foreground">
             <span className="inline-flex items-center gap-1"><Copy className="h-3 w-3" /> {fmt(prompt.copies)}</span>
@@ -134,7 +136,7 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
           className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border bg-surface-2/60 px-3 py-2 text-xs font-medium text-foreground transition hover:border-magenta/40 hover:bg-magenta/10 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <Copy className="h-3.5 w-3.5" />
-          {prompt.state === "soon" ? "Locked" : copied ? "Copied" : "Copy prompt"}
+          {prompt.state === "soon" ? m.common_locked() : copied ? m.common_copied() : m.prompt_copy_button()}
         </button>
       </div>
     </Link>

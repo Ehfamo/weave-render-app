@@ -51,21 +51,21 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
           </Link>
         </nav>
 
-        <div className="ml-auto flex flex-1 items-center gap-3 sm:flex-none">
+        <div className="ms-auto flex flex-1 items-center gap-3 sm:flex-none">
           <label className="group relative flex w-full items-center sm:w-80">
-            <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute start-3 h-4 w-4 text-muted-foreground" />
             <input
               value={query ?? ""}
               onChange={(e) => onSearch?.(e.target.value)}
               placeholder={m.search_placeholder()}
-              className="w-full rounded-full border border-border bg-surface/60 py-2 pl-9 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-magenta/50 focus:outline-none focus:ring-2 focus:ring-magenta/30"
+              className="w-full rounded-full border border-border bg-surface/60 py-2 ps-9 pe-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-magenta/50 focus:outline-none focus:ring-2 focus:ring-magenta/30"
             />
           </label>
           <LanguageSwitcher />
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 rounded-full border border-border bg-surface/60 p-1 pr-3 transition hover:border-magenta/40">
+                <button className="flex items-center gap-2 rounded-full border border-border bg-surface/60 p-1 pe-3 transition hover:border-magenta/40">
                   {avatar ? (
                     <img src={avatar} alt={name} className="h-7 w-7 rounded-full object-cover" referrerPolicy="no-referrer" />
                   ) : (

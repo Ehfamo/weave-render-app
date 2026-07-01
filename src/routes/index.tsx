@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArrowRight, Flame, Heart, MessageCircle, Play, Share2 } from "lucide-react";
 import { CATEGORIES, COLLECTIONS, CREATORS, PROMPTS, ROWS } from "@/lib/prompts";
+import { CORE_SECTIONS, EXPLORE_SECTIONS } from "@/lib/explore-sections";
 import { Header } from "@/components/xeomx/Header";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
@@ -14,6 +15,15 @@ import { SignalBadge } from "@/components/xeomx/Signal";
 import { ConnectSection } from "@/components/xeomx/ConnectSection";
 import heroImg from "@/assets/hero.jpg";
 import cover1 from "@/assets/cover-1.jpg";
+
+const CATEGORY_LABELS: Record<string, () => string> = {
+  All: () => m.cat_all(),
+  Portrait: () => m.cat_portrait(),
+  Fashion: () => m.cat_fashion(),
+  Atmosphere: () => m.cat_atmosphere(),
+  "Sci-Fi": () => m.cat_scifi(),
+  Texture: () => m.cat_texture(),
+};
 
 export const Route = createFileRoute("/")({
   head: () => ({

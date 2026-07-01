@@ -26,6 +26,7 @@ export const EXPLORE_CATEGORIES = [
 ] as const;
 
 export const CORE_SECTIONS: ExploreSection[] = [
+  { slug: 'landing', name: 'Landing', tagline: 'The arrival experience', description: 'The multilingual cinematic front door to XeomX — where the world discovers the platform.', icon: 'Globe', phase: 'live', category: 'core', features: [] },
   { slug: 'login', name: 'The Awakening', tagline: 'Your cinematic entry point', description: 'Sign in to unlock the full XeomX universe.', icon: 'Sparkles', phase: 'live', category: 'core', features: [] },
   { slug: 'dashboard', name: 'Central Intelligence', tagline: 'Your command center', description: 'Monitor, manage and orchestrate everything from one place.', icon: 'LayoutDashboard', phase: 'live', category: 'core', features: [] },
   { slug: 'home', name: 'Home Feed', tagline: 'The pulse of XeomX', description: 'Discover trending prompts, viral content and premium drops.', icon: 'Home', phase: 'live', category: 'core', features: [] },

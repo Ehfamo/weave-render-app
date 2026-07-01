@@ -114,7 +114,7 @@ function Index() {
               </Link>
             </div>
 
-            <dl className="mt-10 grid max-w-md grid-cols-3 gap-6 border-t border-border/60 pt-6 text-left">
+            <dl className="mt-10 grid max-w-md grid-cols-3 gap-6 border-t border-border/60 pt-6 text-start">
               {[
                 ["12,480", m.hero_stat_prompts()],
                 ["1.4M", m.hero_stat_renders()],
@@ -132,7 +132,7 @@ function Index() {
           <Link
             to="/prompt/$id"
             params={{ id: featured.id }}
-            className="group relative ml-auto hidden w-[340px] shrink-0 overflow-hidden rounded-3xl border border-border shadow-[var(--shadow-card)] lg:block"
+            className="group relative ms-auto hidden w-[340px] shrink-0 overflow-hidden rounded-3xl border border-border shadow-[var(--shadow-card)] lg:block"
           >
             <img src={featured.cover} alt={featured.title} className="aspect-[3/4] w-full object-cover transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-x-0 bottom-0 p-5">
@@ -170,7 +170,7 @@ function Index() {
               </button>
             );
           })}
-          <span className="ml-auto hidden shrink-0 self-center text-[11px] uppercase tracking-[0.22em] text-muted-foreground sm:inline">
+          <span className="ms-auto hidden shrink-0 self-center text-[11px] uppercase tracking-[0.22em] text-muted-foreground sm:inline">
             {m.prompts_count({ count: String(filtered.length), total: String(PROMPTS.length) })}
           </span>
         </div>

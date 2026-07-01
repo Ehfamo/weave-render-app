@@ -21,6 +21,7 @@ export const Route = createFileRoute("/explore")({
 function ExplorePage() {
   const [q, setQ] = useState("");
   const query = q.trim().toLowerCase();
+  const SECTION_COUNT = CORE_SECTIONS.length + EXPLORE_SECTIONS.length;
 
   const filtered = useMemo(() => {
     if (!query) return EXPLORE_SECTIONS;

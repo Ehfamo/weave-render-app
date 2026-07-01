@@ -96,7 +96,7 @@ function Index() {
               {m.hero_title_line_2()}
             </h1>
             <p className="mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
-              {featured.title} — a {featured.category.toLowerCase()} prompt by {featured.author}. Open it, copy it, render it. Or scroll the viral feed below.
+              {featured.title} — {featured.author}. {m.hero_subtitle()}
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <Link
@@ -154,6 +154,7 @@ function Index() {
         <div className="scrollbar-hidden mx-auto flex max-w-[1400px] gap-2 overflow-x-auto px-4 py-3 sm:px-8">
           {CATEGORIES.map((c) => {
             const active = cat === c;
+            const label = CATEGORY_LABELS[c]?.() ?? c;
             return (
               <button
                 key={c}
@@ -165,12 +166,12 @@ function Index() {
                 }`}
                 style={active ? { background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)" } : undefined}
               >
-                {c}
+                {label}
               </button>
             );
           })}
           <span className="ml-auto hidden shrink-0 self-center text-[11px] uppercase tracking-[0.22em] text-muted-foreground sm:inline">
-            {filtered.length} of {PROMPTS.length} prompts
+            {m.prompts_count({ count: String(filtered.length), total: String(PROMPTS.length) })}
           </span>
         </div>
       </div>

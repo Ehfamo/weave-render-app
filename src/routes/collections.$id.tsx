@@ -3,6 +3,8 @@ import { ArrowLeft, Layers } from "lucide-react";
 import { getCollection, PROMPTS, type Collection } from "@/lib/prompts";
 import { Header } from "@/components/xeomx/Header";
 import { PromptCard } from "@/components/xeomx/PromptCard";
+// @ts-expect-error - paraglide generated messages
+import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/collections/$id")({
   loader: ({ params }) => {
@@ -24,14 +26,14 @@ export const Route = createFileRoute("/collections/$id")({
   notFoundComponent: () => (
     <div className="grid min-h-screen place-items-center bg-background px-4 text-center">
       <div>
-        <h1 className="font-display text-4xl">Collection not found</h1>
-        <Link to="/collections" className="mt-4 inline-block text-magenta">All collections</Link>
+        <h1 className="font-display text-4xl">{m.collections_not_found()}</h1>
+        <Link to="/collections" className="mt-4 inline-block text-magenta">{m.nav_back_all_collections()}</Link>
       </div>
     </div>
   ),
   errorComponent: ({ reset }) => (
     <div className="grid min-h-screen place-items-center bg-background px-4 text-center">
-      <button onClick={reset} className="rounded-full border border-border px-4 py-2">Retry</button>
+      <button onClick={reset} className="rounded-full border border-border px-4 py-2">{m.common_retry()}</button>
     </div>
   ),
   component: CollectionDetail,
@@ -51,7 +53,7 @@ function CollectionDetail() {
         </div>
         <div className="relative mx-auto max-w-[1200px] px-4 pb-12 pt-10 sm:px-8 sm:pt-16">
           <Link to="/collections" className="inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" /> All collections
+            <ArrowLeft className="h-4 w-4" /> {m.nav_back_all_collections()}
           </Link>
           <div className="mt-8 grid gap-10 lg:grid-cols-[420px_minmax(0,1fr)]">
             <div className="overflow-hidden rounded-3xl border border-border">
@@ -66,14 +68,14 @@ function CollectionDetail() {
               </h1>
               <p className="mt-4 max-w-xl text-base text-muted-foreground">{collection.subtitle}</p>
               <p className="mt-3 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                <Layers className="h-3 w-3" /> {collection.count} prompts in this pack
+                <Layers className="h-3 w-3" /> {m.collections_prompts_in_pack({ count: String(collection.count) })}
               </p>
             </div>
           </div>
         </div>
       </section>
       <section className="mx-auto max-w-[1400px] px-4 pb-20 sm:px-8">
-        <h2 className="mb-6 font-display text-2xl font-semibold tracking-tight sm:text-3xl">Inside the pack</h2>
+        <h2 className="mb-6 font-display text-2xl font-semibold tracking-tight sm:text-3xl">{m.collections_inside_pack()}</h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
           {prompts.map((p) => (
             <PromptCard key={p.id} prompt={p} />

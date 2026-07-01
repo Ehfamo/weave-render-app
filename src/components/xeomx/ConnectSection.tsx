@@ -1,31 +1,33 @@
 import { ArrowUpRight } from "lucide-react";
+// @ts-expect-error - paraglide generated messages
+import { m } from "@/paraglide/messages.js";
 
 const SOCIALS = [
   {
     name: "TikTok",
     handle: "@xeomxai",
-    desc: "Viral prompt drops · daily",
+    descKey: "connect_tiktok_desc" as const,
     href: "https://www.tiktok.com/@xeomxai?_r=1&_t=ZS-97O9c8UbPSn",
     accent: "var(--gradient-magenta)",
   },
   {
     name: "Instagram",
     handle: "@xeomx_ai",
-    desc: "Cinematic renders · behind the scenes",
+    descKey: "connect_instagram_desc" as const,
     href: "https://www.instagram.com/xeomx_ai?utm_source=qr&igsh=MTVkMzJuZHU1M3o1YQ==",
     accent: "linear-gradient(135deg, oklch(0.72 0.18 20), oklch(0.62 0.22 340))",
   },
   {
     name: "Telegram",
     handle: "@xeomxai",
-    desc: "Founders channel · early drops",
+    descKey: "connect_telegram_desc" as const,
     href: "https://t.me/xeomxai",
     accent: "linear-gradient(135deg, oklch(0.72 0.16 230), oklch(0.62 0.18 260))",
   },
   {
     name: "Pinterest",
     handle: "xeomx",
-    desc: "Mood boards · prompt aesthetics",
+    descKey: "connect_pinterest_desc" as const,
     href: "https://pin.it/2iNs9SqEe",
     accent: "var(--gradient-gold)",
   },
@@ -44,20 +46,19 @@ export function ConnectSection() {
       <div className="relative grid gap-10 p-8 sm:p-14 lg:grid-cols-[1fr_1.2fr] lg:items-center">
         <div className="max-w-lg">
           <span className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-gold">
-            Global · network
+            {m.connect_eyebrow()}
           </span>
           <h2 className="mt-4 font-display text-4xl font-semibold leading-[0.95] tracking-tight sm:text-5xl">
-            Connect with{" "}
+            {m.connect_title_1()}{" "}
             <span className="text-gradient-magenta italic">XeomX</span>
           </h2>
           <p className="mt-4 text-sm text-muted-foreground sm:text-base">
-            One ecosystem. Four channels. Follow the official XeomX network for
-            daily prompt drops, cinematic renders and founders-only releases.
+            {m.connect_desc()}
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-            <span className="rounded-full border border-border bg-background/50 px-3 py-1">verified</span>
-            <span className="rounded-full border border-border bg-background/50 px-3 py-1">official</span>
-            <span className="rounded-full border border-border bg-background/50 px-3 py-1">global</span>
+            <span className="rounded-full border border-border bg-background/50 px-3 py-1">{m.connect_verified()}</span>
+            <span className="rounded-full border border-border bg-background/50 px-3 py-1">{m.connect_official()}</span>
+            <span className="rounded-full border border-border bg-background/50 px-3 py-1">{m.connect_global()}</span>
           </div>
         </div>
 
@@ -78,7 +79,7 @@ export function ConnectSection() {
                 <div>
                   <p className="font-display text-xl font-semibold tracking-tight">{s.name}</p>
                   <p className="mt-0.5 text-xs text-muted-foreground">{s.handle}</p>
-                  <p className="mt-3 text-[13px] text-foreground/80">{s.desc}</p>
+                  <p className="mt-3 text-[13px] text-foreground/80">{m[s.descKey]()}</p>
                 </div>
                 <span
                   className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-border bg-surface/80 transition group-hover:scale-110"

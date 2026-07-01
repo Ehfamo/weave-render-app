@@ -2,6 +2,8 @@ import * as Icons from "lucide-react";
 import { Check } from "lucide-react";
 import { type ExploreSection } from "@/lib/explore-sections";
 import { BackToExplore, NotifyForm } from "./shared";
+// @ts-expect-error - paraglide generated messages
+import { m } from "@/paraglide/messages.js";
 
 export function LaunchingSoon({ section }: { section: ExploreSection }) {
   const Icon = (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[section.icon] ?? Icons.Sparkles;
@@ -17,7 +19,7 @@ export function LaunchingSoon({ section }: { section: ExploreSection }) {
             <Icon className="h-9 w-9 text-black" />
           </span>
           <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-amber-300/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200">
-            Launching Q1 2026
+            {m.launching_badge()}
           </div>
           <h1 className="mt-4 font-display text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
             {section.name}
@@ -40,9 +42,9 @@ export function LaunchingSoon({ section }: { section: ExploreSection }) {
         )}
 
         <div className="rounded-3xl border border-amber-300/20 bg-surface/40 p-6 backdrop-blur">
-          <h3 className="font-display text-xl font-bold">Join the waitlist</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Be first in line when {section.name} goes live.</p>
-          <div className="mt-4"><NotifyForm label="Join Waitlist" sectionSlug={section.slug} /></div>
+          <h3 className="font-display text-xl font-bold">{m.launching_waitlist_title()}</h3>
+          <p className="mt-1 text-sm text-muted-foreground">{m.launching_waitlist_desc({ name: section.name })}</p>
+          <div className="mt-4"><NotifyForm label={m.notify_waitlist_button()} sectionSlug={section.slug} /></div>
         </div>
       </div>
     </div>

@@ -1,5 +1,7 @@
 import { Crown, Sparkles, TrendingUp } from "lucide-react";
 import type { Creator } from "@/lib/prompts";
+// @ts-expect-error - paraglide generated messages
+import { m } from "@/paraglide/messages.js";
 
 const tierMap = {
   Founder: { Icon: Crown, cls: "text-gold border-gold/40 bg-gold/10" },
@@ -26,8 +28,8 @@ export function CreatorCard({ c }: { c: Creator }) {
         </div>
         <p className="line-clamp-2 text-xs text-muted-foreground">{c.bio}</p>
         <div className="flex items-center justify-between border-t border-border/60 pt-2 text-[11px] text-muted-foreground">
-          <span>{c.followers} followers</span>
-          <span>{c.copies} copies</span>
+          <span>{m.creator_followers({ count: String(c.followers) })}</span>
+          <span>{m.creator_copies({ count: String(c.copies) })}</span>
         </div>
       </div>
     </div>

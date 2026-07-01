@@ -8,7 +8,7 @@ import { m } from "@/paraglide/messages.js";
 export function BackToExplore() {
   return (
     <Link to="/explore" className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-3 py-1.5 text-xs text-foreground backdrop-blur transition hover:border-amber-300/40">
-      <ArrowLeft className="h-3.5 w-3.5" /> All sections
+      <ArrowLeft className="h-3.5 w-3.5" /> {m.nav_back_all_sections()}
     </Link>
   );
 }

@@ -375,7 +375,7 @@ function Index() {
               </ul>
             </div>
             <div>
-              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Coming Soon</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.footer_coming_soon()}</h4>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                 <li><Link to="/explore_/$slug" params={{ slug: "studio-canvas" }} className="transition hover:text-foreground">Studio Canvas</Link></li>
                 <li><Link to="/explore_/$slug" params={{ slug: "agent-store" }} className="transition hover:text-foreground">Agent Store</Link></li>
@@ -385,18 +385,18 @@ function Index() {
               </ul>
             </div>
             <div>
-              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Legal</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.footer_legal()}</h4>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li><span className="cursor-not-allowed opacity-50">Terms of Service</span></li>
-                <li><span className="cursor-not-allowed opacity-50">Privacy Policy</span></li>
-                <li><span className="cursor-not-allowed opacity-50">Cookie Policy</span></li>
-                <li><span className="cursor-not-allowed opacity-50">Refund Policy</span></li>
+                <li><span className="cursor-not-allowed opacity-50">{m.footer_terms()}</span></li>
+                <li><span className="cursor-not-allowed opacity-50">{m.footer_privacy()}</span></li>
+                <li><span className="cursor-not-allowed opacity-50">{m.footer_cookie()}</span></li>
+                <li><span className="cursor-not-allowed opacity-50">{m.footer_refund()}</span></li>
               </ul>
             </div>
           </div>
           <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border/60 pt-6 sm:flex-row">
             <p className="text-xs text-muted-foreground">{m.footer_rights()}</p>
-            <p className="text-xs text-muted-foreground">Built for the AI era · <span className="text-gradient-gold">64 sections</span> · Powered by intelligence</p>
+            <p className="text-xs text-muted-foreground">{m.footer_built()} · <span className="text-gradient-gold">{m.footer_sections({ count: String(CORE_SECTIONS.length + EXPLORE_SECTIONS.length) })}</span> · {m.footer_powered()}</p>
           </div>
         </div>
       </footer>

@@ -180,10 +180,10 @@ function Index() {
         {isFiltering ? (
           <section className="space-y-6 px-4 sm:px-8">
             <h2 className="font-display text-2xl font-semibold sm:text-3xl">
-              Results <span className="text-muted-foreground">({filtered.length})</span>
+              {m.results_title()} <span className="text-muted-foreground">({filtered.length})</span>
             </h2>
             {filtered.length === 0 ? (
-              <p className="text-muted-foreground">No prompts match — try another keyword.</p>
+              <p className="text-muted-foreground">{m.results_empty()}</p>
             ) : (
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
                 {filtered.map((p) => (
@@ -204,13 +204,13 @@ function Index() {
             <section className="px-4 sm:px-8">
               <div className="mb-6 flex items-end justify-between">
                 <div>
-                  <p className="text-[11px] uppercase tracking-[0.28em] text-gold/80">Curated · structured paths</p>
+                  <p className="text-[11px] uppercase tracking-[0.28em] text-gold/80">{m.collections_eyebrow()}</p>
                   <h2 className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-                    Prompt <span className="text-gradient-gold italic">collections</span>
+                    {m.collections_title_1()} <span className="text-gradient-gold italic">{m.collections_title_2()}</span>
                   </h2>
                 </div>
                 <Link to="/collections" className="hidden text-sm text-muted-foreground transition hover:text-foreground sm:inline">
-                  See all →
+                  {m.see_all()}
                 </Link>
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
@@ -224,13 +224,13 @@ function Index() {
             <section className="px-4 sm:px-8">
               <div className="mb-6 flex items-end justify-between">
                 <div>
-                  <p className="text-[11px] uppercase tracking-[0.28em] text-magenta/80">Creator economy</p>
+                  <p className="text-[11px] uppercase tracking-[0.28em] text-magenta/80">{m.creators_eyebrow()}</p>
                   <h2 className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-                    Elite <span className="text-gradient-magenta">prompt engineers</span>
+                    {m.creators_title_1()} <span className="text-gradient-magenta">{m.creators_title_2()}</span>
                   </h2>
                 </div>
                 <Link to="/creators" className="hidden text-sm text-muted-foreground transition hover:text-foreground sm:inline">
-                  See all →
+                  {m.see_all()}
                 </Link>
               </div>
               <div className="scrollbar-hidden -mx-4 flex gap-4 overflow-x-auto px-4 pb-2 sm:-mx-8 sm:px-8">
@@ -244,13 +244,13 @@ function Index() {
             <section className="px-4 sm:px-8">
               <div className="mb-6 flex items-end justify-between">
                 <div>
-                  <p className="text-[11px] uppercase tracking-[0.28em] text-magenta/80">For you · vertical feed</p>
+                  <p className="text-[11px] uppercase tracking-[0.28em] text-magenta/80">{m.viral_eyebrow()}</p>
                   <h2 className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-                    Viral <span className="text-gradient-magenta">prompts</span>
+                    {m.viral_title_1()} <span className="text-gradient-magenta">{m.viral_title_2()}</span>
                   </h2>
                 </div>
                 <Link to="/feed" className="hidden text-sm text-muted-foreground transition hover:text-foreground sm:inline">
-                  Open full feed →
+                  {m.viral_see_all()}
                 </Link>
               </div>
 

@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Loader2, CheckCircle } from "lucide-react";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -31,11 +32,19 @@ export function NotifyForm({ label, sectionSlug = "" }: { label?: string; sectio
 
     setLoading(true);
     setError("");
-    await new Promise((r) => setTimeout(r, 800));
-    if (typeof window !== "undefined") localStorage.setItem(key, Date.now().toString());
-    setDone(true);
-    setEmail("");
-    setLoading(false);
+    try {
+      const { error: insertError } = await supabase
+        .from("waitlist")
+        .insert({ email, section: sectionSlug || "general" });
+      if (insertError) throw insertError;
+      if (typeof window !== "undefined") localStorage.setItem(key, Date.now().toString());
+      setDone(true);
+      setEmail("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (done) {

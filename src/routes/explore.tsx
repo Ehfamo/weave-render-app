@@ -10,7 +10,7 @@ export const Route = createFileRoute("/explore")({
   head: () => ({
     meta: [
       { title: "Explore — The XeomX Universe" },
-      { name: "description", content: "Every tool. Every studio. Every superpower. Browse all 64 sections of the XeomX platform." },
+      { name: "description", content: "Every tool. Every studio. Every superpower. Browse all sections of the XeomX platform." },
       { property: "og:title", content: "Explore — The XeomX Universe" },
       { property: "og:description", content: "Every tool. Every studio. Every superpower." },
     ],
@@ -21,6 +21,7 @@ export const Route = createFileRoute("/explore")({
 function ExplorePage() {
   const [q, setQ] = useState("");
   const query = q.trim().toLowerCase();
+  const SECTION_COUNT = CORE_SECTIONS.length + EXPLORE_SECTIONS.length;
 
   const filtered = useMemo(() => {
     if (!query) return EXPLORE_SECTIONS;
@@ -58,7 +59,7 @@ function ExplorePage() {
             <ArrowLeft className="h-3.5 w-3.5" /> Back to discover
           </Link>
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-amber-300/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200">
-            <span className="h-1.5 w-1.5 rounded-full bg-amber-300" /> Platform map · 64 sections
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-300" /> Platform map · {SECTION_COUNT} sections
           </div>
           <h1 className="mt-5 font-display text-5xl font-bold leading-[1.05] tracking-tight sm:text-7xl">
             <span className="text-gradient-gold animate-fade-in">The XeomX</span>
@@ -165,7 +166,7 @@ function ExplorePage() {
           </div>
           <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border/60 pt-6 sm:flex-row">
             <p className="text-xs text-muted-foreground">© 2026 XeomX. All rights reserved.</p>
-            <p className="text-xs text-muted-foreground">Built for the AI era · <span className="text-gradient-gold">64 sections</span> · Powered by intelligence</p>
+            <p className="text-xs text-muted-foreground">Built for the AI era · <span className="text-gradient-gold">{SECTION_COUNT} sections</span> · Powered by intelligence</p>
           </div>
         </div>
       </footer>

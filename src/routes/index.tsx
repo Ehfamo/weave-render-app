@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArrowRight, Flame, Heart, MessageCircle, Play, Share2 } from "lucide-react";
 import { CATEGORIES, COLLECTIONS, CREATORS, PROMPTS, ROWS } from "@/lib/prompts";
+import { CORE_SECTIONS, EXPLORE_SECTIONS } from "@/lib/explore-sections";
 import { Header } from "@/components/xeomx/Header";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
@@ -14,6 +15,15 @@ import { SignalBadge } from "@/components/xeomx/Signal";
 import { ConnectSection } from "@/components/xeomx/ConnectSection";
 import heroImg from "@/assets/hero.jpg";
 import cover1 from "@/assets/cover-1.jpg";
+
+const CATEGORY_LABELS: Record<string, () => string> = {
+  All: () => m.cat_all(),
+  Portrait: () => m.cat_portrait(),
+  Fashion: () => m.cat_fashion(),
+  Atmosphere: () => m.cat_atmosphere(),
+  "Sci-Fi": () => m.cat_scifi(),
+  Texture: () => m.cat_texture(),
+};
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -86,7 +96,7 @@ function Index() {
               {m.hero_title_line_2()}
             </h1>
             <p className="mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
-              {featured.title} — a {featured.category.toLowerCase()} prompt by {featured.author}. Open it, copy it, render it. Or scroll the viral feed below.
+              {featured.title} — {featured.author}. {m.hero_subtitle()}
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <Link
@@ -144,6 +154,7 @@ function Index() {
         <div className="scrollbar-hidden mx-auto flex max-w-[1400px] gap-2 overflow-x-auto px-4 py-3 sm:px-8">
           {CATEGORIES.map((c) => {
             const active = cat === c;
+            const label = CATEGORY_LABELS[c]?.() ?? c;
             return (
               <button
                 key={c}
@@ -155,12 +166,12 @@ function Index() {
                 }`}
                 style={active ? { background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)" } : undefined}
               >
-                {c}
+                {label}
               </button>
             );
           })}
           <span className="ml-auto hidden shrink-0 self-center text-[11px] uppercase tracking-[0.22em] text-muted-foreground sm:inline">
-            {filtered.length} of {PROMPTS.length} prompts
+            {m.prompts_count({ count: String(filtered.length), total: String(PROMPTS.length) })}
           </span>
         </div>
       </div>
@@ -169,10 +180,10 @@ function Index() {
         {isFiltering ? (
           <section className="space-y-6 px-4 sm:px-8">
             <h2 className="font-display text-2xl font-semibold sm:text-3xl">
-              Results <span className="text-muted-foreground">({filtered.length})</span>
+              {m.results_title()} <span className="text-muted-foreground">({filtered.length})</span>
             </h2>
             {filtered.length === 0 ? (
-              <p className="text-muted-foreground">No prompts match — try another keyword.</p>
+              <p className="text-muted-foreground">{m.results_empty()}</p>
             ) : (
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
                 {filtered.map((p) => (
@@ -193,13 +204,13 @@ function Index() {
             <section className="px-4 sm:px-8">
               <div className="mb-6 flex items-end justify-between">
                 <div>
-                  <p className="text-[11px] uppercase tracking-[0.28em] text-gold/80">Curated · structured paths</p>
+                  <p className="text-[11px] uppercase tracking-[0.28em] text-gold/80">{m.collections_eyebrow()}</p>
                   <h2 className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-                    Prompt <span className="text-gradient-gold italic">collections</span>
+                    {m.collections_title_1()} <span className="text-gradient-gold italic">{m.collections_title_2()}</span>
                   </h2>
                 </div>
                 <Link to="/collections" className="hidden text-sm text-muted-foreground transition hover:text-foreground sm:inline">
-                  See all →
+                  {m.see_all()}
                 </Link>
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
@@ -213,13 +224,13 @@ function Index() {
             <section className="px-4 sm:px-8">
               <div className="mb-6 flex items-end justify-between">
                 <div>
-                  <p className="text-[11px] uppercase tracking-[0.28em] text-magenta/80">Creator economy</p>
+                  <p className="text-[11px] uppercase tracking-[0.28em] text-magenta/80">{m.creators_eyebrow()}</p>
                   <h2 className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-                    Elite <span className="text-gradient-magenta">prompt engineers</span>
+                    {m.creators_title_1()} <span className="text-gradient-magenta">{m.creators_title_2()}</span>
                   </h2>
                 </div>
                 <Link to="/creators" className="hidden text-sm text-muted-foreground transition hover:text-foreground sm:inline">
-                  See all →
+                  {m.see_all()}
                 </Link>
               </div>
               <div className="scrollbar-hidden -mx-4 flex gap-4 overflow-x-auto px-4 pb-2 sm:-mx-8 sm:px-8">
@@ -233,13 +244,13 @@ function Index() {
             <section className="px-4 sm:px-8">
               <div className="mb-6 flex items-end justify-between">
                 <div>
-                  <p className="text-[11px] uppercase tracking-[0.28em] text-magenta/80">For you · vertical feed</p>
+                  <p className="text-[11px] uppercase tracking-[0.28em] text-magenta/80">{m.viral_eyebrow()}</p>
                   <h2 className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-                    Viral <span className="text-gradient-magenta">prompts</span>
+                    {m.viral_title_1()} <span className="text-gradient-magenta">{m.viral_title_2()}</span>
                   </h2>
                 </div>
                 <Link to="/feed" className="hidden text-sm text-muted-foreground transition hover:text-foreground sm:inline">
-                  Open full feed →
+                  {m.viral_see_all()}
                 </Link>
               </div>
 
@@ -282,22 +293,22 @@ function Index() {
             <section className="mx-4 overflow-hidden rounded-3xl border border-border bg-surface/40 p-8 sm:mx-8 sm:p-12">
               <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
                 <div>
-                  <p className="text-[11px] uppercase tracking-[0.28em] text-gold/80">Ranking engine</p>
+                  <p className="text-[11px] uppercase tracking-[0.28em] text-gold/80">{m.ranking_eyebrow()}</p>
                   <h2 className="mt-2 font-display text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
-                    Algorithmic discovery, not endless lists.
+                    {m.ranking_title()}
                   </h2>
                   <p className="mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
-                    Every prompt is ranked live: views ×1, copies ×5, saves ×4, shares ×6, remixes ×7. The best work surfaces. Creators get paid.
+                    {m.ranking_subtitle()}
                   </p>
                 </div>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                   {[
-                    ["12,480", "Prompts indexed"],
-                    ["1.4M", "Renders / month"],
-                    ["98", "Top viral score"],
-                    ["284k", "Active creators"],
-                    ["$0", "Cost to copy"],
-                    ["70%", "Creator share"],
+                    ["12,480", m.ranking_stat_prompts()],
+                    ["1.4M", m.ranking_stat_renders()],
+                    ["98", m.ranking_stat_viral()],
+                    ["284k", m.ranking_stat_creators()],
+                    ["$0", m.ranking_stat_cost()],
+                    ["70%", m.ranking_stat_share()],
                   ].map(([v, l]) => (
                     <div key={l} className="rounded-2xl border border-border bg-background/40 p-4">
                       <p className="font-display text-2xl font-semibold tracking-tight">{v}</p>
@@ -315,22 +326,22 @@ function Index() {
               <div className="relative grid gap-6 p-8 sm:p-14 lg:grid-cols-[1fr_auto] lg:items-center">
                 <div className="max-w-xl">
                   <span className="inline-flex items-center gap-2 rounded-full border border-magenta/30 bg-magenta/10 px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-magenta">
-                    Founders drop · Tier 01
+                    {m.founders_badge()}
                   </span>
                   <h2 className="mt-4 font-display text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
-                    500 numbered prompts.
-                    <br /> <span className="text-gradient-gold italic">Once gone, gone.</span>
+                    {m.founders_title_1()}
+                    <br /> <span className="text-gradient-gold italic">{m.founders_title_2()}</span>
                   </h2>
                   <p className="mt-3 text-sm text-muted-foreground sm:text-base">
-                    Hand-curated by XeomX directors. Each prompt ships with style sheet, render presets, and a numbered certificate.
+                    {m.founders_subtitle()}
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                   <button className="rounded-full px-5 py-3 text-sm font-medium text-white" style={{ background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)" }}>
-                    Reserve your slot
+                    {m.founders_cta_reserve()}
                   </button>
                   <button className="rounded-full border border-border bg-surface/60 px-5 py-3 text-sm text-foreground backdrop-blur">
-                    See timeline
+                    {m.founders_cta_timeline()}
                   </button>
                 </div>
               </div>
@@ -364,7 +375,7 @@ function Index() {
               </ul>
             </div>
             <div>
-              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Coming Soon</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.footer_coming_soon()}</h4>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                 <li><Link to="/explore_/$slug" params={{ slug: "studio-canvas" }} className="transition hover:text-foreground">Studio Canvas</Link></li>
                 <li><Link to="/explore_/$slug" params={{ slug: "agent-store" }} className="transition hover:text-foreground">Agent Store</Link></li>
@@ -374,18 +385,18 @@ function Index() {
               </ul>
             </div>
             <div>
-              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Legal</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.footer_legal()}</h4>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li><span className="cursor-not-allowed opacity-50">Terms of Service</span></li>
-                <li><span className="cursor-not-allowed opacity-50">Privacy Policy</span></li>
-                <li><span className="cursor-not-allowed opacity-50">Cookie Policy</span></li>
-                <li><span className="cursor-not-allowed opacity-50">Refund Policy</span></li>
+                <li><span className="cursor-not-allowed opacity-50">{m.footer_terms()}</span></li>
+                <li><span className="cursor-not-allowed opacity-50">{m.footer_privacy()}</span></li>
+                <li><span className="cursor-not-allowed opacity-50">{m.footer_cookie()}</span></li>
+                <li><span className="cursor-not-allowed opacity-50">{m.footer_refund()}</span></li>
               </ul>
             </div>
           </div>
           <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border/60 pt-6 sm:flex-row">
             <p className="text-xs text-muted-foreground">{m.footer_rights()}</p>
-            <p className="text-xs text-muted-foreground">Built for the AI era · <span className="text-gradient-gold">64 sections</span> · Powered by intelligence</p>
+            <p className="text-xs text-muted-foreground">{m.footer_built()} · <span className="text-gradient-gold">{m.footer_sections({ count: String(CORE_SECTIONS.length + EXPLORE_SECTIONS.length) })}</span> · {m.footer_powered()}</p>
           </div>
         </div>
       </footer>

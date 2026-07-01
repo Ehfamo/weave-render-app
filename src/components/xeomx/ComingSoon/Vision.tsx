@@ -1,6 +1,8 @@
 import * as Icons from "lucide-react";
 import { type ExploreSection } from "@/lib/explore-sections";
 import { BackToExplore, NotifyForm } from "./shared";
+// @ts-expect-error - paraglide generated messages
+import { m } from "@/paraglide/messages.js";
 
 export function Vision({ section }: { section: ExploreSection }) {
   const Icon = (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[section.icon] ?? Icons.Sparkles;
@@ -21,7 +23,7 @@ export function Vision({ section }: { section: ExploreSection }) {
             <Icon className="h-7 w-7 text-amber-200" />
           </span>
           <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            Coming Q3 2026 · Vision
+            {m.vision_badge()}
           </div>
           <h1 className="mt-4 font-display text-5xl font-bold italic leading-[1.05] tracking-tight sm:text-7xl">
             <span className="text-gradient-gold">{section.name}</span>
@@ -34,19 +36,19 @@ export function Vision({ section }: { section: ExploreSection }) {
         </p>
 
         <div>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Concept preview</div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{m.vision_concept_preview()}</div>
           <div className="relative mt-3 aspect-[16/9] overflow-hidden rounded-3xl border border-white/10">
             <div className="absolute inset-0 blur-2xl" style={{ background: "conic-gradient(from 90deg at 50% 50%, oklch(0.81 0.13 80 / 0.35), oklch(0.68 0.28 0 / 0.35), oklch(0.81 0.13 80 / 0.35))" }} />
             <div className="absolute inset-0 backdrop-blur-2xl" />
             <div className="relative grid h-full place-items-center">
-              <div className="font-display text-2xl italic text-foreground/60">A glimpse of what's to come</div>
+              <div className="font-display text-2xl italic text-foreground/60">{m.vision_glimpse()}</div>
             </div>
           </div>
         </div>
 
         <div className="rounded-3xl border border-white/10 bg-surface/40 p-6 backdrop-blur">
-          <h3 className="font-display text-xl font-bold">Be part of the future</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Get notified when {section.name} enters early preview.</p>
+          <h3 className="font-display text-xl font-bold">{m.vision_future_title()}</h3>
+          <p className="mt-1 text-sm text-muted-foreground">{m.vision_future_desc({ name: section.name })}</p>
           <div className="mt-4"><NotifyForm sectionSlug={section.slug} /></div>
         </div>
       </div>

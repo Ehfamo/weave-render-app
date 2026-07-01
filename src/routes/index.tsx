@@ -293,22 +293,22 @@ function Index() {
             <section className="mx-4 overflow-hidden rounded-3xl border border-border bg-surface/40 p-8 sm:mx-8 sm:p-12">
               <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
                 <div>
-                  <p className="text-[11px] uppercase tracking-[0.28em] text-gold/80">Ranking engine</p>
+                  <p className="text-[11px] uppercase tracking-[0.28em] text-gold/80">{m.ranking_eyebrow()}</p>
                   <h2 className="mt-2 font-display text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
-                    Algorithmic discovery, not endless lists.
+                    {m.ranking_title()}
                   </h2>
                   <p className="mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
-                    Every prompt is ranked live: views ×1, copies ×5, saves ×4, shares ×6, remixes ×7. The best work surfaces. Creators get paid.
+                    {m.ranking_subtitle()}
                   </p>
                 </div>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                   {[
-                    ["12,480", "Prompts indexed"],
-                    ["1.4M", "Renders / month"],
-                    ["98", "Top viral score"],
-                    ["284k", "Active creators"],
-                    ["$0", "Cost to copy"],
-                    ["70%", "Creator share"],
+                    ["12,480", m.ranking_stat_prompts()],
+                    ["1.4M", m.ranking_stat_renders()],
+                    ["98", m.ranking_stat_viral()],
+                    ["284k", m.ranking_stat_creators()],
+                    ["$0", m.ranking_stat_cost()],
+                    ["70%", m.ranking_stat_share()],
                   ].map(([v, l]) => (
                     <div key={l} className="rounded-2xl border border-border bg-background/40 p-4">
                       <p className="font-display text-2xl font-semibold tracking-tight">{v}</p>
@@ -326,22 +326,22 @@ function Index() {
               <div className="relative grid gap-6 p-8 sm:p-14 lg:grid-cols-[1fr_auto] lg:items-center">
                 <div className="max-w-xl">
                   <span className="inline-flex items-center gap-2 rounded-full border border-magenta/30 bg-magenta/10 px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-magenta">
-                    Founders drop · Tier 01
+                    {m.founders_badge()}
                   </span>
                   <h2 className="mt-4 font-display text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
-                    500 numbered prompts.
-                    <br /> <span className="text-gradient-gold italic">Once gone, gone.</span>
+                    {m.founders_title_1()}
+                    <br /> <span className="text-gradient-gold italic">{m.founders_title_2()}</span>
                   </h2>
                   <p className="mt-3 text-sm text-muted-foreground sm:text-base">
-                    Hand-curated by XeomX directors. Each prompt ships with style sheet, render presets, and a numbered certificate.
+                    {m.founders_subtitle()}
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                   <button className="rounded-full px-5 py-3 text-sm font-medium text-white" style={{ background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)" }}>
-                    Reserve your slot
+                    {m.founders_cta_reserve()}
                   </button>
                   <button className="rounded-full border border-border bg-surface/60 px-5 py-3 text-sm text-foreground backdrop-blur">
-                    See timeline
+                    {m.founders_cta_timeline()}
                   </button>
                 </div>
               </div>

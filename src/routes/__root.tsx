@@ -12,6 +12,8 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+// @ts-expect-error - paraglide generated runtime
+import { getLocale } from "../paraglide/runtime.js";
 
 function NotFoundComponent() {
   return (
@@ -112,8 +114,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  let locale = "en";
+  try {
+    locale = getLocale();
+  } catch {
+    locale = "en";
+  }
+  const dir = locale === "fa" || locale === "ar" ? "rtl" : "ltr";
   return (
-    <html lang="en">
+    <html lang={locale} dir={dir}>
       <head>
         <HeadContent />
       </head>

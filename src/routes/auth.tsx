@@ -54,17 +54,7 @@ function AuthPage() {
     else setLoading(null);
   }
 
-  async function signInGithub() {
-    setLoading("github");
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: { redirectTo: window.location.origin },
-    });
-    if (error) {
-      toast.error(m.auth_signin_failed());
-      setLoading(null);
-    }
-  }
+  // GitHub OAuth intentionally disabled — not available on Lovable Cloud.
 
   async function sendMagicLink(e: React.FormEvent) {
     e.preventDefault();
@@ -141,9 +131,18 @@ function AuthPage() {
               <OAuthButton onClick={() => signInOAuth("apple")} loading={loading === "apple"} label={m.auth_continue_apple()}>
                 <Apple className="h-4 w-4" />
               </OAuthButton>
-              <OAuthButton onClick={signInGithub} loading={loading === "github"} label={m.auth_continue_github()}>
+              <button
+                type="button"
+                disabled
+                aria-disabled="true"
+                className="inline-flex w-full items-center justify-center gap-3 rounded-full border border-border bg-background px-5 py-3 text-sm font-medium text-muted-foreground opacity-60 cursor-not-allowed"
+              >
                 <Github className="h-4 w-4" />
-              </OAuthButton>
+                {m.auth_continue_github()}
+                <span className="ms-1 rounded-full border border-border/60 px-2 py-0.5 text-[10px] uppercase tracking-wide">
+                  {m.auth_coming_soon()}
+                </span>
+              </button>
 
               <div className="my-2 flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
                 <span className="h-px flex-1 bg-border/60" />

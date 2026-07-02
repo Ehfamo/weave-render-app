@@ -4,12 +4,14 @@ import { getSection } from "@/lib/explore-sections";
 import { LaunchingSoon } from "@/components/xeomx/ComingSoon/LaunchingSoon";
 import { InDevelopment } from "@/components/xeomx/ComingSoon/InDevelopment";
 import { Vision } from "@/components/xeomx/ComingSoon/Vision";
+// @ts-expect-error - paraglide generated messages
+import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/explore_/$slug")({
   head: ({ params }) => {
     const s = getSection(params.slug);
-    const title = s ? `${s.name} — XeomX` : "Section — XeomX";
-    const description = s?.tagline ?? "Explore the XeomX universe.";
+    const title = s ? m.section_head_title({ name: s.name }) : m.section_head_generic();
+    const description = s?.tagline ?? m.section_head_default_desc();
     return {
       meta: [
         { title },
@@ -28,10 +30,10 @@ export const Route = createFileRoute("/explore_/$slug")({
     <div className="min-h-svh bg-background">
       <Header />
       <div className="mx-auto max-w-xl px-6 py-32 text-center">
-        <h1 className="font-display text-4xl font-bold">Section not found</h1>
-        <p className="mt-3 text-muted-foreground">This corner of the universe doesn't exist yet.</p>
+        <h1 className="font-display text-4xl font-bold">{m.section_not_found()}</h1>
+        <p className="mt-3 text-muted-foreground">{m.section_not_found_desc()}</p>
         <Link to="/explore" className="mt-6 inline-flex rounded-full px-5 py-2 text-sm font-semibold text-black" style={{ background: "var(--gradient-gold)" }}>
-          Back to Explore
+          {m.section_back_to_explore()}
         </Link>
       </div>
     </div>
@@ -50,9 +52,9 @@ function SectionPage() {
       {section.phase === "live" && (
         <div className="mx-auto max-w-xl px-6 py-32 text-center">
           <h1 className="font-display text-3xl font-bold">{section.name}</h1>
-          <p className="mt-3 text-muted-foreground">This section is live.</p>
+          <p className="mt-3 text-muted-foreground">{m.section_live_message()}</p>
           <Link to="/" className="mt-6 inline-flex rounded-full px-5 py-2 text-sm font-semibold text-black" style={{ background: "var(--gradient-gold)" }}>
-            Open
+            {m.section_open()}
           </Link>
         </div>
       )}

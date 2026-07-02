@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -24,6 +25,11 @@ import { Route as CollectionsIdRouteImport } from './routes/collections.$id'
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeedRoute = FeedRouteImport.update({
@@ -85,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
+  '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore/$slug': typeof ExploreSlugRoute
@@ -98,6 +105,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
+  '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore/$slug': typeof ExploreSlugRoute
@@ -112,6 +120,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
+  '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore_/$slug': typeof ExploreSlugRoute
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/explore'
     | '/feed'
+    | '/privacy'
     | '/terms'
     | '/collections/$id'
     | '/explore/$slug'
@@ -140,6 +150,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/explore'
     | '/feed'
+    | '/privacy'
     | '/terms'
     | '/collections/$id'
     | '/explore/$slug'
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/explore'
     | '/feed'
+    | '/privacy'
     | '/terms'
     | '/collections/$id'
     | '/explore_/$slug'
@@ -167,6 +179,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   ExploreRoute: typeof ExploreRoute
   FeedRoute: typeof FeedRoute
+  PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   ExploreSlugRoute: typeof ExploreSlugRoute
   PromptIdRoute: typeof PromptIdRoute
@@ -179,6 +192,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/feed': {
@@ -274,6 +294,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   ExploreRoute: ExploreRoute,
   FeedRoute: FeedRoute,
+  PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   ExploreSlugRoute: ExploreSlugRoute,
   PromptIdRoute: PromptIdRoute,

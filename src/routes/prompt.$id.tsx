@@ -98,7 +98,7 @@ function Detail() {
           <div className="mt-8 grid gap-10 lg:grid-cols-[420px_minmax(0,1fr)] lg:gap-14">
             <div className="relative overflow-hidden rounded-3xl border border-border shadow-[var(--shadow-card)]">
               <img src={prompt.cover} alt={prompt.title} className="aspect-[4/5] w-full object-cover" />
-              <div className="absolute left-4 top-4 flex items-center gap-2">
+              <div className="absolute start-4 top-4 flex items-center gap-2">
                 <span
                   className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium"
                   style={

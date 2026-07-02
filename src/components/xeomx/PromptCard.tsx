@@ -64,7 +64,7 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
         />
 
         {/* top row chips */}
-        <div className="absolute left-3 right-3 top-3 flex items-start justify-between gap-2">
+        <div className="absolute start-3 end-3 top-3 flex items-start justify-between gap-2">
           <span
             className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium tracking-wide ${
               prompt.state === "premium"

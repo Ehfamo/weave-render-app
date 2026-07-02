@@ -44,7 +44,7 @@ export function LanguageSwitcher() {
         <button
           type="button"
           aria-label="Change language"
-          className="hidden items-center gap-2 rounded-full border border-border bg-surface/60 px-3 py-2 text-xs text-foreground transition hover:border-magenta/40 sm:inline-flex"
+          className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-2.5 py-2 text-xs text-foreground transition hover:border-magenta/40 sm:px-3"
         >
           <Languages className="h-3.5 w-3.5" />
           <span className="hidden md:inline">{activeNative}</span>

@@ -212,10 +212,10 @@
   "explore_hero_desc": "هر ابزار. هر استودیو. هر ابرقدرت. یک پلتفرم سینمایی برای عصر هوش مصنوعی.",
   "explore_search_placeholder": "کیهان را جست‌وجو کنید — استودیوها، عامل‌ها، هوش…",
   "explore_clear": "پاک کردن",
-  "explore_stat_live": "۳ فعال",
-  "explore_stat_launching": "۲۸ راه‌اندازی فصل اول",
-  "explore_stat_indev": "۲۱ در حال توسعه",
-  "explore_stat_vision": "۱۲ چشم‌انداز",
+  "explore_stat_live": "{count} فعال",
+  "explore_stat_launching": "{count} راه‌اندازی فصل اول",
+  "explore_stat_indev": "{count} در حال توسعه",
+  "explore_stat_vision": "{count} چشم‌انداز",
   "explore_live_now": "اکنون فعال",
   "explore_core_platform": "پلتفرم اصلی",
   "explore_no_match": "هیچ بخشی با «{q}» مطابقت ندارد.",
@@ -270,5 +270,8 @@
   "auth_use_password": "استفاده از رمز عبور",
   "auth_use_magic_link": "استفاده از لینک ورود",
   "auth_back_options": "همه‌ی گزینه‌های ورود",
-  "auth_check_email": "برای تأیید حساب، ایمیل خود را بررسی کنید."
+  "auth_check_email": "برای تأیید حساب، ایمیل خود را بررسی کنید.",
+  "auth_coming_soon": "به‌زودی",
+  "root_head_title": "ژیوم‌ایکس — بازار سینمایی پرامپت‌های هوش مصنوعی",
+  "root_head_desc": "سینمایی‌ترین پرامپت‌های هوش مصنوعی جهان را کشف، بازآفرینی و تصاحب کنید. کشف به سبک نتفلیکس، فید ویروسی، عرضه‌های ویژه."
 }

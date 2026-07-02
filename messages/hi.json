@@ -212,10 +212,10 @@
   "explore_hero_desc": "हर उपकरण। हर स्टूडियो। हर महाशक्ति। AI युग के लिए एक सिनेमाई प्लेटफ़ॉर्म।",
   "explore_search_placeholder": "ब्रह्मांड में खोजें — स्टूडियो, एजेंट, इंटेलिजेंस…",
   "explore_clear": "साफ़ करें",
-  "explore_stat_live": "3 लाइव",
-  "explore_stat_launching": "28 Q1 में लॉन्च",
-  "explore_stat_indev": "21 विकास में",
-  "explore_stat_vision": "12 विज़न",
+  "explore_stat_live": "{count} लाइव",
+  "explore_stat_launching": "{count} Q1 में लॉन्च",
+  "explore_stat_indev": "{count} विकास में",
+  "explore_stat_vision": "{count} विज़न",
   "explore_live_now": "अभी लाइव",
   "explore_core_platform": "कोर प्लेटफ़ॉर्म",
   "explore_no_match": "«{q}» से मेल खाने वाला कोई अनुभाग नहीं।",
@@ -270,5 +270,8 @@
   "auth_use_password": "इसके बजाय पासवर्ड का उपयोग करें",
   "auth_use_magic_link": "इसके बजाय मैजिक लिंक का उपयोग करें",
   "auth_back_options": "सभी साइन-इन विकल्प",
-  "auth_check_email": "अपना खाता पुष्टि करने के लिए ईमेल देखें।"
+  "auth_check_email": "अपना खाता पुष्टि करने के लिए ईमेल देखें।",
+  "auth_coming_soon": "जल्द आ रहा है",
+  "root_head_title": "XeomX — सिनेमैटिक AI प्रॉम्प्ट मार्केटप्लेस",
+  "root_head_desc": "दुनिया के सबसे सिनेमैटिक AI प्रॉम्प्ट खोजें, रीमिक्स करें और अपनाएँ। Netflix जैसा डिस्कवरी, वायरल फ़ीड, प्रीमियम ड्रॉप्स।"
 }

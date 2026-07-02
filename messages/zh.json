@@ -212,10 +212,10 @@
   "explore_hero_desc": "每一个工具。每一个工作室。每一种超能力。为 AI 时代打造的电影级平台。",
   "explore_search_placeholder": "搜索宇宙 — 工作室、代理、智能…",
   "explore_clear": "清除",
-  "explore_stat_live": "3 个在线",
-  "explore_stat_launching": "28 个 Q1 上线",
-  "explore_stat_indev": "21 个开发中",
-  "explore_stat_vision": "12 个愿景",
+  "explore_stat_live": "{count} 个在线",
+  "explore_stat_launching": "{count} 个 Q1 上线",
+  "explore_stat_indev": "{count} 个开发中",
+  "explore_stat_vision": "{count} 个愿景",
   "explore_live_now": "现已上线",
   "explore_core_platform": "核心平台",
   "explore_no_match": "没有匹配「{q}」的板块。",
@@ -270,5 +270,8 @@
   "auth_use_password": "改用密码",
   "auth_use_magic_link": "改用登录链接",
   "auth_back_options": "所有登录方式",
-  "auth_check_email": "请查收邮箱以确认您的账户。"
+  "auth_check_email": "请查收邮箱以确认您的账户。",
+  "auth_coming_soon": "即将推出",
+  "root_head_title": "XeomX — 电影级 AI 提示词市场",
+  "root_head_desc": "发现、混剪并拥有全球最具电影感的 AI 提示词。Netflix 风格的探索、爆款信息流、高端首发。"
 }

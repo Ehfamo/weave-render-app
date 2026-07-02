@@ -212,10 +212,10 @@
   "explore_hero_desc": "كل أداة. كل استوديو. كل قوة خارقة. منصة سينمائية واحدة لعصر الذكاء الاصطناعي.",
   "explore_search_placeholder": "ابحث في الكون — استوديوهات، وكلاء، ذكاء…",
   "explore_clear": "مسح",
-  "explore_stat_live": "3 مباشر",
-  "explore_stat_launching": "28 يُطلق في الربع الأول",
-  "explore_stat_indev": "21 قيد التطوير",
-  "explore_stat_vision": "12 رؤية",
+  "explore_stat_live": "{count} مباشر",
+  "explore_stat_launching": "{count} يُطلق في الربع الأول",
+  "explore_stat_indev": "{count} قيد التطوير",
+  "explore_stat_vision": "{count} رؤية",
   "explore_live_now": "مباشر الآن",
   "explore_core_platform": "المنصة الأساسية",
   "explore_no_match": "لا توجد أقسام تطابق «{q}».",
@@ -270,5 +270,8 @@
   "auth_use_password": "استخدم كلمة المرور بدلاً من ذلك",
   "auth_use_magic_link": "استخدم رابط الدخول بدلاً من ذلك",
   "auth_back_options": "جميع خيارات الدخول",
-  "auth_check_email": "تحقق من بريدك لتأكيد حسابك."
+  "auth_check_email": "تحقق من بريدك لتأكيد حسابك.",
+  "auth_coming_soon": "قريباً",
+  "root_head_title": "XeomX — سوق سينمائي لموجّهات الذكاء الاصطناعي",
+  "root_head_desc": "اكتشف أروع موجّهات الذكاء الاصطناعي وأعد صياغتها وامتلكها. اكتشاف بأسلوب نتفليكس، وموجز فيروسي، وإصدارات مميزة."
 }

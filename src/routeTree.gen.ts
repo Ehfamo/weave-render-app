@@ -14,15 +14,16 @@ import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as ExploreRouteImport } from './routes/explore'
-import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CreatorsRouteImport } from './routes/creators'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PromptIdRouteImport } from './routes/prompt.$id'
 import { Route as ExploreSlugRouteImport } from './routes/explore_.$slug'
 import { Route as CollectionsIdRouteImport } from './routes/collections.$id'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -49,11 +50,6 @@ const ExploreRoute = ExploreRouteImport.update({
   path: '/explore',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CreatorsRoute = CreatorsRouteImport.update({
   id: '/creators',
   path: '/creators',
@@ -72,6 +68,10 @@ const CollectionsRoute = CollectionsRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -94,6 +94,11 @@ const CollectionsIdRoute = CollectionsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => CollectionsRoute,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -101,12 +106,12 @@ export interface FileRoutesByFullPath {
   '/collections': typeof CollectionsRouteWithChildren
   '/cookies': typeof CookiesRoute
   '/creators': typeof CreatorsRoute
-  '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/terms': typeof TermsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore/$slug': typeof ExploreSlugRoute
   '/prompt/$id': typeof PromptIdRoute
@@ -117,12 +122,12 @@ export interface FileRoutesByTo {
   '/collections': typeof CollectionsRouteWithChildren
   '/cookies': typeof CookiesRoute
   '/creators': typeof CreatorsRoute
-  '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/terms': typeof TermsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore/$slug': typeof ExploreSlugRoute
   '/prompt/$id': typeof PromptIdRoute
@@ -130,16 +135,17 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/collections': typeof CollectionsRouteWithChildren
   '/cookies': typeof CookiesRoute
   '/creators': typeof CreatorsRoute
-  '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/terms': typeof TermsRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore_/$slug': typeof ExploreSlugRoute
   '/prompt/$id': typeof PromptIdRoute
@@ -152,12 +158,12 @@ export interface FileRouteTypes {
     | '/collections'
     | '/cookies'
     | '/creators'
-    | '/dashboard'
     | '/explore'
     | '/feed'
     | '/privacy'
     | '/refund-policy'
     | '/terms'
+    | '/dashboard'
     | '/collections/$id'
     | '/explore/$slug'
     | '/prompt/$id'
@@ -168,28 +174,29 @@ export interface FileRouteTypes {
     | '/collections'
     | '/cookies'
     | '/creators'
-    | '/dashboard'
     | '/explore'
     | '/feed'
     | '/privacy'
     | '/refund-policy'
     | '/terms'
+    | '/dashboard'
     | '/collections/$id'
     | '/explore/$slug'
     | '/prompt/$id'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/auth'
     | '/collections'
     | '/cookies'
     | '/creators'
-    | '/dashboard'
     | '/explore'
     | '/feed'
     | '/privacy'
     | '/refund-policy'
     | '/terms'
+    | '/_authenticated/dashboard'
     | '/collections/$id'
     | '/explore_/$slug'
     | '/prompt/$id'
@@ -197,11 +204,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CollectionsRoute: typeof CollectionsRouteWithChildren
   CookiesRoute: typeof CookiesRoute
   CreatorsRoute: typeof CreatorsRoute
-  DashboardRoute: typeof DashboardRoute
   ExploreRoute: typeof ExploreRoute
   FeedRoute: typeof FeedRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -248,13 +255,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExploreRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/creators': {
       id: '/creators'
       path: '/creators'
@@ -281,6 +281,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -311,8 +318,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CollectionsIdRouteImport
       parentRoute: typeof CollectionsRoute
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface CollectionsRouteChildren {
   CollectionsIdRoute: typeof CollectionsIdRoute
@@ -328,11 +353,11 @@ const CollectionsRouteWithChildren = CollectionsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   CollectionsRoute: CollectionsRouteWithChildren,
   CookiesRoute: CookiesRoute,
   CreatorsRoute: CreatorsRoute,
-  DashboardRoute: DashboardRoute,
   ExploreRoute: ExploreRoute,
   FeedRoute: FeedRoute,
   PrivacyRoute: PrivacyRoute,

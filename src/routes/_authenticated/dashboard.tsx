@@ -13,7 +13,7 @@ import { toast } from "sonner";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
-export const Route = createFileRoute("/dashboard")({
+export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
   ssr: false,
   head: () => ({ meta: [{ title: "Your dashboard — XeomX" }] }),

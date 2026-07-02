@@ -44,6 +44,7 @@ export default {
     try {
       const handler = await getServerEntry();
       const response = await paraglideMiddleware(request, async ({ request: localized }: { request: Request; locale: string }) => {
+        console.log("[paraglide] orig=", request.url, "delocalized=", localized.url);
         return handler.fetch(localized, env, ctx);
       });
       return await normalizeCatastrophicSsrResponse(response);

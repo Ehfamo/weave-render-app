@@ -14,7 +14,6 @@ import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as ExploreRouteImport } from './routes/explore'
-import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CreatorsRouteImport } from './routes/creators'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as CollectionsRouteImport } from './routes/collections'
@@ -47,11 +46,6 @@ const FeedRoute = FeedRouteImport.update({
 const ExploreRoute = ExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CreatorsRoute = CreatorsRouteImport.update({
@@ -101,7 +95,6 @@ export interface FileRoutesByFullPath {
   '/collections': typeof CollectionsRouteWithChildren
   '/cookies': typeof CookiesRoute
   '/creators': typeof CreatorsRoute
-  '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/privacy': typeof PrivacyRoute
@@ -117,7 +110,6 @@ export interface FileRoutesByTo {
   '/collections': typeof CollectionsRouteWithChildren
   '/cookies': typeof CookiesRoute
   '/creators': typeof CreatorsRoute
-  '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/privacy': typeof PrivacyRoute
@@ -134,7 +126,6 @@ export interface FileRoutesById {
   '/collections': typeof CollectionsRouteWithChildren
   '/cookies': typeof CookiesRoute
   '/creators': typeof CreatorsRoute
-  '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/privacy': typeof PrivacyRoute
@@ -152,7 +143,6 @@ export interface FileRouteTypes {
     | '/collections'
     | '/cookies'
     | '/creators'
-    | '/dashboard'
     | '/explore'
     | '/feed'
     | '/privacy'
@@ -168,7 +158,6 @@ export interface FileRouteTypes {
     | '/collections'
     | '/cookies'
     | '/creators'
-    | '/dashboard'
     | '/explore'
     | '/feed'
     | '/privacy'
@@ -184,7 +173,6 @@ export interface FileRouteTypes {
     | '/collections'
     | '/cookies'
     | '/creators'
-    | '/dashboard'
     | '/explore'
     | '/feed'
     | '/privacy'
@@ -201,7 +189,6 @@ export interface RootRouteChildren {
   CollectionsRoute: typeof CollectionsRouteWithChildren
   CookiesRoute: typeof CookiesRoute
   CreatorsRoute: typeof CreatorsRoute
-  DashboardRoute: typeof DashboardRoute
   ExploreRoute: typeof ExploreRoute
   FeedRoute: typeof FeedRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -246,13 +233,6 @@ declare module '@tanstack/react-router' {
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof ExploreRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/creators': {
@@ -332,7 +312,6 @@ const rootRouteChildren: RootRouteChildren = {
   CollectionsRoute: CollectionsRouteWithChildren,
   CookiesRoute: CookiesRoute,
   CreatorsRoute: CreatorsRoute,
-  DashboardRoute: DashboardRoute,
   ExploreRoute: ExploreRoute,
   FeedRoute: FeedRoute,
   PrivacyRoute: PrivacyRoute,

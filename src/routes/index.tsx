@@ -265,8 +265,8 @@ function Index() {
                     <div className="relative aspect-[9/14] overflow-hidden">
                       <img src={p.cover} alt={p.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
-                      <div className="absolute left-3 top-3"><SignalBadge signal={p.signal ?? null} score={p.viralScore} /></div>
-                      <div className="absolute right-3 top-3 flex flex-col gap-2">
+                      <div className="absolute start-3 top-3"><SignalBadge signal={p.signal ?? null} score={p.viralScore} /></div>
+                      <div className="absolute end-3 top-3 flex flex-col gap-2">
                         {[Heart, MessageCircle, Share2].map((Icon, i) => (
                           <span key={i} className="grid h-10 w-10 place-items-center rounded-full border border-foreground/20 bg-background/40 backdrop-blur transition hover:border-magenta/60">
                             <Icon className="h-4 w-4" />

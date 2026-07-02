@@ -387,10 +387,10 @@ function Index() {
             <div>
               <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.footer_legal()}</h4>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li><span className="cursor-not-allowed opacity-50">{m.footer_terms()}</span></li>
-                <li><span className="cursor-not-allowed opacity-50">{m.footer_privacy()}</span></li>
-                <li><span className="cursor-not-allowed opacity-50">{m.footer_cookie()}</span></li>
-                <li><span className="cursor-not-allowed opacity-50">{m.footer_refund()}</span></li>
+                <li><Link to="/terms" className="transition hover:text-foreground">{m.footer_terms()}</Link></li>
+                <li><Link to="/privacy" className="transition hover:text-foreground">{m.footer_privacy()}</Link></li>
+                <li><Link to="/cookies" className="transition hover:text-foreground">{m.footer_cookie()}</Link></li>
+                <li><Link to="/refund-policy" className="transition hover:text-foreground">{m.footer_refund()}</Link></li>
               </ul>
             </div>
           </div>

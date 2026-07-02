@@ -20,7 +20,7 @@ export function ViralFeedCard({ p }: { p: Prompt }) {
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-background/10" />
       <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-transparent to-background/30" />
 
-      <div className="absolute right-3 top-1/2 z-10 flex -translate-y-1/2 flex-col items-center gap-3 sm:right-5">
+      <div className="absolute end-3 top-1/2 z-10 flex -translate-y-1/2 flex-col items-center gap-3 sm:end-5">
         {[
           { Icon: Heart, label: p.likes },
           { Icon: MessageCircle, label: "412" },

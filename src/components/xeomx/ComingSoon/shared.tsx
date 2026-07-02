@@ -41,7 +41,8 @@ export function NotifyForm({ label, sectionSlug = "" }: { label?: string; sectio
       setDone(true);
       setEmail("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      console.error("[waitlist] insert failed", err);
+      setError(m.notify_error());
     } finally {
       setLoading(false);
     }

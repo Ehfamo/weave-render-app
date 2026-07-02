@@ -265,8 +265,8 @@ function Index() {
                     <div className="relative aspect-[9/14] overflow-hidden">
                       <img src={p.cover} alt={p.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
-                      <div className="absolute left-3 top-3"><SignalBadge signal={p.signal ?? null} score={p.viralScore} /></div>
-                      <div className="absolute right-3 top-3 flex flex-col gap-2">
+                      <div className="absolute start-3 top-3"><SignalBadge signal={p.signal ?? null} score={p.viralScore} /></div>
+                      <div className="absolute end-3 top-3 flex flex-col gap-2">
                         {[Heart, MessageCircle, Share2].map((Icon, i) => (
                           <span key={i} className="grid h-10 w-10 place-items-center rounded-full border border-foreground/20 bg-background/40 backdrop-blur transition hover:border-magenta/60">
                             <Icon className="h-4 w-4" />
@@ -377,11 +377,11 @@ function Index() {
             <div>
               <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.footer_coming_soon()}</h4>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/explore_/$slug" params={{ slug: "studio-canvas" }} className="transition hover:text-foreground">Studio Canvas</Link></li>
-                <li><Link to="/explore_/$slug" params={{ slug: "agent-store" }} className="transition hover:text-foreground">Agent Store</Link></li>
-                <li><Link to="/explore_/$slug" params={{ slug: "ai-compare" }} className="transition hover:text-foreground">AI Compare Arena</Link></li>
-                <li><Link to="/explore_/$slug" params={{ slug: "academy" }} className="transition hover:text-foreground">Academy</Link></li>
-                <li><Link to="/explore_/$slug" params={{ slug: "founders" }} className="transition hover:text-foreground">Founders Access</Link></li>
+                <li><Link to="/explore/$slug" params={{ slug: "studio-canvas" }} className="transition hover:text-foreground">Studio Canvas</Link></li>
+                <li><Link to="/explore/$slug" params={{ slug: "agent-store" }} className="transition hover:text-foreground">Agent Store</Link></li>
+                <li><Link to="/explore/$slug" params={{ slug: "ai-compare" }} className="transition hover:text-foreground">AI Compare Arena</Link></li>
+                <li><Link to="/explore/$slug" params={{ slug: "academy" }} className="transition hover:text-foreground">Academy</Link></li>
+                <li><Link to="/explore/$slug" params={{ slug: "founders" }} className="transition hover:text-foreground">Founders Access</Link></li>
               </ul>
             </div>
             <div>

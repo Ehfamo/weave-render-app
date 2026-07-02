@@ -94,7 +94,7 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
             <>
               <Link
                 to="/auth"
-                className="hidden rounded-full border border-border bg-surface/60 px-4 py-2 text-sm text-foreground transition hover:border-magenta/40 sm:inline-flex"
+                className="inline-flex rounded-full border border-border bg-surface/60 px-3 py-2 text-xs text-foreground transition hover:border-magenta/40 sm:px-4 sm:text-sm"
               >
                 {m.nav_sign_in()}
               </Link>

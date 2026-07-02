@@ -5,14 +5,16 @@ import { Header } from "@/components/xeomx/Header";
 import { ExploreCard } from "@/components/xeomx/ExploreCard";
 import { ExploreRow } from "@/components/xeomx/ExploreRow";
 import { CORE_SECTIONS, EXPLORE_CATEGORIES, EXPLORE_SECTIONS } from "@/lib/explore-sections";
+// @ts-expect-error - paraglide generated messages
+import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/explore")({
   head: () => ({
     meta: [
-      { title: "Explore — The XeomX Universe" },
-      { name: "description", content: "Every tool. Every studio. Every superpower. Browse all sections of the XeomX platform." },
-      { property: "og:title", content: "Explore — The XeomX Universe" },
-      { property: "og:description", content: "Every tool. Every studio. Every superpower." },
+      { title: m.explore_head_title() },
+      { name: "description", content: m.explore_head_desc() },
+      { property: "og:title", content: m.explore_head_title() },
+      { property: "og:description", content: m.explore_head_desc() },
     ],
   }),
   component: ExplorePage,
@@ -56,18 +58,18 @@ function ExplorePage() {
 
         <div className="relative mx-auto max-w-[1400px] px-4 py-16 sm:px-8 sm:py-24">
           <Link to="/" className="mb-8 inline-flex items-center gap-2 text-xs text-muted-foreground transition hover:text-foreground">
-            <ArrowLeft className="h-3.5 w-3.5" /> Back to discover
+            <ArrowLeft className="h-3.5 w-3.5" /> {m.explore_hero_back()}
           </Link>
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-amber-300/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200">
-            <span className="h-1.5 w-1.5 rounded-full bg-amber-300" /> Platform map · {SECTION_COUNT} sections
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-300" /> {m.explore_platform_map({ count: String(SECTION_COUNT) })}
           </div>
           <h1 className="mt-5 font-display text-5xl font-bold leading-[1.05] tracking-tight sm:text-7xl">
-            <span className="text-gradient-gold animate-fade-in">The XeomX</span>
+            <span className="text-gradient-gold animate-fade-in">{m.explore_universe_pre()}</span>
             <br />
-            <span className="text-foreground">Universe</span>
+            <span className="text-foreground">{m.explore_universe()}</span>
           </h1>
           <p className="mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
-            Every tool. Every studio. Every superpower. One cinematic platform for the AI era.
+            {m.explore_hero_desc()}
           </p>
 
           <label className="mt-8 flex max-w-xl items-center gap-3 rounded-2xl border border-white/10 bg-surface/40 px-4 py-3 backdrop-blur-xl transition focus-within:border-amber-300/40">
@@ -75,19 +77,19 @@ function ExplorePage() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search the universe — studios, agents, intelligence…"
+              placeholder={m.explore_search_placeholder()}
               className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
             />
             {q && (
-              <button onClick={() => setQ("")} className="text-xs text-muted-foreground hover:text-foreground">clear</button>
+              <button onClick={() => setQ("")} className="text-xs text-muted-foreground hover:text-foreground">{m.explore_clear()}</button>
             )}
           </label>
 
           <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />3 Live</span>
-            <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-amber-300" />28 Launching Q1</span>
-            <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-fuchsia-400" />21 In Development</span>
-            <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-white/20" />12 Vision</span>
+            <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />{m.explore_stat_live()}</span>
+            <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-amber-300" />{m.explore_stat_launching()}</span>
+            <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-fuchsia-400" />{m.explore_stat_indev()}</span>
+            <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-white/20" />{m.explore_stat_vision()}</span>
           </div>
         </div>
       </section>
@@ -97,8 +99,8 @@ function ExplorePage() {
         <section className="mx-auto max-w-[1400px] px-4 pt-12 sm:px-8">
           <div className="mb-4 flex items-end justify-between gap-4">
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200">Live now</div>
-              <h2 className="mt-1 font-display text-2xl font-bold sm:text-3xl">Core platform</h2>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200">{m.explore_live_now()}</div>
+              <h2 className="mt-1 font-display text-2xl font-bold sm:text-3xl">{m.explore_core_platform()}</h2>
             </div>
           </div>
           <div className="scrollbar-hidden flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 sm:grid sm:snap-none sm:grid-cols-3 sm:overflow-visible sm:[&>*]:w-auto">
@@ -118,7 +120,7 @@ function ExplorePage() {
           return <ExploreRow key={cat} title={cat} sections={items} rowIndex={rowIndex} />;
         })}
         {query && filtered.length === 0 && filteredCore.length === 0 && (
-          <div className="px-8 py-20 text-center text-muted-foreground">No sections match "{q}".</div>
+          <div className="px-8 py-20 text-center text-muted-foreground">{m.explore_no_match({ q })}</div>
         )}
       </div>
 
@@ -132,20 +134,20 @@ function ExplorePage() {
                 </span>
                 <span className="font-display text-base font-bold">XeomX</span>
               </div>
-              <p className="mt-3 text-xs leading-relaxed text-muted-foreground">The cinematic AI super-platform. Built for creators who move fast.</p>
+              <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{m.footer_tagline()}</p>
             </div>
             <div>
-              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Platform</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.footer_platform()}</h4>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/" className="transition hover:text-foreground">Discover</Link></li>
-                <li><Link to="/feed" className="transition hover:text-foreground">Viral Feed</Link></li>
-                <li><Link to="/collections" className="transition hover:text-foreground">Collections</Link></li>
-                <li><Link to="/creators" className="transition hover:text-foreground">Creators</Link></li>
-                <li><Link to="/explore" className="transition hover:text-foreground">Explore Universe</Link></li>
+                <li><Link to="/" className="transition hover:text-foreground">{m.explore_footer_discover()}</Link></li>
+                <li><Link to="/feed" className="transition hover:text-foreground">{m.explore_footer_viral()}</Link></li>
+                <li><Link to="/collections" className="transition hover:text-foreground">{m.explore_footer_collections()}</Link></li>
+                <li><Link to="/creators" className="transition hover:text-foreground">{m.explore_footer_creators()}</Link></li>
+                <li><Link to="/explore" className="transition hover:text-foreground">{m.explore_footer_universe()}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Coming Soon</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.explore_footer_coming()}</h4>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                 <li><Link to="/explore/$slug" params={{ slug: "studio-canvas" }} className="transition hover:text-foreground">Studio Canvas</Link></li>
                 <li><Link to="/explore/$slug" params={{ slug: "agent-store" }} className="transition hover:text-foreground">Agent Store</Link></li>
@@ -155,18 +157,18 @@ function ExplorePage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Legal</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.footer_legal()}</h4>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li><span className="cursor-not-allowed opacity-50">Terms of Service</span></li>
-                <li><span className="cursor-not-allowed opacity-50">Privacy Policy</span></li>
-                <li><span className="cursor-not-allowed opacity-50">Cookie Policy</span></li>
-                <li><span className="cursor-not-allowed opacity-50">Refund Policy</span></li>
+                <li><Link to="/terms" className="transition hover:text-foreground">{m.footer_terms()}</Link></li>
+                <li><Link to="/privacy" className="transition hover:text-foreground">{m.footer_privacy()}</Link></li>
+                <li><Link to="/cookies" className="transition hover:text-foreground">{m.footer_cookie()}</Link></li>
+                <li><Link to="/refund-policy" className="transition hover:text-foreground">{m.footer_refund()}</Link></li>
               </ul>
             </div>
           </div>
           <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border/60 pt-6 sm:flex-row">
-            <p className="text-xs text-muted-foreground">© 2026 XeomX. All rights reserved.</p>
-            <p className="text-xs text-muted-foreground">Built for the AI era · <span className="text-gradient-gold">{SECTION_COUNT} sections</span> · Powered by intelligence</p>
+            <p className="text-xs text-muted-foreground">{m.footer_rights()}</p>
+            <p className="text-xs text-muted-foreground">{m.footer_built()} · <span className="text-gradient-gold">{m.footer_sections({ count: String(SECTION_COUNT) })}</span> · {m.footer_powered()}</p>
           </div>
         </div>
       </footer>

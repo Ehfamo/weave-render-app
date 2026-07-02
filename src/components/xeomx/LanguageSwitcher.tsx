@@ -7,6 +7,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+// @ts-expect-error - paraglide generated messages
+import { m } from "@/paraglide/messages.js";
 // @ts-expect-error - paraglide generated runtime
 import { getLocale, localizeHref } from "@/paraglide/runtime.js";
 
@@ -43,7 +45,7 @@ export function LanguageSwitcher() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label="Change language"
+          aria-label={m.language_change_aria()}
           className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-2.5 py-2 text-xs text-foreground transition hover:border-magenta/40 sm:px-3"
         >
           <Languages className="h-3.5 w-3.5" />
@@ -51,7 +53,7 @@ export function LanguageSwitcher() {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
-        <DropdownMenuLabel>Language</DropdownMenuLabel>
+        <DropdownMenuLabel>{m.language()}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {LOCALES.map((l) => (
           <DropdownMenuItem key={l.code} asChild>

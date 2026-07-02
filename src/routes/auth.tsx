@@ -12,8 +12,8 @@ export const Route = createFileRoute("/auth")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Sign in — XeomX" },
-      { name: "description", content: "Sign in to XeomX to save prompts, follow creators, and unlock premium drops." },
+      { title: m.auth_head_title() },
+      { name: "description", content: m.auth_head_desc() },
     ],
   }),
 });
@@ -34,7 +34,7 @@ function AuthPage() {
       redirect_uri: window.location.origin + "/dashboard",
     });
     if (result.error) {
-      toast.error(result.error.message ?? "Sign-in failed");
+      toast.error(m.auth_signin_failed());
       setLoading(false);
       return;
     }

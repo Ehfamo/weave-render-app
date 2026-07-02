@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -20,6 +21,11 @@ import { Route as PromptIdRouteImport } from './routes/prompt.$id'
 import { Route as ExploreSlugRouteImport } from './routes/explore_.$slug'
 import { Route as CollectionsIdRouteImport } from './routes/collections.$id'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FeedRoute = FeedRouteImport.update({
   id: '/feed',
   path: '/feed',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
+  '/terms': typeof TermsRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore/$slug': typeof ExploreSlugRoute
   '/prompt/$id': typeof PromptIdRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
+  '/terms': typeof TermsRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore/$slug': typeof ExploreSlugRoute
   '/prompt/$id': typeof PromptIdRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
+  '/terms': typeof TermsRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore_/$slug': typeof ExploreSlugRoute
   '/prompt/$id': typeof PromptIdRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/explore'
     | '/feed'
+    | '/terms'
     | '/collections/$id'
     | '/explore/$slug'
     | '/prompt/$id'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/explore'
     | '/feed'
+    | '/terms'
     | '/collections/$id'
     | '/explore/$slug'
     | '/prompt/$id'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/explore'
     | '/feed'
+    | '/terms'
     | '/collections/$id'
     | '/explore_/$slug'
     | '/prompt/$id'
@@ -155,12 +167,20 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   ExploreRoute: typeof ExploreRoute
   FeedRoute: typeof FeedRoute
+  TermsRoute: typeof TermsRoute
   ExploreSlugRoute: typeof ExploreSlugRoute
   PromptIdRoute: typeof PromptIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/feed': {
       id: '/feed'
       path: '/feed'
@@ -254,6 +274,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   ExploreRoute: ExploreRoute,
   FeedRoute: FeedRoute,
+  TermsRoute: TermsRoute,
   ExploreSlugRoute: ExploreSlugRoute,
   PromptIdRoute: PromptIdRoute,
 }

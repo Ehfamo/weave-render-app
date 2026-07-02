@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as ExploreRouteImport } from './routes/explore'
@@ -26,6 +27,11 @@ import { Route as CollectionsIdRouteImport } from './routes/collections.$id'
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RefundPolicyRoute = RefundPolicyRouteImport.update({
+  id: '/refund-policy',
+  path: '/refund-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/privacy': typeof PrivacyRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/terms': typeof TermsRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore/$slug': typeof ExploreSlugRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByTo {
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/privacy': typeof PrivacyRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/terms': typeof TermsRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore/$slug': typeof ExploreSlugRoute
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/privacy': typeof PrivacyRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/terms': typeof TermsRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore_/$slug': typeof ExploreSlugRoute
@@ -147,6 +156,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/feed'
     | '/privacy'
+    | '/refund-policy'
     | '/terms'
     | '/collections/$id'
     | '/explore/$slug'
@@ -162,6 +172,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/feed'
     | '/privacy'
+    | '/refund-policy'
     | '/terms'
     | '/collections/$id'
     | '/explore/$slug'
@@ -177,6 +188,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/feed'
     | '/privacy'
+    | '/refund-policy'
     | '/terms'
     | '/collections/$id'
     | '/explore_/$slug'
@@ -193,6 +205,7 @@ export interface RootRouteChildren {
   ExploreRoute: typeof ExploreRoute
   FeedRoute: typeof FeedRoute
   PrivacyRoute: typeof PrivacyRoute
+  RefundPolicyRoute: typeof RefundPolicyRoute
   TermsRoute: typeof TermsRoute
   ExploreSlugRoute: typeof ExploreSlugRoute
   PromptIdRoute: typeof PromptIdRoute
@@ -205,6 +218,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refund-policy': {
+      id: '/refund-policy'
+      path: '/refund-policy'
+      fullPath: '/refund-policy'
+      preLoaderRoute: typeof RefundPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -316,6 +336,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExploreRoute: ExploreRoute,
   FeedRoute: FeedRoute,
   PrivacyRoute: PrivacyRoute,
+  RefundPolicyRoute: RefundPolicyRoute,
   TermsRoute: TermsRoute,
   ExploreSlugRoute: ExploreSlugRoute,
   PromptIdRoute: PromptIdRoute,

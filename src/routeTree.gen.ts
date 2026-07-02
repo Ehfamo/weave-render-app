@@ -15,6 +15,7 @@ import { Route as FeedRouteImport } from './routes/feed'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CreatorsRouteImport } from './routes/creators'
+import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
@@ -52,6 +53,11 @@ const CreatorsRoute = CreatorsRouteImport.update({
   path: '/creators',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CookiesRoute = CookiesRouteImport.update({
+  id: '/cookies',
+  path: '/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CollectionsRoute = CollectionsRouteImport.update({
   id: '/collections',
   path: '/collections',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/collections': typeof CollectionsRouteWithChildren
+  '/cookies': typeof CookiesRoute
   '/creators': typeof CreatorsRoute
   '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/collections': typeof CollectionsRouteWithChildren
+  '/cookies': typeof CookiesRoute
   '/creators': typeof CreatorsRoute
   '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/collections': typeof CollectionsRouteWithChildren
+  '/cookies': typeof CookiesRoute
   '/creators': typeof CreatorsRoute
   '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/collections'
+    | '/cookies'
     | '/creators'
     | '/dashboard'
     | '/explore'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/collections'
+    | '/cookies'
     | '/creators'
     | '/dashboard'
     | '/explore'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/collections'
+    | '/cookies'
     | '/creators'
     | '/dashboard'
     | '/explore'
@@ -175,6 +187,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   CollectionsRoute: typeof CollectionsRouteWithChildren
+  CookiesRoute: typeof CookiesRoute
   CreatorsRoute: typeof CreatorsRoute
   DashboardRoute: typeof DashboardRoute
   ExploreRoute: typeof ExploreRoute
@@ -227,6 +240,13 @@ declare module '@tanstack/react-router' {
       path: '/creators'
       fullPath: '/creators'
       preLoaderRoute: typeof CreatorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cookies': {
+      id: '/cookies'
+      path: '/cookies'
+      fullPath: '/cookies'
+      preLoaderRoute: typeof CookiesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/collections': {
@@ -290,6 +310,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   CollectionsRoute: CollectionsRouteWithChildren,
+  CookiesRoute: CookiesRoute,
   CreatorsRoute: CreatorsRoute,
   DashboardRoute: DashboardRoute,
   ExploreRoute: ExploreRoute,

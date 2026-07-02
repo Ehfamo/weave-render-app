@@ -212,10 +212,10 @@
   "explore_hero_desc": "Every tool. Every studio. Every superpower. One cinematic platform for the AI era.",
   "explore_search_placeholder": "Search the universe — studios, agents, intelligence…",
   "explore_clear": "clear",
-  "explore_stat_live": "3 Live",
-  "explore_stat_launching": "28 Launching Q1",
-  "explore_stat_indev": "21 In Development",
-  "explore_stat_vision": "12 Vision",
+  "explore_stat_live": "{count} Live",
+  "explore_stat_launching": "{count} Launching Q1",
+  "explore_stat_indev": "{count} In Development",
+  "explore_stat_vision": "{count} Vision",
   "explore_live_now": "Live now",
   "explore_core_platform": "Core platform",
   "explore_no_match": "No sections match \"{q}\".",
@@ -270,5 +270,8 @@
   "auth_use_password": "Use password instead",
   "auth_use_magic_link": "Use magic link instead",
   "auth_back_options": "All sign-in options",
-  "auth_check_email": "Check your email to confirm your account."
+  "auth_check_email": "Check your email to confirm your account.",
+  "auth_coming_soon": "Coming soon",
+  "root_head_title": "XeomX — Cinematic AI Prompt Marketplace",
+  "root_head_desc": "Discover, remix and own the world's most cinematic AI prompts. Netflix-style discovery, viral feed, premium drops."
 }

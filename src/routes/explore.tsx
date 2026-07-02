@@ -24,6 +24,12 @@ function ExplorePage() {
   const [q, setQ] = useState("");
   const query = q.trim().toLowerCase();
   const SECTION_COUNT = CORE_SECTIONS.length + EXPLORE_SECTIONS.length;
+  const ALL_SECTIONS = [...CORE_SECTIONS, ...EXPLORE_SECTIONS];
+  const countPhase = (p: string) => ALL_SECTIONS.filter((s) => s.phase === p).length;
+  const liveCount = countPhase("live");
+  const q1Count = countPhase("q1");
+  const q2Count = countPhase("q2");
+  const q3Count = countPhase("q3");
 
   const filtered = useMemo(() => {
     if (!query) return EXPLORE_SECTIONS;
@@ -86,10 +92,10 @@ function ExplorePage() {
           </label>
 
           <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />{m.explore_stat_live()}</span>
-            <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-amber-300" />{m.explore_stat_launching()}</span>
-            <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-fuchsia-400" />{m.explore_stat_indev()}</span>
-            <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-white/20" />{m.explore_stat_vision()}</span>
+            <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />{m.explore_stat_live({ count: String(liveCount) })}</span>
+            <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-amber-300" />{m.explore_stat_launching({ count: String(q1Count) })}</span>
+            <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-fuchsia-400" />{m.explore_stat_indev({ count: String(q2Count) })}</span>
+            <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-white/20" />{m.explore_stat_vision({ count: String(q3Count) })}</span>
           </div>
         </div>
       </section>

@@ -72,15 +72,24 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
+  head: () => {
+    let title = "XeomX — Cinematic AI Prompt Marketplace";
+    let desc = "Discover, remix and own the world's most cinematic AI prompts. Netflix-style discovery, viral feed, premium drops.";
+    try {
+      title = m.root_head_title();
+      desc = m.root_head_desc();
+    } catch {
+      /* fall back to English defaults during prerender */
+    }
+    return {
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "XeomX — Cinematic AI Prompt Marketplace" },
-      { name: "description", content: "Discover, remix and own the world's most cinematic AI prompts. Netflix-style discovery, viral feed, premium drops." },
+      { title },
+      { name: "description", content: desc },
       { name: "author", content: "XeomX" },
-      { property: "og:title", content: "XeomX — Cinematic AI Prompt Marketplace" },
-      { property: "og:description", content: "Discover, remix and own the world's most cinematic AI prompts. Netflix-style discovery, viral feed, premium drops." },
+      { property: "og:title", content: title },
+      { property: "og:description", content: desc },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://xeomx.com" },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f3ac660c-5be5-4a24-a16e-26d0e29e3731/id-preview-1192bc07--41d00db9-b84f-46e8-93a0-82cedb23d459.lovable.app-1781992326521.png" },
@@ -89,8 +98,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@xeomxai" },
       { name: "twitter:creator", content: "@xeomxai" },
-      { name: "twitter:title", content: "XeomX — Cinematic AI Prompt Marketplace" },
-      { name: "twitter:description", content: "Discover, remix and own the world's most cinematic AI prompts. Netflix-style discovery, viral feed, premium drops." },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: desc },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f3ac660c-5be5-4a24-a16e-26d0e29e3731/id-preview-1192bc07--41d00db9-b84f-46e8-93a0-82cedb23d459.lovable.app-1781992326521.png" },
     ],
     links: [
@@ -102,7 +111,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
     ],
-  }),
+  };
+  },
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,

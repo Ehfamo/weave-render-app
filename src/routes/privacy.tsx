@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
+import { motion } from "framer-motion";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -20,16 +21,39 @@ function PrivacyPage() {
   return (
     <div className="min-h-svh bg-background">
       <Header />
-      <div className="mx-auto max-w-3xl px-4 py-16 sm:px-8 sm:py-24">
-        <Link to="/" className="mb-8 inline-flex items-center gap-2 text-xs text-muted-foreground transition hover:text-foreground">
+      <motion.article
+        className="mx-auto"
+        style={{ maxWidth: "700px", paddingInline: "var(--space-4)", paddingBlock: "var(--space-12)" }}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 transition hover:text-foreground"
+          style={{ marginBottom: "var(--space-8)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}
+        >
           <ArrowLeft className="h-3.5 w-3.5" /> {m.explore_hero_back()}
         </Link>
-        <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl">{m.privacy_title()}</h1>
-        <p className="mt-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">{m.legal_updated()}</p>
-        <div className="mt-8 whitespace-pre-line text-sm leading-relaxed text-muted-foreground sm:text-base">
+        <h1
+          className="font-display font-bold tracking-tight"
+          style={{ fontSize: "clamp(2rem, 4vw, var(--font-size-h1))" }}
+        >
+          {m.privacy_title()}
+        </h1>
+        <p
+          className="uppercase tracking-[0.2em]"
+          style={{ marginTop: "var(--space-3)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}
+        >
+          {m.legal_updated()}
+        </p>
+        <div
+          className="whitespace-pre-line"
+          style={{ marginTop: "var(--space-8)", fontSize: "var(--font-size-body)", lineHeight: 1.7, color: "var(--text-muted)" }}
+        >
           {m.privacy_body()}
         </div>
-      </div>
+      </motion.article>
     </div>
   );
 }

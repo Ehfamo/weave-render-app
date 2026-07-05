@@ -51,11 +51,25 @@ function CollectionDetail() {
           <img src={collection.cover} alt="" className="h-full w-full object-cover opacity-40 blur-2xl" />
           <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/85 to-background" />
         </div>
-        <div className="relative mx-auto max-w-[1200px] px-4 pb-12 pt-10 sm:px-8 sm:pt-16">
-          <Link to="/collections" className="inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground">
+        <div
+          className="relative mx-auto max-w-[1200px]"
+          style={{
+            paddingInline: "var(--space-4)",
+            paddingTop: "var(--space-10)",
+            paddingBottom: "var(--space-12)",
+          }}
+        >
+          <Link
+            to="/collections"
+            className="inline-flex items-center gap-2 text-muted-foreground transition hover:text-foreground"
+            style={{ fontSize: "var(--font-size-caption)" }}
+          >
             <ArrowLeft className="h-4 w-4" /> {m.nav_back_all_collections()}
           </Link>
-          <div className="mt-8 grid gap-10 lg:grid-cols-[420px_minmax(0,1fr)]">
+          <div
+            className="grid lg:grid-cols-[420px_minmax(0,1fr)]"
+            style={{ marginTop: "var(--space-8)", gap: "var(--space-10)" }}
+          >
             <div className="overflow-hidden rounded-3xl border border-border">
               <img src={collection.cover} alt={collection.title} className="aspect-[16/10] w-full object-cover" />
             </div>
@@ -63,20 +77,56 @@ function CollectionDetail() {
               <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.22em]" style={{ background: "var(--gradient-gold)", color: "oklch(0.18 0.02 60)" }}>
                 {collection.badge}
               </span>
-              <h1 className="mt-4 font-display text-4xl font-semibold leading-[0.98] tracking-tight sm:text-6xl">
+              <h1
+                className="font-display font-semibold leading-[0.98] tracking-tight"
+                style={{
+                  marginTop: "var(--space-4)",
+                  fontSize: "clamp(2.25rem, 5vw, var(--font-size-h1))",
+                }}
+              >
                 {collection.title}
               </h1>
-              <p className="mt-4 max-w-xl text-base text-muted-foreground">{collection.subtitle}</p>
-              <p className="mt-3 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+              <p
+                className="max-w-xl"
+                style={{
+                  marginTop: "var(--space-4)",
+                  fontSize: "var(--font-size-body-lg)",
+                  color: "var(--text-muted)",
+                }}
+              >
+                {collection.subtitle}
+              </p>
+              <p
+                className="inline-flex items-center gap-2 uppercase tracking-[0.22em]"
+                style={{
+                  marginTop: "var(--space-3)",
+                  fontSize: "var(--font-size-caption)",
+                  color: "var(--text-muted)",
+                }}
+              >
                 <Layers className="h-3 w-3" /> {m.collections_prompts_in_pack({ count: String(collection.count) })}
               </p>
             </div>
           </div>
         </div>
       </section>
-      <section className="mx-auto max-w-[1400px] px-4 pb-20 sm:px-8">
-        <h2 className="mb-6 font-display text-2xl font-semibold tracking-tight sm:text-3xl">{m.collections_inside_pack()}</h2>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
+      <section
+        className="mx-auto max-w-[1400px]"
+        style={{
+          paddingInline: "var(--space-4)",
+          paddingBottom: "var(--space-20)",
+        }}
+      >
+        <h2
+          className="font-display font-semibold tracking-tight"
+          style={{ marginBottom: "var(--space-6)", fontSize: "var(--font-size-h2)" }}
+        >
+          {m.collections_inside_pack()}
+        </h2>
+        <div
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+          style={{ gap: "var(--space-6)" }}
+        >
           {prompts.map((p) => (
             <PromptCard key={p.id} prompt={p} />
           ))}

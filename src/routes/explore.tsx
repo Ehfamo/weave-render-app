@@ -102,14 +102,40 @@ function ExplorePage() {
 
       {/* Core sections */}
       {filteredCore.length > 0 && (
-        <section className="mx-auto max-w-[1400px] px-4 pt-12 sm:px-8">
-          <div className="mb-4 flex items-end justify-between gap-4">
+        <section
+          className="mx-auto max-w-[1400px]"
+          style={{ paddingInline: "var(--space-4)", paddingTop: "var(--space-6)" }}
+        >
+          <div
+            className="flex items-end justify-between"
+            style={{ marginBottom: "var(--space-4)", gap: "var(--space-4)" }}
+          >
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200">{m.explore_live_now()}</div>
-              <h2 className="mt-1 font-display text-2xl font-bold sm:text-3xl">{m.explore_core_platform()}</h2>
+              <div
+                className="font-semibold uppercase tracking-[0.2em] text-amber-200"
+                style={{ fontSize: "var(--font-size-micro)" }}
+              >
+                {m.explore_live_now()}
+              </div>
+              <h2
+                className="font-display font-bold"
+                style={{ marginTop: "var(--space-1)", fontSize: "clamp(1.5rem, 3vw, var(--font-size-h2))" }}
+              >
+                {m.explore_core_platform()}
+              </h2>
             </div>
+            <Link
+              to="/"
+              className="hidden text-sm font-medium sm:inline-flex"
+              style={{ color: "var(--action-primary)" }}
+            >
+              {m.see_all()}
+            </Link>
           </div>
-          <div className="scrollbar-hidden flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 sm:grid sm:snap-none sm:grid-cols-3 sm:overflow-visible sm:[&>*]:w-auto">
+          <div
+            className="scrollbar-hidden flex snap-x snap-mandatory overflow-x-auto sm:grid sm:snap-none sm:grid-cols-3 sm:overflow-visible sm:[&>*]:w-auto"
+            style={{ gap: "var(--space-4)", paddingBottom: "var(--space-4)" }}
+          >
             {filteredCore.map((s, i) => (
               <div key={s.slug} className="snap-start sm:w-full">
                 <ExploreCard section={s} index={i} core />
@@ -120,7 +146,15 @@ function ExplorePage() {
       )}
 
       {/* Category rows */}
-      <div className="mx-auto max-w-[1400px] space-y-10 py-14 sm:space-y-14">
+      <div
+        className="mx-auto max-w-[1400px]"
+        style={{
+          paddingBlock: "var(--space-7)",
+          display: "flex",
+          flexDirection: "column",
+          gap: "var(--space-7)",
+        }}
+      >
         {EXPLORE_CATEGORIES.map((cat, rowIndex) => {
           const items = filtered.filter((s) => s.category === cat);
           return <ExploreRow key={cat} title={cat} sections={items} rowIndex={rowIndex} />;

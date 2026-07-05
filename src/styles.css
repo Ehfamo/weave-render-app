@@ -1,6 +1,8 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/vazirmatn";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -43,7 +45,37 @@
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --font-display: "Fraunces", "Times New Roman", serif;
-  --font-sans: "Inter", system-ui, sans-serif;
+  --font-sans: "InterVariable", "Inter", system-ui, sans-serif;
+  --font-rtl: "VazirmatnVariable", "Vazirmatn", system-ui, sans-serif;
+  /* XeomX design system font-size tokens (8-step scale, do not extend) */
+  --font-size-display: 4rem;      /* 64px Bold */
+  --font-size-h1: 2.5rem;         /* 40px Bold */
+  --font-size-h2: 1.75rem;        /* 28px Semi-Bold */
+  --font-size-h3: 1.25rem;        /* 20px Medium */
+  --font-size-body-lg: 1.0625rem; /* 17px Regular */
+  --font-size-body: 0.9375rem;    /* 15px Regular */
+  --font-size-caption: 0.8125rem; /* 13px Medium */
+  --font-size-micro: 0.6875rem;   /* 11px Medium */
+  /* Spacing scale (strict) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  /* Radius scale */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  /* Motion tokens */
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-duration-fast: 200ms;
+  --motion-duration-base: 350ms;
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -108,6 +140,84 @@
   --gradient-magenta: linear-gradient(135deg, oklch(0.72 0.3 0), oklch(0.55 0.25 350));
   --shadow-glow: 0 10px 40px -10px oklch(0.68 0.28 0 / 0.45);
   --shadow-card: 0 30px 60px -30px oklch(0 0 0 / 0.7);
+
+  /* ===========================================================
+   * XeomX Design System — Foundation Tokens
+   * (color / surface / semantic / elevation)
+   * =========================================================== */
+
+  /* Neutral scale */
+  --color-neutral-0: #ffffff;
+  --color-neutral-50: #f7f7f7;
+  --color-neutral-100: #ededed;
+  --color-neutral-200: #d4d4d4;
+  --color-neutral-300: #a3a3a3;
+  --color-neutral-400: #737373;
+  --color-neutral-500: #525252;
+  --color-neutral-600: #343434;
+  --color-neutral-700: #282828;
+  --color-neutral-800: #1d1d1d;
+  --color-neutral-850: #151515;
+  --color-neutral-900: #0e0e0e;
+  --color-neutral-950: #070707;
+
+  /* Surfaces */
+  --surface-primary: #0e0e0e;
+  --surface-secondary: #141414;
+  --surface-tertiary: #1b1b1b;
+  --surface-elevated: #232323;
+  --surface-floating: #2d2d2d;
+  --surface-overlay: rgba(0, 0, 0, 0.72);
+  --surface-glass: rgba(255, 255, 255, 0.04);
+
+  /* Accent — Orange */
+  --color-orange-400: #ffa15a;
+  --color-orange-500: #ff8b3d;
+  --color-orange-600: #ff6b1a;
+  --color-orange-700: #e8570d;
+  --color-orange-800: #c74608;
+
+  /* Accent — Magenta */
+  --color-magenta-400: #ff7ab8;
+  --color-magenta-500: #ff2e8a;
+  --color-magenta-600: #e11973;
+  --color-magenta-700: #b40f5b;
+  --color-magenta-800: #890a44;
+
+  /* Accent — Gold */
+  --color-gold-400: #ffd98a;
+  --color-gold-500: #ffc14d;
+  --color-gold-600: #e6a82e;
+  --color-gold-700: #b37f1a;
+  --color-gold-800: #8a5f1a;
+
+  /* Functional */
+  --color-success: #2cc86f;
+  --color-warning: #ffb84d;
+  --color-error: #ff585b;
+  --color-info: #4da3ff;
+
+  /* Semantic — text */
+  --text-primary: #ffffff;
+  --text-secondary: #d4d4d4;
+  --text-tertiary: #a3a3a3;
+  --text-muted: #737373;
+  --text-disabled: #525252;
+
+  /* Semantic — borders */
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.10);
+  --border-strong: rgba(255, 255, 255, 0.18);
+
+  /* Semantic — action */
+  --action-primary: #ff6b1a;
+  --action-secondary: #ff2e8a;
+
+  /* Elevation shadows (Depth Over Decoration) */
+  --elevation-base: none;
+  --elevation-raised: 0 1px 2px rgba(0, 0, 0, 0.18);
+  --elevation-elevated: 0 6px 18px rgba(0, 0, 0, 0.22);
+  --elevation-floating: 0 12px 32px rgba(0, 0, 0, 0.28);
 }
 
 .dark {
@@ -162,9 +272,42 @@
   }
 
   h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
+
+  /* RTL locales swap the default UI font to Vazirmatn */
+  html[dir="rtl"] body,
+  html[lang="fa"] body,
+  html[lang="ar"] body {
+    font-family: var(--font-rtl);
+  }
+
+  /* Reduced motion — neutralise non-essential animation */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
 @layer utilities {
+  /* Elevation surface classes */
+  .surface-base {
+    background-color: var(--surface-primary);
+  }
+  .surface-raised {
+    background-color: var(--surface-tertiary);
+    box-shadow: var(--elevation-raised);
+  }
+  .surface-elevated {
+    background-color: var(--surface-elevated);
+    box-shadow: var(--elevation-elevated);
+  }
+  .surface-floating {
+    background-color: var(--surface-floating);
+    box-shadow: var(--elevation-floating);
+  }
   .glass {
     background: color-mix(in oklab, var(--surface) 60%, transparent);
     backdrop-filter: blur(18px) saturate(140%);

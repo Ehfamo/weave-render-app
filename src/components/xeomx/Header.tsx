@@ -52,6 +52,9 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
           <Link to="/studio" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
             {m.nav_studio()}
           </Link>
+          <Link to="/magazine" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
+            {m.nav_magazine()}
+          </Link>
           <Link
             to="/xeomx-ai"
             className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-foreground transition"

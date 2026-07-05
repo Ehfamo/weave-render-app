@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Header } from "@/components/xeomx/Header";
 import { toast } from "sonner";
+import { motion } from "motion/react";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -36,6 +37,20 @@ const COMING_SOON_FEATURES = [
   { icon: Image, labelKey: "feature_model_hub" as const, descKey: "feature_model_hub_desc" as const, color: "text-purple-400" },
   { icon: Zap, labelKey: "feature_prompt_marketing" as const, descKey: "feature_prompt_marketing_desc" as const, color: "text-orange-400" },
 ];
+
+const metricItemVariants = {
+  hidden: { opacity: 0, y: 12 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
+
+const metricContainerVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.05 } },
+};
 
 function Dashboard() {
   const { user, loading } = useAuth();
@@ -83,7 +98,13 @@ function Dashboard() {
       <main className="mx-auto max-w-[1400px] px-4 py-10 sm:px-8">
 
         {/* Profile Hero */}
-        <section className="relative overflow-hidden flex flex-col gap-6 rounded-3xl border border-border/60 bg-surface/40 p-6 backdrop-blur-xl sm:flex-row sm:items-center sm:p-8">
+        <motion.section
+          initial="hidden"
+          animate="show"
+          variants={metricContainerVariants}
+          className="surface-elevated relative overflow-hidden flex flex-col rounded-3xl sm:flex-row sm:items-center"
+          style={{ gap: "var(--space-5)", padding: "var(--space-5)" }}
+        >
           <div
             aria-hidden
             className="absolute inset-0 -z-10 opacity-30"
@@ -91,7 +112,7 @@ function Dashboard() {
               background: "radial-gradient(ellipse 60% 80% at 0% 50%, oklch(0.45 0.25 340 / 0.4), transparent 70%)",
             }}
           />
-          <div className="flex items-center gap-4">
+          <motion.div variants={metricItemVariants} className="flex items-center" style={{ gap: "var(--space-4)" }}>
             {avatar ? (
               <img
                 src={avatar}
@@ -105,55 +126,92 @@ function Dashboard() {
               </div>
             )}
             <div>
-              <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+              <h1
+                className="font-display font-bold tracking-tight text-foreground"
+                style={{ fontSize: "clamp(2rem, 5vw, var(--font-size-display))", lineHeight: 1 }}
+              >
                 {displayName}
               </h1>
-              <p className="text-sm text-muted-foreground">
+              <p style={{ marginTop: "var(--space-2)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>
                 {profile?.username ? `@${profile.username}` : user.email}
               </p>
-              <span className="mt-1 inline-flex items-center gap-1 rounded-full border border-border/60 bg-surface/60 px-2.5 py-0.5 text-[11px] text-muted-foreground">
+              <span
+                className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] text-muted-foreground"
+                style={{ marginTop: "var(--space-2)", border: "1px solid var(--border-default)", backgroundColor: "var(--surface-glass)" }}
+              >
                 <Sparkles className="h-3 w-3 text-magenta" /> {m.dashboard_free_plan()}
               </span>
             </div>
-          </div>
-          <div className="flex flex-wrap gap-2 sm:ms-auto">
+          </motion.div>
+          <motion.div variants={metricItemVariants} className="flex flex-wrap sm:ms-auto" style={{ gap: "var(--space-2)" }}>
             <Link
               to="/"
-              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-white"
-              style={{ background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)" }}
+              className="inline-flex items-center gap-2 text-sm font-medium text-white"
+              style={{
+                backgroundColor: "var(--action-primary)",
+                borderRadius: "var(--radius-sm)",
+                paddingInline: "var(--space-4)",
+                paddingBlock: "var(--space-2)",
+              }}
             >
               <Plus className="h-4 w-4" /> {m.dashboard_publish_prompt()}
             </Link>
             <button
               onClick={signOut}
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-4 py-2 text-sm text-foreground transition hover:border-magenta/40"
+              className="inline-flex items-center gap-2 text-sm text-foreground transition hover:border-magenta/40"
+              style={{
+                border: "1px solid var(--border-default)",
+                backgroundColor: "var(--surface-glass)",
+                borderRadius: "var(--radius-sm)",
+                paddingInline: "var(--space-4)",
+                paddingBlock: "var(--space-2)",
+              }}
             >
               <LogOut className="h-4 w-4" /> {m.nav_sign_out()}
             </button>
-          </div>
-        </section>
+          </motion.div>
+        </motion.section>
 
         {/* Main Stats */}
-        <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <motion.section
+          initial="hidden"
+          animate="show"
+          variants={metricContainerVariants}
+          className="grid grid-cols-2 sm:grid-cols-4"
+          style={{ marginTop: "var(--space-5)", gap: "var(--space-3)" }}
+        >
           {[
-            { label: m.dashboard_stat_copied(), value: 0, icon: Copy, color: "text-magenta" },
-            { label: m.dashboard_stat_bought(), value: 0, icon: ShoppingBag, color: "text-gold" },
-            { label: m.dashboard_stat_sold(), value: 0, icon: Tag, color: "text-green-400" },
-            { label: m.dashboard_stat_nfts(), value: 0, icon: Hexagon, color: "text-purple-400" },
+            { label: m.dashboard_stat_copied(), value: 0, icon: Copy, color: "var(--color-magenta-500)" },
+            { label: m.dashboard_stat_bought(), value: 0, icon: ShoppingBag, color: "var(--color-orange-500)" },
+            { label: m.dashboard_stat_sold(), value: 0, icon: Tag, color: "var(--color-success)" },
+            { label: m.dashboard_stat_nfts(), value: 0, icon: Hexagon, color: "var(--color-gold-500)" },
           ].map((s) => (
-            <div key={s.label} className="rounded-2xl border border-border/60 bg-surface/40 p-5 backdrop-blur-xl">
-              <s.icon className={`h-4 w-4 ${s.color}`} />
-              <div className="mt-3 font-display text-2xl font-semibold text-foreground">{s.value}</div>
-              <div className="text-xs text-muted-foreground">{s.label}</div>
-            </div>
+            <motion.div
+              key={s.label}
+              variants={metricItemVariants}
+              className="surface-raised rounded-2xl"
+              style={{ padding: "var(--space-4)" }}
+            >
+              <s.icon className="h-4 w-4" style={{ color: s.color }} />
+              <div
+                className="font-display font-bold text-foreground"
+                style={{ marginTop: "var(--space-3)", fontSize: "var(--font-size-h2)", color: s.color }}
+              >
+                {s.value}
+              </div>
+              <div style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>{s.label}</div>
+            </motion.div>
           ))}
-        </section>
+        </motion.section>
 
         {/* Subscription & Wallet */}
-        <section className="mt-4 grid gap-4 sm:grid-cols-2">
+        <section
+          className="grid sm:grid-cols-2"
+          style={{ marginTop: "var(--space-4)", gap: "var(--space-4)" }}
+        >
 
           {/* Subscription Card */}
-          <div className="rounded-2xl border border-border/60 bg-surface/40 p-6 backdrop-blur-xl">
+          <div className="surface-raised rounded-2xl" style={{ padding: "var(--space-5)" }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Crown className="h-4 w-4 text-gold" />
@@ -180,7 +238,7 @@ function Dashboard() {
           </div>
 
           {/* Wallet Card */}
-          <div className="rounded-2xl border border-border/60 bg-surface/40 p-6 backdrop-blur-xl">
+          <div className="surface-raised rounded-2xl" style={{ padding: "var(--space-5)" }}>
             <div className="flex items-center gap-2">
               <Wallet className="h-4 w-4 text-magenta" />
               <span className="text-sm font-medium text-foreground">{m.dashboard_wallet()}</span>
@@ -189,15 +247,20 @@ function Dashboard() {
               </span>
             </div>
             <div className="mt-4">
-              <p className="font-display text-3xl font-semibold text-foreground">$0.00</p>
+              <p
+                className="font-display font-bold"
+                style={{ fontSize: "var(--font-size-h2)", color: "var(--color-orange-500)" }}
+              >
+                $0.00
+              </p>
               <p className="text-xs text-muted-foreground">{m.dashboard_total_earnings()}</p>
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <div className="rounded-xl border border-border/40 bg-surface/60 p-3">
+            <div className="mt-4 grid grid-cols-2" style={{ gap: "var(--space-2)" }}>
+              <div className="rounded-xl p-3" style={{ backgroundColor: "var(--surface-tertiary)" }}>
                 <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{m.dashboard_pending()}</p>
                 <p className="mt-1 font-display text-lg">$0.00</p>
               </div>
-              <div className="rounded-xl border border-border/40 bg-surface/60 p-3">
+              <div className="rounded-xl p-3" style={{ backgroundColor: "var(--surface-tertiary)" }}>
                 <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{m.dashboard_withdrawn()}</p>
                 <p className="mt-1 font-display text-lg">$0.00</p>
               </div>
@@ -206,13 +269,13 @@ function Dashboard() {
         </section>
 
         {/* Activity Cards */}
-        <section className="mt-4 grid gap-4 lg:grid-cols-3">
+        <section className="grid lg:grid-cols-3" style={{ marginTop: "var(--space-4)", gap: "var(--space-4)" }}>
           {[
             { title: m.dashboard_saved_prompts(), icon: Bookmark, empty: m.dashboard_saved_empty() },
             { title: m.dashboard_liked(), icon: Heart, empty: m.dashboard_liked_empty() },
             { title: m.dashboard_your_drops(), icon: Sparkles, empty: m.dashboard_your_drops_empty() },
           ].map((c) => (
-            <div key={c.title} className="rounded-2xl border border-border/60 bg-surface/40 p-5 backdrop-blur-xl">
+            <div key={c.title} className="surface-raised rounded-2xl" style={{ padding: "var(--space-4)" }}>
               <div className="flex items-center gap-2">
                 <c.icon className="h-4 w-4 text-magenta" />
                 <h3 className="font-display text-lg font-semibold text-foreground">{c.title}</h3>

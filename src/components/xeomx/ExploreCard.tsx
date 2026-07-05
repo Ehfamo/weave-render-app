@@ -15,7 +15,6 @@ export function ExploreCard({ section, index = 0, core = false }: { section: Exp
             ? 'border-amber-300/40 hover:border-amber-300/70'
             : 'hover:border-amber-300/40'
         }`}
-      // eslint-disable-next-line react/forbid-dom-props
     >
       <div className="flex items-start justify-between gap-3">
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-amber-300/20 to-fuchsia-500/10 ring-1 ring-white/10">

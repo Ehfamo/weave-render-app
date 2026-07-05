@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Sparkles, Loader2, Mail, Apple, Github, ArrowLeft } from "lucide-react";
+import { motion } from "motion/react";
 import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -98,8 +99,15 @@ function AuthPage() {
             "radial-gradient(ellipse 80% 50% at 50% 0%, oklch(0.45 0.25 340 / 0.35), transparent 60%), radial-gradient(ellipse 60% 40% at 80% 80%, oklch(0.6 0.18 60 / 0.2), transparent 60%)",
         }}
       />
-      <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-6">
-        <Link to="/" className="mb-10 flex items-center gap-2">
+      <div
+        className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center"
+        style={{ paddingInline: "var(--space-5)" }}
+      >
+        <Link
+          to="/"
+          className="flex items-center gap-2"
+          style={{ marginBottom: "var(--space-6)" }}
+        >
           <span className="grid h-9 w-9 place-items-center rounded-lg" style={{ background: "var(--gradient-magenta)" }}>
             <Sparkles className="h-4 w-4 text-white" />
           </span>
@@ -108,21 +116,35 @@ function AuthPage() {
           </span>
         </Link>
 
-        <div className="w-full rounded-3xl border border-border/60 bg-surface/40 p-8 backdrop-blur-xl">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="surface-elevated w-full rounded-3xl"
+          style={{ padding: "var(--space-6)" }}
+        >
           {view !== "root" && (
             <button
               type="button"
               onClick={() => setView("root")}
-              className="mb-4 inline-flex items-center gap-1 text-xs text-muted-foreground transition hover:text-foreground"
+              className="inline-flex items-center gap-1 transition hover:text-foreground"
+              style={{ marginBottom: "var(--space-4)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}
             >
               <ArrowLeft className="h-3 w-3" /> {m.auth_back_options()}
             </button>
           )}
-          <h1 className="font-display text-3xl font-semibold tracking-tight text-foreground">{m.auth_welcome()}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">{m.auth_subtitle()}</p>
+          <h1
+            className="font-display font-bold tracking-tight text-foreground"
+            style={{ fontSize: "clamp(1.75rem, 4vw, var(--font-size-h1))" }}
+          >
+            {m.auth_welcome()}
+          </h1>
+          <p style={{ marginTop: "var(--space-2)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>
+            {m.auth_subtitle()}
+          </p>
 
           {view === "root" && (
-            <div className="mt-8 flex flex-col gap-3">
+            <div className="flex flex-col" style={{ marginTop: "var(--space-6)", gap: "var(--space-3)" }}>
               <OAuthButton onClick={() => signInOAuth("google")} loading={loading === "google"} label={m.auth_continue_google()}>
                 <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden>
                   <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.4-1.6 4.1-5.5 4.1-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.2.8 3.9 1.5l2.7-2.6C17 3.4 14.7 2.4 12 2.4 6.7 2.4 2.4 6.7 2.4 12s4.3 9.6 9.6 9.6c5.5 0 9.2-3.9 9.2-9.4 0-.6-.1-1.1-.2-1.6H12z" />
@@ -135,7 +157,14 @@ function AuthPage() {
                 type="button"
                 disabled
                 aria-disabled="true"
-                className="inline-flex w-full items-center justify-center gap-3 rounded-full border border-border bg-background px-5 py-3 text-sm font-medium text-muted-foreground opacity-60 cursor-not-allowed"
+                className="inline-flex w-full items-center justify-center gap-3 text-sm font-medium text-muted-foreground opacity-60 cursor-not-allowed"
+                style={{
+                  border: "1px solid var(--border-default)",
+                  backgroundColor: "var(--surface-glass)",
+                  borderRadius: "var(--radius-sm)",
+                  paddingInline: "var(--space-5)",
+                  paddingBlock: "var(--space-3)",
+                }}
               >
                 <Github className="h-4 w-4" />
                 {m.auth_continue_github()}
@@ -144,7 +173,10 @@ function AuthPage() {
                 </span>
               </button>
 
-              <div className="my-2 flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+              <div
+                className="flex items-center uppercase tracking-[0.2em] text-muted-foreground"
+                style={{ marginBlock: "var(--space-2)", gap: "var(--space-3)", fontSize: "var(--font-size-micro)" }}
+              >
                 <span className="h-px flex-1 bg-border/60" />
                 {m.auth_or()}
                 <span className="h-px flex-1 bg-border/60" />
@@ -157,7 +189,11 @@ function AuthPage() {
           )}
 
           {view === "email" && (
-            <form onSubmit={sendMagicLink} className="mt-8 flex flex-col gap-3">
+            <form
+              onSubmit={sendMagicLink}
+              className="flex flex-col"
+              style={{ marginTop: "var(--space-6)", gap: "var(--space-3)" }}
+            >
               <label className="text-xs font-medium text-muted-foreground" htmlFor="email-ml">
                 {m.auth_email_label()}
               </label>
@@ -167,23 +203,37 @@ function AuthPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-magenta/60"
+                className="text-sm text-foreground outline-none transition focus:border-magenta/60"
+                style={{
+                  border: "1px solid var(--border-default)",
+                  backgroundColor: "var(--surface-secondary)",
+                  borderRadius: "var(--radius-sm)",
+                  paddingInline: "var(--space-4)",
+                  paddingBlock: "var(--space-3)",
+                }}
                 placeholder="you@example.com"
               />
               <button
                 type="submit"
                 disabled={loading === "magic"}
-                className="mt-2 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium text-white disabled:opacity-60"
-                style={{ background: "var(--gradient-magenta)" }}
+                className="inline-flex items-center justify-center gap-2 text-sm font-medium text-white disabled:opacity-60"
+                style={{
+                  marginTop: "var(--space-2)",
+                  backgroundColor: "var(--action-primary)",
+                  borderRadius: "var(--radius-sm)",
+                  paddingInline: "var(--space-5)",
+                  paddingBlock: "var(--space-3)",
+                }}
               >
                 {loading === "magic" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
                 {m.auth_send_magic_link()}
               </button>
-              <p className="text-center text-[11px] text-muted-foreground">{m.auth_magic_link_desc()}</p>
+              <p className="text-center" style={{ fontSize: "var(--font-size-micro)", color: "var(--text-muted)" }}>{m.auth_magic_link_desc()}</p>
               <button
                 type="button"
                 onClick={() => setView("password")}
-                className="mt-1 text-xs text-muted-foreground transition hover:text-foreground"
+                className="transition hover:text-foreground"
+                style={{ marginTop: "var(--space-1)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}
               >
                 {m.auth_use_password()}
               </button>
@@ -191,7 +241,11 @@ function AuthPage() {
           )}
 
           {view === "password" && (
-            <form onSubmit={submitPassword} className="mt-8 flex flex-col gap-3">
+            <form
+              onSubmit={submitPassword}
+              className="flex flex-col"
+              style={{ marginTop: "var(--space-6)", gap: "var(--space-3)" }}
+            >
               <label className="text-xs font-medium text-muted-foreground" htmlFor="email-pw">
                 {m.auth_email_label()}
               </label>
@@ -201,7 +255,14 @@ function AuthPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-magenta/60"
+                className="text-sm text-foreground outline-none transition focus:border-magenta/60"
+                style={{
+                  border: "1px solid var(--border-default)",
+                  backgroundColor: "var(--surface-secondary)",
+                  borderRadius: "var(--radius-sm)",
+                  paddingInline: "var(--space-4)",
+                  paddingBlock: "var(--space-3)",
+                }}
               />
               <label className="text-xs font-medium text-muted-foreground" htmlFor="pw">
                 {m.auth_password_label()}
@@ -213,13 +274,26 @@ function AuthPage() {
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-magenta/60"
+                className="text-sm text-foreground outline-none transition focus:border-magenta/60"
+                style={{
+                  border: "1px solid var(--border-default)",
+                  backgroundColor: "var(--surface-secondary)",
+                  borderRadius: "var(--radius-sm)",
+                  paddingInline: "var(--space-4)",
+                  paddingBlock: "var(--space-3)",
+                }}
               />
               <button
                 type="submit"
                 disabled={loading === "password"}
-                className="mt-2 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium text-white disabled:opacity-60"
-                style={{ background: "var(--gradient-magenta)" }}
+                className="inline-flex items-center justify-center gap-2 text-sm font-medium text-white disabled:opacity-60"
+                style={{
+                  marginTop: "var(--space-2)",
+                  backgroundColor: "var(--action-primary)",
+                  borderRadius: "var(--radius-sm)",
+                  paddingInline: "var(--space-5)",
+                  paddingBlock: "var(--space-3)",
+                }}
               >
                 {loading === "password" ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {isSignUp ? m.auth_sign_up() : m.auth_sign_in()}
@@ -227,26 +301,35 @@ function AuthPage() {
               <button
                 type="button"
                 onClick={() => setIsSignUp((v) => !v)}
-                className="mt-1 text-xs text-muted-foreground transition hover:text-foreground"
+                className="transition hover:text-foreground"
+                style={{ marginTop: "var(--space-1)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}
               >
                 {isSignUp ? m.auth_toggle_signin() : m.auth_toggle_signup()}
               </button>
               <button
                 type="button"
                 onClick={() => setView("email")}
-                className="text-xs text-muted-foreground transition hover:text-foreground"
+                className="transition hover:text-foreground"
+                style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}
               >
                 {m.auth_use_magic_link()}
               </button>
             </form>
           )}
 
-          <p className="mt-6 text-center text-xs text-muted-foreground">
+          <p
+            className="text-center"
+            style={{ marginTop: "var(--space-5)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}
+          >
             {m.auth_terms()}
           </p>
-        </div>
+        </motion.div>
 
-        <Link to="/" className="mt-6 text-xs text-muted-foreground hover:text-foreground">
+        <Link
+          to="/"
+          className="hover:text-foreground"
+          style={{ marginTop: "var(--space-5)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}
+        >
           {m.auth_back()}
         </Link>
       </div>
@@ -269,7 +352,16 @@ function OAuthButton({
     <button
       onClick={onClick}
       disabled={loading}
-      className="inline-flex w-full items-center justify-center gap-3 rounded-full border border-border bg-background px-5 py-3 text-sm font-medium text-foreground transition hover:border-magenta/40 hover:bg-surface disabled:opacity-60"
+      className="inline-flex w-full items-center justify-center gap-3 text-sm font-medium text-foreground transition hover:border-magenta/40 disabled:opacity-60"
+      style={{
+        border: "1px solid var(--border-default)",
+        backgroundColor: "var(--surface-glass)",
+        borderRadius: "var(--radius-sm)",
+        paddingInline: "var(--space-5)",
+        paddingBlock: "var(--space-3)",
+        transitionDuration: "var(--motion-duration-fast)",
+        transitionTimingFunction: "var(--motion-ease)",
+      }}
     >
       {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : children}
       {label}

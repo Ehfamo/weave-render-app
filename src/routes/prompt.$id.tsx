@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, Bookmark, Check, Copy, Crown, Heart, Lock, Share2, Shuffle, Sparkles, TrendingUp } from "lucide-react";
+import { motion } from "motion/react";
 import { getPrompt, PROMPTS, type Prompt } from "@/lib/prompts";
 import { Header } from "@/components/xeomx/Header";
 import { PromptCard } from "@/components/xeomx/PromptCard";
@@ -95,8 +96,16 @@ function Detail() {
             <ArrowLeft className="h-4 w-4" /> {m.nav_back_library()}
           </Link>
 
-          <div className="mt-8 grid gap-10 lg:grid-cols-[420px_minmax(0,1fr)] lg:gap-14">
-            <div className="relative overflow-hidden rounded-3xl border border-border shadow-[var(--shadow-card)]">
+          <div
+            className="grid lg:grid-cols-[420px_minmax(0,1fr)]"
+            style={{ marginTop: "var(--space-6)", gap: "var(--space-6)" }}
+          >
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="surface-elevated relative overflow-hidden rounded-3xl"
+            >
               <img src={prompt.cover} alt={prompt.title} className="aspect-[4/5] w-full object-cover" />
               <div className="absolute start-4 top-4 flex items-center gap-2">
                 <span
@@ -113,14 +122,30 @@ function Detail() {
                   {prompt.state === "premium" ? m.common_premium() : prompt.state === "soon" ? m.common_coming_soon() : m.common_free()}
                 </span>
               </div>
-            </div>
+            </motion.div>
 
             <div>
-              <p className="text-[11px] uppercase tracking-[0.28em] text-magenta/80">{prompt.category} · {prompt.author}</p>
-              <h1 className="mt-3 font-display text-4xl font-semibold leading-[0.98] tracking-tight sm:text-5xl lg:text-6xl">
+              <p
+                className="uppercase tracking-[0.28em] text-magenta/80"
+                style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}
+              >
+                {prompt.category} · {prompt.author}
+              </p>
+              <h1
+                className="font-display font-bold leading-[0.98] tracking-tight"
+                style={{ marginTop: "var(--space-3)", fontSize: "clamp(2rem, 5vw, var(--font-size-h1))" }}
+              >
                 {prompt.title}
               </h1>
-              <div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+              <div
+                className="flex flex-wrap items-center"
+                style={{
+                  marginTop: "var(--space-4)",
+                  gap: "var(--space-3)",
+                  fontSize: "var(--font-size-caption)",
+                  color: "var(--text-muted)",
+                }}
+              >
                 <span>▶ {prompt.views} {m.prompt_views()}</span>
                 <span>·</span>
                 <span>❤ {prompt.likes}</span>
@@ -129,14 +154,20 @@ function Detail() {
                 <SignalBadge signal={prompt.signal ?? null} score={prompt.viralScore} />
               </div>
 
-              <div className="mt-6 grid grid-cols-4 gap-2">
+              <div
+                className="grid grid-cols-4"
+                style={{ marginTop: "var(--space-5)", gap: "var(--space-2)" }}
+              >
                 {[
                   { label: m.prompt_stat_copies(), value: fmt(prompt.copies), Icon: Copy },
                   { label: m.prompt_stat_saves(), value: fmt(prompt.saves), Icon: Bookmark },
                   { label: m.prompt_stat_shares(), value: fmt(prompt.shares), Icon: Share2 },
                   { label: m.prompt_stat_remixes(), value: fmt(prompt.remixes), Icon: Shuffle },
                 ].map(({ label, value, Icon }) => (
-                  <div key={label} className="rounded-xl border border-border bg-surface/40 p-3">
+                  <div
+                    key={label}
+                    className="surface-raised rounded-xl p-3"
+                  >
                     <Icon className="h-3.5 w-3.5 text-magenta" />
                     <p className="mt-1.5 font-display text-lg leading-none">{value}</p>
                     <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{label}</p>
@@ -144,7 +175,14 @@ function Detail() {
                 ))}
               </div>
 
-              <div className="glass mt-8 rounded-2xl p-5">
+              <div
+                className="rounded-2xl"
+                style={{
+                  marginTop: "var(--space-6)",
+                  padding: "var(--space-5)",
+                  backgroundColor: "var(--surface-secondary)",
+                }}
+              >
                 <div className="mb-4 flex items-center justify-between">
                   <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">{m.prompt_the_prompt()}</span>
                   <div className="flex gap-2">
@@ -163,20 +201,49 @@ function Detail() {
                   {locked ? m.prompt_locked_message() : prompt.prompt}
                 </p>
 
-                <button
-                  onClick={onCopy}
-                  disabled={locked}
-                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
-                  style={{ background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)" }}
+                <div
+                  className="flex flex-wrap"
+                  style={{ marginTop: "var(--space-5)", gap: "var(--space-3)" }}
                 >
-                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  {locked ? m.prompt_locked_button() : copied ? m.prompt_copied_button() : m.prompt_copy_button()}
-                </button>
+                  <button
+                    onClick={onCopy}
+                    disabled={locked}
+                    className="inline-flex flex-1 items-center justify-center gap-2 text-sm font-medium text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
+                    style={{
+                      backgroundColor: "var(--action-primary)",
+                      borderRadius: "var(--radius-sm)",
+                      paddingInline: "var(--space-5)",
+                      paddingBlock: "var(--space-3)",
+                      transitionDuration: "var(--motion-duration-fast)",
+                      transitionTimingFunction: "var(--motion-ease)",
+                    }}
+                  >
+                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    {locked ? m.prompt_locked_button() : copied ? m.prompt_copied_button() : m.prompt_copy_button()}
+                  </button>
+                  <button
+                    className="inline-flex items-center justify-center gap-2 text-sm font-medium text-foreground transition hover:border-magenta/40"
+                    style={{
+                      border: "1px solid var(--border-default)",
+                      backgroundColor: "var(--surface-glass)",
+                      borderRadius: "var(--radius-sm)",
+                      paddingInline: "var(--space-5)",
+                      paddingBlock: "var(--space-3)",
+                      transitionDuration: "var(--motion-duration-fast)",
+                      transitionTimingFunction: "var(--motion-ease)",
+                    }}
+                  >
+                    <Shuffle className="h-4 w-4" /> {m.prompt_stat_remixes()}
+                  </button>
+                </div>
               </div>
 
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              <div
+                className="grid sm:grid-cols-2"
+                style={{ marginTop: "var(--space-6)", gap: "var(--space-3)" }}
+              >
                 {prompt.breakdown.map((b) => (
-                  <div key={b.label} className="rounded-2xl border border-border bg-surface/50 p-4">
+                  <div key={b.label} className="surface-raised rounded-2xl p-4">
                     <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">{b.label}</p>
                     <p className="mt-1 font-display text-lg">{b.value}</p>
                   </div>

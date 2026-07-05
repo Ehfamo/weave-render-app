@@ -1,6 +1,8 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/vazirmatn";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -43,7 +45,37 @@
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --font-display: "Fraunces", "Times New Roman", serif;
-  --font-sans: "Inter", system-ui, sans-serif;
+  --font-sans: "InterVariable", "Inter", system-ui, sans-serif;
+  --font-rtl: "VazirmatnVariable", "Vazirmatn", system-ui, sans-serif;
+  /* XeomX design system font-size tokens (8-step scale, do not extend) */
+  --font-size-display: 4rem;      /* 64px Bold */
+  --font-size-h1: 2.5rem;         /* 40px Bold */
+  --font-size-h2: 1.75rem;        /* 28px Semi-Bold */
+  --font-size-h3: 1.25rem;        /* 20px Medium */
+  --font-size-body-lg: 1.0625rem; /* 17px Regular */
+  --font-size-body: 0.9375rem;    /* 15px Regular */
+  --font-size-caption: 0.8125rem; /* 13px Medium */
+  --font-size-micro: 0.6875rem;   /* 11px Medium */
+  /* Spacing scale (strict) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  /* Radius scale */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  /* Motion tokens */
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-duration-fast: 200ms;
+  --motion-duration-base: 350ms;
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);

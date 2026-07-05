@@ -47,7 +47,11 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
     <Link
       to="/prompt/$id"
       params={{ id: prompt.id }}
-      className={`group relative shrink-0 ${widths[size]} overflow-hidden rounded-2xl border border-border bg-surface transition-all duration-500 hover:border-magenta/40 hover:shadow-[var(--shadow-glow)]`}
+      className={`group surface-raised relative shrink-0 ${widths[size]} overflow-hidden rounded-2xl border border-[var(--border-default)] transition-transform hover:scale-[1.02] hover:border-magenta/40`}
+      style={{
+        transitionDuration: "var(--motion-duration-fast)",
+        transitionTimingFunction: "var(--motion-ease)",
+      }}
     >
       <div className="relative aspect-[4/5] overflow-hidden">
         <img

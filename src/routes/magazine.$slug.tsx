@@ -95,8 +95,9 @@ const BODY: { heading: string; paragraphs: string[] }[] = [
 function ArticlePage() {
   const { article } = Route.useLoaderData();
   const related = ARTICLES.filter((a) => a.slug !== article.slug).slice(0, 3);
-  const color = CAT_COLOR[article.category];
-  const gradient = CAT_GRADIENT[article.category];
+  const cat = article.category as keyof typeof CAT_COLOR;
+  const color = CAT_COLOR[cat];
+  const gradient = CAT_GRADIENT[cat];
 
   return (
     <div className="min-h-svh" style={{ background: "var(--surface-primary)" }}>
@@ -139,7 +140,7 @@ function ArticlePage() {
               fontWeight: 600,
             }}
           >
-            {catLabel(article.category)}
+            {catLabel(cat)}
           </span>
           <h1
             className="font-display font-bold"

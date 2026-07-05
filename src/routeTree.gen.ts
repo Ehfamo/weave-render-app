@@ -26,6 +26,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PromptIdRouteImport } from './routes/prompt.$id'
+import { Route as MagazineSlugRouteImport } from './routes/magazine.$slug'
 import { Route as ExploreSlugRouteImport } from './routes/explore_.$slug'
 import { Route as CollectionsIdRouteImport } from './routes/collections.$id'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -114,6 +115,11 @@ const PromptIdRoute = PromptIdRouteImport.update({
   path: '/prompt/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MagazineSlugRoute = MagazineSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => MagazineRoute,
+} as any)
 const ExploreSlugRoute = ExploreSlugRouteImport.update({
   id: '/explore_/$slug',
   path: '/explore/$slug',
@@ -138,7 +144,7 @@ export interface FileRoutesByFullPath {
   '/creators': typeof CreatorsRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
-  '/magazine': typeof MagazineRoute
+  '/magazine': typeof MagazineRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore/$slug': typeof ExploreSlugRoute
+  '/magazine/$slug': typeof MagazineSlugRoute
   '/prompt/$id': typeof PromptIdRoute
 }
 export interface FileRoutesByTo {
@@ -159,7 +166,7 @@ export interface FileRoutesByTo {
   '/creators': typeof CreatorsRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
-  '/magazine': typeof MagazineRoute
+  '/magazine': typeof MagazineRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore/$slug': typeof ExploreSlugRoute
+  '/magazine/$slug': typeof MagazineSlugRoute
   '/prompt/$id': typeof PromptIdRoute
 }
 export interface FileRoutesById {
@@ -182,7 +190,7 @@ export interface FileRoutesById {
   '/creators': typeof CreatorsRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
-  '/magazine': typeof MagazineRoute
+  '/magazine': typeof MagazineRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
@@ -193,6 +201,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore_/$slug': typeof ExploreSlugRoute
+  '/magazine/$slug': typeof MagazineSlugRoute
   '/prompt/$id': typeof PromptIdRoute
 }
 export interface FileRouteTypes {
@@ -216,6 +225,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/collections/$id'
     | '/explore/$slug'
+    | '/magazine/$slug'
     | '/prompt/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/collections/$id'
     | '/explore/$slug'
+    | '/magazine/$slug'
     | '/prompt/$id'
   id:
     | '__root__'
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/collections/$id'
     | '/explore_/$slug'
+    | '/magazine/$slug'
     | '/prompt/$id'
   fileRoutesById: FileRoutesById
 }
@@ -271,7 +283,7 @@ export interface RootRouteChildren {
   CreatorsRoute: typeof CreatorsRoute
   ExploreRoute: typeof ExploreRoute
   FeedRoute: typeof FeedRoute
-  MagazineRoute: typeof MagazineRoute
+  MagazineRoute: typeof MagazineRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
@@ -404,6 +416,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PromptIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/magazine/$slug': {
+      id: '/magazine/$slug'
+      path: '/$slug'
+      fullPath: '/magazine/$slug'
+      preLoaderRoute: typeof MagazineSlugRouteImport
+      parentRoute: typeof MagazineRoute
+    }
     '/explore_/$slug': {
       id: '/explore_/$slug'
       path: '/explore/$slug'
@@ -451,6 +470,18 @@ const CollectionsRouteWithChildren = CollectionsRoute._addFileChildren(
   CollectionsRouteChildren,
 )
 
+interface MagazineRouteChildren {
+  MagazineSlugRoute: typeof MagazineSlugRoute
+}
+
+const MagazineRouteChildren: MagazineRouteChildren = {
+  MagazineSlugRoute: MagazineSlugRoute,
+}
+
+const MagazineRouteWithChildren = MagazineRoute._addFileChildren(
+  MagazineRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -460,7 +491,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreatorsRoute: CreatorsRoute,
   ExploreRoute: ExploreRoute,
   FeedRoute: FeedRoute,
-  MagazineRoute: MagazineRoute,
+  MagazineRoute: MagazineRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RefundPolicyRoute: RefundPolicyRoute,

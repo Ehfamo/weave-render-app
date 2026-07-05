@@ -29,32 +29,59 @@ export function ViralFeedCard({ p }: { p: Prompt }) {
           { Icon: Shuffle, label: String(p.remixes ?? "—") },
         ].map(({ Icon, label }, i) => (
           <button key={i} className="group flex flex-col items-center gap-1">
-            <span className="grid h-12 w-12 place-items-center rounded-full border border-foreground/25 bg-background/40 backdrop-blur transition group-hover:border-magenta/60 group-hover:bg-magenta/15">
+            <span
+              className="surface-raised grid h-12 w-12 place-items-center rounded-full backdrop-blur transition group-hover:border-magenta/60"
+              style={{
+                transitionDuration: "var(--motion-duration-fast)",
+                transitionTimingFunction: "var(--motion-ease)",
+              }}
+            >
               <Icon className="h-5 w-5" />
             </span>
-            <span className="text-[10px] text-muted-foreground">{label}</span>
+            <span style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>{label}</span>
           </button>
         ))}
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 z-10 mx-auto max-w-[760px] space-y-4 p-5 sm:p-10">
-        <div className="flex flex-wrap items-center gap-2">
+      <div
+        className="absolute inset-x-0 bottom-0 z-10 mx-auto flex max-w-[760px] flex-col"
+        style={{ padding: "var(--space-5)", gap: "var(--space-4)" }}
+      >
+        <div className="flex flex-wrap items-center" style={{ gap: "var(--space-2)" }}>
           <span className="rounded-full border border-border/60 bg-background/60 px-2.5 py-1 text-[10px] uppercase tracking-[0.22em] text-muted-foreground backdrop-blur">
             {p.category}
           </span>
           <SignalBadge signal={p.signal ?? null} score={p.viralScore} />
         </div>
         <h2 className="font-display text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">{p.title}</h2>
-        <p className="line-clamp-3 max-w-xl text-sm text-foreground/80 sm:text-base">{p.prompt}</p>
-        <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+        <p
+          className="line-clamp-3 max-w-xl"
+          style={{ fontSize: "var(--font-size-body)", color: "var(--text-secondary)" }}
+        >
+          {p.prompt}
+        </p>
+        <p
+          className="uppercase tracking-[0.22em]"
+          style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}
+        >
           {p.author} · {p.views} views · {p.likes} likes
         </p>
-        <div className="flex flex-wrap items-center gap-2 pt-2">
+        <div
+          className="flex flex-wrap items-center"
+          style={{ paddingTop: "var(--space-2)", gap: "var(--space-3)" }}
+        >
           <button
             onClick={onCopy}
             disabled={p.state === "soon"}
-            className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium text-white transition disabled:opacity-40"
-            style={{ background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)" }}
+            className="inline-flex items-center gap-2 text-sm font-medium text-white transition disabled:opacity-40"
+            style={{
+              backgroundColor: "var(--action-primary)",
+              borderRadius: "var(--radius-sm)",
+              paddingInline: "var(--space-5)",
+              paddingBlock: "var(--space-3)",
+              transitionDuration: "var(--motion-duration-fast)",
+              transitionTimingFunction: "var(--motion-ease)",
+            }}
           >
             <Copy className="h-4 w-4" />
             {p.state === "soon" ? "Locked" : copied ? "Copied ✓" : "Copy prompt"}
@@ -62,7 +89,16 @@ export function ViralFeedCard({ p }: { p: Prompt }) {
           <Link
             to="/prompt/$id"
             params={{ id: p.id }}
-            className="rounded-full border border-border bg-surface/60 px-5 py-3 text-sm text-foreground backdrop-blur transition hover:border-gold/40"
+            className="text-sm text-foreground backdrop-blur transition hover:border-gold/40"
+            style={{
+              border: "1px solid var(--border-default)",
+              backgroundColor: "var(--surface-glass)",
+              borderRadius: "var(--radius-sm)",
+              paddingInline: "var(--space-5)",
+              paddingBlock: "var(--space-3)",
+              transitionDuration: "var(--motion-duration-fast)",
+              transitionTimingFunction: "var(--motion-ease)",
+            }}
           >
             Open studio →
           </Link>

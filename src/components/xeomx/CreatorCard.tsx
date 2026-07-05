@@ -13,7 +13,13 @@ export function CreatorCard({ c }: { c: Creator }) {
   const t = tierMap[c.tier];
   const Icon = t.Icon;
   return (
-    <div className="group relative w-[260px] shrink-0 overflow-hidden rounded-3xl border border-border bg-surface transition hover:border-magenta/40 hover:shadow-[var(--shadow-glow)]">
+    <div
+      className="group surface-raised relative w-[260px] shrink-0 overflow-hidden rounded-3xl transition-transform hover:scale-[1.02] hover:border-magenta/40"
+      style={{
+        transitionDuration: "var(--motion-duration-fast)",
+        transitionTimingFunction: "var(--motion-ease)",
+      }}
+    >
       <div className="relative aspect-[5/4] overflow-hidden">
         <img src={c.cover} alt={c.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
@@ -21,16 +27,49 @@ export function CreatorCard({ c }: { c: Creator }) {
           <Icon className="h-3 w-3" /> {c.tier}
         </span>
       </div>
-      <div className="space-y-2 p-4">
+      <div style={{ padding: "var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
         <div>
-          <h3 className="font-display text-lg font-semibold tracking-tight">{c.name}</h3>
-          <p className="text-xs text-muted-foreground">{c.handle}</p>
+          <h3
+            className="font-display font-semibold tracking-tight"
+            style={{ fontSize: "var(--font-size-h3)" }}
+          >
+            {c.name}
+          </h3>
+          <p style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>{c.handle}</p>
         </div>
-        <p className="line-clamp-2 text-xs text-muted-foreground">{c.bio}</p>
-        <div className="flex items-center justify-between border-t border-border/60 pt-2 text-[11px] text-muted-foreground">
+        <p
+          className="line-clamp-2"
+          style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}
+        >
+          {c.bio}
+        </p>
+        <div
+          className="flex items-center justify-between"
+          style={{
+            borderTop: "1px solid var(--border-subtle)",
+            paddingTop: "var(--space-2)",
+            fontSize: "var(--font-size-caption)",
+            color: "var(--text-muted)",
+          }}
+        >
           <span>{m.creator_followers({ count: String(c.followers) })}</span>
           <span>{m.creator_copies({ count: String(c.copies) })}</span>
         </div>
+        <button
+          type="button"
+          className="inline-flex w-full items-center justify-center text-sm font-medium text-white transition hover:opacity-95"
+          style={{
+            marginTop: "var(--space-2)",
+            backgroundColor: "var(--action-secondary)",
+            borderRadius: "var(--radius-sm)",
+            paddingInline: "var(--space-4)",
+            paddingBlock: "var(--space-2)",
+            transitionDuration: "var(--motion-duration-fast)",
+            transitionTimingFunction: "var(--motion-ease)",
+          }}
+        >
+          Follow
+        </button>
       </div>
     </div>
   );

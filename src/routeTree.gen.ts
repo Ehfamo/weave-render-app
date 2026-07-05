@@ -10,8 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as CreatorsRouteImport } from './routes/creators'
@@ -30,6 +32,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RefundPolicyRoute = RefundPolicyRouteImport.update({
   id: '/refund-policy',
   path: '/refund-policy',
@@ -38,6 +45,11 @@ const RefundPolicyRoute = RefundPolicyRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeedRoute = FeedRouteImport.update({
@@ -108,8 +120,10 @@ export interface FileRoutesByFullPath {
   '/creators': typeof CreatorsRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
+  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/settings': typeof SettingsRoute
   '/terms': typeof TermsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/collections/$id': typeof CollectionsIdRoute
@@ -124,8 +138,10 @@ export interface FileRoutesByTo {
   '/creators': typeof CreatorsRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
+  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/settings': typeof SettingsRoute
   '/terms': typeof TermsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/collections/$id': typeof CollectionsIdRoute
@@ -142,8 +158,10 @@ export interface FileRoutesById {
   '/creators': typeof CreatorsRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
+  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/settings': typeof SettingsRoute
   '/terms': typeof TermsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/collections/$id': typeof CollectionsIdRoute
@@ -160,8 +178,10 @@ export interface FileRouteTypes {
     | '/creators'
     | '/explore'
     | '/feed'
+    | '/pricing'
     | '/privacy'
     | '/refund-policy'
+    | '/settings'
     | '/terms'
     | '/dashboard'
     | '/collections/$id'
@@ -176,8 +196,10 @@ export interface FileRouteTypes {
     | '/creators'
     | '/explore'
     | '/feed'
+    | '/pricing'
     | '/privacy'
     | '/refund-policy'
+    | '/settings'
     | '/terms'
     | '/dashboard'
     | '/collections/$id'
@@ -193,8 +215,10 @@ export interface FileRouteTypes {
     | '/creators'
     | '/explore'
     | '/feed'
+    | '/pricing'
     | '/privacy'
     | '/refund-policy'
+    | '/settings'
     | '/terms'
     | '/_authenticated/dashboard'
     | '/collections/$id'
@@ -211,8 +235,10 @@ export interface RootRouteChildren {
   CreatorsRoute: typeof CreatorsRoute
   ExploreRoute: typeof ExploreRoute
   FeedRoute: typeof FeedRoute
+  PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
+  SettingsRoute: typeof SettingsRoute
   TermsRoute: typeof TermsRoute
   ExploreSlugRoute: typeof ExploreSlugRoute
   PromptIdRoute: typeof PromptIdRoute
@@ -227,6 +253,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/refund-policy': {
       id: '/refund-policy'
       path: '/refund-policy'
@@ -239,6 +272,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/feed': {
@@ -360,8 +400,10 @@ const rootRouteChildren: RootRouteChildren = {
   CreatorsRoute: CreatorsRoute,
   ExploreRoute: ExploreRoute,
   FeedRoute: FeedRoute,
+  PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RefundPolicyRoute: RefundPolicyRoute,
+  SettingsRoute: SettingsRoute,
   TermsRoute: TermsRoute,
   ExploreSlugRoute: ExploreSlugRoute,
   PromptIdRoute: PromptIdRoute,

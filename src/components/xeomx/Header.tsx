@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Search, Sparkles, LogOut, LayoutDashboard } from "lucide-react";
+import { Search, Sparkles, LogOut, LayoutDashboard, Settings } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { LanguageSwitcher } from "@/components/xeomx/LanguageSwitcher";
@@ -49,6 +49,9 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
           <Link to="/explore" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
             {m.nav_explore()}
           </Link>
+          <Link to="/pricing" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
+            {m.nav_pricing()}
+          </Link>
         </nav>
 
         <div className="ms-auto flex flex-1 items-center gap-3 sm:flex-none">
@@ -82,6 +85,11 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard" className="flex items-center gap-2">
                     <LayoutDashboard className="h-4 w-4" /> {m.nav_dashboard()}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/settings" className="flex items-center gap-2">
+                    <Settings className="h-4 w-4" /> {m.nav_settings()}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

@@ -286,7 +286,9 @@ function ArticlePage() {
             className="grid gap-4"
             style={{ gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}
           >
-            {related.map((a) => (
+            {related.map((a) => {
+              const ac = a.category as keyof typeof CAT_COLOR;
+              return (
               <Link
                 key={a.slug}
                 to="/magazine/$slug"
@@ -294,18 +296,18 @@ function ArticlePage() {
                 className="surface-raised group overflow-hidden rounded-2xl transition hover:scale-[1.02]"
                 style={{ transitionDuration: "var(--motion-duration-base)" }}
               >
-                <div aria-hidden style={{ aspectRatio: "16/10", background: CAT_GRADIENT[a.category] }} />
+                <div aria-hidden style={{ aspectRatio: "16/10", background: CAT_GRADIENT[ac] }} />
                 <div style={{ padding: "var(--space-4)" }}>
                   <div
                     style={{
                       fontSize: "var(--font-size-micro)",
-                      color: CAT_COLOR[a.category],
+                      color: CAT_COLOR[ac],
                       textTransform: "uppercase",
                       letterSpacing: "0.2em",
                       fontWeight: 600,
                     }}
                   >
-                    {catLabel(a.category)}
+                    {catLabel(ac)}
                   </div>
                   <div
                     className="font-display"
@@ -318,7 +320,8 @@ function ArticlePage() {
                   </div>
                 </div>
               </Link>
-            ))}
+              );
+            })}
           </div>
         </section>
       </motion.div>

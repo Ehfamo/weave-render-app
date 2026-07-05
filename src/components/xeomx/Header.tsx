@@ -49,6 +49,9 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
           <Link to="/explore" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
             {m.nav_explore()}
           </Link>
+          <Link to="/studio" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
+            {m.nav_studio()}
+          </Link>
           <Link to="/pricing" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
             {m.nav_pricing()}
           </Link>

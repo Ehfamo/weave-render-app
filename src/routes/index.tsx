@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArrowRight, Flame, Heart, MessageCircle, Play, Share2 } from "lucide-react";
+import { motion } from "motion/react";
 import { CATEGORIES, COLLECTIONS, CREATORS, PROMPTS, ROWS } from "@/lib/prompts";
 import { CORE_SECTIONS, EXPLORE_SECTIONS } from "@/lib/explore-sections";
 import { Header } from "@/components/xeomx/Header";
@@ -40,6 +41,15 @@ export const Route = createFileRoute("/")({
 function Index() {
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState("All");
+
+  const heroItemVariants = {
+    hidden: { opacity: 0, y: 12 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const },
+    },
+  };
 
   const filtered = useMemo(() => {
     return PROMPTS.filter((p) => {
@@ -85,36 +95,93 @@ function Index() {
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
         </div>
 
-        <div className="relative mx-auto flex max-w-[1400px] flex-col gap-8 px-4 pb-20 pt-16 sm:px-8 sm:pt-24 lg:flex-row lg:items-end lg:gap-16 lg:pb-32 lg:pt-32">
-          <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-gold">
+        <div
+          className="relative mx-auto flex max-w-[1400px] flex-col lg:flex-row lg:items-end"
+          style={{
+            gap: "var(--space-6)",
+            paddingInline: "var(--space-4)",
+            paddingTop: "var(--space-8)",
+            paddingBottom: "var(--space-8)",
+          }}
+        >
+          <motion.div
+            className="max-w-2xl"
+            initial="hidden"
+            animate="show"
+            variants={{
+              hidden: {},
+              show: { transition: { staggerChildren: 0.05, delayChildren: 0.05 } },
+            }}
+          >
+            <motion.span
+              variants={heroItemVariants}
+              className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 uppercase tracking-[0.28em] text-gold"
+              style={{ fontSize: "var(--font-size-micro)" }}
+            >
               <Flame className="h-3 w-3" /> {m.hero_eyebrow()}
-            </span>
-            <h1 className="mt-5 font-display text-5xl font-semibold leading-[0.95] tracking-tight sm:text-6xl lg:text-7xl">
+            </motion.span>
+            <motion.h1
+              variants={heroItemVariants}
+              className="font-display font-bold leading-[0.95] tracking-tight"
+              style={{ marginTop: "var(--space-4)", fontSize: "clamp(2.5rem, 6vw, var(--font-size-display))" }}
+            >
               {m.hero_title_line_1()}
               <br />
               {m.hero_title_line_2()}
-            </h1>
-            <p className="mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
+            </motion.h1>
+            <motion.p
+              variants={heroItemVariants}
+              className="max-w-xl text-muted-foreground"
+              style={{ marginTop: "var(--space-4)", fontSize: "var(--font-size-body-lg)" }}
+            >
               {featured.title} — {featured.author}. {m.hero_subtitle()}
-            </p>
-            <div className="mt-7 flex flex-wrap items-center gap-3">
+            </motion.p>
+            <motion.div
+              variants={heroItemVariants}
+              className="flex flex-wrap items-center"
+              style={{ marginTop: "var(--space-5)", gap: "var(--space-3)" }}
+            >
               <Link
                 to="/feed"
-                className="group inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium text-white transition hover:opacity-95"
-                style={{ background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)" }}
+                className="group inline-flex items-center gap-2 text-sm font-medium text-white transition hover:opacity-95"
+                style={{
+                  backgroundColor: "var(--action-primary)",
+                  borderRadius: "var(--radius-sm)",
+                  paddingInline: "var(--space-5)",
+                  paddingBlock: "var(--space-3)",
+                  transitionDuration: "var(--motion-duration-fast)",
+                  transitionTimingFunction: "var(--motion-ease)",
+                }}
               >
                 <Play className="h-4 w-4 fill-white" /> {m.hero_cta_feed()}
               </Link>
               <Link
                 to="/collections"
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/70 px-5 py-3 text-sm font-medium text-foreground backdrop-blur transition hover:border-gold/40"
+                className="inline-flex items-center gap-2 text-sm font-medium text-foreground backdrop-blur transition hover:border-gold/40"
+                style={{
+                  border: "1px solid var(--border-default)",
+                  backgroundColor: "var(--surface-glass)",
+                  borderRadius: "var(--radius-sm)",
+                  paddingInline: "var(--space-5)",
+                  paddingBlock: "var(--space-3)",
+                  transitionDuration: "var(--motion-duration-fast)",
+                  transitionTimingFunction: "var(--motion-ease)",
+                }}
               >
                 {m.hero_cta_collections()} <ArrowRight className="h-4 w-4" />
               </Link>
-            </div>
+            </motion.div>
 
-            <dl className="mt-10 grid max-w-md grid-cols-3 gap-6 border-t border-border/60 pt-6 text-start">
+            <motion.dl
+              variants={heroItemVariants}
+              className="grid max-w-md grid-cols-3 text-start"
+              style={{
+                marginTop: "var(--space-7)",
+                gap: "var(--space-5)",
+                paddingTop: "var(--space-5)",
+                borderTop: "1px solid var(--border-subtle)",
+              }}
+            >
               {[
                 ["12,480", m.hero_stat_prompts()],
                 ["1.4M", m.hero_stat_renders()],
@@ -125,8 +192,8 @@ function Index() {
                   <dd className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">{l}</dd>
                 </div>
               ))}
-            </dl>
-          </div>
+            </motion.dl>
+          </motion.div>
 
           {/* Featured poster */}
           <Link

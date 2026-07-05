@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as XeomxAiRouteImport } from './routes/xeomx-ai'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as SettingsRouteImport } from './routes/settings'
@@ -28,6 +29,11 @@ import { Route as ExploreSlugRouteImport } from './routes/explore_.$slug'
 import { Route as CollectionsIdRouteImport } from './routes/collections.$id'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
+const XeomxAiRoute = XeomxAiRouteImport.update({
+  id: '/xeomx-ai',
+  path: '/xeomx-ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -132,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
+  '/xeomx-ai': typeof XeomxAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore/$slug': typeof ExploreSlugRoute
@@ -151,6 +158,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
+  '/xeomx-ai': typeof XeomxAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore/$slug': typeof ExploreSlugRoute
@@ -172,6 +180,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
+  '/xeomx-ai': typeof XeomxAiRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore_/$slug': typeof ExploreSlugRoute
@@ -193,6 +202,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/studio'
     | '/terms'
+    | '/xeomx-ai'
     | '/dashboard'
     | '/collections/$id'
     | '/explore/$slug'
@@ -212,6 +222,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/studio'
     | '/terms'
+    | '/xeomx-ai'
     | '/dashboard'
     | '/collections/$id'
     | '/explore/$slug'
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/studio'
     | '/terms'
+    | '/xeomx-ai'
     | '/_authenticated/dashboard'
     | '/collections/$id'
     | '/explore_/$slug'
@@ -253,12 +265,20 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   StudioRoute: typeof StudioRoute
   TermsRoute: typeof TermsRoute
+  XeomxAiRoute: typeof XeomxAiRoute
   ExploreSlugRoute: typeof ExploreSlugRoute
   PromptIdRoute: typeof PromptIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/xeomx-ai': {
+      id: '/xeomx-ai'
+      path: '/xeomx-ai'
+      fullPath: '/xeomx-ai'
+      preLoaderRoute: typeof XeomxAiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -426,6 +446,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   StudioRoute: StudioRoute,
   TermsRoute: TermsRoute,
+  XeomxAiRoute: XeomxAiRoute,
   ExploreSlugRoute: ExploreSlugRoute,
   PromptIdRoute: PromptIdRoute,
 }

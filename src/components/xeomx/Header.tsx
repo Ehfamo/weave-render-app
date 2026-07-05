@@ -52,6 +52,14 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
           <Link to="/studio" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
             {m.nav_studio()}
           </Link>
+          <Link
+            to="/xeomx-ai"
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-foreground transition"
+            style={{ background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)", color: "#fff" }}
+            activeProps={{ className: "ring-2 ring-magenta/50" }}
+          >
+            <Sparkles className="h-3.5 w-3.5" /> {m.nav_xeomx_ai()}
+          </Link>
           <Link to="/pricing" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
             {m.nav_pricing()}
           </Link>

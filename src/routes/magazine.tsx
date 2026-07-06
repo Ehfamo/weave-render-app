@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { useState } from "react";
 import { ArrowRight, Search, Clock } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";

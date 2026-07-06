@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { COLLECTIONS } from "@/lib/prompts";
 import { Header } from "@/components/xeomx/Header";
 import { CollectionCard } from "@/components/xeomx/CollectionCard";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 

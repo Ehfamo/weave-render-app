@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 

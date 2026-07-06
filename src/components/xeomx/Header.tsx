@@ -1,10 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { Search, Sparkles, LogOut, LayoutDashboard, Settings } from "lucide-react";
+import { Search, Sparkles, LogOut, LayoutDashboard, Settings, Menu } from "lucide-react";
+import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { LanguageSwitcher } from "@/components/xeomx/LanguageSwitcher";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +18,7 @@ import {
 
 export function Header({ onSearch, query }: { onSearch?: (v: string) => void; query?: string }) {
   const { user } = useAuth();
+  const [mobileOpen, setMobileOpen] = useState(false);
   const avatar = user?.user_metadata?.avatar_url as string | undefined;
   const name =
     (user?.user_metadata?.full_name as string | undefined) ||
@@ -24,6 +27,39 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex max-w-[1400px] items-center gap-4 px-4 py-3 sm:px-8">
+        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+          <SheetTrigger asChild>
+            <button
+              type="button"
+              aria-label="Open menu"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface/60 text-foreground transition hover:border-magenta/40 lg:hidden"
+            >
+              <Menu className="h-4 w-4" />
+            </button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-72 border-border bg-background p-0 rtl:[&]:!inset-y-0 rtl:[&]:!right-0 rtl:[&]:!left-auto rtl:[&]:border-l-0 rtl:[&]:border-r">
+            <SheetTitle className="sr-only">Navigation</SheetTitle>
+            <nav className="flex flex-col gap-1 p-4 pt-10">
+              <Link to="/" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }} activeOptions={{ exact: true }}>{m.nav_discover()}</Link>
+              <Link to="/feed" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>{m.nav_feed()}</Link>
+              <Link to="/collections" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>{m.nav_collections()}</Link>
+              <Link to="/creators" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>{m.nav_creators()}</Link>
+              <Link to="/explore" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>{m.nav_explore()}</Link>
+              <Link to="/studio" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>{m.nav_studio()}</Link>
+              <Link to="/magazine" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>{m.nav_magazine()}</Link>
+              <Link
+                to="/xeomx-ai"
+                onClick={() => setMobileOpen(false)}
+                className="mt-1 inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition"
+                style={{ background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)", color: "#fff" }}
+              >
+                <Sparkles className="h-3.5 w-3.5" /> {m.nav_xeomx_ai()}
+              </Link>
+              <Link to="/pricing" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>{m.nav_pricing()}</Link>
+            </nav>
+          </SheetContent>
+        </Sheet>
+
         <Link to="/" className="flex items-center gap-2">
           <span className="grid h-8 w-8 place-items-center rounded-lg" style={{ background: "var(--gradient-magenta)" }}>
             <Sparkles className="h-4 w-4 text-white" />

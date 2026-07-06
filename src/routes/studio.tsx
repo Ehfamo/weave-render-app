@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { Sparkles } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
 // @ts-expect-error - paraglide generated messages

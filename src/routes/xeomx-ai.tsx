@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import {
   Sparkles, ChevronDown, Command, Bell, Wand2, Info, RefreshCw,
   Filter, CheckCircle2, Orbit, CircleDot, Activity, RotateCcw,
@@ -826,7 +826,7 @@ const C = "color:var(--text-disabled)";    // comment
 const P = "color:var(--text-primary)";
 const CODE_LINES = [
   `<span style="${C}">// cinematic scene — generated</span>`,
-  `<span style="${K}">import</span> <span style="${P}">{ motion }</span> <span style="${K}">from</span> <span style="${S}">"framer-motion"</span>;`,
+  `<span style="${K}">import</span> <span style="${P}">{ motion }</span> <span style="${K}">from</span> <span style="${S}">"motion/react"</span>;`,
   ``,
   `<span style="${K}">export function</span> <span style="${P}">Scene</span>() {`,
   `  <span style="${K}">return</span> (`,

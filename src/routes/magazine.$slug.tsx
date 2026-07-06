@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { ArrowLeft, Share2, Bookmark, Clock } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
 import { ARTICLES } from "./magazine";

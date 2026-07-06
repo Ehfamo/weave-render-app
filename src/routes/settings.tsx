@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { User, ShieldCheck, Bell, CreditCard, Languages, Palette, KeyRound, ChevronRight, Lock } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
 // @ts-expect-error - paraglide generated messages

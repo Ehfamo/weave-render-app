@@ -37,7 +37,7 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
               <Menu className="h-4 w-4" />
             </button>
           </SheetTrigger>
-          <SheetContent side="start" className="w-72 border-border bg-background p-0">
+          <SheetContent side="left" className="w-72 border-border bg-background p-0 rtl:[&]:!inset-y-0 rtl:[&]:!right-0 rtl:[&]:!left-auto rtl:[&]:border-l-0 rtl:[&]:border-r">
             <SheetTitle className="sr-only">Navigation</SheetTitle>
             <nav className="flex flex-col gap-1 p-4 pt-10">
               <Link to="/" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }} activeOptions={{ exact: true }}>{m.nav_discover()}</Link>

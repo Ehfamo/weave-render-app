@@ -42,7 +42,11 @@ export const Route = createFileRoute("/explore_/$slug")({
 });
 
 function SectionPage() {
-  const { section } = Route.useLoaderData();
+  const loaderData = Route.useLoaderData();
+  const section = loaderData?.section;
+
+  if (!section) throw notFound();
+
   return (
     <div className="bg-background">
       <Header />

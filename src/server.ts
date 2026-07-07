@@ -43,8 +43,8 @@ export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
-      const response = await paraglideMiddleware(request, async ({ request: localized }: { request: Request; locale: string }) => {
-        return handler.fetch(localized, env, ctx);
+      const response = await paraglideMiddleware(request, async () => {
+        return handler.fetch(request, env, ctx);
       });
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {

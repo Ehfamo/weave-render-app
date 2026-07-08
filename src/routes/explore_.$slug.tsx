@@ -4,6 +4,7 @@ import { getSection } from "@/lib/explore-sections";
 import { LaunchingSoon } from "@/components/xeomx/ComingSoon/LaunchingSoon";
 import { InDevelopment } from "@/components/xeomx/ComingSoon/InDevelopment";
 import { Vision } from "@/components/xeomx/ComingSoon/Vision";
+import { pageUrl } from "@/lib/seo";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -12,13 +13,17 @@ export const Route = createFileRoute("/explore_/$slug")({
     const s = getSection(params.slug);
     const title = s ? m.section_head_title({ name: s.name }) : m.section_head_generic();
     const description = s?.tagline ?? m.section_head_default_desc();
+    const url = pageUrl(`/explore/${params.slug}`);
     return {
       meta: [
         { title },
         { name: "description", content: description },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: url },
       ],
+      links: [{ rel: "canonical", href: url }],
     };
   },
   loader: ({ params }) => {

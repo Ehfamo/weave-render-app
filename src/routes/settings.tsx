@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { pageUrl } from "@/lib/seo";
 import { useState } from "react";
 import { motion } from "motion/react";
 import { User, ShieldCheck, Bell, CreditCard, Languages, Palette, KeyRound, ChevronRight, Lock } from "lucide-react";
@@ -13,7 +14,10 @@ export const Route = createFileRoute("/settings")({
       { name: "description", content: m.settings_head_desc() },
       { property: "og:title", content: m.settings_head_title() },
       { property: "og:description", content: m.settings_head_desc() },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: pageUrl("/settings") },
     ],
+    links: [{ rel: "canonical", href: pageUrl("/settings") }],
   }),
   component: SettingsPage,
 });

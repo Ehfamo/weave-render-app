@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { pageUrl } from "@/lib/seo";
 import { ArrowLeft } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
 import { motion } from "motion/react";
@@ -12,7 +13,10 @@ export const Route = createFileRoute("/terms")({
       { name: "description", content: m.terms_head_desc() },
       { property: "og:title", content: m.terms_head_title() },
       { property: "og:description", content: m.terms_head_desc() },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: pageUrl("/terms") },
     ],
+    links: [{ rel: "canonical", href: pageUrl("/terms") }],
   }),
   component: TermsPage,
 });

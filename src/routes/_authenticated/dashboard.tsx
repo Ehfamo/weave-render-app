@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { pageUrl } from "@/lib/seo";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -17,7 +18,16 @@ import { m } from "@/paraglide/messages.js";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
   ssr: false,
-  head: () => ({ meta: [{ title: "Your dashboard — XeomX" }] }),
+  head: () => ({
+    meta: [
+      { title: "Your dashboard — XeomX" },
+      { name: "robots", content: "noindex" },
+      { property: "og:title", content: "Your dashboard — XeomX" },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: pageUrl("/dashboard") },
+    ],
+    links: [{ rel: "canonical", href: pageUrl("/dashboard") }],
+  }),
 });
 
 type Profile = {

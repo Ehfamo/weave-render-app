@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { ArrowLeft, Share2, Bookmark, Clock } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
 import { ARTICLES } from "./magazine";
+import { pageUrl } from "@/lib/seo";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -12,16 +13,25 @@ export const Route = createFileRoute("/magazine/$slug")({
     if (!article) throw notFound();
     return { article };
   },
-  head: ({ loaderData }) => ({
-    meta: loaderData
-      ? [
-          { title: `${loaderData.article.title} — XeomX Magazine` },
-          { name: "description", content: loaderData.article.dek },
-          { property: "og:title", content: loaderData.article.title },
-          { property: "og:description", content: loaderData.article.dek },
-        ]
-      : [{ title: m.magazine_not_found_title() }, { name: "robots", content: "noindex" }],
-  }),
+  head: ({ loaderData, params }) => {
+    const url = pageUrl(`/magazine/${params.slug}`);
+    if (!loaderData) {
+      return {
+        meta: [{ title: m.magazine_not_found_title() }, { name: "robots", content: "noindex" }],
+      };
+    }
+    return {
+      meta: [
+        { title: `${loaderData.article.title} — XeomX Magazine` },
+        { name: "description", content: loaderData.article.dek },
+        { property: "og:title", content: loaderData.article.title },
+        { property: "og:description", content: loaderData.article.dek },
+        { property: "og:type", content: "article" },
+        { property: "og:url", content: url },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   component: ArticlePage,
   notFoundComponent: () => (
     <div className="min-h-svh" style={{ background: "var(--surface-primary)" }}>

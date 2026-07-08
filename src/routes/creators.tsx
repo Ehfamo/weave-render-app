@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { CREATORS } from "@/lib/prompts";
 import { Header } from "@/components/xeomx/Header";
 import { CreatorCard } from "@/components/xeomx/CreatorCard";
+import { pageUrl } from "@/lib/seo";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -11,7 +12,12 @@ export const Route = createFileRoute("/creators")({
     meta: [
       { title: "Creators — XeomX" },
       { name: "description", content: "Founder & elite prompt engineers earning from copies, saves, and remixes." },
+      { property: "og:title", content: "Creators — XeomX" },
+      { property: "og:description", content: "Founder & elite prompt engineers earning from copies, saves, and remixes." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: pageUrl("/creators") },
     ],
+    links: [{ rel: "canonical", href: pageUrl("/creators") }],
   }),
   component: CreatorsPage,
 });

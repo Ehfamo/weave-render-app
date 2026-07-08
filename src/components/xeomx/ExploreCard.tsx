@@ -1,9 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import * as Icons from "lucide-react";
 import { type ExploreSection, getPhaseBadge, getCoreLink } from "@/lib/explore-sections";
+import { getIcon } from "@/lib/icon-map";
 
 export function ExploreCard({ section, index = 0, core = false }: { section: ExploreSection; index?: number; core?: boolean }) {
-  const Icon = (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[section.icon] ?? Icons.Sparkles;
+  const Icon = getIcon(section.icon);
   const badge = getPhaseBadge(section.phase);
   const href = section.phase === 'live' ? getCoreLink(section.slug) : `/explore/${section.slug}`;
   return (

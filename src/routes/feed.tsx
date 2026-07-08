@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { PROMPTS, TOP_PROMPT_IDS } from "@/lib/prompts";
 import { ViralFeedCard } from "@/components/xeomx/ViralFeedCard";
+import { pageUrl } from "@/lib/seo";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -10,7 +11,12 @@ export const Route = createFileRoute("/feed")({
     meta: [
       { title: "Viral Feed — XeomX" },
       { name: "description", content: "Full-screen viral prompt feed. Scroll, copy, remix." },
+      { property: "og:title", content: "Viral Feed — XeomX" },
+      { property: "og:description", content: "Full-screen viral prompt feed. Scroll, copy, remix." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: pageUrl("/feed") },
     ],
+    links: [{ rel: "canonical", href: pageUrl("/feed") }],
   }),
   component: Feed,
 });

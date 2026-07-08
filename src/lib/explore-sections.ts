@@ -1,3 +1,5 @@
+import type { IconName } from "./icon-map";
+
 export type SectionPhase = 'live' | 'q1' | 'q2' | 'q3';
 
 export interface ExploreSection {
@@ -5,7 +7,7 @@ export interface ExploreSection {
   name: string;
   tagline: string;
   description: string;
-  icon: string;
+  icon: IconName;
   phase: SectionPhase;
   category: string;
   features?: string[];

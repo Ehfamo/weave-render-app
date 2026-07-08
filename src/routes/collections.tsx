@@ -3,6 +3,7 @@ import { COLLECTIONS } from "@/lib/prompts";
 import { Header } from "@/components/xeomx/Header";
 import { CollectionCard } from "@/components/xeomx/CollectionCard";
 import { motion } from "motion/react";
+import { pageUrl } from "@/lib/seo";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -13,7 +14,10 @@ export const Route = createFileRoute("/collections")({
       { name: "description", content: "Curated prompt packs. Build a SaaS in 10 prompts. Master AI automation." },
       { property: "og:title", content: "Collections — XeomX" },
       { property: "og:description", content: "Curated prompt packs. Structured learning paths." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: pageUrl("/collections") },
     ],
+    links: [{ rel: "canonical", href: pageUrl("/collections") }],
   }),
   component: CollectionsPage,
 });

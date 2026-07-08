@@ -6,10 +6,9 @@ import { getPrompt, PROMPTS, type Prompt } from "@/lib/prompts";
 import { Header } from "@/components/xeomx/Header";
 import { PromptCard } from "@/components/xeomx/PromptCard";
 import { SignalBadge } from "@/components/xeomx/Signal";
+import { pageUrl, SITE_URL } from "@/lib/seo";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
-
-const SITE_URL = "https://xeomx.com";
 
 export const Route = createFileRoute("/prompt/$id")({
   loader: ({ params }) => {
@@ -17,20 +16,21 @@ export const Route = createFileRoute("/prompt/$id")({
     if (!prompt) throw notFound();
     return { prompt };
   },
-  head: ({ loaderData }) => {
-    if (!loaderData) return { meta: [] };
+  head: ({ loaderData, params }) => {
+    if (!loaderData) return { meta: [{ name: "robots", content: "noindex" }] };
     const { prompt } = loaderData;
     const absoluteCover = prompt.cover.startsWith("http")
       ? prompt.cover
       : `${SITE_URL}${prompt.cover}`;
+    const url = pageUrl(`/prompt/${params.id}`);
     return {
       meta: [
         { title: `${prompt.title} — XeomX` },
         { name: "description", content: prompt.prompt.slice(0, 150) },
         { property: "og:title", content: `${prompt.title} — XeomX` },
         { property: "og:description", content: prompt.prompt.slice(0, 150) },
-        { property: "og:type", content: "website" },
-        { property: "og:url", content: `${SITE_URL}/prompt/${prompt.id}` },
+        { property: "og:type", content: "article" },
+        { property: "og:url", content: url },
         { property: "og:image", content: absoluteCover },
         { property: "og:image:width", content: "1200" },
         { property: "og:image:height", content: "630" },
@@ -40,6 +40,7 @@ export const Route = createFileRoute("/prompt/$id")({
         { name: "twitter:description", content: prompt.prompt.slice(0, 150) },
         { name: "twitter:image", content: absoluteCover },
       ],
+      links: [{ rel: "canonical", href: url }],
     };
   },
   notFoundComponent: () => (

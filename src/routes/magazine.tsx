@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import { ArrowRight, Search, Clock } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
+import { pageUrl } from "@/lib/seo";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -13,7 +14,10 @@ export const Route = createFileRoute("/magazine")({
       { name: "description", content: m.magazine_head_desc() },
       { property: "og:title", content: m.magazine_head_title() },
       { property: "og:description", content: m.magazine_head_desc() },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: pageUrl("/magazine") },
     ],
+    links: [{ rel: "canonical", href: pageUrl("/magazine") }],
   }),
   component: MagazinePage,
 });

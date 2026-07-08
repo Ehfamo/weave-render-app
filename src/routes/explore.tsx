@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { pageUrl } from "@/lib/seo";
 import { useMemo, useState } from "react";
 import { Search, ArrowLeft } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
@@ -15,7 +16,10 @@ export const Route = createFileRoute("/explore")({
       { name: "description", content: m.explore_head_desc() },
       { property: "og:title", content: m.explore_head_title() },
       { property: "og:description", content: m.explore_head_desc() },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: pageUrl("/explore") },
     ],
+    links: [{ rel: "canonical", href: pageUrl("/explore") }],
   }),
   component: ExplorePage,
 });

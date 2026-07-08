@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { pageUrl } from "@/lib/seo";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Sparkles } from "lucide-react";
@@ -13,7 +14,10 @@ export const Route = createFileRoute("/studio")({
       { name: "description", content: m.studio_head_desc() },
       { property: "og:title", content: m.studio_head_title() },
       { property: "og:description", content: m.studio_head_desc() },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: pageUrl("/studio") },
     ],
+    links: [{ rel: "canonical", href: pageUrl("/studio") }],
   }),
   component: StudioPage,
 });

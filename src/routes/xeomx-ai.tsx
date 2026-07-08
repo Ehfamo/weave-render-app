@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { pageUrl } from "@/lib/seo";
 import { useState } from "react";
 import { motion } from "motion/react";
 import {
@@ -17,7 +18,10 @@ export const Route = createFileRoute("/xeomx-ai")({
       { name: "description", content: m.xai_head_desc() },
       { property: "og:title", content: m.xai_head_title() },
       { property: "og:description", content: m.xai_head_desc() },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: pageUrl("/xeomx-ai") },
     ],
+    links: [{ rel: "canonical", href: pageUrl("/xeomx-ai") }],
   }),
   component: XeomxAIPage,
 });

@@ -5,17 +5,23 @@ import { motion } from "motion/react";
 import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { pageUrl } from "@/lib/seo";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
-  ssr: false,
   head: () => ({
     meta: [
       { title: m.auth_head_title() },
       { name: "description", content: m.auth_head_desc() },
+      { property: "og:title", content: m.auth_head_title() },
+      { property: "og:description", content: m.auth_head_desc() },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: pageUrl("/auth") },
+      { name: "robots", content: "noindex" },
     ],
+    links: [{ rel: "canonical", href: pageUrl("/auth") }],
   }),
 });
 

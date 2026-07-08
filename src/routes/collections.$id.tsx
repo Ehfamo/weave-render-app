@@ -3,6 +3,7 @@ import { ArrowLeft, Layers } from "lucide-react";
 import { getCollection, PROMPTS, type Collection } from "@/lib/prompts";
 import { Header } from "@/components/xeomx/Header";
 import { PromptCard } from "@/components/xeomx/PromptCard";
+import { pageUrl, SITE_URL } from "@/lib/seo";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -12,17 +13,26 @@ export const Route = createFileRoute("/collections/$id")({
     if (!c) throw notFound();
     return { collection: c };
   },
-  head: ({ loaderData }) => ({
-    meta: loaderData
-      ? [
-          { title: `${loaderData.collection.title} — XeomX Collection` },
-          { name: "description", content: loaderData.collection.subtitle },
-          { property: "og:title", content: `${loaderData.collection.title} — XeomX` },
-          { property: "og:description", content: loaderData.collection.subtitle },
-          { property: "og:image", content: loaderData.collection.cover },
-        ]
-      : [],
-  }),
+  head: ({ loaderData, params }) => {
+    if (!loaderData) return { meta: [{ name: "robots", content: "noindex" }] };
+    const url = pageUrl(`/collections/${params.id}`);
+    const cover = loaderData.collection.cover;
+    const absCover = /^https?:\/\//.test(cover) ? cover : `${SITE_URL}${cover.startsWith("/") ? "" : "/"}${cover}`;
+    return {
+      meta: [
+        { title: `${loaderData.collection.title} — XeomX Collection` },
+        { name: "description", content: loaderData.collection.subtitle },
+        { property: "og:title", content: `${loaderData.collection.title} — XeomX` },
+        { property: "og:description", content: loaderData.collection.subtitle },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: url },
+        { property: "og:image", content: absCover },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:image", content: absCover },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   notFoundComponent: () => (
     <div className="grid min-h-screen place-items-center bg-background px-4 text-center">
       <div>

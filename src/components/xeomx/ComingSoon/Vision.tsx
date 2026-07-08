@@ -1,11 +1,11 @@
-import * as Icons from "lucide-react";
 import { type ExploreSection } from "@/lib/explore-sections";
+import { getIcon } from "@/lib/icon-map";
 import { BackToExplore, NotifyForm } from "./shared";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 export function Vision({ section }: { section: ExploreSection }) {
-  const Icon = (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[section.icon] ?? Icons.Sparkles;
+  const Icon = getIcon(section.icon);
   return (
     <div className="relative min-h-svh overflow-hidden bg-background">
       {/* abstract geometric decoration */}

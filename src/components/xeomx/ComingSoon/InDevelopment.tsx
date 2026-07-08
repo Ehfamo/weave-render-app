@@ -1,11 +1,11 @@
-import * as Icons from "lucide-react";
 import { type ExploreSection } from "@/lib/explore-sections";
+import { getIcon } from "@/lib/icon-map";
 import { BackToExplore, NotifyForm } from "./shared";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 export function InDevelopment({ section }: { section: ExploreSection }) {
-  const Icon = (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[section.icon] ?? Icons.Sparkles;
+  const Icon = getIcon(section.icon);
   return (
     <div className="relative min-h-svh overflow-hidden bg-background">
       <div className="pointer-events-none absolute inset-0 animate-pulse" style={{ background: "radial-gradient(50% 50% at 20% 0%, oklch(0.68 0.28 0 / 0.18), transparent 70%), radial-gradient(40% 40% at 90% 30%, oklch(0.81 0.13 80 / 0.12), transparent 70%)" }} />

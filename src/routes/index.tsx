@@ -16,6 +16,7 @@ import { SignalBadge } from "@/components/xeomx/Signal";
 import { ConnectSection } from "@/components/xeomx/ConnectSection";
 import heroImg from "@/assets/hero.jpg";
 import cover1 from "@/assets/cover-1.jpg";
+import { pageUrl } from "@/lib/seo";
 
 const CATEGORY_LABELS: Record<string, () => string> = {
   All: () => m.cat_all(),
@@ -33,7 +34,10 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Discover, remix and own the world's most cinematic AI prompts. Netflix-style discovery, viral feed, premium drops." },
       { property: "og:title", content: "XeomX — Cinematic AI Prompt Marketplace" },
       { property: "og:description", content: "Discover, remix and own the world's most cinematic AI prompts." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: pageUrl("/") },
     ],
+    links: [{ rel: "canonical", href: pageUrl("/") }],
   }),
   component: Index,
 });

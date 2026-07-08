@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { pageUrl } from "@/lib/seo";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 

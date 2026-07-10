@@ -320,7 +320,7 @@ export async function fetchCollectionBySlug(slug: string) {
     .select("prompt_id, position, prompts(" + PROMPT_LIST_SELECT + ")")
     .eq("collection_id", row.id)
     .order("position", { ascending: true });
-  const prompts = ((items ?? []) as Array<{ prompts: PromptRow | null }>)
+  const prompts = ((items ?? []) as unknown as Array<{ prompts: PromptRow | null }>)
     .map((it) => it.prompts)
     .filter((p): p is PromptRow => !!p && p.is_published)
     .map(toPromptCard);

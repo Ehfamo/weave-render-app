@@ -16,6 +16,9 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { getLocale } from "../paraglide/runtime.js";
 // @ts-expect-error - paraglide generated messages
 import { m } from "../paraglide/messages.js";
+import { SITE_URL } from "../lib/seo";
+
+const LOCALES = ["en", "fa", "ar", "zh", "hi"] as const;
 
 function NotFoundComponent() {
   return (
@@ -158,6 +161,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "author", content: "XeomX" },
       { property: "og:title", content: title },
       { property: "og:description", content: desc },
+      { property: "og:site_name", content: "XeomX" },
+      { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@xeomxai" },
       { name: "twitter:creator", content: "@xeomxai" },
@@ -165,12 +170,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:description", content: desc },
     ],
     links: [
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Inter:wght@300;400;500;600;700&display=swap" },
       {
         rel: "stylesheet",
         href: appCss,
+      },
+      ...LOCALES.map((loc) => ({
+        rel: "alternate",
+        hrefLang: loc,
+        href: `${SITE_URL}/${loc}/`,
+      })),
+      { rel: "alternate", hrefLang: "x-default", href: `${SITE_URL}/en/` },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "XeomX",
+          url: SITE_URL,
+          logo: `${SITE_URL}/favicon.ico`,
+          sameAs: ["https://twitter.com/xeomxai"],
+        }),
       },
     ],
   };

@@ -111,6 +111,8 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
               value={query ?? ""}
               onChange={(e) => onSearch?.(e.target.value)}
               placeholder={m.search_placeholder()}
+              aria-label={m.search_placeholder()}
+              type="search"
               className="w-full rounded-full border border-border bg-surface/60 py-2 ps-9 pe-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-magenta/50 focus:outline-none focus:ring-2 focus:ring-magenta/30"
             />
           </label>

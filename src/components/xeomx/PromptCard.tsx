@@ -44,16 +44,20 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
   } as const;
 
   return (
-    <Link
-      to="/prompt/$id"
-      params={{ id: prompt.id }}
-      className={`group surface-raised relative shrink-0 ${widths[size]} overflow-hidden rounded-2xl border border-[var(--border-default)] transition-transform hover:scale-[1.02] hover:border-magenta/40`}
+    <div
+      className={`group surface-raised relative shrink-0 ${widths[size]} overflow-hidden rounded-2xl border border-[var(--border-default)] transition-transform hover:scale-[1.02] hover:border-magenta/40 focus-within:ring-2 focus-within:ring-magenta/50`}
       style={{
         transitionDuration: "var(--motion-duration-fast)",
         transitionTimingFunction: "var(--motion-ease)",
       }}
     >
       <div className="relative aspect-[4/5] overflow-hidden">
+        <Link
+          to="/prompt/$id"
+          params={{ id: prompt.id }}
+          aria-label={prompt.title}
+          className="absolute inset-0 z-0"
+        />
         <img
           src={prompt.cover}
           alt={prompt.title}
@@ -68,7 +72,7 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
         />
 
         {/* top row chips */}
-        <div className="absolute start-3 end-3 top-3 flex items-start justify-between gap-2">
+        <div className="pointer-events-none absolute start-3 end-3 top-3 z-10 flex items-start justify-between gap-2">
           <span
             className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium tracking-wide ${
               prompt.state === "premium"
@@ -91,7 +95,7 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
         </div>
 
         {/* hover quick actions */}
-        <div className="absolute inset-x-3 bottom-3 flex translate-y-2 items-center justify-between gap-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+        <div className="absolute inset-x-3 bottom-3 z-10 flex translate-y-2 items-center justify-between gap-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 focus-within:translate-y-0 focus-within:opacity-100">
           <span className="grid h-10 w-10 place-items-center rounded-full border border-foreground/30 bg-background/40 backdrop-blur">
             <Play className="h-4 w-4 fill-foreground text-foreground" />
           </span>
@@ -104,6 +108,7 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
             ].map(({ Icon: I, onClick, key }) => (
               <button
                 key={key}
+                type="button"
                 onClick={onClick}
                 className="grid h-9 w-9 place-items-center rounded-full border border-foreground/20 bg-background/50 text-foreground backdrop-blur transition hover:border-magenta/60 hover:bg-magenta/15"
                 aria-label={key}
@@ -123,7 +128,9 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
       <div className="space-y-3 p-4">
         <div className="space-y-1">
           <h3 className="font-display text-lg font-semibold leading-tight tracking-tight text-foreground">
-            {prompt.title}
+            <Link to="/prompt/$id" params={{ id: prompt.id }} className="outline-none hover:text-magenta focus-visible:text-magenta">
+              {prompt.title}
+            </Link>
           </h3>
           <p className="text-xs text-muted-foreground">
             {prompt.author} · {prompt.views} {m.prompt_views()}
@@ -135,6 +142,7 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
           </div>
         </div>
         <button
+          type="button"
           onClick={onCopy}
           disabled={prompt.state === "soon"}
           className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border bg-surface-2/60 px-3 py-2 text-xs font-medium text-foreground transition hover:border-magenta/40 hover:bg-magenta/10 disabled:cursor-not-allowed disabled:opacity-40"
@@ -143,6 +151,6 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
           {prompt.state === "soon" ? m.common_locked() : copied ? m.common_copied() : m.prompt_copy_button()}
         </button>
       </div>
-    </Link>
+    </div>
   );
 }

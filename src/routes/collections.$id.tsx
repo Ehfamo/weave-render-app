@@ -51,17 +51,7 @@ export const Route = createFileRoute("/collections/$id")({
 });
 
 function CollectionDetail() {
-  const params = Route.useParams();
-  const { data } = useQuery({
-    queryKey: ["collection", params.id],
-    queryFn: () => fetchCollectionBySlug(params.id),
-    initialData: () => {
-      const ld = Route.useLoaderData();
-      return { collection: ld.collection, prompts: ld.prompts, raw: null as never };
-    },
-  });
-  const collection = data!.collection;
-  const prompts = data!.prompts;
+  const { collection, prompts } = Route.useLoaderData();
 
   return (
     <div className="min-h-screen bg-background text-foreground">

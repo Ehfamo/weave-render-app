@@ -3,20 +3,17 @@ import { pageUrl } from "@/lib/seo";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Sparkles, TrendingUp, Plus, LogOut, ChevronRight,
-  Wand2, BarChart3, Wallet, LayoutGrid, LineChart as LineChartIcon,
-  Trophy, Flame, Rocket, ArrowUpRight, Eye, Coins, Users2,
+  Bell, ChevronDown, Sparkles, Box, Users, DollarSign, TrendingUp,
+  Plus, BarChart3, LogOut, ArrowRight, Award, Star, Trophy,
 } from "lucide-react";
 import {
-  Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid,
+  Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Line, LineChart,
 } from "recharts";
+import { motion } from "motion/react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { Header } from "@/components/xeomx/Header";
-import { toast } from "sonner";
-import { motion } from "motion/react";
-// @ts-expect-error - paraglide generated messages
-import { m } from "@/paraglide/messages.js";
+import avatarImg from "@/assets/dashboard-avatar.jpg";
+import cyberImg from "@/assets/dashboard-cyber.jpg";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -38,23 +35,32 @@ type Profile = {
   username: string | null;
   display_name: string | null;
   avatar_url: string | null;
-  bio: string | null;
-  is_creator: boolean;
 };
 
-const metricItemVariants = {
-  hidden: { opacity: 0, y: 12 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const },
-  },
-};
+const trendData = [
+  { d: "May 15", v: 12000 }, { d: "May 16", v: 15000 }, { d: "May 17", v: 22000 },
+  { d: "May 18", v: 18000 }, { d: "May 19", v: 30000 }, { d: "May 20", v: 34000 },
+  { d: "May 21", v: 28000 }, { d: "May 22", v: 40000 }, { d: "May 23", v: 48000 },
+  { d: "May 24", v: 42000 }, { d: "May 25", v: 52000 }, { d: "May 26", v: 60000 },
+  { d: "May 27", v: 58000 }, { d: "May 28", v: 66000 }, { d: "May 29", v: 72000 },
+  { d: "May 30", v: 68000 }, { d: "May 31", v: 78000 }, { d: "Jun 1", v: 84000 },
+  { d: "Jun 2", v: 92000 }, { d: "Jun 3", v: 88000 }, { d: "Jun 4", v: 98000 },
+  { d: "Jun 5", v: 105000 }, { d: "Jun 6", v: 108000 }, { d: "Jun 7", v: 112480 },
+  { d: "Jun 8", v: 96000 }, { d: "Jun 9", v: 82000 }, { d: "Jun 10", v: 74000 },
+  { d: "Jun 11", v: 70000 }, { d: "Jun 12", v: 68000 }, { d: "Jun 13", v: 66000 },
+];
 
-const metricContainerVariants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.05 } },
-};
+const spark = (seed: number) =>
+  Array.from({ length: 14 }, (_, i) => ({
+    x: i,
+    y: 50 + Math.sin(i * 0.9 + seed) * 18 + Math.cos(i * 1.4 + seed) * 8,
+  }));
+
+const topPrompts = [
+  { rank: "01", title: "Cyber Noir", views: "12.4k views", color: "#ff2d87", data: spark(1) },
+  { rank: "02", title: "Velvet Dusk", views: "9.8k views", color: "#ff8a3d", data: spark(3) },
+  { rank: "03", title: "Neon Reverie", views: "7.2k views", color: "#ff2d87", data: spark(5) },
+];
 
 function Dashboard() {
   const { user, loading } = useAuth();
@@ -69,593 +75,554 @@ function Dashboard() {
     enabled: !!user,
     queryFn: async (): Promise<Profile | null> => {
       const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user!.id)
-        .maybeSingle();
+        .from("profiles").select("*").eq("id", user!.id).maybeSingle();
       if (error) throw error;
       return data as Profile | null;
     },
   });
 
-  async function signOut() {
-    await supabase.auth.signOut();
-    toast.success(m.common_signed_out());
-    navigate({ to: "/" });
-  }
-
   if (loading || !user) {
     return (
-      <div className="grid min-h-screen place-items-center bg-background text-sm text-muted-foreground">
-        {m.common_loading()}
+      <div className="grid min-h-screen place-items-center bg-[#08060a] text-sm text-white/50">
+        Loading…
       </div>
     );
   }
 
-  const displayName =
-    profile?.display_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "Creator";
-  const username = profile?.username || user.email?.split("@")[0] || "creator";
+  const username = profile?.username || user.email?.split("@")[0] || "nocturne";
+  const avatarUrl = profile?.avatar_url || avatarImg;
 
-  // ---- Real data adapters (presentation-only; no query changes) ----
-  // The current data layer exposes only the `profiles` row. Any metric not
-  // present there is treated as "no data yet" → empty state (never fabricated).
-  const latestCreationImage: string | null = null; // no creations table wired yet
-  const heroBackground: string = latestCreationImage
-    ? `url("${latestCreationImage}") center/cover`
-    : "radial-gradient(120% 100% at 100% 0%, oklch(0.72 0.19 55 / 0.55), transparent 55%), radial-gradient(90% 90% at 0% 100%, oklch(0.55 0.24 340 / 0.6), transparent 60%), linear-gradient(135deg, oklch(0.22 0.05 320), oklch(0.16 0.03 40))";
-
-  const primaryStat: number | null = null;      // creations generated
-  const reachStat: number | null = null;        // reach / impressions
-  const earningsStat: number | null = null;     // USD earnings
-  const followersStat: number | null = null;    // followers
-  const trendSeries: { day: string; value: number }[] = []; // render history
-  const topPrompts: { id: string; title: string; value: number }[] = [];
-  const highlights: { title: string; body: string; icon: typeof Trophy }[] = [];
-
-  const hasActivity = (primaryStat ?? 0) > 0;
-  const hasTrend = trendSeries.length > 0;
-  const hasHighlights = highlights.length > 0;
-  const hasPrompts = topPrompts.length > 0;
-
-  const subheading = hasActivity
-    ? "Your creative momentum is building."
-    : "Let's create your first masterpiece.";
+  async function signOut() {
+    await supabase.auth.signOut();
+    navigate({ to: "/" });
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="mx-auto max-w-[1400px] px-4 py-10 sm:px-8">
-
-        {/* 1. Cinematic Hero Band */}
-        <motion.section
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="relative overflow-hidden rounded-3xl"
-          style={{
-            minHeight: "clamp(240px, 32vw, 340px)",
-            background: heroBackground,
-            border: "1px solid var(--border-default)",
-          }}
-        >
-          <div
-            aria-hidden
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(180deg, transparent 0%, oklch(0.12 0.02 320 / 0.35) 45%, oklch(0.10 0.02 320 / 0.92) 100%)",
-            }}
-          />
-          <div className="relative flex h-full flex-col justify-end" style={{ padding: "var(--space-5)", minHeight: "inherit" }}>
-            <span
-              className="inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-white/90"
-              style={{ backgroundColor: "oklch(0 0 0 / 0.35)", backdropFilter: "blur(8px)", border: "1px solid oklch(1 0 0 / 0.15)" }}
-            >
-              <Sparkles className="h-3 w-3" /> {m.dashboard_free_plan()}
-            </span>
-            <h1
-              className="font-display font-bold tracking-tight text-white"
-              style={{ marginTop: "var(--space-3)", fontSize: "clamp(2rem, 5.5vw, var(--font-size-display))", lineHeight: 1.05 }}
-            >
-              Welcome back, @{username}
-            </h1>
-            <p className="text-white/80" style={{ marginTop: "var(--space-2)", fontSize: "var(--font-size-body)" }}>
-              {subheading}
-            </p>
-            <div className="flex flex-wrap" style={{ marginTop: "var(--space-4)", gap: "var(--space-2)" }}>
-              <Link
-                to="/studio"
-                className="inline-flex items-center gap-2 text-sm font-medium text-white"
-                style={{
-                  backgroundColor: "var(--action-primary)",
-                  borderRadius: "var(--radius-md)",
-                  paddingInline: "var(--space-4)",
-                  paddingBlock: "var(--space-3)",
-                }}
-              >
-                <Wand2 className="h-4 w-4" /> {hasActivity ? "Create new" : "Start creating"}
-              </Link>
-              <button
-                onClick={signOut}
-                className="inline-flex items-center gap-2 text-sm text-white/90 transition hover:text-white"
-                style={{
-                  border: "1px solid oklch(1 0 0 / 0.2)",
-                  backgroundColor: "oklch(0 0 0 / 0.25)",
-                  borderRadius: "var(--radius-md)",
-                  paddingInline: "var(--space-4)",
-                  paddingBlock: "var(--space-3)",
-                  backdropFilter: "blur(8px)",
-                }}
-              >
-                <LogOut className="h-4 w-4" /> {m.nav_sign_out()}
-              </button>
-            </div>
-          </div>
-        </motion.section>
-
-        {/* 3. Hero Metric + 4. Secondary Metrics */}
-        <motion.section
-          initial="hidden"
-          animate="show"
-          variants={metricContainerVariants}
-          className="grid gap-4 lg:grid-cols-[1.4fr_1fr_1fr_1fr]"
-          style={{ marginTop: "var(--space-5)" }}
-        >
-          <HeroMetricCard
-            label="Creations generated"
-            value={primaryStat}
-            icon={Rocket}
-            accent="var(--color-magenta-500)"
-            emptyCta={{ label: "Generate your first creation", to: "/studio" }}
-          />
-          <MetricCard
-            label="Reach"
-            value={reachStat}
-            icon={Eye}
-            accent="var(--color-magenta-500)"
-            emptyHint="Publish to grow your reach"
-          />
-          <MetricCard
-            label="Earnings"
-            value={earningsStat}
-            format="currency"
-            icon={Coins}
-            accent="var(--color-orange-500)"
-            emptyHint="List a prompt to start earning"
-          />
-          <MetricCard
-            label="Followers"
-            value={followersStat}
-            icon={Users2}
-            accent="var(--color-gold-500)"
-            emptyHint="Share your profile to gain followers"
-          />
-        </motion.section>
-
-        {/* 5. Trend Chart + 6. Highlights */}
-        <section
-          className="grid gap-4 lg:grid-cols-[1.6fr_1fr]"
-          style={{ marginTop: "var(--space-4)" }}
-        >
-          <TrendChartCard series={trendSeries} hasTrend={hasTrend} />
-          <HighlightsCard highlights={highlights} hasHighlights={hasHighlights} />
-        </section>
-
-        {/* 7. Top Prompts + Quick Actions */}
-        <section
-          className="grid gap-4 lg:grid-cols-[1.6fr_1fr]"
-          style={{ marginTop: "var(--space-4)" }}
-        >
-          <TopPromptsCard prompts={topPrompts} hasPrompts={hasPrompts} />
-          <QuickActionsCard />
-        </section>
-
+    <div
+      className="min-h-screen text-white"
+      style={{
+        background:
+          "radial-gradient(1200px 700px at 15% -10%, rgba(255,90,40,0.10), transparent 60%), radial-gradient(900px 700px at 95% 20%, rgba(255,45,135,0.10), transparent 60%), radial-gradient(1000px 800px at 50% 110%, rgba(140,50,220,0.10), transparent 60%), #08060a",
+        fontFamily: "'InterVariable', Inter, system-ui, sans-serif",
+      }}
+    >
+      <TopNav avatarUrl={avatarUrl} onSignOut={signOut} />
+      <main className="mx-auto max-w-[1200px] px-4 pb-16 pt-8 sm:px-6 lg:px-8">
+        <HeroSection username={username} avatarUrl={avatarUrl} />
+        <StatsRow />
+        <AnalyticsCard />
+        <StudioHighlights />
+        <BottomRow />
+        <MilestoneBanner />
       </main>
     </div>
   );
 }
 
-// ============================================================================
-// Presentation components — pure, no data fetching.
-// ============================================================================
-
-function formatNumber(n: number) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return String(n);
-}
-
-function HeroMetricCard({
-  label, value, icon: Icon, accent, emptyCta,
-}: {
-  label: string;
-  value: number | null;
-  icon: typeof Rocket;
-  accent: string;
-  emptyCta: { label: string; to: string };
-}) {
-  const isEmpty = !value || value <= 0;
+function TopNav({ avatarUrl, onSignOut }: { avatarUrl: string; onSignOut: () => void }) {
   return (
-    <motion.div
-      variants={metricItemVariants}
-      className="surface-elevated relative overflow-hidden rounded-2xl"
-      style={{ padding: "var(--space-5)" }}
-    >
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 opacity-25"
-        style={{ background: `radial-gradient(90% 90% at 100% 0%, ${accent}, transparent 60%)` }}
-      />
-      <div className="flex items-center gap-2">
-        <Icon className="h-4 w-4" style={{ color: accent }} />
-        <span style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>{label}</span>
-      </div>
-      <div
-        className="font-display font-bold text-foreground"
-        style={{
-          marginTop: "var(--space-3)",
-          fontSize: "clamp(3rem, 7vw, var(--font-size-display))",
-          lineHeight: 1,
-          color: isEmpty ? "var(--text-primary)" : accent,
-        }}
-      >
-        {isEmpty ? "0" : formatNumber(value!)}
-      </div>
-      {isEmpty ? (
-        <Link
-          to={emptyCta.to}
-          className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium"
-          style={{ color: accent }}
-        >
-          {emptyCta.label} <ArrowUpRight className="h-3.5 w-3.5" />
+    <header className="sticky top-0 z-40 backdrop-blur-xl" style={{ background: "rgba(8,6,10,0.55)" }}>
+      <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
+        <Link to="/" className="text-2xl font-bold tracking-tight">
+          Xeom<span style={{ color: "#ff2d87" }}>X</span>
         </Link>
-      ) : (
-        <p style={{ marginTop: "var(--space-3)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>
-          Lifetime total
-        </p>
-      )}
-    </motion.div>
+        <div className="flex items-center gap-3">
+          <button className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-white/80 transition hover:bg-white/[0.06]">
+            This Month <ChevronDown className="h-4 w-4" />
+          </button>
+          <button className="relative grid h-10 w-10 place-items-center rounded-full border border-white/10 bg-white/[0.03] transition hover:bg-white/[0.06]">
+            <Bell className="h-4 w-4" />
+            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#ff2d87] shadow-[0_0_8px_#ff2d87]" />
+          </button>
+          <Link
+            to="/profile-edit"
+            className="relative block h-10 w-10 overflow-hidden rounded-full ring-2 ring-[#ff8a3d]/70"
+            title="Edit profile"
+          >
+            <img src={avatarUrl} alt="You" className="h-full w-full object-cover" />
+          </Link>
+          <button
+            onClick={onSignOut}
+            className="grid h-10 w-10 place-items-center rounded-full border border-white/10 bg-white/[0.03] transition hover:bg-white/[0.06]"
+            title="Sign out"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </header>
   );
 }
 
-function MetricCard({
-  label, value, icon: Icon, accent, emptyHint, format,
-}: {
-  label: string;
-  value: number | null;
-  icon: typeof Rocket;
-  accent: string;
-  emptyHint: string;
-  format?: "currency";
-}) {
-  const isEmpty = value == null || value <= 0;
-  const display = isEmpty
-    ? (format === "currency" ? "$0" : "0")
-    : (format === "currency" ? `$${formatNumber(value!)}` : formatNumber(value!));
+function HeroSection({ username, avatarUrl }: { username: string; avatarUrl: string }) {
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="flex flex-col items-start gap-8 pt-4 sm:flex-row sm:items-start sm:gap-10"
+    >
+      <div className="relative shrink-0">
+        <div
+          className="absolute -inset-3 rounded-full opacity-70 blur-2xl"
+          style={{ background: "radial-gradient(circle, #ff5a28 0%, transparent 70%)" }}
+        />
+        <div
+          className="relative h-[168px] w-[168px] overflow-hidden rounded-full"
+          style={{ boxShadow: "0 0 0 2px #ff5a28, 0 0 40px rgba(255,90,40,0.55)" }}
+        >
+          <img src={avatarUrl} alt={username} className="h-full w-full object-cover" width={336} height={336} />
+        </div>
+        <div
+          className="absolute -bottom-1 right-2 grid h-11 w-11 place-items-center"
+          style={{
+            clipPath: "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
+            background: "linear-gradient(135deg, #ff8a3d, #ff5a28)",
+          }}
+        >
+          <Star className="h-5 w-5 fill-black text-black" />
+        </div>
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <p className="text-lg text-white/60">Welcome back, @{username}</p>
+        <h1
+          className="mt-2 font-bold leading-[0.98] tracking-tight"
+          style={{ fontSize: "clamp(2.5rem, 6vw, 4.5rem)" }}
+        >
+          This is your
+          <br />
+          <span
+            style={{
+              background: "linear-gradient(90deg, #ff8a3d, #ff2d87)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            best
+          </span>{" "}
+          month yet.
+          <Sparkles className="ml-2 inline h-8 w-8 text-[#ff8a3d]" />
+        </h1>
+        <div className="mt-5 flex flex-wrap items-center gap-4 text-sm">
+          <span className="inline-flex items-center gap-2 text-[#f5c76e]">
+            <Trophy className="h-4 w-4" /> Top 3% globally
+          </span>
+          <span className="h-4 w-px bg-white/20" />
+          <span className="text-white/60">Keep creating. You're inspiring millions.</span>
+        </div>
+      </div>
+    </motion.section>
+  );
+}
+
+function StatsRow() {
+  return (
+    <section className="mt-10 grid gap-6 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <PrimaryStat />
+      <SecondaryStat icon={Users} label="Creators reached" value="840k" delta="14%" color="#ff2d87" />
+      <SecondaryStat icon={DollarSign} label="Earned this month" value="$12,480" delta="22%" color="#ff8a3d" />
+      <SecondaryStat icon={Users} label="Followers" value="3.2k" delta="9%" color="#ff2d87" />
+    </section>
+  );
+}
+
+function PrimaryStat() {
   return (
     <motion.div
-      variants={metricItemVariants}
-      className="surface-raised rounded-2xl"
-      style={{ padding: "var(--space-4)" }}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.05 }}
     >
-      <div className="flex items-center gap-2">
-        <Icon className="h-4 w-4" style={{ color: accent }} />
-        <span style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>{label}</span>
+      <div className="flex items-center gap-2 text-white/70">
+        <span
+          className="grid h-7 w-7 place-items-center rounded-md"
+          style={{ border: "1px solid rgba(255,138,61,0.4)", color: "#ff8a3d" }}
+        >
+          <Box className="h-3.5 w-3.5" />
+        </span>
+        <span className="text-sm">Creations generated</span>
       </div>
       <div
-        className="font-display font-bold"
+        className="mt-3 font-extrabold tracking-tight"
         style={{
-          marginTop: "var(--space-3)",
-          fontSize: "var(--font-size-h1)",
-          color: isEmpty ? "var(--text-primary)" : accent,
-          lineHeight: 1,
+          fontSize: "clamp(4rem, 10vw, 8rem)",
+          lineHeight: 0.9,
+          background: "linear-gradient(180deg, #ff8a3d 0%, #ff2d87 100%)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          filter: "drop-shadow(0 6px 30px rgba(255,90,40,0.35))",
         }}
       >
-        {display}
+        2.1M
       </div>
-      <p style={{ marginTop: "var(--space-2)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>
-        {isEmpty ? emptyHint : "Last 30 days"}
+      <p className="mt-2 text-sm">
+        <span className="text-[#ff8a3d]">↗ 18%</span>{" "}
+        <span className="text-white/50">vs last month</span>
       </p>
     </motion.div>
   );
 }
 
-function ChartTooltip({ active, payload, label }: {
-  active?: boolean;
-  payload?: Array<{ value: number }>;
-  label?: string;
+function SecondaryStat({
+  icon: Icon, label, value, delta, color,
+}: {
+  icon: typeof Users; label: string; value: string; delta: string; color: string;
 }) {
-  if (!active || !payload || payload.length === 0) return null;
   return (
-    <div
-      className="rounded-xl"
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.15 }}
+      className="lg:border-l lg:border-white/10 lg:pl-6"
+    >
+      <span
+        className="grid h-9 w-9 place-items-center rounded-full"
+        style={{ background: `${color}22`, color }}
+      >
+        <Icon className="h-4 w-4" />
+      </span>
+      <p className="mt-3 text-sm text-white/60">{label}</p>
+      <div className="mt-1 text-3xl font-bold tracking-tight" style={{ color }}>
+        {value}
+      </div>
+      <p className="mt-2 text-xs">
+        <span style={{ color: "#ff8a3d" }}>↗ {delta}</span>{" "}
+        <span className="text-white/50">vs last month</span>
+      </p>
+    </motion.div>
+  );
+}
+
+function AnalyticsCard() {
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.5 }}
+      className="mt-8 rounded-[28px] p-6 sm:p-8"
       style={{
-        backgroundColor: "var(--surface-elevated)",
-        border: "1px solid var(--border-default)",
-        padding: "var(--space-3)",
-        boxShadow: "0 12px 32px oklch(0 0 0 / 0.35)",
+        background: "linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0))",
+        border: "1px solid rgba(255,255,255,0.06)",
+        boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
       }}
     >
-      <div style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>{label}</div>
-      <div
-        className="font-display font-semibold"
-        style={{ marginTop: 4, fontSize: "var(--font-size-h3)", color: "var(--color-magenta-500)" }}
-      >
-        {formatNumber(payload[0].value)}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h3 className="text-xl font-semibold">Renders overview</h3>
+          <p className="mt-1 text-sm text-white/50">Last 30 days</p>
+        </div>
+        <Link to="/dashboard" className="inline-flex items-center gap-1.5 text-sm font-medium text-[#ff2d87] hover:opacity-90">
+          View full analytics report <ArrowRight className="h-4 w-4" />
+        </Link>
       </div>
+      <div className="mt-6 h-[280px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={trendData} margin={{ top: 10, right: 8, left: -10, bottom: 0 }}>
+            <defs>
+              <linearGradient id="renderFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#ff5a28" stopOpacity={0.55} />
+                <stop offset="100%" stopColor="#ff2d87" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="renderStroke" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#ff8a3d" />
+                <stop offset="100%" stopColor="#ff2d87" />
+              </linearGradient>
+            </defs>
+            <XAxis
+              dataKey="d" stroke="rgba(255,255,255,0.35)" fontSize={11}
+              tickLine={false} axisLine={false}
+              ticks={["May 15", "May 22", "May 29", "Jun 5", "Jun 12"]}
+            />
+            <YAxis
+              stroke="rgba(255,255,255,0.35)" fontSize={11}
+              tickLine={false} axisLine={false} width={44}
+              tickFormatter={(v) => (v === 0 ? "0" : `${v / 1000}k`)}
+              ticks={[0, 30000, 60000, 90000, 120000]}
+            />
+            <Tooltip
+              cursor={{ stroke: "rgba(255,138,61,0.5)", strokeDasharray: "3 3" }}
+              content={<RenderTip />}
+            />
+            <Area
+              type="monotone" dataKey="v"
+              stroke="url(#renderStroke)" strokeWidth={2.5}
+              fill="url(#renderFill)"
+              activeDot={{ r: 7, fill: "#ff8a3d", stroke: "#fff", strokeWidth: 2 }}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    </motion.section>
+  );
+}
+
+function RenderTip({ active, payload, label }: {
+  active?: boolean; payload?: Array<{ value: number }>; label?: string;
+}) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div
+      className="rounded-xl px-4 py-3"
+      style={{ background: "#141014", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 12px 30px rgba(0,0,0,0.5)" }}
+    >
+      <div className="text-xs text-white/60">{label}</div>
+      <div className="mt-1 text-lg font-semibold">{payload[0].value.toLocaleString()}</div>
+      <div className="text-xs text-white/50">renders</div>
     </div>
   );
 }
 
-function TrendChartCard({
-  series, hasTrend,
-}: {
-  series: { day: string; value: number }[];
-  hasTrend: boolean;
-}) {
+function StudioHighlights() {
   return (
-    <div className="surface-raised rounded-2xl" style={{ padding: "var(--space-5)" }}>
+    <section className="mt-10">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <LineChartIcon className="h-4 w-4 text-magenta" />
-          <h3 className="font-display text-lg font-semibold text-foreground">Render activity</h3>
-        </div>
-        {hasTrend && (
-          <span className="rounded-full border border-border/60 bg-surface/60 px-2.5 py-0.5 text-[11px] text-muted-foreground">
-            Last 30 days
-          </span>
-        )}
+        <h2 className="inline-flex items-center gap-2 text-xl font-semibold">
+          <Sparkles className="h-5 w-5 text-[#ff8a3d]" /> Studio highlights
+        </h2>
+        <Link to="/dashboard" className="inline-flex items-center gap-1.5 text-sm text-[#ff2d87]">
+          View all highlights <ArrowRight className="h-4 w-4" />
+        </Link>
       </div>
+      <div className="mt-5 grid gap-5 lg:grid-cols-[1.7fr_1fr_1fr]">
+        <TrendingCard />
+        <AchievementCard />
+        <RankCard />
+      </div>
+    </section>
+  );
+}
 
-      <div style={{ marginTop: "var(--space-4)", height: 260 }}>
-        {hasTrend ? (
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={series} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="dashTrendFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="oklch(0.65 0.25 340)" stopOpacity={0.5} />
-                  <stop offset="100%" stopColor="oklch(0.65 0.25 340)" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="oklch(1 0 0 / 0.06)" vertical={false} />
-              <XAxis
-                dataKey="day"
-                stroke="oklch(1 0 0 / 0.4)"
-                fontSize={11}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis stroke="oklch(1 0 0 / 0.4)" fontSize={11} tickLine={false} axisLine={false} width={30} />
-              <Tooltip content={<ChartTooltip />} cursor={{ stroke: "oklch(0.65 0.25 340)", strokeWidth: 1, strokeDasharray: "3 3" }} />
-              <Area
-                type="monotone"
-                dataKey="value"
-                stroke="oklch(0.72 0.22 340)"
-                strokeWidth={2}
-                fill="url(#dashTrendFill)"
-                activeDot={{ r: 6, fill: "oklch(0.72 0.22 340)", stroke: "white", strokeWidth: 2 }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        ) : (
-          <div
-            className="flex h-full flex-col items-center justify-center rounded-xl text-center"
-            style={{
-              border: "1px dashed var(--border-default)",
-              backgroundColor: "var(--surface-tertiary)",
-              padding: "var(--space-5)",
-            }}
-          >
-            <div
-              className="grid h-12 w-12 place-items-center rounded-full"
-              style={{ backgroundColor: "var(--surface-glass)", border: "1px solid var(--border-default)" }}
-            >
-              <BarChart3 className="h-5 w-5 text-magenta" />
-            </div>
-            <p
-              className="font-display font-semibold text-foreground"
-              style={{ marginTop: "var(--space-3)", fontSize: "var(--font-size-h4)" }}
-            >
-              No render history yet
-            </p>
-            <p style={{ marginTop: "var(--space-2)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)", maxWidth: 320 }}>
-              Your analytics will appear here after your first generation.
-            </p>
+function HighlightShell({ children, glow }: { children: React.ReactNode; glow: string }) {
+  return (
+    <div
+      className="relative overflow-hidden rounded-[22px] p-5"
+      style={{
+        background: `radial-gradient(120% 100% at 100% 0%, ${glow}, transparent 60%), #100b0f`,
+        border: "1px solid rgba(255,255,255,0.06)",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function TrendingCard() {
+  return (
+    <HighlightShell glow="rgba(255,45,135,0.10)">
+      <div className="grid grid-cols-[140px_1fr] gap-5 sm:grid-cols-[180px_1fr]">
+        <div className="relative h-[200px] overflow-hidden rounded-2xl">
+          <img src={cyberImg} alt="Cyber Noir" className="h-full w-full object-cover" loading="lazy" />
+          <div className="absolute left-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-black/50 backdrop-blur">
+            <TrendingUp className="h-4 w-4 text-[#ff2d87]" />
           </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function HighlightsCard({
-  highlights, hasHighlights,
-}: {
-  highlights: { title: string; body: string; icon: typeof Trophy }[];
-  hasHighlights: boolean;
-}) {
-  const emptyItems = [
-    { title: "Complete your first generation", body: "Open Studio and turn an idea into an image.", to: "/studio", icon: Wand2, accent: "var(--color-orange-500)" },
-    { title: "Need inspiration?", body: "Browse community prompts to spark ideas.", to: "/explore", icon: Flame, accent: "var(--color-magenta-500)" },
-    { title: "Set up your creator profile", body: "Add a bio and unlock earnings.", to: "/settings", icon: Trophy, accent: "var(--color-gold-500)" },
-  ];
-
-  return (
-    <div className="surface-raised rounded-2xl" style={{ padding: "var(--space-5)" }}>
-      <div className="flex items-center gap-2">
-        <Trophy className="h-4 w-4 text-gold" />
-        <h3 className="font-display text-lg font-semibold text-foreground">
-          {hasHighlights ? "Highlights" : "Get started"}
-        </h3>
-      </div>
-      <div className="flex flex-col" style={{ marginTop: "var(--space-4)", gap: "var(--space-2)" }}>
-        {hasHighlights
-          ? highlights.map((h) => (
-              <div
-                key={h.title}
-                className="rounded-xl"
-                style={{
-                  padding: "var(--space-4)",
-                  background: "linear-gradient(135deg, oklch(0.65 0.2 55 / 0.15), oklch(0.55 0.25 340 / 0.15))",
-                  border: "1px solid var(--border-default)",
-                }}
-              >
-                <div className="flex items-center gap-2">
-                  <h.icon className="h-4 w-4 text-gold" />
-                  <span className="text-sm font-medium text-foreground">{h.title}</span>
-                </div>
-                <p className="mt-1 text-xs text-muted-foreground">{h.body}</p>
-              </div>
-            ))
-          : emptyItems.map((item) => (
-              <Link
-                key={item.title}
-                to={item.to}
-                className="group flex items-start gap-3 rounded-xl transition hover:border-magenta/40"
-                style={{
-                  padding: "var(--space-3)",
-                  border: "1px solid var(--border-default)",
-                  backgroundColor: "var(--surface-tertiary)",
-                }}
-              >
-                <div
-                  className="grid h-9 w-9 shrink-0 place-items-center rounded-lg"
-                  style={{ backgroundColor: "var(--surface-glass)", border: "1px solid var(--border-default)" }}
-                >
-                  <item.icon className="h-4 w-4" style={{ color: item.accent }} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground">{item.title}</p>
-                  <p className="text-xs text-muted-foreground">{item.body}</p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground transition group-hover:text-magenta" />
-              </Link>
-            ))}
-      </div>
-    </div>
-  );
-}
-
-function TopPromptsCard({
-  prompts, hasPrompts,
-}: {
-  prompts: { id: string; title: string; value: number }[];
-  hasPrompts: boolean;
-}) {
-  return (
-    <div className="surface-raised rounded-2xl" style={{ padding: "var(--space-5)" }}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="h-4 w-4 text-magenta" />
-          <h3 className="font-display text-lg font-semibold text-foreground">Top performing prompts</h3>
+        </div>
+        <div className="flex min-w-0 flex-col">
+          <span className="inline-flex items-center gap-1.5 text-xs text-[#ff2d87]">
+            <Sparkles className="h-3 w-3" /> Your prompt is trending
+          </span>
+          <h4 className="mt-2 text-2xl font-bold">Cyber Noir</h4>
+          <p className="mt-2 text-sm text-white/60">
+            Exploded this week and loved by the community.
+          </p>
+          <div className="mt-4 grid grid-cols-3 gap-4 text-white">
+            <MiniStat value="12.4k" label="views" />
+            <MiniStat value="2.1k" label="uses" />
+            <MiniStat value="18%" label="engagement" />
+          </div>
+          <div className="mt-auto flex items-center justify-between pt-4">
+            <div className="flex gap-1.5">
+              <span className="h-1 w-6 rounded-full bg-[#ff8a3d]" />
+              <span className="h-1 w-6 rounded-full bg-white/15" />
+              <span className="h-1 w-6 rounded-full bg-white/15" />
+            </div>
+            <button className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-[#ff2d87] transition hover:bg-white/[0.06]">
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
-      {hasPrompts ? (
-        <ul className="flex flex-col" style={{ marginTop: "var(--space-4)", gap: "var(--space-2)" }}>
-          {prompts.map((p, i) => (
-            <li
-              key={p.id}
-              className="flex items-center gap-3 rounded-xl"
-              style={{
-                padding: "var(--space-3)",
-                border: "1px solid var(--border-default)",
-                backgroundColor: "var(--surface-tertiary)",
-              }}
-            >
-              <span
-                className="grid h-8 w-8 place-items-center rounded-lg font-display text-sm font-semibold"
-                style={{ backgroundColor: "var(--surface-glass)", color: "var(--color-magenta-500)" }}
-              >
-                {i + 1}
-              </span>
-              <span className="flex-1 truncate text-sm text-foreground">{p.title}</span>
-              <span className="text-sm font-medium" style={{ color: "var(--color-orange-500)" }}>
-                {formatNumber(p.value)}
-              </span>
-            </li>
-          ))}
-        </ul>
-      ) : (
+    </HighlightShell>
+  );
+}
+
+function MiniStat({ value, label }: { value: string; label: string }) {
+  return (
+    <div>
+      <div className="text-lg font-bold">{value}</div>
+      <div className="text-xs text-white/50">{label}</div>
+    </div>
+  );
+}
+
+function AchievementCard() {
+  return (
+    <HighlightShell glow="rgba(255,138,61,0.14)">
+      <div className="flex h-full flex-col">
+        <span className="grid h-8 w-8 place-items-center rounded-full" style={{ background: "rgba(255,138,61,0.18)" }}>
+          <Award className="h-4 w-4 text-[#ff8a3d]" />
+        </span>
+        <p className="mt-6 text-sm text-[#ff8a3d]">New achievement</p>
         <div
-          className="flex flex-col items-center rounded-xl text-center"
+          className="mt-1 text-4xl font-extrabold"
           style={{
-            marginTop: "var(--space-4)",
-            border: "1px dashed var(--border-default)",
-            backgroundColor: "var(--surface-tertiary)",
-            padding: "var(--space-5)",
+            background: "linear-gradient(180deg,#ff8a3d,#ff5a28)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
           }}
         >
-          <div
-            className="grid h-12 w-12 place-items-center rounded-full"
-            style={{ backgroundColor: "var(--surface-glass)", border: "1px solid var(--border-default)" }}
-          >
-            <Sparkles className="h-5 w-5 text-magenta" />
-          </div>
-          <p
-            className="font-display font-semibold text-foreground"
-            style={{ marginTop: "var(--space-3)", fontSize: "var(--font-size-h4)" }}
-          >
-            No prompts published yet
-          </p>
-          <p style={{ marginTop: "var(--space-2)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)", maxWidth: 320 }}>
-            Once you publish prompts, your top performers will land here.
-          </p>
-          <Link
-            to="/studio"
-            className="inline-flex items-center gap-2 text-sm font-medium text-white"
-            style={{
-              marginTop: "var(--space-4)",
-              backgroundColor: "var(--action-primary)",
-              borderRadius: "var(--radius-md)",
-              paddingInline: "var(--space-4)",
-              paddingBlock: "var(--space-2)",
-            }}
-          >
-            <Plus className="h-4 w-4" /> Publish a prompt
-          </Link>
+          1M
         </div>
-      )}
+        <p className="mt-3 text-sm text-white/70">
+          Total renders<br />milestone reached
+        </p>
+        <div className="mt-auto flex justify-end pt-4">
+          <button className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-[#ff8a3d] transition hover:bg-white/[0.06]">
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </HighlightShell>
+  );
+}
+
+function RankCard() {
+  return (
+    <HighlightShell glow="rgba(255,45,135,0.14)">
+      <div className="flex h-full flex-col">
+        <span className="grid h-8 w-8 place-items-center rounded-full" style={{ background: "rgba(255,45,135,0.18)" }}>
+          <Sparkles className="h-4 w-4 text-[#ff2d87]" />
+        </span>
+        <p className="mt-6 text-sm text-white/70">You ranked up</p>
+        <div
+          className="mt-1 text-4xl font-extrabold"
+          style={{
+            background: "linear-gradient(180deg,#ff2d87,#c026d3)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
+          Top 3%
+        </div>
+        <p className="mt-3 text-sm text-white/70">
+          Among all creators<br />this month
+        </p>
+        <div className="mt-auto flex justify-end pt-4">
+          <button className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-[#ff2d87] transition hover:bg-white/[0.06]">
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </HighlightShell>
+  );
+}
+
+function BottomRow() {
+  return (
+    <section className="mt-6 grid gap-6 lg:grid-cols-2">
+      <TopPromptsCard />
+      <QuickActionsCard />
+    </section>
+  );
+}
+
+function TopPromptsCard() {
+  return (
+    <div className="rounded-[22px] p-6" style={{ background: "#100b0f", border: "1px solid rgba(255,255,255,0.06)" }}>
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Top performing prompts</h3>
+        <Link to="/dashboard" className="inline-flex items-center gap-1.5 text-sm text-[#ff2d87]">
+          See all <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
+      <ul className="mt-5 divide-y divide-white/5">
+        {topPrompts.map((p) => (
+          <li key={p.rank} className="grid grid-cols-[28px_56px_1fr_120px] items-center gap-4 py-3">
+            <span className="text-sm font-semibold text-[#ff2d87]">{p.rank}</span>
+            <div className="h-12 w-14 overflow-hidden rounded-lg">
+              <img src={cyberImg} alt={p.title} className="h-full w-full object-cover" loading="lazy" />
+            </div>
+            <div className="min-w-0">
+              <p className="truncate font-medium">{p.title}</p>
+              <p className="text-xs text-white/50">{p.views}</p>
+            </div>
+            <div className="h-10">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={p.data} margin={{ top: 2, right: 2, left: 2, bottom: 2 }}>
+                  <Line type="monotone" dataKey="y" stroke={p.color} strokeWidth={2} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
 
 function QuickActionsCard() {
   const actions = [
-    { label: "Create new", to: "/studio", icon: Wand2, accent: "var(--color-magenta-500)" },
-    { label: "My prompts", to: "/dashboard", icon: LayoutGrid, accent: "var(--color-orange-500)" },
-    { label: "Analytics", to: "/dashboard", icon: BarChart3, accent: "var(--color-magenta-500)" },
-    { label: "Payouts", to: "/settings", icon: Wallet, accent: "var(--color-gold-500)" },
+    { icon: Plus, title: "Create new", desc: "Start from scratch", color: "#ff2d87", to: "/studio" as const },
+    { icon: Box, title: "View my prompts", desc: "Manage your library", color: "#ff8a3d", to: "/dashboard" as const },
+    { icon: BarChart3, title: "Analytics report", desc: "Deep dive insights", color: "#ff2d87", to: "/dashboard" as const },
+    { icon: DollarSign, title: "Payouts", desc: "View earnings", color: "#ff8a3d", to: "/dashboard" as const },
   ];
   return (
-    <div className="surface-raised rounded-2xl" style={{ padding: "var(--space-5)" }}>
-      <div className="flex items-center gap-2">
-        <Rocket className="h-4 w-4 text-magenta" />
-        <h3 className="font-display text-lg font-semibold text-foreground">Quick actions</h3>
-      </div>
-      <div className="grid grid-cols-2" style={{ marginTop: "var(--space-4)", gap: "var(--space-2)" }}>
+    <div className="rounded-[22px] p-6" style={{ background: "#100b0f", border: "1px solid rgba(255,255,255,0.06)" }}>
+      <h3 className="text-lg font-semibold">Quick actions</h3>
+      <div className="mt-5 grid grid-cols-2 gap-3">
         {actions.map((a) => (
           <Link
-            key={a.label}
+            key={a.title}
             to={a.to}
-            className="group flex flex-col items-start rounded-xl transition hover:border-magenta/40"
-            style={{
-              padding: "var(--space-4)",
-              border: "1px solid var(--border-default)",
-              backgroundColor: "var(--surface-tertiary)",
-              minHeight: 96,
-            }}
+            className="group flex items-center gap-3 rounded-2xl p-4 transition hover:bg-white/[0.03]"
+            style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
           >
-            <div
-              className="grid h-8 w-8 place-items-center rounded-lg"
-              style={{ backgroundColor: "var(--surface-glass)", border: "1px solid var(--border-default)" }}
+            <span
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-xl"
+              style={{ background: `${a.color}22`, color: a.color }}
             >
-              <a.icon className="h-4 w-4" style={{ color: a.accent }} />
+              <a.icon className="h-5 w-5" />
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold">{a.title}</p>
+              <p className="truncate text-xs text-white/50">{a.desc}</p>
             </div>
-            <span className="mt-3 text-sm font-medium text-foreground">{a.label}</span>
-            <ArrowUpRight className="mt-1 h-3.5 w-3.5 text-muted-foreground transition group-hover:text-magenta" />
           </Link>
         ))}
       </div>
     </div>
+  );
+}
+
+function MilestoneBanner() {
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 8 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+      className="mt-6 rounded-[22px] p-[1px]"
+      style={{ background: "linear-gradient(90deg, #ff8a3d, #ff2d87, #c026d3)" }}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-[21px] px-6 py-5" style={{ background: "#100b0f" }}>
+        <div className="flex items-center gap-4">
+          <span className="grid h-11 w-11 place-items-center rounded-xl" style={{ background: "rgba(255,138,61,0.15)" }}>
+            <Sparkles className="h-5 w-5 text-[#ff8a3d]" />
+          </span>
+          <div>
+            <p className="font-semibold">You reached 2 new milestones this month</p>
+            <p className="text-sm text-white/50">Keep going — your journey is just getting started.</p>
+          </div>
+        </div>
+        <Link
+          to="/dashboard"
+          className="inline-flex items-center gap-2 rounded-full border border-[#ff8a3d]/50 px-5 py-2.5 text-sm font-medium text-[#ff8a3d] transition hover:bg-[#ff8a3d]/10"
+        >
+          See milestones <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
+    </motion.section>
   );
 }

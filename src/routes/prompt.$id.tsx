@@ -1,8 +1,21 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowLeft, Bookmark, Check, Copy, Crown, Heart, Lock, Share2, Shuffle, Sparkles, TrendingUp } from "lucide-react";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { ArrowLeft, Bookmark, Check, Copy, Crown, Heart, Lock, Share2, Shuffle, Sparkles, Trash2, TrendingUp } from "lucide-react";
 import { motion } from "motion/react";
-import { getPrompt, PROMPTS, type Prompt } from "@/lib/prompts";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { Prompt } from "@/lib/prompts";
+import {
+  fetchPromptBySlug,
+  fetchRelatedPrompts,
+  recordPromptView,
+  togglePromptLike,
+  togglePromptSave,
+  fetchViewerEngagement,
+  fetchComments,
+  postComment,
+  deleteComment,
+} from "@/lib/marketplace";
+import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/xeomx/Header";
 import { PromptCard } from "@/components/xeomx/PromptCard";
 import { SignalBadge } from "@/components/xeomx/Signal";
@@ -11,10 +24,10 @@ import { pageUrl, SITE_URL } from "@/lib/seo";
 import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/prompt/$id")({
-  loader: ({ params }) => {
-    const prompt = getPrompt(params.id);
-    if (!prompt) throw notFound();
-    return { prompt };
+  loader: async ({ params }) => {
+    const res = await fetchPromptBySlug(params.id);
+    if (!res) throw notFound();
+    return { prompt: res.prompt, promptId: res.row.id };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ name: "robots", content: "noindex" }] };
@@ -63,9 +76,59 @@ export const Route = createFileRoute("/prompt/$id")({
 });
 
 function Detail() {
-  const { prompt } = Route.useLoaderData() as { prompt: Prompt };
+  const { prompt, promptId } = Route.useLoaderData();
+  const params = Route.useParams();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [copied, setCopied] = useState(false);
   const locked = prompt.state === "soon";
+
+  // Record a view once per mount
+  useEffect(() => {
+    recordPromptView(promptId).catch(() => {});
+  }, [promptId]);
+
+  const [uid, setUid] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.auth.getUser().then((r) => setUid(r.data.user?.id ?? null));
+  }, []);
+
+  const { data: engagement } = useQuery({
+    queryKey: ["engagement", promptId, uid],
+    queryFn: () => fetchViewerEngagement(promptId),
+    enabled: !!uid,
+  });
+
+  const requireAuth = () => {
+    if (!uid) {
+      navigate({ to: "/auth" });
+      return false;
+    }
+    return true;
+  };
+
+  const likeMut = useMutation({
+    mutationFn: (on: boolean) => togglePromptLike(promptId, on),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["engagement", promptId, uid] });
+      queryClient.invalidateQueries({ queryKey: ["prompt", params.id] });
+    },
+  });
+  const saveMut = useMutation({
+    mutationFn: (on: boolean) => togglePromptSave(promptId, on),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["engagement", promptId, uid] });
+    },
+  });
+
+  const { data: related = [] } = useQuery<Prompt[]>({
+    queryKey: ["related", promptId],
+    queryFn: async () => {
+      const res = await fetchPromptBySlug(params.id);
+      if (!res) return [];
+      return fetchRelatedPrompts(res.row, 4);
+    },
+  });
 
   const onCopy = async () => {
     if (locked) return;
@@ -74,13 +137,21 @@ function Detail() {
     setTimeout(() => setCopied(false), 1600);
   };
 
-  const relatedIds = prompt.related ?? [];
-  const related = (relatedIds.length
-    ? relatedIds.map((id) => PROMPTS.find((p) => p.id === id)).filter(Boolean)
-    : PROMPTS.filter((p) => p.id !== prompt.id).slice(0, 4)) as Prompt[];
-
-  const engine = prompt.engine ?? null;
+  const engine = null;
   const fmt = (n?: number) => (n ? (n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 0 : 1) + "k" : String(n)) : "—");
+
+  const onShare = async () => {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    try {
+      if (typeof navigator !== "undefined" && (navigator as unknown as { share?: (d: { url: string; title?: string }) => Promise<void> }).share) {
+        await (navigator as unknown as { share: (d: { url: string; title?: string }) => Promise<void> }).share({ url, title: prompt.title });
+      } else if (typeof navigator !== "undefined") {
+        await navigator.clipboard.writeText(url);
+      }
+    } catch {
+      /* user cancelled */
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -187,13 +258,27 @@ function Detail() {
                 <div className="mb-4 flex items-center justify-between">
                   <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">{m.prompt_the_prompt()}</span>
                   <div className="flex gap-2">
-                    <button className="grid h-9 w-9 place-items-center rounded-full border border-border bg-surface/60 transition hover:border-magenta/40">
+                    <button
+                      type="button"
+                      onClick={() => { if (requireAuth()) saveMut.mutate(!engagement?.saved); }}
+                      aria-pressed={!!engagement?.saved}
+                      className={`grid h-9 w-9 place-items-center rounded-full border transition ${engagement?.saved ? "border-magenta/60 bg-magenta/15 text-magenta" : "border-border bg-surface/60 hover:border-magenta/40"}`}
+                    >
                       <Bookmark className="h-4 w-4" />
                     </button>
-                    <button className="grid h-9 w-9 place-items-center rounded-full border border-border bg-surface/60 transition hover:border-magenta/40">
-                      <Heart className="h-4 w-4" />
+                    <button
+                      type="button"
+                      onClick={() => { if (requireAuth()) likeMut.mutate(!engagement?.liked); }}
+                      aria-pressed={!!engagement?.liked}
+                      className={`grid h-9 w-9 place-items-center rounded-full border transition ${engagement?.liked ? "border-magenta/60 bg-magenta/15 text-magenta" : "border-border bg-surface/60 hover:border-magenta/40"}`}
+                    >
+                      <Heart className={`h-4 w-4 ${engagement?.liked ? "fill-current" : ""}`} />
                     </button>
-                    <button className="grid h-9 w-9 place-items-center rounded-full border border-border bg-surface/60 transition hover:border-magenta/40">
+                    <button
+                      type="button"
+                      onClick={onShare}
+                      className="grid h-9 w-9 place-items-center rounded-full border border-border bg-surface/60 transition hover:border-magenta/40"
+                    >
                       <Share2 className="h-4 w-4" />
                     </button>
                   </div>
@@ -239,47 +324,27 @@ function Detail() {
                 </div>
               </div>
 
-              <div
-                className="grid sm:grid-cols-2"
-                style={{ marginTop: "var(--space-6)", gap: "var(--space-3)" }}
-              >
-                {prompt.breakdown.map((b) => (
-                  <div key={b.label} className="surface-raised rounded-2xl p-4">
-                    <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">{b.label}</p>
-                    <p className="mt-1 font-display text-lg">{b.value}</p>
-                  </div>
-                ))}
-              </div>
+              {prompt.breakdown.length > 0 && (
+                <div
+                  className="grid sm:grid-cols-2"
+                  style={{ marginTop: "var(--space-6)", gap: "var(--space-3)" }}
+                >
+                  {prompt.breakdown.map((b: { label: string; value: string }) => (
+                    <div key={b.label} className="surface-raised rounded-2xl p-4">
+                      <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">{b.label}</p>
+                      <p className="mt-1 font-display text-lg">{b.value}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      {engine ? (
-        <section className="mx-auto max-w-[1200px] px-4 pb-16 sm:px-8">
-          <div className="mb-6 flex items-end justify-between">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.28em] text-gold/80">{m.prompt_engine_eyebrow()}</p>
-              <h2 className="mt-1 font-display text-2xl font-semibold tracking-tight sm:text-3xl">{m.prompt_engine_title()}</h2>
-            </div>
-            <span className="hidden text-[11px] uppercase tracking-[0.22em] text-muted-foreground sm:inline">{m.prompt_engine_framework()}</span>
-          </div>
-          <div className="grid gap-3 lg:grid-cols-5">
-            {([
-              [m.prompt_engine_role(), engine.role],
-              [m.prompt_engine_context(), engine.context],
-              [m.prompt_engine_instructions(), engine.instructions],
-              [m.prompt_engine_output(), engine.output],
-              [m.prompt_engine_constraints(), engine.constraints],
-            ] as const).map(([k, v]) => (
-              <div key={k} className="rounded-2xl border border-border bg-surface/50 p-5">
-                <p className="text-[10px] uppercase tracking-[0.28em] text-magenta">{k}</p>
-                <p className="mt-3 text-sm leading-relaxed text-foreground/90">{v}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      ) : null}
+      {engine ? null : null}
+
+      <CommentsSection promptId={promptId} viewerId={uid} onAuthRequired={() => navigate({ to: "/auth" })} />
 
       <section className="mx-auto max-w-[1200px] px-4 pb-16 sm:px-8">
         <div className="mb-6 flex items-end justify-between">
@@ -331,5 +396,132 @@ function Detail() {
         {m.prompt_footer()}
       </footer>
     </div>
+  );
+}
+
+function timeAgo(iso: string) {
+  const s = Math.round((Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60) return `${s}s ago`;
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return `${Math.floor(s / 86400)}d ago`;
+}
+
+function CommentsSection({ promptId, viewerId, onAuthRequired }: { promptId: string; viewerId: string | null; onAuthRequired: () => void }) {
+  const queryClient = useQueryClient();
+  const [text, setText] = useState("");
+  const { data: comments = [], isLoading } = useQuery({
+    queryKey: ["comments", promptId],
+    queryFn: () => fetchComments(promptId),
+  });
+
+  useEffect(() => {
+    const channel = supabase
+      .channel(`comments:${promptId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "comments", filter: `prompt_id=eq.${promptId}` }, () => {
+        queryClient.invalidateQueries({ queryKey: ["comments", promptId] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [promptId, queryClient]);
+
+  const post = useMutation({
+    mutationFn: () => postComment(promptId, text),
+    onSuccess: () => {
+      setText("");
+      queryClient.invalidateQueries({ queryKey: ["comments", promptId] });
+    },
+  });
+  const del = useMutation({
+    mutationFn: (id: string) => deleteComment(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["comments", promptId] }),
+  });
+
+  return (
+    <section className="mx-auto max-w-[900px] px-4 pb-16 sm:px-8">
+      <div className="mb-4 flex items-end justify-between">
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.28em] text-magenta/80">Discussion</p>
+          <h2 className="mt-1 font-display text-2xl font-semibold tracking-tight sm:text-3xl">Comments ({comments.length})</h2>
+        </div>
+      </div>
+
+      {viewerId ? (
+        <form
+          onSubmit={(e) => { e.preventDefault(); if (text.trim()) post.mutate(); }}
+          className="mb-6 rounded-2xl border border-border bg-surface/50 p-4"
+        >
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Share your thoughts…"
+            rows={3}
+            maxLength={2000}
+            className="w-full resize-none bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+          />
+          <div className="mt-2 flex items-center justify-between">
+            <span className="text-xs text-muted-foreground">{text.length}/2000</span>
+            <button
+              type="submit"
+              disabled={!text.trim() || post.isPending}
+              className="rounded-full bg-magenta px-4 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+              style={{ backgroundColor: "var(--action-primary)" }}
+            >
+              {post.isPending ? "Posting…" : "Post"}
+            </button>
+          </div>
+        </form>
+      ) : (
+        <button
+          type="button"
+          onClick={onAuthRequired}
+          className="mb-6 w-full rounded-2xl border border-dashed border-border/60 p-6 text-center text-sm text-muted-foreground transition hover:border-magenta/40 hover:text-foreground"
+        >
+          Sign in to join the discussion →
+        </button>
+      )}
+
+      {isLoading ? (
+        <p className="text-sm text-muted-foreground">Loading comments…</p>
+      ) : comments.length === 0 ? (
+        <p className="text-sm text-muted-foreground">Be the first to comment.</p>
+      ) : (
+        <ul className="space-y-4">
+          {comments.map((c) => {
+            const handle = c.author?.username ? `@${c.author.username}` : "anonymous";
+            const name = c.author?.display_name || c.author?.username || "Anonymous";
+            const mine = viewerId === c.author_id;
+            return (
+              <li key={c.id} className="rounded-2xl border border-border/60 bg-surface/30 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    {c.author?.avatar_url ? (
+                      <img src={c.author.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
+                    ) : (
+                      <div className="h-8 w-8 rounded-full bg-magenta/20" />
+                    )}
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{name}</p>
+                      <p className="text-[11px] text-muted-foreground">{handle} · {timeAgo(c.created_at)}</p>
+                    </div>
+                  </div>
+                  {mine && (
+                    <button
+                      type="button"
+                      onClick={() => del.mutate(c.id)}
+                      className="text-muted-foreground transition hover:text-destructive"
+                      aria-label="Delete comment"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+                <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">{c.body}</p>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
   );
 }

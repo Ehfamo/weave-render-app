@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, Layers } from "lucide-react";
-import { getCollection, PROMPTS, type Collection } from "@/lib/prompts";
+import { fetchCollectionBySlug } from "@/lib/marketplace";
+import type { Prompt } from "@/lib/prompts";
 import { Header } from "@/components/xeomx/Header";
 import { PromptCard } from "@/components/xeomx/PromptCard";
 import { pageUrl, SITE_URL } from "@/lib/seo";
@@ -8,10 +9,10 @@ import { pageUrl, SITE_URL } from "@/lib/seo";
 import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/collections/$id")({
-  loader: ({ params }) => {
-    const c = getCollection(params.id);
-    if (!c) throw notFound();
-    return { collection: c };
+  loader: async ({ params }) => {
+    const res = await fetchCollectionBySlug(params.id);
+    if (!res) throw notFound();
+    return { collection: res.collection, prompts: res.prompts };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ name: "robots", content: "noindex" }] };
@@ -50,8 +51,7 @@ export const Route = createFileRoute("/collections/$id")({
 });
 
 function CollectionDetail() {
-  const { collection } = Route.useLoaderData() as { collection: Collection };
-  const prompts = collection.ids.map((id) => PROMPTS.find((p) => p.id === id)).filter(Boolean) as typeof PROMPTS;
+  const { collection, prompts } = Route.useLoaderData();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -137,7 +137,7 @@ function CollectionDetail() {
           className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
           style={{ gap: "var(--space-6)" }}
         >
-          {prompts.map((p) => (
+          {prompts.map((p: Prompt) => (
             <PromptCard key={p.id} prompt={p} />
           ))}
         </div>

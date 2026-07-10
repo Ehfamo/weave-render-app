@@ -1,4 +1,4 @@
-import { Crown, Sparkles, TrendingUp } from "lucide-react";
+import { Crown, Sparkles, TrendingUp, Check } from "lucide-react";
 import type { Creator } from "@/lib/prompts";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
@@ -9,7 +9,17 @@ const tierMap = {
   Rising: { Icon: TrendingUp, cls: "text-foreground border-border bg-surface-2" },
 } as const;
 
-export function CreatorCard({ c }: { c: Creator }) {
+export function CreatorCard({
+  c,
+  onFollow,
+  following,
+  disabled,
+}: {
+  c: Creator;
+  onFollow?: () => void;
+  following?: boolean;
+  disabled?: boolean;
+}) {
   const t = tierMap[c.tier];
   const Icon = t.Icon;
   return (
@@ -57,10 +67,12 @@ export function CreatorCard({ c }: { c: Creator }) {
         </div>
         <button
           type="button"
+          onClick={onFollow}
+          disabled={disabled}
           className="inline-flex w-full items-center justify-center text-sm font-medium text-white transition hover:opacity-95"
           style={{
             marginTop: "var(--space-2)",
-            backgroundColor: "var(--action-secondary)",
+            backgroundColor: following ? "var(--surface-secondary)" : "var(--action-secondary)",
             borderRadius: "var(--radius-sm)",
             paddingInline: "var(--space-4)",
             paddingBlock: "var(--space-2)",
@@ -68,7 +80,7 @@ export function CreatorCard({ c }: { c: Creator }) {
             transitionTimingFunction: "var(--motion-ease)",
           }}
         >
-          Follow
+          {following ? (<><Check className="mr-1 h-3.5 w-3.5" /> Following</>) : "Follow"}
         </button>
       </div>
     </div>

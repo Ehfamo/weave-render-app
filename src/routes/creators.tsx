@@ -1,9 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { CREATORS } from "@/lib/prompts";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { fetchCreators, toggleFollow } from "@/lib/marketplace";
 import { Header } from "@/components/xeomx/Header";
 import { CreatorCard } from "@/components/xeomx/CreatorCard";
 import { pageUrl } from "@/lib/seo";
+import { useEffect, useState } from "react";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -23,6 +26,31 @@ export const Route = createFileRoute("/creators")({
 });
 
 function CreatorsPage() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [uid, setUid] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.auth.getUser().then((r) => setUid(r.data.user?.id ?? null));
+  }, []);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["creators"],
+    queryFn: () => fetchCreators(48),
+    staleTime: 60_000,
+  });
+  const { data: followingIds = [] } = useQuery({
+    queryKey: ["following", uid],
+    enabled: !!uid,
+    queryFn: async () => {
+      const { data } = await supabase.from("follows").select("followee_id").eq("follower_id", uid!);
+      return (data ?? []).map((r) => r.followee_id);
+    },
+  });
+  const follow = useMutation({
+    mutationFn: ({ id, on }: { id: string; on: boolean }) => toggleFollow(id, on),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["following", uid] }),
+  });
+  const creators = data?.creators ?? [];
+  const ids = data?.ids ?? [];
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
@@ -48,6 +76,20 @@ function CreatorsPage() {
         >
           {m.creators_subtitle()}
         </p>
+        {isLoading ? (
+          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="h-80 animate-pulse rounded-3xl border border-border/60 bg-surface/40" />
+            ))}
+          </div>
+        ) : error ? (
+          <p className="mt-8 text-sm text-destructive">Failed to load creators.</p>
+        ) : creators.length === 0 ? (
+          <div className="mt-10 rounded-3xl border border-dashed border-border/60 p-10 text-center">
+            <h2 className="font-display text-2xl">No creators yet</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Publish your first prompt to appear here.</p>
+          </div>
+        ) : (
         <motion.div
           initial="hidden"
           whileInView="show"
@@ -59,9 +101,12 @@ function CreatorsPage() {
           className="grid sm:grid-cols-2 lg:grid-cols-3"
           style={{ marginTop: "var(--space-6)", gap: "var(--space-5)" }}
         >
-          {CREATORS.map((c) => (
+          {creators.map((c, idx) => {
+            const authorId = ids[idx];
+            const following = !!authorId && followingIds.includes(authorId);
+            return (
             <motion.div
-              key={c.handle}
+              key={authorId ?? c.handle}
               variants={{
                 hidden: { opacity: 0, y: 12 },
                 show: {
@@ -72,10 +117,21 @@ function CreatorsPage() {
               }}
               className="w-full [&>div]:w-full"
             >
-              <CreatorCard c={c} />
+              <CreatorCard
+                c={c}
+                following={following}
+                disabled={!authorId || follow.isPending || (!!uid && uid === authorId)}
+                onFollow={() => {
+                  if (!authorId) return;
+                  if (!uid) { navigate({ to: "/auth" }); return; }
+                  follow.mutate({ id: authorId, on: !following });
+                }}
+              />
             </motion.div>
-          ))}
+            );
+          })}
         </motion.div>
+        )}
 
         <div
           className="surface-elevated rounded-3xl"

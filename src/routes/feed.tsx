@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { PROMPTS, TOP_PROMPT_IDS } from "@/lib/prompts";
+import { useQuery } from "@tanstack/react-query";
+import { fetchViralPrompts } from "@/lib/marketplace";
 import { ViralFeedCard } from "@/components/xeomx/ViralFeedCard";
 import { pageUrl } from "@/lib/seo";
 // @ts-expect-error - paraglide generated messages
@@ -22,7 +23,11 @@ export const Route = createFileRoute("/feed")({
 });
 
 function Feed() {
-  const queue = TOP_PROMPT_IDS.map((id) => PROMPTS.find((p) => p.id === id)).filter(Boolean) as typeof PROMPTS;
+  const { data: queue = [], isLoading, error } = useQuery({
+    queryKey: ["viral-feed"],
+    queryFn: () => fetchViralPrompts(20),
+    staleTime: 60_000,
+  });
   return (
     <div className="relative bg-background">
       <Link
@@ -31,11 +36,27 @@ function Feed() {
       >
         <ArrowLeft className="h-3.5 w-3.5" /> {m.nav_back_discover()}
       </Link>
-      <div className="h-[100svh] snap-y snap-mandatory overflow-y-auto">
-        {queue.map((p) => (
-          <ViralFeedCard key={p.id} p={p} />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="grid h-[100svh] place-items-center text-sm text-muted-foreground">Loading feed…</div>
+      ) : error ? (
+        <div className="grid h-[100svh] place-items-center text-sm text-destructive">Failed to load feed.</div>
+      ) : queue.length === 0 ? (
+        <div className="grid h-[100svh] place-items-center px-6 text-center">
+          <div>
+            <h2 className="font-display text-2xl">No prompts yet</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Be the first to publish a prompt.</p>
+            <Link to="/studio" className="mt-4 inline-block rounded-full border border-border px-4 py-2 text-sm">
+              Open Studio
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div className="h-[100svh] snap-y snap-mandatory overflow-y-auto">
+          {queue.map((p) => (
+            <ViralFeedCard key={p.id} p={p} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

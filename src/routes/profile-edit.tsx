@@ -36,6 +36,18 @@ export const Route = createFileRoute("/profile-edit")({
 
 type Availability = "idle" | "checking" | "available" | "taken" | "invalid";
 
+/**
+ * Best-effort extraction of the storage path (`<uid>/avatar-...`) from a
+ * public URL served by the `avatars` bucket. Returns null when the URL
+ * does not look like our own storage path.
+ */
+function extractAvatarPath(url: string, uid: string): string | null {
+  const marker = `/avatars/${uid}/`;
+  const idx = url.indexOf(marker);
+  if (idx === -1) return null;
+  return url.slice(idx + "/avatars/".length);
+}
+
 function ProfileEdit() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();

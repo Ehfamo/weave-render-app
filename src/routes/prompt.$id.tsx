@@ -398,3 +398,130 @@ function Detail() {
     </div>
   );
 }
+
+function timeAgo(iso: string) {
+  const s = Math.round((Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60) return `${s}s ago`;
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return `${Math.floor(s / 86400)}d ago`;
+}
+
+function CommentsSection({ promptId, viewerId, onAuthRequired }: { promptId: string; viewerId: string | null; onAuthRequired: () => void }) {
+  const queryClient = useQueryClient();
+  const [text, setText] = useState("");
+  const { data: comments = [], isLoading } = useQuery({
+    queryKey: ["comments", promptId],
+    queryFn: () => fetchComments(promptId),
+  });
+
+  useEffect(() => {
+    const channel = supabase
+      .channel(`comments:${promptId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "comments", filter: `prompt_id=eq.${promptId}` }, () => {
+        queryClient.invalidateQueries({ queryKey: ["comments", promptId] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [promptId, queryClient]);
+
+  const post = useMutation({
+    mutationFn: () => postComment(promptId, text),
+    onSuccess: () => {
+      setText("");
+      queryClient.invalidateQueries({ queryKey: ["comments", promptId] });
+    },
+  });
+  const del = useMutation({
+    mutationFn: (id: string) => deleteComment(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["comments", promptId] }),
+  });
+
+  return (
+    <section className="mx-auto max-w-[900px] px-4 pb-16 sm:px-8">
+      <div className="mb-4 flex items-end justify-between">
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.28em] text-magenta/80">Discussion</p>
+          <h2 className="mt-1 font-display text-2xl font-semibold tracking-tight sm:text-3xl">Comments ({comments.length})</h2>
+        </div>
+      </div>
+
+      {viewerId ? (
+        <form
+          onSubmit={(e) => { e.preventDefault(); if (text.trim()) post.mutate(); }}
+          className="mb-6 rounded-2xl border border-border bg-surface/50 p-4"
+        >
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Share your thoughts…"
+            rows={3}
+            maxLength={2000}
+            className="w-full resize-none bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+          />
+          <div className="mt-2 flex items-center justify-between">
+            <span className="text-xs text-muted-foreground">{text.length}/2000</span>
+            <button
+              type="submit"
+              disabled={!text.trim() || post.isPending}
+              className="rounded-full bg-magenta px-4 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+              style={{ backgroundColor: "var(--action-primary)" }}
+            >
+              {post.isPending ? "Posting…" : "Post"}
+            </button>
+          </div>
+        </form>
+      ) : (
+        <button
+          type="button"
+          onClick={onAuthRequired}
+          className="mb-6 w-full rounded-2xl border border-dashed border-border/60 p-6 text-center text-sm text-muted-foreground transition hover:border-magenta/40 hover:text-foreground"
+        >
+          Sign in to join the discussion →
+        </button>
+      )}
+
+      {isLoading ? (
+        <p className="text-sm text-muted-foreground">Loading comments…</p>
+      ) : comments.length === 0 ? (
+        <p className="text-sm text-muted-foreground">Be the first to comment.</p>
+      ) : (
+        <ul className="space-y-4">
+          {comments.map((c) => {
+            const handle = c.author?.username ? `@${c.author.username}` : "anonymous";
+            const name = c.author?.display_name || c.author?.username || "Anonymous";
+            const mine = viewerId === c.author_id;
+            return (
+              <li key={c.id} className="rounded-2xl border border-border/60 bg-surface/30 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    {c.author?.avatar_url ? (
+                      <img src={c.author.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
+                    ) : (
+                      <div className="h-8 w-8 rounded-full bg-magenta/20" />
+                    )}
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{name}</p>
+                      <p className="text-[11px] text-muted-foreground">{handle} · {timeAgo(c.created_at)}</p>
+                    </div>
+                  </div>
+                  {mine && (
+                    <button
+                      type="button"
+                      onClick={() => del.mutate(c.id)}
+                      className="text-muted-foreground transition hover:text-destructive"
+                      aria-label="Delete comment"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+                <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">{c.body}</p>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
+}

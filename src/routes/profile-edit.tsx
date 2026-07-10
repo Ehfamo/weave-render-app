@@ -9,7 +9,6 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { deleteAccount } from "@/lib/account.functions";
 import { toast } from "sonner";
 import avatarImg from "@/assets/dashboard-avatar.jpg";
@@ -74,7 +73,6 @@ function ProfileEdit() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [confirmText, setConfirmText] = useState("");
   const [deleting, setDeleting] = useState(false);
-  const deleteAccountFn = useServerFn(deleteAccount);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth", search: { next: "/profile-edit" } });
@@ -181,7 +179,7 @@ function ProfileEdit() {
     if (confirmText !== "DELETE") { toast.error('Type DELETE to confirm.'); return; }
     setDeleting(true);
     try {
-      await deleteAccountFn();
+      await deleteAccount();
       await supabase.auth.signOut();
       queryClient.clear();
       toast.success("Your account has been deleted.");

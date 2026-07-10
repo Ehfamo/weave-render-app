@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, Layers } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import { fetchCollectionBySlug } from "@/lib/marketplace";
+import type { Prompt } from "@/lib/prompts";
 import { Header } from "@/components/xeomx/Header";
 import { PromptCard } from "@/components/xeomx/PromptCard";
 import { pageUrl, SITE_URL } from "@/lib/seo";
@@ -137,7 +137,7 @@ function CollectionDetail() {
           className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
           style={{ gap: "var(--space-6)" }}
         >
-          {prompts.map((p) => (
+          {prompts.map((p: Prompt) => (
             <PromptCard key={p.id} prompt={p} />
           ))}
         </div>

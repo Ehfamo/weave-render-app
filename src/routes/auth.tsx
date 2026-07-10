@@ -1,16 +1,21 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { Sparkles, Loader2, Mail, Apple, Github, ArrowLeft } from "lucide-react";
 import { motion } from "motion/react";
 import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { pageUrl } from "@/lib/seo";
+import { scorePassword, friendlyAuthError } from "@/lib/auth-validation";
+import { StrengthMeter } from "@/routes/reset-password";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
+  validateSearch: (s: Record<string, unknown>) => ({
+    next: typeof s.next === "string" ? s.next : undefined,
+  }),
   head: () => ({
     meta: [
       { title: m.auth_head_title() },
@@ -27,37 +32,53 @@ export const Route = createFileRoute("/auth")({
 
 type View = "root" | "email" | "password";
 
+function sanitizeNext(next: string | undefined): string {
+  if (!next) return "/dashboard";
+  // Only allow same-origin relative paths, no protocol-relative or external.
+  if (!next.startsWith("/") || next.startsWith("//")) return "/dashboard";
+  return next;
+}
+
 function AuthPage() {
   const navigate = useNavigate();
+  const { next } = useSearch({ from: "/auth" });
+  const dest = useMemo(() => sanitizeNext(next), [next]);
   const [loading, setLoading] = useState<string | null>(null);
   const [view, setView] = useState<View>("root");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [awaitingConfirm, setAwaitingConfirm] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard" });
+      if (data.session) navigate({ to: dest });
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (session) navigate({ to: "/dashboard" });
+      if (session) navigate({ to: dest });
     });
     return () => sub.subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, dest]);
 
   async function signInOAuth(provider: "google" | "apple") {
     setLoading(provider);
+    setError(null);
     const result = await lovable.auth.signInWithOAuth(provider, {
-      redirect_uri: window.location.origin,
+      // Public callback URL — the app-level session listener redirects to `dest`
+      // once Supabase reports a hydrated session.
+      redirect_uri: `${window.location.origin}/auth${dest !== "/dashboard" ? `?next=${encodeURIComponent(dest)}` : ""}`,
     });
     if (result.error) {
-      toast.error(m.auth_signin_failed());
+      const msg = friendlyAuthError((result.error as { message?: string }).message);
+      setError(msg);
+      toast.error(msg);
       setLoading(null);
       return;
     }
     if (result.redirected) return;
     const { data } = await supabase.auth.getSession();
-    if (data.session) navigate({ to: "/dashboard" });
+    if (data.session) navigate({ to: dest });
     else setLoading(null);
   }
 
@@ -66,33 +87,74 @@ function AuthPage() {
   async function sendMagicLink(e: React.FormEvent) {
     e.preventDefault();
     setLoading("magic");
+    setError(null);
     const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: window.location.origin },
+      email: email.trim(),
+      options: { emailRedirectTo: `${window.location.origin}/auth${dest !== "/dashboard" ? `?next=${encodeURIComponent(dest)}` : ""}` },
     });
     setLoading(null);
     if (error) {
-      toast.error(m.auth_signin_failed());
+      const msg = friendlyAuthError(error.message);
+      setError(msg);
+      toast.error(msg);
       return;
     }
     toast.success(m.auth_magic_link_sent());
   }
 
+  const pwStrength = useMemo(() => scorePassword(password), [password]);
+
   async function submitPassword(e: React.FormEvent) {
     e.preventDefault();
-    setLoading("password");
-    const fn = isSignUp ? supabase.auth.signUp : supabase.auth.signInWithPassword;
-    const { error } = await fn.call(supabase.auth, {
-      email,
-      password,
-      ...(isSignUp && { options: { emailRedirectTo: window.location.origin } }),
-    } as never);
-    setLoading(null);
-    if (error) {
-      toast.error(m.auth_signin_failed());
+    setError(null);
+    if (isSignUp && !pwStrength.ok) {
+      setError("Please choose a stronger password.");
       return;
     }
-    if (isSignUp) toast.success(m.auth_check_email());
+    setLoading("password");
+    if (isSignUp) {
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: { emailRedirectTo: `${window.location.origin}/auth${dest !== "/dashboard" ? `?next=${encodeURIComponent(dest)}` : ""}` },
+      });
+      setLoading(null);
+      if (error) {
+        const msg = friendlyAuthError(error.message);
+        setError(msg);
+        toast.error(msg);
+        return;
+      }
+      if (!data.session) {
+        setAwaitingConfirm(true);
+        toast.success(m.auth_check_email());
+      }
+      return;
+    }
+    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+    setLoading(null);
+    if (error) {
+      const msg = friendlyAuthError(error.message);
+      setError(msg);
+      toast.error(msg);
+      return;
+    }
+  }
+
+  async function resendConfirmation() {
+    if (!email) return;
+    setLoading("resend");
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: email.trim(),
+      options: { emailRedirectTo: `${window.location.origin}/auth${dest !== "/dashboard" ? `?next=${encodeURIComponent(dest)}` : ""}` },
+    });
+    setLoading(null);
+    if (error) {
+      toast.error(friendlyAuthError(error.message));
+      return;
+    }
+    toast.success("Verification email sent again.");
   }
 
   return (
@@ -251,6 +313,7 @@ function AuthPage() {
               onSubmit={submitPassword}
               className="flex flex-col"
               style={{ marginTop: "var(--space-6)", gap: "var(--space-3)" }}
+              noValidate
             >
               <label className="text-xs font-medium text-muted-foreground" htmlFor="email-pw">
                 {m.auth_email_label()}
@@ -259,6 +322,7 @@ function AuthPage() {
                 id="email-pw"
                 type="email"
                 required
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="text-sm text-foreground outline-none transition focus:border-magenta/60"
@@ -277,7 +341,8 @@ function AuthPage() {
                 id="pw"
                 type="password"
                 required
-                minLength={6}
+                minLength={isSignUp ? 8 : 6}
+                autoComplete={isSignUp ? "new-password" : "current-password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="text-sm text-foreground outline-none transition focus:border-magenta/60"
@@ -289,9 +354,21 @@ function AuthPage() {
                   paddingBlock: "var(--space-3)",
                 }}
               />
+              {isSignUp && password.length > 0 && <StrengthMeter strength={pwStrength} />}
+              {error && (
+                <p role="alert" style={{ fontSize: "var(--font-size-micro)", color: "var(--action-secondary)" }}>{error}</p>
+              )}
+              {awaitingConfirm && (
+                <div role="status" style={{ fontSize: "var(--font-size-micro)", color: "var(--text-muted)" }}>
+                  Verification email sent — check your inbox.{" "}
+                  <button type="button" onClick={resendConfirmation} className="underline hover:text-foreground">
+                    Resend
+                  </button>
+                </div>
+              )}
               <button
                 type="submit"
-                disabled={loading === "password"}
+                disabled={loading === "password" || (isSignUp && !pwStrength.ok)}
                 className="inline-flex items-center justify-center gap-2 text-sm font-medium text-white disabled:opacity-60"
                 style={{
                   marginTop: "var(--space-2)",
@@ -304,9 +381,18 @@ function AuthPage() {
                 {loading === "password" ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {isSignUp ? m.auth_sign_up() : m.auth_sign_in()}
               </button>
+              {!isSignUp && (
+                <Link
+                  to="/forgot-password"
+                  className="text-center transition hover:text-foreground"
+                  style={{ marginTop: "var(--space-1)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}
+                >
+                  Forgot your password?
+                </Link>
+              )}
               <button
                 type="button"
-                onClick={() => setIsSignUp((v) => !v)}
+                onClick={() => { setIsSignUp((v) => !v); setError(null); }}
                 className="transition hover:text-foreground"
                 style={{ marginTop: "var(--space-1)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}
               >

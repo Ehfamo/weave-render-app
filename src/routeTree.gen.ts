@@ -15,7 +15,6 @@ import { Route as StudioRouteImport } from './routes/studio'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
-import { Route as ProfileEditRouteImport } from './routes/profile-edit'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as MagazineRouteImport } from './routes/magazine'
@@ -62,11 +61,6 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const RefundPolicyRoute = RefundPolicyRouteImport.update({
   id: '/refund-policy',
   path: '/refund-policy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProfileEditRoute = ProfileEditRouteImport.update({
-  id: '/profile-edit',
-  path: '/profile-edit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -166,7 +160,6 @@ export interface FileRoutesByFullPath {
   '/magazine': typeof MagazineRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
-  '/profile-edit': typeof ProfileEditRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
@@ -191,7 +184,6 @@ export interface FileRoutesByTo {
   '/magazine': typeof MagazineRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
-  '/profile-edit': typeof ProfileEditRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
@@ -218,7 +210,6 @@ export interface FileRoutesById {
   '/magazine': typeof MagazineRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
-  '/profile-edit': typeof ProfileEditRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
@@ -245,7 +236,6 @@ export interface FileRouteTypes {
     | '/magazine'
     | '/pricing'
     | '/privacy'
-    | '/profile-edit'
     | '/refund-policy'
     | '/reset-password'
     | '/settings'
@@ -270,7 +260,6 @@ export interface FileRouteTypes {
     | '/magazine'
     | '/pricing'
     | '/privacy'
-    | '/profile-edit'
     | '/refund-policy'
     | '/reset-password'
     | '/settings'
@@ -296,7 +285,6 @@ export interface FileRouteTypes {
     | '/magazine'
     | '/pricing'
     | '/privacy'
-    | '/profile-edit'
     | '/refund-policy'
     | '/reset-password'
     | '/settings'
@@ -323,7 +311,6 @@ export interface RootRouteChildren {
   MagazineRoute: typeof MagazineRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
-  ProfileEditRoute: typeof ProfileEditRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SettingsRoute: typeof SettingsRoute
@@ -376,13 +363,6 @@ declare module '@tanstack/react-router' {
       path: '/refund-policy'
       fullPath: '/refund-policy'
       preLoaderRoute: typeof RefundPolicyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profile-edit': {
-      id: '/profile-edit'
-      path: '/profile-edit'
-      fullPath: '/profile-edit'
-      preLoaderRoute: typeof ProfileEditRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -555,7 +535,6 @@ const rootRouteChildren: RootRouteChildren = {
   MagazineRoute: MagazineRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
-  ProfileEditRoute: ProfileEditRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SettingsRoute: SettingsRoute,

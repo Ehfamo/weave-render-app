@@ -1,8 +1,21 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowLeft, Bookmark, Check, Copy, Crown, Heart, Lock, Share2, Shuffle, Sparkles, TrendingUp } from "lucide-react";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { ArrowLeft, Bookmark, Check, Copy, Crown, Heart, Lock, Share2, Shuffle, Sparkles, Trash2, TrendingUp } from "lucide-react";
 import { motion } from "motion/react";
-import { getPrompt, PROMPTS, type Prompt } from "@/lib/prompts";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { Prompt } from "@/lib/prompts";
+import {
+  fetchPromptBySlug,
+  fetchRelatedPrompts,
+  recordPromptView,
+  togglePromptLike,
+  togglePromptSave,
+  fetchViewerEngagement,
+  fetchComments,
+  postComment,
+  deleteComment,
+} from "@/lib/marketplace";
+import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/xeomx/Header";
 import { PromptCard } from "@/components/xeomx/PromptCard";
 import { SignalBadge } from "@/components/xeomx/Signal";
@@ -11,10 +24,10 @@ import { pageUrl, SITE_URL } from "@/lib/seo";
 import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/prompt/$id")({
-  loader: ({ params }) => {
-    const prompt = getPrompt(params.id);
-    if (!prompt) throw notFound();
-    return { prompt };
+  loader: async ({ params }) => {
+    const res = await fetchPromptBySlug(params.id);
+    if (!res) throw notFound();
+    return { prompt: res.prompt, promptId: res.row.id };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ name: "robots", content: "noindex" }] };
@@ -63,9 +76,59 @@ export const Route = createFileRoute("/prompt/$id")({
 });
 
 function Detail() {
-  const { prompt } = Route.useLoaderData() as { prompt: Prompt };
+  const { prompt, promptId } = Route.useLoaderData();
+  const params = Route.useParams();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [copied, setCopied] = useState(false);
   const locked = prompt.state === "soon";
+
+  // Record a view once per mount
+  useEffect(() => {
+    recordPromptView(promptId).catch(() => {});
+  }, [promptId]);
+
+  const [uid, setUid] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.auth.getUser().then((r) => setUid(r.data.user?.id ?? null));
+  }, []);
+
+  const { data: engagement } = useQuery({
+    queryKey: ["engagement", promptId, uid],
+    queryFn: () => fetchViewerEngagement(promptId),
+    enabled: !!uid,
+  });
+
+  const requireAuth = () => {
+    if (!uid) {
+      navigate({ to: "/auth" });
+      return false;
+    }
+    return true;
+  };
+
+  const likeMut = useMutation({
+    mutationFn: (on: boolean) => togglePromptLike(promptId, on),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["engagement", promptId, uid] });
+      queryClient.invalidateQueries({ queryKey: ["prompt", params.id] });
+    },
+  });
+  const saveMut = useMutation({
+    mutationFn: (on: boolean) => togglePromptSave(promptId, on),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["engagement", promptId, uid] });
+    },
+  });
+
+  const { data: related = [] } = useQuery<Prompt[]>({
+    queryKey: ["related", promptId],
+    queryFn: async () => {
+      const res = await fetchPromptBySlug(params.id);
+      if (!res) return [];
+      return fetchRelatedPrompts(res.row, 4);
+    },
+  });
 
   const onCopy = async () => {
     if (locked) return;
@@ -74,13 +137,21 @@ function Detail() {
     setTimeout(() => setCopied(false), 1600);
   };
 
-  const relatedIds = prompt.related ?? [];
-  const related = (relatedIds.length
-    ? relatedIds.map((id) => PROMPTS.find((p) => p.id === id)).filter(Boolean)
-    : PROMPTS.filter((p) => p.id !== prompt.id).slice(0, 4)) as Prompt[];
-
-  const engine = prompt.engine ?? null;
+  const engine = null;
   const fmt = (n?: number) => (n ? (n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 0 : 1) + "k" : String(n)) : "—");
+
+  const onShare = async () => {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    try {
+      if (typeof navigator !== "undefined" && (navigator as unknown as { share?: (d: { url: string; title?: string }) => Promise<void> }).share) {
+        await (navigator as unknown as { share: (d: { url: string; title?: string }) => Promise<void> }).share({ url, title: prompt.title });
+      } else if (typeof navigator !== "undefined") {
+        await navigator.clipboard.writeText(url);
+      }
+    } catch {
+      /* user cancelled */
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">

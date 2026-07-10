@@ -8,6 +8,8 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { deleteAccount } from "@/lib/account.functions";
 import { toast } from "sonner";
 import avatarImg from "@/assets/dashboard-avatar.jpg";
 import {
@@ -43,6 +45,8 @@ function ProfileEdit() {
   const [initialUsername, setInitialUsername] = useState("");
   const [avatar, setAvatar] = useState<string>(avatarImg);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPath, setAvatarPath] = useState<string | null>(null);
+  const [hasAvatar, setHasAvatar] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
@@ -54,6 +58,10 @@ function ProfileEdit() {
   const [uploading, setUploading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
   const [availability, setAvailability] = useState<Availability>("idle");
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const deleteAccountFn = useServerFn(deleteAccount);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth", search: { next: "/profile-edit" } });
@@ -79,7 +87,11 @@ function ProfileEdit() {
         setCountry(data.country ?? "");
         setLanguage(data.language ?? "");
         setTimezone(data.timezone ?? tz);
-        if (data.avatar_url) setAvatar(data.avatar_url);
+        if (data.avatar_url) {
+          setAvatar(data.avatar_url);
+          setHasAvatar(true);
+          setAvatarPath(extractAvatarPath(data.avatar_url, user.id));
+        }
       } else {
         setTimezone(tz);
       }
@@ -125,10 +137,45 @@ function ProfileEdit() {
         .from("avatars")
         .upload(path, avatarFile, { cacheControl: "3600", upsert: false, contentType: avatarFile.type });
       if (upErr) throw upErr;
+      // Best-effort delete of previous avatar so the bucket doesn't accrete.
+      if (avatarPath && avatarPath !== path) {
+        await supabase.storage.from("avatars").remove([avatarPath]).catch(() => {});
+      }
+      setAvatarPath(path);
       const { data } = supabase.storage.from("avatars").getPublicUrl(path);
       return data.publicUrl;
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function removeAvatar() {
+    if (!user) return;
+    if (avatarPath) {
+      await supabase.storage.from("avatars").remove([avatarPath]).catch(() => {});
+    }
+    const { error } = await supabase.from("profiles").update({ avatar_url: null }).eq("id", user.id);
+    if (error) { toast.error(error.message); return; }
+    setAvatar(avatarImg);
+    setAvatarFile(null);
+    setAvatarPath(null);
+    setHasAvatar(false);
+    await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
+    toast.success("Avatar removed");
+  }
+
+  async function onDeleteAccount() {
+    if (confirmText !== "DELETE") { toast.error('Type DELETE to confirm.'); return; }
+    setDeleting(true);
+    try {
+      await deleteAccountFn();
+      await supabase.auth.signOut();
+      queryClient.clear();
+      toast.success("Your account has been deleted.");
+      navigate({ to: "/" });
+    } catch (e) {
+      toast.error((e as Error).message || "Could not delete account.");
+      setDeleting(false);
     }
   }
 

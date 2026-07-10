@@ -157,7 +157,7 @@ function ProfileEdit() {
         return;
       }
 
-      const patch: Record<string, string | null> = {
+      const patch = {
         display_name: displayName.trim(),
         username: normalizeUsername(username),
         bio: bio.trim() || null,
@@ -165,8 +165,8 @@ function ProfileEdit() {
         country: country.trim() || null,
         language: language.trim() || null,
         timezone: timezone.trim() || null,
+        ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
       };
-      if (avatarUrl) patch.avatar_url = avatarUrl;
 
       const { error } = await supabase.from("profiles").update(patch).eq("id", user.id);
       if (error) {

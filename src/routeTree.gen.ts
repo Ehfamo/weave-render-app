@@ -18,6 +18,7 @@ import { Route as ProfileEditRouteImport } from './routes/profile-edit'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as MagazineRouteImport } from './routes/magazine'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as CreatorsRouteImport } from './routes/creators'
@@ -75,6 +76,11 @@ const PricingRoute = PricingRouteImport.update({
 const MagazineRoute = MagazineRouteImport.update({
   id: '/magazine',
   path: '/magazine',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeedRoute = FeedRouteImport.update({
@@ -150,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/creators': typeof CreatorsRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/magazine': typeof MagazineRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -173,6 +180,7 @@ export interface FileRoutesByTo {
   '/creators': typeof CreatorsRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/magazine': typeof MagazineRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -198,6 +206,7 @@ export interface FileRoutesById {
   '/creators': typeof CreatorsRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/magazine': typeof MagazineRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -223,6 +232,7 @@ export interface FileRouteTypes {
     | '/creators'
     | '/explore'
     | '/feed'
+    | '/forgot-password'
     | '/magazine'
     | '/pricing'
     | '/privacy'
@@ -246,6 +256,7 @@ export interface FileRouteTypes {
     | '/creators'
     | '/explore'
     | '/feed'
+    | '/forgot-password'
     | '/magazine'
     | '/pricing'
     | '/privacy'
@@ -270,6 +281,7 @@ export interface FileRouteTypes {
     | '/creators'
     | '/explore'
     | '/feed'
+    | '/forgot-password'
     | '/magazine'
     | '/pricing'
     | '/privacy'
@@ -295,6 +307,7 @@ export interface RootRouteChildren {
   CreatorsRoute: typeof CreatorsRoute
   ExploreRoute: typeof ExploreRoute
   FeedRoute: typeof FeedRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   MagazineRoute: typeof MagazineRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -371,6 +384,13 @@ declare module '@tanstack/react-router' {
       path: '/magazine'
       fullPath: '/magazine'
       preLoaderRoute: typeof MagazineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/feed': {
@@ -511,6 +531,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreatorsRoute: CreatorsRoute,
   ExploreRoute: ExploreRoute,
   FeedRoute: FeedRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   MagazineRoute: MagazineRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,

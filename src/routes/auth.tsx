@@ -50,6 +50,13 @@ function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [awaitingConfirm, setAwaitingConfirm] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setInterval(() => setResendCooldown((s) => (s > 0 ? s - 1 : 0)), 1000);
+    return () => clearInterval(t);
+  }, [resendCooldown]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -143,6 +150,7 @@ function AuthPage() {
 
   async function resendConfirmation() {
     if (!email) return;
+    if (resendCooldown > 0) return;
     setLoading("resend");
     const { error } = await supabase.auth.resend({
       type: "signup",
@@ -154,6 +162,7 @@ function AuthPage() {
       toast.error(friendlyAuthError(error.message));
       return;
     }
+    setResendCooldown(60);
     toast.success("Verification email sent again.");
   }
 
@@ -361,8 +370,13 @@ function AuthPage() {
               {awaitingConfirm && (
                 <div role="status" style={{ fontSize: "var(--font-size-micro)", color: "var(--text-muted)" }}>
                   Verification email sent — check your inbox.{" "}
-                  <button type="button" onClick={resendConfirmation} className="underline hover:text-foreground">
-                    Resend
+                  <button
+                    type="button"
+                    onClick={resendConfirmation}
+                    disabled={resendCooldown > 0 || loading === "resend"}
+                    className="underline hover:text-foreground disabled:no-underline disabled:opacity-60"
+                  >
+                    {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend"}
                   </button>
                 </div>
               )}

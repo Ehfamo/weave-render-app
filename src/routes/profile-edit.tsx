@@ -4,10 +4,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "motion/react";
 import {
   Upload, Check, X, Globe, MapPin, Languages, Clock, ArrowLeft, Sparkles, Loader2,
+  Trash2, ShieldAlert,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { deleteAccount } from "@/lib/account.functions";
 import { toast } from "sonner";
 import avatarImg from "@/assets/dashboard-avatar.jpg";
 import {
@@ -34,6 +36,18 @@ export const Route = createFileRoute("/profile-edit")({
 
 type Availability = "idle" | "checking" | "available" | "taken" | "invalid";
 
+/**
+ * Best-effort extraction of the storage path (`<uid>/avatar-...`) from a
+ * public URL served by the `avatars` bucket. Returns null when the URL
+ * does not look like our own storage path.
+ */
+function extractAvatarPath(url: string, uid: string): string | null {
+  const marker = `/avatars/${uid}/`;
+  const idx = url.indexOf(marker);
+  if (idx === -1) return null;
+  return url.slice(idx + "/avatars/".length);
+}
+
 function ProfileEdit() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -43,6 +57,8 @@ function ProfileEdit() {
   const [initialUsername, setInitialUsername] = useState("");
   const [avatar, setAvatar] = useState<string>(avatarImg);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPath, setAvatarPath] = useState<string | null>(null);
+  const [hasAvatar, setHasAvatar] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
@@ -54,6 +70,9 @@ function ProfileEdit() {
   const [uploading, setUploading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
   const [availability, setAvailability] = useState<Availability>("idle");
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth", search: { next: "/profile-edit" } });
@@ -79,7 +98,11 @@ function ProfileEdit() {
         setCountry(data.country ?? "");
         setLanguage(data.language ?? "");
         setTimezone(data.timezone ?? tz);
-        if (data.avatar_url) setAvatar(data.avatar_url);
+        if (data.avatar_url) {
+          setAvatar(data.avatar_url);
+          setHasAvatar(true);
+          setAvatarPath(extractAvatarPath(data.avatar_url, user.id));
+        }
       } else {
         setTimezone(tz);
       }
@@ -125,10 +148,45 @@ function ProfileEdit() {
         .from("avatars")
         .upload(path, avatarFile, { cacheControl: "3600", upsert: false, contentType: avatarFile.type });
       if (upErr) throw upErr;
+      // Best-effort delete of previous avatar so the bucket doesn't accrete.
+      if (avatarPath && avatarPath !== path) {
+        await supabase.storage.from("avatars").remove([avatarPath]).catch(() => {});
+      }
+      setAvatarPath(path);
       const { data } = supabase.storage.from("avatars").getPublicUrl(path);
       return data.publicUrl;
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function removeAvatar() {
+    if (!user) return;
+    if (avatarPath) {
+      await supabase.storage.from("avatars").remove([avatarPath]).catch(() => {});
+    }
+    const { error } = await supabase.from("profiles").update({ avatar_url: null }).eq("id", user.id);
+    if (error) { toast.error(error.message); return; }
+    setAvatar(avatarImg);
+    setAvatarFile(null);
+    setAvatarPath(null);
+    setHasAvatar(false);
+    await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
+    toast.success("Avatar removed");
+  }
+
+  async function onDeleteAccount() {
+    if (confirmText !== "DELETE") { toast.error('Type DELETE to confirm.'); return; }
+    setDeleting(true);
+    try {
+      await deleteAccount();
+      await supabase.auth.signOut();
+      queryClient.clear();
+      toast.success("Your account has been deleted.");
+      navigate({ to: "/" });
+    } catch (e) {
+      toast.error((e as Error).message || "Could not delete account.");
+      setDeleting(false);
     }
   }
 
@@ -240,6 +298,16 @@ function ProfileEdit() {
                     {uploading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Upload className="h-4 w-4" aria-hidden />}
                     {uploading ? "Uploading…" : "Upload new"}
                   </button>
+                  {hasAvatar && (
+                    <button
+                      type="button"
+                      onClick={removeAvatar}
+                      disabled={uploading}
+                      className="ms-2 mt-3 inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-white/70 hover:bg-white/[0.05] disabled:opacity-60"
+                    >
+                      <Trash2 className="h-4 w-4" aria-hidden /> Remove
+                    </button>
+                  )}
                   <input
                     ref={fileRef}
                     type="file"
@@ -313,6 +381,68 @@ function ProfileEdit() {
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Sparkles className="h-4 w-4" aria-hidden />}
                 {saving ? "Saving…" : "Save changes"}
               </button>
+            </div>
+
+            {/* Danger zone: permanent account deletion */}
+            <div
+              className="mt-8 rounded-[22px] p-6"
+              style={{ background: "rgba(255,45,45,0.04)", border: "1px solid rgba(255,80,80,0.25)" }}
+              role="region"
+              aria-labelledby="danger-zone"
+            >
+              <div className="flex items-start gap-3">
+                <ShieldAlert className="mt-0.5 h-5 w-5 text-rose-400" aria-hidden />
+                <div className="flex-1">
+                  <h2 id="danger-zone" className="font-semibold text-rose-200">Delete account</h2>
+                  <p className="mt-1 text-sm text-white/60">
+                    Permanently deletes your account, profile, prompts, collections and
+                    avatars. This action cannot be undone.
+                  </p>
+                  {!confirmDelete ? (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDelete(true)}
+                      className="mt-4 inline-flex items-center gap-2 rounded-full border border-rose-500/40 px-4 py-2 text-sm text-rose-200 hover:bg-rose-500/10"
+                    >
+                      <Trash2 className="h-4 w-4" aria-hidden /> Delete my account…
+                    </button>
+                  ) : (
+                    <div className="mt-4 space-y-3">
+                      <label htmlFor="confirm-del" className="block text-xs uppercase tracking-wider text-white/60">
+                        Type <span className="font-mono text-rose-300">DELETE</span> to confirm
+                      </label>
+                      <input
+                        id="confirm-del"
+                        value={confirmText}
+                        onChange={(e) => setConfirmText(e.target.value)}
+                        autoComplete="off"
+                        spellCheck={false}
+                        aria-describedby="confirm-del-help"
+                        className="w-full max-w-xs rounded-xl border border-rose-500/30 bg-white/[0.03] px-4 py-2.5 text-sm outline-none focus:border-rose-400"
+                      />
+                      <p id="confirm-del-help" className="text-xs text-white/40">This is irreversible.</p>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => { setConfirmDelete(false); setConfirmText(""); }}
+                          className="rounded-full border border-white/15 px-4 py-2 text-sm hover:bg-white/[0.05]"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={onDeleteAccount}
+                          disabled={deleting || confirmText !== "DELETE"}
+                          className="inline-flex items-center gap-2 rounded-full bg-rose-500 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-400 disabled:opacity-60"
+                        >
+                          {deleting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Trash2 className="h-4 w-4" aria-hidden />}
+                          Permanently delete
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         )}

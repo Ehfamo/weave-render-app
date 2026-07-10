@@ -1,11 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { pageUrl } from "@/lib/seo";
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Search, ArrowLeft } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
 import { ExploreCard } from "@/components/xeomx/ExploreCard";
 import { ExploreRow } from "@/components/xeomx/ExploreRow";
+import { PromptCard } from "@/components/xeomx/PromptCard";
 import { CORE_SECTIONS, EXPLORE_CATEGORIES, EXPLORE_SECTIONS } from "@/lib/explore-sections";
+import { searchAll } from "@/lib/marketplace";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -27,6 +30,13 @@ export const Route = createFileRoute("/explore")({
 function ExplorePage() {
   const [q, setQ] = useState("");
   const query = q.trim().toLowerCase();
+  const debounced = q.trim();
+  const { data: searchResults } = useQuery({
+    queryKey: ["explore-search", debounced],
+    queryFn: () => searchAll(debounced),
+    enabled: debounced.length >= 2,
+    staleTime: 30_000,
+  });
   const SECTION_COUNT = CORE_SECTIONS.length + EXPLORE_SECTIONS.length;
   const ALL_SECTIONS = [...CORE_SECTIONS, ...EXPLORE_SECTIONS];
   const countPhase = (p: string) => ALL_SECTIONS.filter((s) => s.phase === p).length;
@@ -103,6 +113,17 @@ function ExplorePage() {
           </div>
         </div>
       </section>
+
+      {debounced.length >= 2 && searchResults && searchResults.prompts.length > 0 && (
+        <section className="mx-auto max-w-[1400px] px-4 pt-8 sm:px-8">
+          <h2 className="mb-4 font-display text-2xl font-semibold tracking-tight">Prompts matching "{debounced}"</h2>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {searchResults.prompts.map((p) => (
+              <PromptCard key={p.id} prompt={p} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Core sections */}
       {filteredCore.length > 0 && (

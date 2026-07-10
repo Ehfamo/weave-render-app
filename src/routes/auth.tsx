@@ -370,8 +370,13 @@ function AuthPage() {
               {awaitingConfirm && (
                 <div role="status" style={{ fontSize: "var(--font-size-micro)", color: "var(--text-muted)" }}>
                   Verification email sent — check your inbox.{" "}
-                  <button type="button" onClick={resendConfirmation} className="underline hover:text-foreground">
-                    Resend
+                  <button
+                    type="button"
+                    onClick={resendConfirmation}
+                    disabled={resendCooldown > 0 || loading === "resend"}
+                    className="underline hover:text-foreground disabled:no-underline disabled:opacity-60"
+                  >
+                    {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend"}
                   </button>
                 </div>
               )}

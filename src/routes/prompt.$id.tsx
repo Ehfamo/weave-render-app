@@ -258,13 +258,27 @@ function Detail() {
                 <div className="mb-4 flex items-center justify-between">
                   <span className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">{m.prompt_the_prompt()}</span>
                   <div className="flex gap-2">
-                    <button className="grid h-9 w-9 place-items-center rounded-full border border-border bg-surface/60 transition hover:border-magenta/40">
+                    <button
+                      type="button"
+                      onClick={() => { if (requireAuth()) saveMut.mutate(!engagement?.saved); }}
+                      aria-pressed={!!engagement?.saved}
+                      className={`grid h-9 w-9 place-items-center rounded-full border transition ${engagement?.saved ? "border-magenta/60 bg-magenta/15 text-magenta" : "border-border bg-surface/60 hover:border-magenta/40"}`}
+                    >
                       <Bookmark className="h-4 w-4" />
                     </button>
-                    <button className="grid h-9 w-9 place-items-center rounded-full border border-border bg-surface/60 transition hover:border-magenta/40">
-                      <Heart className="h-4 w-4" />
+                    <button
+                      type="button"
+                      onClick={() => { if (requireAuth()) likeMut.mutate(!engagement?.liked); }}
+                      aria-pressed={!!engagement?.liked}
+                      className={`grid h-9 w-9 place-items-center rounded-full border transition ${engagement?.liked ? "border-magenta/60 bg-magenta/15 text-magenta" : "border-border bg-surface/60 hover:border-magenta/40"}`}
+                    >
+                      <Heart className={`h-4 w-4 ${engagement?.liked ? "fill-current" : ""}`} />
                     </button>
-                    <button className="grid h-9 w-9 place-items-center rounded-full border border-border bg-surface/60 transition hover:border-magenta/40">
+                    <button
+                      type="button"
+                      onClick={onShare}
+                      className="grid h-9 w-9 place-items-center rounded-full border border-border bg-surface/60 transition hover:border-magenta/40"
+                    >
                       <Share2 className="h-4 w-4" />
                     </button>
                   </div>
@@ -310,47 +324,27 @@ function Detail() {
                 </div>
               </div>
 
-              <div
-                className="grid sm:grid-cols-2"
-                style={{ marginTop: "var(--space-6)", gap: "var(--space-3)" }}
-              >
-                {prompt.breakdown.map((b) => (
-                  <div key={b.label} className="surface-raised rounded-2xl p-4">
-                    <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">{b.label}</p>
-                    <p className="mt-1 font-display text-lg">{b.value}</p>
-                  </div>
-                ))}
-              </div>
+              {prompt.breakdown.length > 0 && (
+                <div
+                  className="grid sm:grid-cols-2"
+                  style={{ marginTop: "var(--space-6)", gap: "var(--space-3)" }}
+                >
+                  {prompt.breakdown.map((b: { label: string; value: string }) => (
+                    <div key={b.label} className="surface-raised rounded-2xl p-4">
+                      <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">{b.label}</p>
+                      <p className="mt-1 font-display text-lg">{b.value}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      {engine ? (
-        <section className="mx-auto max-w-[1200px] px-4 pb-16 sm:px-8">
-          <div className="mb-6 flex items-end justify-between">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.28em] text-gold/80">{m.prompt_engine_eyebrow()}</p>
-              <h2 className="mt-1 font-display text-2xl font-semibold tracking-tight sm:text-3xl">{m.prompt_engine_title()}</h2>
-            </div>
-            <span className="hidden text-[11px] uppercase tracking-[0.22em] text-muted-foreground sm:inline">{m.prompt_engine_framework()}</span>
-          </div>
-          <div className="grid gap-3 lg:grid-cols-5">
-            {([
-              [m.prompt_engine_role(), engine.role],
-              [m.prompt_engine_context(), engine.context],
-              [m.prompt_engine_instructions(), engine.instructions],
-              [m.prompt_engine_output(), engine.output],
-              [m.prompt_engine_constraints(), engine.constraints],
-            ] as const).map(([k, v]) => (
-              <div key={k} className="rounded-2xl border border-border bg-surface/50 p-5">
-                <p className="text-[10px] uppercase tracking-[0.28em] text-magenta">{k}</p>
-                <p className="mt-3 text-sm leading-relaxed text-foreground/90">{v}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      ) : null}
+      {engine ? null : null}
+
+      <CommentsSection promptId={promptId} viewerId={uid} onAuthRequired={() => navigate({ to: "/auth" })} />
 
       <section className="mx-auto max-w-[1200px] px-4 pb-16 sm:px-8">
         <div className="mb-6 flex items-end justify-between">

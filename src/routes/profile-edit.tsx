@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "motion/react";
 import {
   Upload, Check, X, Globe, MapPin, Languages, Clock, ArrowLeft, Sparkles, Loader2,
+  Trash2, ShieldAlert,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -299,6 +300,16 @@ function ProfileEdit() {
                     {uploading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Upload className="h-4 w-4" aria-hidden />}
                     {uploading ? "Uploading…" : "Upload new"}
                   </button>
+                  {hasAvatar && (
+                    <button
+                      type="button"
+                      onClick={removeAvatar}
+                      disabled={uploading}
+                      className="ms-2 mt-3 inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-white/70 hover:bg-white/[0.05] disabled:opacity-60"
+                    >
+                      <Trash2 className="h-4 w-4" aria-hidden /> Remove
+                    </button>
+                  )}
                   <input
                     ref={fileRef}
                     type="file"
@@ -372,6 +383,68 @@ function ProfileEdit() {
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Sparkles className="h-4 w-4" aria-hidden />}
                 {saving ? "Saving…" : "Save changes"}
               </button>
+            </div>
+
+            {/* Danger zone: permanent account deletion */}
+            <div
+              className="mt-8 rounded-[22px] p-6"
+              style={{ background: "rgba(255,45,45,0.04)", border: "1px solid rgba(255,80,80,0.25)" }}
+              role="region"
+              aria-labelledby="danger-zone"
+            >
+              <div className="flex items-start gap-3">
+                <ShieldAlert className="mt-0.5 h-5 w-5 text-rose-400" aria-hidden />
+                <div className="flex-1">
+                  <h2 id="danger-zone" className="font-semibold text-rose-200">Delete account</h2>
+                  <p className="mt-1 text-sm text-white/60">
+                    Permanently deletes your account, profile, prompts, collections and
+                    avatars. This action cannot be undone.
+                  </p>
+                  {!confirmDelete ? (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDelete(true)}
+                      className="mt-4 inline-flex items-center gap-2 rounded-full border border-rose-500/40 px-4 py-2 text-sm text-rose-200 hover:bg-rose-500/10"
+                    >
+                      <Trash2 className="h-4 w-4" aria-hidden /> Delete my account…
+                    </button>
+                  ) : (
+                    <div className="mt-4 space-y-3">
+                      <label htmlFor="confirm-del" className="block text-xs uppercase tracking-wider text-white/60">
+                        Type <span className="font-mono text-rose-300">DELETE</span> to confirm
+                      </label>
+                      <input
+                        id="confirm-del"
+                        value={confirmText}
+                        onChange={(e) => setConfirmText(e.target.value)}
+                        autoComplete="off"
+                        spellCheck={false}
+                        aria-describedby="confirm-del-help"
+                        className="w-full max-w-xs rounded-xl border border-rose-500/30 bg-white/[0.03] px-4 py-2.5 text-sm outline-none focus:border-rose-400"
+                      />
+                      <p id="confirm-del-help" className="text-xs text-white/40">This is irreversible.</p>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => { setConfirmDelete(false); setConfirmText(""); }}
+                          className="rounded-full border border-white/15 px-4 py-2 text-sm hover:bg-white/[0.05]"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={onDeleteAccount}
+                          disabled={deleting || confirmText !== "DELETE"}
+                          className="inline-flex items-center gap-2 rounded-full bg-rose-500 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-400 disabled:opacity-60"
+                        >
+                          {deleting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Trash2 className="h-4 w-4" aria-hidden />}
+                          Permanently delete
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         )}

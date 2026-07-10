@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { COLLECTIONS } from "@/lib/prompts";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCollections } from "@/lib/marketplace";
 import { Header } from "@/components/xeomx/Header";
 import { CollectionCard } from "@/components/xeomx/CollectionCard";
 import { motion } from "motion/react";
@@ -23,6 +24,11 @@ export const Route = createFileRoute("/collections")({
 });
 
 function CollectionsPage() {
+  const { data: collections = [], isLoading, error } = useQuery({
+    queryKey: ["collections", "public"],
+    queryFn: () => fetchCollections(48),
+    staleTime: 60_000,
+  });
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
@@ -59,6 +65,20 @@ function CollectionsPage() {
           {m.collections_subtitle()}
         </p>
 
+        {isLoading ? (
+          <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="h-64 animate-pulse rounded-3xl border border-border/60 bg-surface/40" />
+            ))}
+          </div>
+        ) : error ? (
+          <p className="mt-10 text-sm text-destructive">Failed to load collections.</p>
+        ) : collections.length === 0 ? (
+          <div className="mt-16 rounded-3xl border border-dashed border-border/60 p-10 text-center">
+            <h2 className="font-display text-2xl">No public collections yet</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Curators are building the first packs. Check back soon.</p>
+          </div>
+        ) : (
         <motion.div
           className="grid lg:grid-cols-2"
           style={{ marginTop: "var(--space-10)", gap: "var(--space-6)" }}
@@ -67,7 +87,7 @@ function CollectionsPage() {
           viewport={{ once: true, margin: "-80px" }}
           variants={{ show: { transition: { staggerChildren: 0.04 } } }}
         >
-          {COLLECTIONS.map((c) => (
+          {collections.map((c) => (
             <motion.div
               key={c.id}
               variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
@@ -77,6 +97,7 @@ function CollectionsPage() {
             </motion.div>
           ))}
         </motion.div>
+        )}
       </section>
     </div>
   );

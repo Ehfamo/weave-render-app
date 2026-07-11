@@ -84,7 +84,22 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "collections_owner_id_profiles_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "creator_stats"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "collections_owner_id_profiles_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       comments: {
         Row: {
@@ -115,6 +130,20 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "comments_author_id_profiles_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "creator_stats"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "comments_author_id_profiles_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "comments_parent_id_fkey"
             columns: ["parent_id"]
@@ -387,7 +416,22 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "prompts_author_id_profiles_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "creator_stats"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "prompts_author_id_profiles_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reserved_usernames: {
         Row: {

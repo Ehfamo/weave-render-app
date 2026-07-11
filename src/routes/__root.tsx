@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
+import { SupportButton } from "@/components/xeomx/SupportButton";
 // @ts-expect-error - paraglide generated runtime
 import { getLocale } from "../paraglide/runtime.js";
 // @ts-expect-error - paraglide generated messages
@@ -243,6 +244,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
+      <SupportButton />
       <Toaster richColors closeButton position="top-right" />
     </QueryClientProvider>
   );

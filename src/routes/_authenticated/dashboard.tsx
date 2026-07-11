@@ -99,7 +99,7 @@ function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && !user) navigate({ to: "/auth", search: {} });
+    if (!loading && !user) navigate({ to: "/auth", search: { next: undefined } });
   }, [loading, user, navigate]);
 
   const { data: profile } = useQuery({

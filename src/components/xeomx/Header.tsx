@@ -154,12 +154,14 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
             <>
               <Link
                 to="/auth"
+                search={{}}
                 className="inline-flex rounded-full border border-border bg-surface/60 px-3 py-2 text-xs text-foreground transition hover:border-magenta/40 sm:px-4 sm:text-sm"
               >
                 {m.nav_sign_in()}
               </Link>
               <Link
                 to="/auth"
+                search={{}}
                 className="rounded-full px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
                 style={{ background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)" }}
               >

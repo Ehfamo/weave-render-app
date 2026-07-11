@@ -217,6 +217,7 @@ function PlanCard({ plan }: { plan: Plan }) {
       <div style={{ marginTop: "var(--space-7)" }}>
         <Link
           to="/auth"
+          search={{}}
           className="flex w-full items-center justify-center font-medium transition hover:opacity-90"
           style={
             featured

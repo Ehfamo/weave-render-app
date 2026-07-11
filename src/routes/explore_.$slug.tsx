@@ -47,7 +47,7 @@ export const Route = createFileRoute("/explore_/$slug")({
 });
 
 function SectionPage() {
-  const loaderData = Route.useLoaderData();
+  const loaderData = Route.useLoaderData() as { section: NonNullable<ReturnType<typeof getSection>> } | undefined;
   const section = loaderData?.section;
 
   if (!section) throw notFound();

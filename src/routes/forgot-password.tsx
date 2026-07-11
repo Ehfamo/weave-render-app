@@ -76,7 +76,7 @@ function ForgotPassword() {
           role="region"
           aria-labelledby="fp-title"
         >
-          <Link to="/auth" className="inline-flex items-center gap-1 transition hover:text-foreground" style={{ marginBottom: "var(--space-4)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>
+          <Link to="/auth" search={{}} className="inline-flex items-center gap-1 transition hover:text-foreground" style={{ marginBottom: "var(--space-4)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>
             <ArrowLeft className="h-3 w-3" /> Back to sign in
           </Link>
           <h1 id="fp-title" className="font-display font-bold tracking-tight text-foreground" style={{ fontSize: "clamp(1.5rem, 4vw, var(--font-size-h1))" }}>

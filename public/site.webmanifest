@@ -1,0 +1,15 @@
+{
+  "name": "XEOMX — Next Evolution of AI",
+  "short_name": "XEOMX",
+  "description": "Cinematic AI prompt marketplace. Discover, remix and own the world's most cinematic AI prompts.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0F0F14",
+  "theme_color": "#FF2CD6",
+  "icons": [
+    { "src": "/android-chrome-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/android-chrome-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/android-chrome-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

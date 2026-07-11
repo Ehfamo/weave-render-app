@@ -308,7 +308,7 @@ function HeroSection({ username, avatarUrl, totalViews }: { username: string; av
           className="relative h-[168px] w-[168px] overflow-hidden rounded-full"
           style={{ boxShadow: "0 0 0 2px #ff5a28, 0 0 40px rgba(255,90,40,0.55)" }}
         >
-          <img src={avatarUrl} alt={username} className="h-full w-full object-cover" width={336} height={336} />
+          <img src={avatarUrl} alt={username} className="h-full w-full object-cover" width={336} height={336} decoding="async" fetchPriority="high" />
         </div>
         <div
           className="absolute -bottom-1 right-2 grid h-11 w-11 place-items-center"

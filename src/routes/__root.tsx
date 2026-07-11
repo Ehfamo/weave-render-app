@@ -189,6 +189,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16.png" },
       { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
       { rel: "manifest", href: "/site.webmanifest" },
+      { rel: "preconnect", href: "https://ovqhdzppfbdvnzuglukf.supabase.co", crossOrigin: "anonymous" },
+      { rel: "dns-prefetch", href: "https://ovqhdzppfbdvnzuglukf.supabase.co" },
       ...LOCALES.map((loc) => ({
         rel: "alternate",
         hrefLang: loc,
@@ -256,6 +258,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground"
+      >
+        Skip to content
+      </a>
       <Outlet />
       <SupportButton />
       <Toaster richColors closeButton position="top-right" />

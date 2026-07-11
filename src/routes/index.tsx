@@ -14,6 +14,7 @@ import { CreatorCard } from "@/components/xeomx/CreatorCard";
 import { TickerMarquee } from "@/components/xeomx/Marquee";
 import { SignalBadge } from "@/components/xeomx/Signal";
 import { ConnectSection } from "@/components/xeomx/ConnectSection";
+import { Logo } from "@/components/xeomx/Logo";
 import heroImg from "@/assets/hero.jpg";
 import cover1 from "@/assets/cover-1.jpg";
 import { pageUrl } from "@/lib/seo";

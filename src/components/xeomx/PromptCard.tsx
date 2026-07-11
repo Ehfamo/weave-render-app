@@ -62,6 +62,7 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
           src={prompt.cover}
           alt={prompt.title}
           loading="lazy"
+          decoding="async"
           className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />

@@ -81,7 +81,7 @@ export function toPromptCard(row: PromptRow): Prompt {
 
 const PROMPT_LIST_SELECT =
   "id, slug, title, body, description, category, cover_url, price_cents, published_at, is_published, author_id, tags, " +
-  "author:profiles!prompts_author_id_fkey(username, display_name, avatar_url), " +
+  "author:profiles!prompts_author_id_profiles_fkey(username, display_name, avatar_url), " +
   "likes(count), saves(count), prompt_views(count), comments(count)";
 
 // -------------------- Prompt queries --------------------
@@ -241,7 +241,7 @@ export type CommentRow = {
 export async function fetchComments(promptId: string): Promise<CommentRow[]> {
   const { data, error } = await supabase
     .from("comments")
-    .select("id, prompt_id, author_id, body, created_at, parent_id, author:profiles!comments_author_id_fkey(username, display_name, avatar_url)")
+    .select("id, prompt_id, author_id, body, created_at, parent_id, author:profiles!comments_author_id_profiles_fkey(username, display_name, avatar_url)")
     .eq("prompt_id", promptId)
     .order("created_at", { ascending: false })
     .limit(100);
@@ -293,7 +293,7 @@ function toCollectionCard(row: CollectionRow): Collection {
 
 const COLLECTION_SELECT =
   "id, slug, title, description, cover_url, owner_id, is_public, updated_at, " +
-  "collection_items(count), owner:profiles!collections_owner_id_fkey(username, display_name)";
+  "collection_items(count), owner:profiles!collections_owner_id_profiles_fkey(username, display_name)";
 
 export async function fetchCollections(limit = 24) {
   const { data, error } = await supabase

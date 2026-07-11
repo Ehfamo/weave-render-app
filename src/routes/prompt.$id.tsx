@@ -101,7 +101,7 @@ function Detail() {
 
   const requireAuth = () => {
     if (!uid) {
-      navigate({ to: "/auth" });
+      navigate({ to: "/auth", search: {} });
       return false;
     }
     return true;
@@ -344,7 +344,7 @@ function Detail() {
 
       {engine ? null : null}
 
-      <CommentsSection promptId={promptId} viewerId={uid} onAuthRequired={() => navigate({ to: "/auth" })} />
+      <CommentsSection promptId={promptId} viewerId={uid} onAuthRequired={() => navigate({ to: "/auth", search: {} })} />
 
       <section className="mx-auto max-w-[1200px] px-4 pb-16 sm:px-8">
         <div className="mb-6 flex items-end justify-between">

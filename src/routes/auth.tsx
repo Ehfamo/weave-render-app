@@ -182,15 +182,11 @@ function AuthPage() {
       >
         <Link
           to="/"
-          className="flex items-center gap-2"
+          aria-label="XEOMX — Home"
+          className="flex items-center"
           style={{ marginBottom: "var(--space-6)" }}
         >
-          <span className="grid h-9 w-9 place-items-center rounded-lg" style={{ background: "var(--gradient-magenta)" }}>
-            <Sparkles className="h-4 w-4 text-white" />
-          </span>
-          <span className="font-display text-2xl font-bold tracking-tight">
-            Xeom<span className="text-gradient-magenta">X</span>
-          </span>
+          <Logo variant="full" size={36} ariaLabel="XEOMX" />
         </Link>
 
         <motion.div

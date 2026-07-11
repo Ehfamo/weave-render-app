@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion } from "motion/react";
-import { Sparkles, Loader2, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Loader2, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Logo } from "@/components/xeomx/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { friendlyAuthError } from "@/lib/auth-validation";
 import { toast } from "sonner";

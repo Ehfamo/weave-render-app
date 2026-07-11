@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Sparkles, Loader2, Mail, Apple, Github, ArrowLeft } from "lucide-react";
+import { Loader2, Mail, Apple, Github, ArrowLeft } from "lucide-react";
+import { Logo } from "@/components/xeomx/Logo";
 import { motion } from "motion/react";
 import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";

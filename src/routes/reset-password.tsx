@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
-import { Sparkles, Loader2, KeyRound, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Loader2, KeyRound, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Logo } from "@/components/xeomx/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { scorePassword, friendlyAuthError } from "@/lib/auth-validation";
 import { toast } from "sonner";

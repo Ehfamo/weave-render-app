@@ -14,6 +14,7 @@ import { CreatorCard } from "@/components/xeomx/CreatorCard";
 import { TickerMarquee } from "@/components/xeomx/Marquee";
 import { SignalBadge } from "@/components/xeomx/Signal";
 import { ConnectSection } from "@/components/xeomx/ConnectSection";
+import { Logo } from "@/components/xeomx/Logo";
 import heroImg from "@/assets/hero.jpg";
 import cover1 from "@/assets/cover-1.jpg";
 import { pageUrl } from "@/lib/seo";
@@ -427,12 +428,7 @@ function Index() {
         <div className="mx-auto max-w-[1400px] px-4 py-12 sm:px-8">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <div className="flex items-center gap-2">
-                <span className="grid h-7 w-7 place-items-center rounded-lg" style={{ background: "var(--gradient-magenta)" }}>
-                  <svg className="h-3.5 w-3.5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                </span>
-                <span className="font-display text-base font-bold">XeomX</span>
-              </div>
+              <Logo variant="full" size={28} ariaLabel="XEOMX" />
               <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{m.footer_tagline()}</p>
             </div>
             <div>

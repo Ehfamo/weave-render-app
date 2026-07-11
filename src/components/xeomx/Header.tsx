@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { LanguageSwitcher } from "@/components/xeomx/LanguageSwitcher";
+import { Logo } from "@/components/xeomx/Logo";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
@@ -60,13 +61,8 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
           </SheetContent>
         </Sheet>
 
-        <Link to="/" className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-lg" style={{ background: "var(--gradient-magenta)" }}>
-            <Sparkles className="h-4 w-4 text-white" />
-          </span>
-          <span className="font-display text-xl font-bold tracking-tight">
-            Xeom<span className="text-gradient-magenta">X</span>
-          </span>
+        <Link to="/" className="flex items-center" aria-label="XEOMX — Home">
+          <Logo variant="full" size={32} ariaLabel="XEOMX" />
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">

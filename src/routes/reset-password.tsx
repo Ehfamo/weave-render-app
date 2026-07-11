@@ -78,7 +78,7 @@ function ResetPassword() {
     toast.success("Password updated");
     // Sign the temporary recovery session out so the user re-authenticates.
     await supabase.auth.signOut();
-    setTimeout(() => navigate({ to: "/auth" }), 1500);
+    setTimeout(() => navigate({ to: "/auth", search: {} }), 1500);
   }
 
   return (

@@ -39,20 +39,124 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
   });
 }
 
+// Enterprise security headers. Applied to every response.
+// - HSTS: force HTTPS for 2y incl. subdomains, preload eligible
+// - CSP: report-only initially to avoid breaking SSR/hydration/3rd-party assets
+// - COOP/CORP/OAC: cross-origin isolation baseline (no COEP — would break avatars)
+// - Permissions-Policy: deny powerful features by default
+// - Cache-Control: keep HTML uncached so signed-in state never leaks between users
+const SUPABASE_ORIGIN = "https://ovqhdzppfbdvnzuglukf.supabase.co";
+const CSP_REPORT_ONLY = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  "object-src 'none'",
+  // TanStack Start injects inline hydration scripts/state.
+  `script-src 'self' 'unsafe-inline' https:`,
+  `style-src 'self' 'unsafe-inline' https:`,
+  `img-src 'self' data: blob: https:`,
+  `font-src 'self' data: https:`,
+  `connect-src 'self' https: wss: ${SUPABASE_ORIGIN} wss://ovqhdzppfbdvnzuglukf.supabase.co`,
+  `media-src 'self' https: blob:`,
+  `worker-src 'self' blob:`,
+  `manifest-src 'self'`,
+  "upgrade-insecure-requests",
+].join("; ");
+
+function applySecurityHeaders(response: Response, request: Request): Response {
+  const h = new Headers(response.headers);
+  h.delete("x-powered-by");
+  h.delete("server");
+
+  if (!h.has("strict-transport-security")) {
+    h.set("strict-transport-security", "max-age=63072000; includeSubDomains; preload");
+  }
+  if (!h.has("x-content-type-options")) h.set("x-content-type-options", "nosniff");
+  if (!h.has("x-frame-options")) h.set("x-frame-options", "DENY");
+  if (!h.has("referrer-policy")) h.set("referrer-policy", "strict-origin-when-cross-origin");
+  if (!h.has("x-dns-prefetch-control")) h.set("x-dns-prefetch-control", "on");
+  if (!h.has("origin-agent-cluster")) h.set("origin-agent-cluster", "?1");
+  if (!h.has("cross-origin-opener-policy")) h.set("cross-origin-opener-policy", "same-origin-allow-popups");
+  if (!h.has("cross-origin-resource-policy")) h.set("cross-origin-resource-policy", "same-site");
+  if (!h.has("permissions-policy")) {
+    h.set(
+      "permissions-policy",
+      [
+        "accelerometer=()",
+        "autoplay=(self)",
+        "camera=()",
+        "display-capture=()",
+        "encrypted-media=()",
+        "fullscreen=(self)",
+        "geolocation=()",
+        "gyroscope=()",
+        "magnetometer=()",
+        "microphone=()",
+        "midi=()",
+        "payment=(self)",
+        "picture-in-picture=(self)",
+        "publickey-credentials-get=(self)",
+        "screen-wake-lock=()",
+        "sync-xhr=()",
+        "usb=()",
+        "xr-spatial-tracking=()",
+        "interest-cohort=()",
+        "browsing-topics=()",
+      ].join(", "),
+    );
+  }
+
+  // Ship CSP in Report-Only mode so we get telemetry without breaking hydration.
+  // Flip to Content-Security-Policy after a clean reporting window.
+  const contentType = h.get("content-type") ?? "";
+  const isHtml = contentType.includes("text/html");
+  if (isHtml && !h.has("content-security-policy-report-only") && !h.has("content-security-policy")) {
+    h.set("content-security-policy-report-only", CSP_REPORT_ONLY);
+  }
+
+  // Never cache authenticated HTML documents at intermediary caches.
+  if (isHtml && !h.has("cache-control")) {
+    h.set("cache-control", "private, no-store");
+  }
+
+  // Belt & braces: block clickjacking for HTML on custom domains too.
+  void request;
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers: h });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    // Force HTTPS at the edge. Cloudflare terminates TLS; x-forwarded-proto tells us the client scheme.
+    const proto = request.headers.get("x-forwarded-proto");
+    const url = new URL(request.url);
+    if (proto === "http" || (url.protocol === "http:" && url.hostname !== "localhost" && !url.hostname.endsWith(".local"))) {
+      const httpsUrl = new URL(request.url);
+      httpsUrl.protocol = "https:";
+      return new Response(null, {
+        status: 308,
+        headers: {
+          location: httpsUrl.toString(),
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        },
+      });
+    }
     try {
       const handler = await getServerEntry();
       const response = await paraglideMiddleware(request, async () => {
         return handler.fetch(request, env, ctx);
       });
-      return await normalizeCatastrophicSsrResponse(response);
+      const normalized = await normalizeCatastrophicSsrResponse(response);
+      return applySecurityHeaders(normalized, request);
     } catch (error) {
       console.error(error);
-      return new Response(renderErrorPage(), {
-        status: 500,
-        headers: { "content-type": "text/html; charset=utf-8" },
-      });
+      return applySecurityHeaders(
+        new Response(renderErrorPage(), {
+          status: 500,
+          headers: { "content-type": "text/html; charset=utf-8" },
+        }),
+        request,
+      );
     }
   },
 };

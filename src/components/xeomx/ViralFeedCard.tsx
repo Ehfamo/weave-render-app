@@ -16,7 +16,13 @@ export function ViralFeedCard({ p }: { p: Prompt }) {
   };
   return (
     <article className="relative h-[100svh] w-full snap-start overflow-hidden">
-      <img src={p.cover} alt={p.title} className="absolute inset-0 h-full w-full object-cover" />
+      <img
+        src={p.cover}
+        alt={p.title}
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 h-full w-full object-cover"
+      />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-background/10" />
       <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-transparent to-background/30" />
 
@@ -27,8 +33,13 @@ export function ViralFeedCard({ p }: { p: Prompt }) {
           { Icon: Bookmark, label: String(p.saves ?? "—") },
           { Icon: Share2, label: String(p.shares ?? "—") },
           { Icon: Shuffle, label: String(p.remixes ?? "—") },
-        ].map(({ Icon, label }, i) => (
-          <button key={i} className="group flex flex-col items-center gap-1">
+        ].map(({ Icon, label, name }, i) => (
+          <button
+            key={i}
+            type="button"
+            aria-label={`${name}: ${label}`}
+            className="group flex flex-col items-center gap-1"
+          >
             <span
               className="surface-raised grid h-12 w-12 place-items-center rounded-full backdrop-blur transition group-hover:border-magenta/60"
               style={{

@@ -86,14 +86,31 @@ function validate(raw: unknown): ContactInput {
     .slice(0, 5000);
   const category = String(r.category ?? "") as ContactCategory;
   const website = typeof r.website === "string" ? r.website : "";
+  const attachmentPath = typeof r.attachmentPath === "string" ? r.attachmentPath.slice(0, 500) : "";
+  const attachmentName = typeof r.attachmentName === "string" ? sanitize(r.attachmentName, 200) : "";
+  const attachmentSize =
+    typeof r.attachmentSize === "number" && Number.isFinite(r.attachmentSize)
+      ? Math.max(0, Math.floor(r.attachmentSize))
+      : 0;
 
   if (!name) throw new Error("Name is required");
   if (!EMAIL_RE.test(email)) throw new Error("Valid email is required");
   if (subject.length < 3) throw new Error("Subject is too short");
   if (message.length < 10) throw new Error("Message is too short");
   if (!CONTACT_CATEGORIES.includes(category)) throw new Error("Invalid category");
+  if (attachmentPath && !/^support\/[a-f0-9-]{36}\/[a-zA-Z0-9._-]+$/.test(attachmentPath)) {
+    throw new Error("Invalid attachment reference");
+  }
+  if (attachmentSize > MAX_ATTACHMENT_BYTES) {
+    throw new Error("Attachment exceeds 10 MB limit");
+  }
 
-  return { name, email, subject, message, category, website };
+  return {
+    name, email, subject, message, category, website,
+    attachmentPath: attachmentPath || undefined,
+    attachmentName: attachmentName || undefined,
+    attachmentSize: attachmentSize || undefined,
+  };
 }
 
 export const submitContact = createServerFn({ method: "POST" })
@@ -101,7 +118,12 @@ export const submitContact = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     // Honeypot: silently succeed so bots don't retry.
     if (data.website && data.website.trim() !== "") {
-      return { ok: true as const };
+      return {
+        ok: true as const,
+        ticket: "XM-000000",
+        team: TEAM_LABEL[data.category] ?? "General Team",
+        sla: SLA_HOURS[data.category] ?? "Within 24 hours",
+      };
     }
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -128,20 +150,90 @@ export const submitContact = createServerFn({ method: "POST" })
     }
 
     const routed_to = ROUTING[data.category];
-    const { error } = await supabaseAdmin.from("contact_messages").insert({
-      name: data.name,
-      email: data.email,
-      subject: data.subject,
-      message: data.message,
-      category: data.category,
-      routed_to,
-      ip_hash: ipHash,
-      user_agent: userAgent,
-    });
-    if (error) {
+    const { data: inserted, error } = await supabaseAdmin
+      .from("contact_messages")
+      .insert({
+        name: data.name,
+        email: data.email,
+        subject: data.subject,
+        message: data.message,
+        category: data.category,
+        routed_to,
+        ip_hash: ipHash,
+        user_agent: userAgent,
+        ticket_number: "", // filled by BEFORE INSERT trigger
+        attachment_path: data.attachmentPath ?? null,
+        attachment_name: data.attachmentName ?? null,
+        attachment_size: data.attachmentSize ?? null,
+      })
+      .select("ticket_number")
+      .single();
+    if (error || !inserted) {
       console.error("[contact] insert failed", error);
       throw new Error("Failed to submit. Please try again.");
     }
 
-    return { ok: true as const };
+    return {
+      ok: true as const,
+      ticket: inserted.ticket_number,
+      team: TEAM_LABEL[data.category],
+      sla: SLA_HOURS[data.category],
+    };
+  });
+
+// --------------------------------------------------------------
+// Signed upload URL for support attachments (private bucket).
+// Client uploads directly using the token; server then only
+// stores the path reference on the ticket row.
+// --------------------------------------------------------------
+
+type UploadInput = { filename: string; size: number };
+
+function validateUpload(raw: unknown): UploadInput {
+  if (!raw || typeof raw !== "object") throw new Error("Invalid payload");
+  const r = raw as Record<string, unknown>;
+  const filename = sanitize(String(r.filename ?? ""), 200).replace(/[^a-zA-Z0-9._-]/g, "_");
+  const size = Number(r.size ?? 0);
+  if (!filename) throw new Error("Filename required");
+  const ext = filename.split(".").pop()?.toLowerCase() ?? "";
+  if (!ext || BLOCKED_ATTACHMENT_EXT.has(ext) || !ALLOWED_ATTACHMENT_EXT.has(ext)) {
+    throw new Error("File type not allowed");
+  }
+  if (!Number.isFinite(size) || size <= 0) throw new Error("Invalid file size");
+  if (size > MAX_ATTACHMENT_BYTES) throw new Error("Attachment exceeds 10 MB limit");
+  return { filename, size: Math.floor(size) };
+}
+
+export const createSupportUpload = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => validateUpload(d))
+  .handler(async ({ data }) => {
+    const ipRaw =
+      getRequestHeader("cf-connecting-ip") ||
+      getRequestHeader("x-forwarded-for")?.split(",")[0]?.trim() ||
+      getRequestHeader("x-real-ip") ||
+      "unknown";
+    const ipHash = createHash("sha256").update(`${ipRaw}:xeomx-contact`).digest("hex");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Reuse the same window as submit to throttle abuse.
+    const since = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+    const { count } = await supabaseAdmin
+      .from("contact_messages")
+      .select("id", { count: "exact", head: true })
+      .eq("ip_hash", ipHash)
+      .gte("created_at", since);
+    if ((count ?? 0) >= 10) {
+      throw new Error("Too many upload requests. Please try again later.");
+    }
+
+    const id = randomUUID();
+    const path = `support/${id}/${data.filename}`;
+    const { data: signed, error } = await supabaseAdmin.storage
+      .from("support-attachments")
+      .createSignedUploadUrl(path);
+    if (error || !signed) {
+      console.error("[contact] signed upload failed", error);
+      throw new Error("Could not prepare upload. Please try again.");
+    }
+    return { path, token: signed.token, bucket: "support-attachments" as const };
   });

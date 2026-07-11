@@ -462,6 +462,8 @@ function Index() {
                 <li><Link to="/privacy" className="transition hover:text-foreground">{m.footer_privacy()}</Link></li>
                 <li><Link to="/cookies" className="transition hover:text-foreground">{m.footer_cookie()}</Link></li>
                 <li><Link to="/refund-policy" className="transition hover:text-foreground">{m.footer_refund()}</Link></li>
+                <li><Link to="/contact" className="transition hover:text-foreground">Contact</Link></li>
+                <li><a href="mailto:hello@xeomx.com" className="transition hover:text-foreground">hello@xeomx.com</a></li>
               </ul>
             </div>
           </div>

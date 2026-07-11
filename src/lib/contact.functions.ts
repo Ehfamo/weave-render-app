@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
-import { createHash } from "crypto";
+import { createHash, randomUUID } from "crypto";
 
 export const CONTACT_CATEGORIES = [
   "general",

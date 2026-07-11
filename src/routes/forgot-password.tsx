@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion } from "motion/react";
-import { Sparkles, Loader2, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Loader2, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Logo } from "@/components/xeomx/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { friendlyAuthError } from "@/lib/auth-validation";
 import { toast } from "sonner";
@@ -58,13 +59,8 @@ function ForgotPassword() {
         }}
       />
       <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center" style={{ paddingInline: "var(--space-5)" }}>
-        <Link to="/" className="flex items-center gap-2" style={{ marginBottom: "var(--space-6)" }}>
-          <span className="grid h-9 w-9 place-items-center rounded-lg" style={{ background: "var(--gradient-magenta)" }}>
-            <Sparkles className="h-4 w-4 text-white" />
-          </span>
-          <span className="font-display text-2xl font-bold tracking-tight">
-            Xeom<span className="text-gradient-magenta">X</span>
-          </span>
+        <Link to="/" aria-label="XEOMX — Home" className="flex items-center" style={{ marginBottom: "var(--space-6)" }}>
+          <Logo variant="full" size={36} ariaLabel="XEOMX" />
         </Link>
 
         <motion.div

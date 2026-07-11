@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Sparkles, Loader2, Mail, Apple, Github, ArrowLeft } from "lucide-react";
+import { Loader2, Mail, Apple, Github, ArrowLeft } from "lucide-react";
+import { Logo } from "@/components/xeomx/Logo";
 import { motion } from "motion/react";
 import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
@@ -182,15 +183,11 @@ function AuthPage() {
       >
         <Link
           to="/"
-          className="flex items-center gap-2"
+          aria-label="XEOMX — Home"
+          className="flex items-center"
           style={{ marginBottom: "var(--space-6)" }}
         >
-          <span className="grid h-9 w-9 place-items-center rounded-lg" style={{ background: "var(--gradient-magenta)" }}>
-            <Sparkles className="h-4 w-4 text-white" />
-          </span>
-          <span className="font-display text-2xl font-bold tracking-tight">
-            Xeom<span className="text-gradient-magenta">X</span>
-          </span>
+          <Logo variant="full" size={36} ariaLabel="XEOMX" />
         </Link>
 
         <motion.div

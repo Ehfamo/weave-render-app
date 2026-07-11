@@ -28,11 +28,11 @@ export function ViralFeedCard({ p }: { p: Prompt }) {
 
       <div className="absolute end-3 top-1/2 z-10 flex -translate-y-1/2 flex-col items-center gap-3 sm:end-5">
         {[
-          { Icon: Heart, label: p.likes },
-          { Icon: MessageCircle, label: "412" },
-          { Icon: Bookmark, label: String(p.saves ?? "—") },
-          { Icon: Share2, label: String(p.shares ?? "—") },
-          { Icon: Shuffle, label: String(p.remixes ?? "—") },
+          { Icon: Heart, label: String(p.likes), name: "Likes" },
+          { Icon: MessageCircle, label: "412", name: "Comments" },
+          { Icon: Bookmark, label: String(p.saves ?? "—"), name: "Saves" },
+          { Icon: Share2, label: String(p.shares ?? "—"), name: "Shares" },
+          { Icon: Shuffle, label: String(p.remixes ?? "—"), name: "Remixes" },
         ].map(({ Icon, label, name }, i) => (
           <button
             key={i}

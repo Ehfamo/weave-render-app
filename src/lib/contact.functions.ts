@@ -23,6 +23,34 @@ const ROUTING: Record<ContactCategory, string> = {
   careers: "careers@xeomx.com",
 };
 
+// Public-facing SLA copy shown in the drawer / contact page.
+export const SLA_HOURS: Record<ContactCategory, string> = {
+  general: "Within 24 hours",
+  support: "Within 12 hours",
+  billing: "Within 24 hours",
+  partnerships: "Within 3 business days",
+  press: "Within 2 business days",
+  careers: "Within 5 business days",
+};
+
+export const TEAM_LABEL: Record<ContactCategory, string> = {
+  general: "General Team",
+  support: "Support Team",
+  billing: "Billing Team",
+  partnerships: "Partnerships Team",
+  press: "Press & Media Team",
+  careers: "Careers Team",
+};
+
+// Attachment limits mirrored on the client.
+const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024; // 10 MB
+const ALLOWED_ATTACHMENT_EXT = new Set([
+  "png","jpg","jpeg","gif","webp","heic","pdf","txt","log","csv","json","md","zip",
+]);
+const BLOCKED_ATTACHMENT_EXT = new Set([
+  "exe","bat","cmd","sh","ps1","js","jar","msi","dmg","app","scr","vbs","apk","dll",
+]);
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type ContactInput = {
@@ -32,6 +60,9 @@ type ContactInput = {
   message: string;
   category: ContactCategory;
   website?: string; // honeypot
+  attachmentPath?: string;
+  attachmentName?: string;
+  attachmentSize?: number;
 };
 
 function sanitize(v: string, max: number): string {

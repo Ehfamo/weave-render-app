@@ -162,6 +162,9 @@ export type Database = {
       }
       contact_messages: {
         Row: {
+          attachment_name: string | null
+          attachment_path: string | null
+          attachment_size: number | null
           category: string
           created_at: string
           email: string
@@ -172,11 +175,15 @@ export type Database = {
           routed_to: string
           status: string
           subject: string
+          ticket_number: string
           updated_at: string
           user_agent: string | null
           user_id: string | null
         }
         Insert: {
+          attachment_name?: string | null
+          attachment_path?: string | null
+          attachment_size?: number | null
           category: string
           created_at?: string
           email: string
@@ -187,11 +194,15 @@ export type Database = {
           routed_to: string
           status?: string
           subject: string
+          ticket_number: string
           updated_at?: string
           user_agent?: string | null
           user_id?: string | null
         }
         Update: {
+          attachment_name?: string | null
+          attachment_path?: string | null
+          attachment_size?: number | null
           category?: string
           created_at?: string
           email?: string
@@ -202,6 +213,7 @@ export type Database = {
           routed_to?: string
           status?: string
           subject?: string
+          ticket_number?: string
           updated_at?: string
           user_agent?: string | null
           user_id?: string | null

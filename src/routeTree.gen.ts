@@ -24,6 +24,7 @@ import { Route as FeedRouteImport } from './routes/feed'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as CreatorsRouteImport } from './routes/creators'
 import { Route as CookiesRouteImport } from './routes/cookies'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -109,6 +110,11 @@ const CookiesRoute = CookiesRouteImport.update({
   path: '/cookies',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CollectionsRoute = CollectionsRouteImport.update({
   id: '/collections',
   path: '/collections',
@@ -158,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/collections': typeof CollectionsRouteWithChildren
+  '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
   '/creators': typeof CreatorsRoute
   '/explore': typeof ExploreRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/collections': typeof CollectionsRouteWithChildren
+  '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
   '/creators': typeof CreatorsRoute
   '/explore': typeof ExploreRoute
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/collections': typeof CollectionsRouteWithChildren
+  '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
   '/creators': typeof CreatorsRoute
   '/explore': typeof ExploreRoute
@@ -237,6 +246,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/collections'
+    | '/contact'
     | '/cookies'
     | '/creators'
     | '/explore'
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/collections'
+    | '/contact'
     | '/cookies'
     | '/creators'
     | '/explore'
@@ -288,6 +299,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/collections'
+    | '/contact'
     | '/cookies'
     | '/creators'
     | '/explore'
@@ -315,6 +327,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CollectionsRoute: typeof CollectionsRouteWithChildren
+  ContactRoute: typeof ContactRoute
   CookiesRoute: typeof CookiesRoute
   CreatorsRoute: typeof CreatorsRoute
   ExploreRoute: typeof ExploreRoute
@@ -441,6 +454,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CookiesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/collections': {
       id: '/collections'
       path: '/collections'
@@ -547,6 +567,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   CollectionsRoute: CollectionsRouteWithChildren,
+  ContactRoute: ContactRoute,
   CookiesRoute: CookiesRoute,
   CreatorsRoute: CreatorsRoute,
   ExploreRoute: ExploreRoute,

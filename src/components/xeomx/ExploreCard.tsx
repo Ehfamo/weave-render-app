@@ -1,11 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { type ExploreSection, getPhaseBadge, getCoreLink } from "@/lib/explore-sections";
 import { getIcon } from "@/lib/icon-map";
+import { getSectionImage } from "@/lib/section-images";
 
 export function ExploreCard({ section, index = 0, core = false }: { section: ExploreSection; index?: number; core?: boolean }) {
   const Icon = getIcon(section.icon);
   const badge = getPhaseBadge(section.phase);
   const href = section.phase === 'live' ? getCoreLink(section.slug) : `/explore/${section.slug}`;
+  const image = getSectionImage(section);
   return (
     <Link
       to={href as string}
@@ -16,6 +18,16 @@ export function ExploreCard({ section, index = 0, core = false }: { section: Exp
             : 'hover:border-amber-300/40'
         }`}
     >
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
+        <img
+          src={image}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover opacity-30 transition-opacity duration-500 group-hover:opacity-45"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/85 to-background/55" />
+      </div>
       <div className="flex items-start justify-between gap-3">
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-amber-300/20 to-fuchsia-500/10 ring-1 ring-white/10">
           <Icon className="h-5 w-5 text-amber-200" />
@@ -24,7 +36,7 @@ export function ExploreCard({ section, index = 0, core = false }: { section: Exp
           {badge.label}
         </span>
       </div>
-      <div className="min-w-0">
+      <div className="relative min-w-0">
         <h3 className="font-display text-lg font-bold leading-tight text-foreground">{section.name}</h3>
         <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{section.tagline}</p>
       </div>

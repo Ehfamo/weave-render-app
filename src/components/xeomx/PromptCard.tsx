@@ -102,19 +102,19 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
           </span>
           <div className="flex items-center gap-1.5">
             {[
-              { Icon: Copy, onClick: onCopy, key: "copy" },
-              { Icon: Bookmark, onClick: stop, key: "save" },
-              { Icon: Share2, onClick: stop, key: "share" },
-              { Icon: Shuffle, onClick: stop, key: "remix" },
-            ].map(({ Icon: I, onClick, key }) => (
+              { Icon: Copy, onClick: onCopy, key: "copy", label: "Copy prompt" },
+              { Icon: Bookmark, onClick: stop, key: "save", label: "Save prompt" },
+              { Icon: Share2, onClick: stop, key: "share", label: "Share prompt" },
+              { Icon: Shuffle, onClick: stop, key: "remix", label: "Remix prompt" },
+            ].map(({ Icon: I, onClick, key, label }) => (
               <button
                 key={key}
                 type="button"
                 onClick={onClick}
                 className="grid h-9 w-9 place-items-center rounded-full border border-foreground/20 bg-background/50 text-foreground backdrop-blur transition hover:border-magenta/60 hover:bg-magenta/15"
-                aria-label={key}
+                aria-label={label}
               >
-                <I className="h-3.5 w-3.5" />
+                <I aria-hidden="true" className="h-3.5 w-3.5" />
               </button>
             ))}
           </div>

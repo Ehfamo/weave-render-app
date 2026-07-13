@@ -38,7 +38,15 @@ export const Route = createFileRoute("/")({
       { property: "og:type", content: "website" },
       { property: "og:url", content: pageUrl("/") },
     ],
-    links: [{ rel: "canonical", href: pageUrl("/") }],
+    links: [
+      { rel: "canonical", href: pageUrl("/") },
+      {
+        rel: "preload",
+        as: "image",
+        href: heroUpload.url,
+        fetchpriority: "high",
+      } as unknown as Record<string, string>,
+    ],
   }),
   component: Index,
 });

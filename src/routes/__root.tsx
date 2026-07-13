@@ -249,15 +249,21 @@ function RootComponent() {
   // import.meta.env.PROD so DX in dev is unaffected.
   useEffect(() => {
     if (!import.meta.env.PROD) return;
-    const noop = () => {};
-    // eslint-disable-next-line no-console
-    console.log = noop;
-    // eslint-disable-next-line no-console
-    console.info = noop;
-    // eslint-disable-next-line no-console
-    console.debug = noop;
-    // eslint-disable-next-line no-console
-    console.warn = noop;
+    // Defer to idle so the main thread stays free during hydration / LCP.
+    const runSuppress = () => {
+      const noop = () => {};
+      // eslint-disable-next-line no-console
+      console.log = noop;
+      // eslint-disable-next-line no-console
+      console.info = noop;
+      // eslint-disable-next-line no-console
+      console.debug = noop;
+      // eslint-disable-next-line no-console
+      console.warn = noop;
+    };
+    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback;
+    if (typeof ric === "function") ric(runSuppress);
+    else setTimeout(runSuppress, 0);
   }, []);
 
   // Global auth listener: keeps router + query cache in sync across tabs.

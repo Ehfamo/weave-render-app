@@ -7,6 +7,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Belt-and-braces: guarantee every custom face uses `font-display: swap` so
+   text is never blocked during initial paint on low-end mobile devices. */
+@font-face { font-family: "Inter Variable"; font-display: swap; src: local("Inter"); }
+@font-face { font-family: "Vazirmatn Variable"; font-display: swap; src: local("Vazirmatn"); }
+@font-face { font-family: "Fraunces"; font-display: swap; src: local("Fraunces"); }
+
 /* XeomX — cinematic AI prompt marketplace.
  * Aesthetic: deep obsidian + baroque gold + neon magenta accent.
  */

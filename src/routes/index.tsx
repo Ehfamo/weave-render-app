@@ -1,24 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { lazy, Suspense, useMemo, useState } from "react";
-import { ArrowRight, Flame, Heart, MessageCircle, Play, Share2 } from "lucide-react";
+import { ArrowRight, Flame, Play } from "lucide-react";
 import { motion } from "motion/react";
-import { CATEGORIES, COLLECTIONS, CREATORS, PROMPTS, ROWS } from "@/lib/prompts";
+import { CATEGORIES, PROMPTS, ROWS } from "@/lib/prompts";
 import { CORE_SECTIONS, EXPLORE_SECTIONS } from "@/lib/explore-sections";
 import { Header } from "@/components/xeomx/Header";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 import { Row } from "@/components/xeomx/Row";
 import { PromptCard } from "@/components/xeomx/PromptCard";
-import { CollectionCard } from "@/components/xeomx/CollectionCard";
-import { CreatorCard } from "@/components/xeomx/CreatorCard";
 import { TickerMarquee } from "@/components/xeomx/Marquee";
-import { SignalBadge } from "@/components/xeomx/Signal";
 // Lazy-load below-the-fold interactive block to free the main thread during hydration.
 const ConnectSection = lazy(() =>
   import("@/components/xeomx/ConnectSection").then((m) => ({ default: m.ConnectSection })),
 );
+// Lazy-load below-the-fold rails (collections/creators/viral/ranking/founders) to
+// slash initial JS. These render only when the user is NOT filtering.
+const IndexRails = lazy(() =>
+  import("@/components/xeomx/IndexRails").then((m) => ({ default: m.IndexRails })),
+);
 import { Logo } from "@/components/xeomx/Logo";
-import heroImg from "@/assets/hero.jpg";
 import { HeroBackground, heroPreloadLinks } from "@/components/xeomx/HeroBackground";
 import { pageUrl } from "@/lib/seo";
 

@@ -16,7 +16,7 @@ import { SignalBadge } from "@/components/xeomx/Signal";
 import { ConnectSection } from "@/components/xeomx/ConnectSection";
 import { Logo } from "@/components/xeomx/Logo";
 import heroImg from "@/assets/hero.jpg";
-import cover1 from "@/assets/cover-1.jpg";
+import heroUpload from "@/assets/xeomx-hero-upload.jpg.asset.json";
 import { pageUrl } from "@/lib/seo";
 
 const CATEGORY_LABELS: Record<string, () => string> = {
@@ -89,12 +89,14 @@ function Index() {
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
-          <img
-            src={cover1}
-            alt=""
-            width={1280}
-            height={1600}
-            className="h-full w-full object-cover opacity-50"
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url(${heroUpload.url})`,
+              backgroundSize: "cover",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "right center",
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/30" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />

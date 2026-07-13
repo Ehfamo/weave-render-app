@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { ArrowRight, Flame, Heart, MessageCircle, Play, Share2 } from "lucide-react";
 import { motion } from "motion/react";
 import { CATEGORIES, COLLECTIONS, CREATORS, PROMPTS, ROWS } from "@/lib/prompts";
@@ -13,7 +13,10 @@ import { CollectionCard } from "@/components/xeomx/CollectionCard";
 import { CreatorCard } from "@/components/xeomx/CreatorCard";
 import { TickerMarquee } from "@/components/xeomx/Marquee";
 import { SignalBadge } from "@/components/xeomx/Signal";
-import { ConnectSection } from "@/components/xeomx/ConnectSection";
+// Lazy-load below-the-fold interactive block to free the main thread during hydration.
+const ConnectSection = lazy(() =>
+  import("@/components/xeomx/ConnectSection").then((m) => ({ default: m.ConnectSection })),
+);
 import { Logo } from "@/components/xeomx/Logo";
 import heroImg from "@/assets/hero.jpg";
 import heroUpload from "@/assets/xeomx-hero-upload.jpg.asset.json";
@@ -267,7 +270,10 @@ function Index() {
         </div>
       </div>
 
-      <main className="mx-auto max-w-[1400px] space-y-16 py-12">
+      <main
+        className="mx-auto max-w-[1400px] space-y-16 py-12"
+        style={{ contain: "content" }}
+      >
         {isFiltering ? (
           <section className="space-y-6 px-4 sm:px-8">
             <h2 className="font-display text-2xl font-semibold sm:text-3xl">
@@ -445,9 +451,15 @@ function Index() {
         )}
       </main>
 
-      {!isFiltering && <ConnectSection />}
+      {!isFiltering && (
+        <Suspense fallback={<div style={{ minHeight: 240 }} aria-hidden />}>
+          <div style={{ contain: "content" }}>
+            <ConnectSection />
+          </div>
+        </Suspense>
+      )}
 
-      <footer className="mt-16 border-t border-border/60 bg-surface/30">
+      <footer className="mt-16 border-t border-border/60 bg-surface/30" style={{ contain: "content" }}>
         <div className="mx-auto max-w-[1400px] px-4 py-12 sm:px-8">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <div>

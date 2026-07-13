@@ -244,6 +244,22 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
 
+  // Production runtime sanitization: silence noisy console.log/info/debug/warn
+  // in production builds (preserve console.error for real errors). Guarded by
+  // import.meta.env.PROD so DX in dev is unaffected.
+  useEffect(() => {
+    if (!import.meta.env.PROD) return;
+    const noop = () => {};
+    // eslint-disable-next-line no-console
+    console.log = noop;
+    // eslint-disable-next-line no-console
+    console.info = noop;
+    // eslint-disable-next-line no-console
+    console.debug = noop;
+    // eslint-disable-next-line no-console
+    console.warn = noop;
+  }, []);
+
   // Global auth listener: keeps router + query cache in sync across tabs.
   // Supabase persists sessions to localStorage; storage events propagate
   // sign-in/out to every open tab, and this listener fires there too.

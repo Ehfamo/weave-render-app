@@ -118,7 +118,7 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 rounded-full border border-border bg-surface/60 p-1 pe-3 transition hover:border-magenta/40">
                   {avatar ? (
-                    <img src={avatar} alt={name} className="h-7 w-7 rounded-full object-cover" referrerPolicy="no-referrer" />
+                    <img src={avatar} alt={name} width={28} height={28} loading="lazy" decoding="async" className="h-7 w-7 rounded-full object-cover" referrerPolicy="no-referrer" />
                   ) : (
                     <span className="grid h-7 w-7 place-items-center rounded-full text-xs font-semibold text-white" style={{ background: "var(--gradient-magenta)" }}>
                       {name.slice(0, 1).toUpperCase()}

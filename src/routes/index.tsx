@@ -216,7 +216,16 @@ function Index() {
             params={{ id: featured.id }}
             className="group relative ms-auto hidden w-[340px] shrink-0 overflow-hidden rounded-3xl border border-border shadow-[var(--shadow-card)] lg:block"
           >
-            <img src={featured.cover} alt={featured.title} className="aspect-[3/4] w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <img
+              src={featured.cover}
+              alt={featured.title}
+              width={340}
+              height={453}
+              loading="eager"
+              decoding="sync"
+              fetchPriority="high"
+              className="aspect-[3/4] w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
             <div className="absolute inset-x-0 bottom-0 p-5">
               <span className="rounded-full px-2.5 py-1 text-[11px] font-medium" style={{ background: "var(--gradient-gold)", color: "oklch(0.18 0.02 60)" }}>
                 Premium
@@ -345,13 +354,17 @@ function Index() {
                     className="group relative overflow-hidden rounded-3xl border border-border bg-surface"
                   >
                     <div className="relative aspect-[9/14] overflow-hidden">
-                      <img src={p.cover} alt={p.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                      <img src={p.cover} alt={p.title} loading="lazy" decoding="async" width={720} height={1120} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
                       <div className="absolute start-3 top-3"><SignalBadge signal={p.signal ?? null} score={p.viralScore} /></div>
                       <div className="absolute end-3 top-3 flex flex-col gap-2">
-                        {[Heart, MessageCircle, Share2].map((Icon, i) => (
-                          <span key={i} className="grid h-10 w-10 place-items-center rounded-full border border-foreground/20 bg-background/40 backdrop-blur transition hover:border-magenta/60">
-                            <Icon className="h-4 w-4" />
+                        {[
+                          { Icon: Heart, label: "Like" },
+                          { Icon: MessageCircle, label: "Comment" },
+                          { Icon: Share2, label: "Share" },
+                        ].map(({ Icon, label }) => (
+                          <span key={label} aria-label={label} role="img" className="grid h-10 w-10 place-items-center rounded-full border border-foreground/20 bg-background/40 backdrop-blur transition hover:border-magenta/60">
+                            <Icon aria-hidden="true" className="h-4 w-4" />
                           </span>
                         ))}
                       </div>
@@ -403,7 +416,7 @@ function Index() {
 
             {/* COMING SOON BANNER */}
             <section className="relative mx-4 overflow-hidden rounded-3xl border border-border sm:mx-8">
-              <img src={heroImg} alt="" className="absolute inset-0 h-full w-full object-cover opacity-60" />
+              <img src={heroImg} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover opacity-60" />
               <div className="absolute inset-0" style={{ background: "linear-gradient(120deg, oklch(0.13 0.012 40 / 0.9), oklch(0.13 0.012 40 / 0.4))" }} />
               <div className="relative grid gap-6 p-8 sm:p-14 lg:grid-cols-[1fr_auto] lg:items-center">
                 <div className="max-w-xl">

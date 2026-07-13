@@ -9,6 +9,7 @@ import { ExploreRow } from "@/components/xeomx/ExploreRow";
 import { PromptCard } from "@/components/xeomx/PromptCard";
 import { CORE_SECTIONS, EXPLORE_CATEGORIES, EXPLORE_SECTIONS } from "@/lib/explore-sections";
 import { searchAll } from "@/lib/marketplace";
+import { HeroBackground, heroPreloadLinks } from "@/components/xeomx/HeroBackground";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -22,7 +23,10 @@ export const Route = createFileRoute("/prompt-hub")({
       { property: "og:type", content: "website" },
       { property: "og:url", content: pageUrl("/prompt-hub") },
     ],
-    links: [{ rel: "canonical", href: pageUrl("/prompt-hub") }],
+    links: [
+      { rel: "canonical", href: pageUrl("/prompt-hub") },
+      ...heroPreloadLinks,
+    ],
   }),
   component: PromptHubPage,
 });
@@ -72,12 +76,17 @@ function PromptHubPage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border/60">
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <HeroBackground />
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
+        </div>
         <div className="pointer-events-none absolute inset-0" style={{ background: "var(--gradient-spotlight)" }} />
         <div className="pointer-events-none absolute -left-32 top-10 h-72 w-72 rounded-full opacity-30 blur-3xl" style={{ background: "var(--gradient-gold)" }} />
         <div className="pointer-events-none absolute -right-32 bottom-0 h-80 w-80 rounded-full opacity-20 blur-3xl" style={{ background: "var(--gradient-magenta)" }} />
 
         <div className="relative mx-auto max-w-[1400px] px-4 py-16 sm:px-8 sm:py-24">
-          <Link to="/" className="mb-8 inline-flex items-center gap-2 text-xs text-muted-foreground transition hover:text-foreground">
+          <Link to="/" className="mb-8 inline-flex items-center gap-2 py-2 text-xs text-muted-foreground transition hover:text-foreground">
             <ArrowLeft className="h-3.5 w-3.5" /> {m.explore_hero_back()}
           </Link>
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-amber-300/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200">

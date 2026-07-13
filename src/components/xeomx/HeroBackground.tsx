@@ -7,6 +7,9 @@ import heroFallback from "@/assets/xeomx-hero-upload.jpg.asset.json";
 export const HERO_SRCSET = `${hero640.url} 640w, ${hero1024.url} 1024w, ${hero1600.url} 1600w`;
 export const HERO_SIZES = "(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1600px";
 export const HERO_FALLBACK = heroFallback.url;
+/** Base src for the <img>. Match the preload target (640w WebP) so mobile
+ *  reuses the preload response and avoids a 307 to the large JPG fallback. */
+export const HERO_SRC = hero640.url;
 export const HERO_LARGEST = hero1600.url;
 
 /**
@@ -18,7 +21,7 @@ export const HERO_LARGEST = hero1600.url;
 export function HeroBackground({ alt = "" }: { alt?: string }) {
   return (
     <img
-      src={HERO_FALLBACK}
+      src={HERO_SRC}
       srcSet={HERO_SRCSET}
       sizes={HERO_SIZES}
       alt={alt}

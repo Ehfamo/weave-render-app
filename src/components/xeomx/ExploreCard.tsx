@@ -24,9 +24,9 @@ export function ExploreCard({ section, index = 0, core = false }: { section: Exp
           alt=""
           loading="lazy"
           decoding="async"
-          className="absolute inset-0 h-full w-full object-cover opacity-30 transition-opacity duration-500 group-hover:opacity-45"
+          className="absolute inset-0 h-full w-full object-cover opacity-70 transition-opacity duration-500 group-hover:opacity-90"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/85 to-background/55" />
+        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-background via-background/80 to-transparent" />
       </div>
       <div className="flex items-start justify-between gap-3">
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-amber-300/20 to-fuchsia-500/10 ring-1 ring-white/10">

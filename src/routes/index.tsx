@@ -19,7 +19,7 @@ const ConnectSection = lazy(() =>
 );
 import { Logo } from "@/components/xeomx/Logo";
 import heroImg from "@/assets/hero.jpg";
-import heroUpload from "@/assets/xeomx-hero-upload.jpg.asset.json";
+import { HeroBackground, heroPreloadLinks } from "@/components/xeomx/HeroBackground";
 import { pageUrl } from "@/lib/seo";
 
 const CATEGORY_LABELS: Record<string, () => string> = {
@@ -43,12 +43,7 @@ export const Route = createFileRoute("/")({
     ],
     links: [
       { rel: "canonical", href: pageUrl("/") },
-      {
-        rel: "preload",
-        as: "image",
-        href: heroUpload.url,
-        fetchpriority: "high",
-      } as unknown as Record<string, string>,
+      ...heroPreloadLinks,
     ],
   }),
   component: Index,
@@ -100,15 +95,7 @@ function Index() {
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `url(${heroUpload.url})`,
-              backgroundSize: "cover",
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "right center",
-            }}
-          />
+          <HeroBackground />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/30" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
         </div>

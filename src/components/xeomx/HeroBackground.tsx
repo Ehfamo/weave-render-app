@@ -7,6 +7,9 @@ import heroFallback from "@/assets/xeomx-hero-upload.jpg.asset.json";
 export const HERO_SRCSET = `${hero640.url} 640w, ${hero1024.url} 1024w, ${hero1600.url} 1600w`;
 export const HERO_SIZES = "(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1600px";
 export const HERO_FALLBACK = heroFallback.url;
+/** Base src for the <img>. Match the preload target (640w WebP) so mobile
+ *  reuses the preload response and avoids a 307 to the large JPG fallback. */
+export const HERO_SRC = hero640.url;
 export const HERO_LARGEST = hero1600.url;
 
 /**
@@ -18,7 +21,7 @@ export const HERO_LARGEST = hero1600.url;
 export function HeroBackground({ alt = "" }: { alt?: string }) {
   return (
     <img
-      src={HERO_FALLBACK}
+      src={HERO_SRC}
       srcSet={HERO_SRCSET}
       sizes={HERO_SIZES}
       alt={alt}
@@ -34,14 +37,19 @@ export function HeroBackground({ alt = "" }: { alt?: string }) {
   );
 }
 
-/** Preload link entries to attach to a route's head().links for the hero LCP. */
+/**
+ * Preload link entries to attach to a route's head().links for the hero LCP.
+ * We preload the mobile (640w) WebP directly: it's what mobile picks from the
+ * srcset (mobile is where LCP is the bottleneck), it matches the `<img>` fetch
+ * exactly so there's no duplicate download or 307 redirect chase, and it keeps
+ * the tag to a single well-formed `href` (no framework-stripped attributes
+ * leaving an empty-href sibling in the emitted HTML).
+ */
 export const heroPreloadLinks = [
   {
     rel: "preload",
     as: "image",
-    href: hero1024.url,
-    imagesrcset: HERO_SRCSET,
-    imagesizes: HERO_SIZES,
+    href: hero640.url,
     fetchpriority: "high",
     type: "image/webp",
   } as unknown as Record<string, string>,

@@ -137,7 +137,7 @@ function PromptHubPage() {
       {/* Core sections */}
       {filteredCore.length > 0 && (
         <section
-          className="mx-auto max-w-[1400px]"
+          className="mx-auto w-full max-w-full overflow-x-hidden lg:max-w-[1400px]"
           style={{ paddingInline: "var(--space-4)", paddingTop: "var(--space-6)" }}
         >
           <div
@@ -181,7 +181,7 @@ function PromptHubPage() {
 
       {/* Category rows */}
       <div
-        className="mx-auto max-w-[1400px]"
+        className="mx-auto w-full max-w-full overflow-x-hidden lg:max-w-[1400px]"
         style={{
           paddingBlock: "var(--space-7)",
           display: "flex",

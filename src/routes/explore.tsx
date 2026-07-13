@@ -9,6 +9,7 @@ import { ExploreRow } from "@/components/xeomx/ExploreRow";
 import { PromptCard } from "@/components/xeomx/PromptCard";
 import { CORE_SECTIONS, EXPLORE_CATEGORIES, EXPLORE_SECTIONS } from "@/lib/explore-sections";
 import { searchAll } from "@/lib/marketplace";
+import heroUpload from "@/assets/xeomx-hero-upload.jpg.asset.json";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -72,6 +73,19 @@ function ExplorePage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border/60">
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url(${heroUpload.url})`,
+              backgroundSize: "cover",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "right center",
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
+        </div>
         <div className="pointer-events-none absolute inset-0" style={{ background: "var(--gradient-spotlight)" }} />
         <div className="pointer-events-none absolute -left-32 top-10 h-72 w-72 rounded-full opacity-30 blur-3xl" style={{ background: "var(--gradient-gold)" }} />
         <div className="pointer-events-none absolute -right-32 bottom-0 h-80 w-80 rounded-full opacity-20 blur-3xl" style={{ background: "var(--gradient-magenta)" }} />

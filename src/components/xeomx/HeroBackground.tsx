@@ -34,14 +34,19 @@ export function HeroBackground({ alt = "" }: { alt?: string }) {
   );
 }
 
-/** Preload link entries to attach to a route's head().links for the hero LCP. */
+/**
+ * Preload link entries to attach to a route's head().links for the hero LCP.
+ * We preload the mobile (640w) WebP directly: it's what mobile picks from the
+ * srcset (mobile is where LCP is the bottleneck), it matches the `<img>` fetch
+ * exactly so there's no duplicate download or 307 redirect chase, and it keeps
+ * the tag to a single well-formed `href` (no framework-stripped attributes
+ * leaving an empty-href sibling in the emitted HTML).
+ */
 export const heroPreloadLinks = [
   {
     rel: "preload",
     as: "image",
-    href: hero1024.url,
-    imagesrcset: HERO_SRCSET,
-    imagesizes: HERO_SIZES,
+    href: hero640.url,
     fetchpriority: "high",
     type: "image/webp",
   } as unknown as Record<string, string>,

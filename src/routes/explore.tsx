@@ -211,7 +211,7 @@ function ExplorePage() {
               <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{m.footer_tagline()}</p>
             </div>
             <div>
-              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.footer_platform()}</h4>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.footer_platform()}</h3>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                 <li><Link to="/" className="transition hover:text-foreground">{m.explore_footer_discover()}</Link></li>
                 <li><Link to="/feed" className="transition hover:text-foreground">{m.explore_footer_viral()}</Link></li>
@@ -221,7 +221,7 @@ function ExplorePage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.explore_footer_coming()}</h4>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.explore_footer_coming()}</h3>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                 <li><Link to="/explore/$slug" params={{ slug: "studio-canvas" }} className="transition hover:text-foreground">Studio Canvas</Link></li>
                 <li><Link to="/explore/$slug" params={{ slug: "agent-store" }} className="transition hover:text-foreground">Agent Store</Link></li>
@@ -231,7 +231,7 @@ function ExplorePage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.footer_legal()}</h4>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.footer_legal()}</h3>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                 <li><Link to="/terms" className="transition hover:text-foreground">{m.footer_terms()}</Link></li>
                 <li><Link to="/privacy" className="transition hover:text-foreground">{m.footer_privacy()}</Link></li>

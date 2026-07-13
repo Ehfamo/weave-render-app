@@ -16,7 +16,7 @@ import { SignalBadge } from "@/components/xeomx/Signal";
 import { ConnectSection } from "@/components/xeomx/ConnectSection";
 import { Logo } from "@/components/xeomx/Logo";
 import heroImg from "@/assets/hero.jpg";
-import cover1 from "@/assets/cover-1.jpg";
+import heroUpload from "@/assets/xeomx-hero-upload.jpg.asset.json";
 import { pageUrl } from "@/lib/seo";
 
 const CATEGORY_LABELS: Record<string, () => string> = {

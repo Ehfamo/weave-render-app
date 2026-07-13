@@ -15,6 +15,7 @@ import { Route as StudioRouteImport } from './routes/studio'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
+import { Route as PromptHubRouteImport } from './routes/prompt-hub'
 import { Route as ProfileEditRouteImport } from './routes/profile-edit'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
@@ -63,6 +64,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const RefundPolicyRoute = RefundPolicyRouteImport.update({
   id: '/refund-policy',
   path: '/refund-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PromptHubRoute = PromptHubRouteImport.update({
+  id: '/prompt-hub',
+  path: '/prompt-hub',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileEditRoute = ProfileEditRouteImport.update({
@@ -174,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/profile-edit': typeof ProfileEditRoute
+  '/prompt-hub': typeof PromptHubRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
@@ -200,6 +207,7 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/profile-edit': typeof ProfileEditRoute
+  '/prompt-hub': typeof PromptHubRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
@@ -228,6 +236,7 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/profile-edit': typeof ProfileEditRoute
+  '/prompt-hub': typeof PromptHubRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
@@ -256,6 +265,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/profile-edit'
+    | '/prompt-hub'
     | '/refund-policy'
     | '/reset-password'
     | '/settings'
@@ -282,6 +292,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/profile-edit'
+    | '/prompt-hub'
     | '/refund-policy'
     | '/reset-password'
     | '/settings'
@@ -309,6 +320,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/profile-edit'
+    | '/prompt-hub'
     | '/refund-policy'
     | '/reset-password'
     | '/settings'
@@ -337,6 +349,7 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileEditRoute: typeof ProfileEditRoute
+  PromptHubRoute: typeof PromptHubRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SettingsRoute: typeof SettingsRoute
@@ -389,6 +402,13 @@ declare module '@tanstack/react-router' {
       path: '/refund-policy'
       fullPath: '/refund-policy'
       preLoaderRoute: typeof RefundPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prompt-hub': {
+      id: '/prompt-hub'
+      path: '/prompt-hub'
+      fullPath: '/prompt-hub'
+      preLoaderRoute: typeof PromptHubRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile-edit': {
@@ -577,6 +597,7 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileEditRoute: ProfileEditRoute,
+  PromptHubRoute: PromptHubRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SettingsRoute: SettingsRoute,
@@ -589,13 +610,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

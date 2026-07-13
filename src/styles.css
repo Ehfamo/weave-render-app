@@ -120,7 +120,7 @@
   --secondary: oklch(0.22 0.018 40);
   --secondary-foreground: oklch(0.96 0.012 80);
   --muted: oklch(0.2 0.014 40);
-  --muted-foreground: oklch(0.78 0.02 70);
+  --muted-foreground: oklch(0.82 0.02 70);
   --accent: oklch(0.81 0.13 80);
   --accent-foreground: oklch(0.18 0.02 60);
   --destructive: oklch(0.62 0.25 25);
@@ -207,8 +207,8 @@
   /* Semantic — text */
   --text-primary: #ffffff;
   --text-secondary: #e5e5e5;
-  --text-tertiary: #b8b8b8;
-  --text-muted: #a3a3a3;
+  --text-tertiary: #c9c9c9;
+  --text-muted: #b8b8b8;
   --text-disabled: #737373;
 
   /* Semantic — borders */
@@ -271,6 +271,7 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     background-image:
       radial-gradient(60rem 40rem at 80% -10%, oklch(0.68 0.28 0 / 0.18), transparent 60%),

@@ -220,7 +220,7 @@ function Index() {
               <span className="rounded-full px-2.5 py-1 text-[11px] font-medium" style={{ background: "var(--gradient-gold)", color: "oklch(0.18 0.02 60)" }}>
                 Premium
               </span>
-              <h3 className="mt-3 font-display text-2xl font-semibold tracking-tight">{featured.title}</h3>
+              <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight">{featured.title}</h2>
               <p className="text-xs text-muted-foreground">{featured.author} · {featured.views} views</p>
             </div>
           </Link>
@@ -240,7 +240,7 @@ function Index() {
               <button
                 key={c}
                 onClick={() => setCat(c)}
-                className={`shrink-0 rounded-full border px-4 py-1.5 text-xs font-medium tracking-wide transition ${
+                className={`shrink-0 rounded-full border px-4 py-2 text-xs font-medium tracking-wide transition ${
                   active
                     ? "border-transparent text-white"
                     : "border-border bg-surface/40 text-muted-foreground hover:border-magenta/40 hover:text-foreground"

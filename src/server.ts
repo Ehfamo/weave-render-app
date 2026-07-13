@@ -156,6 +156,16 @@ export default {
     }
     try {
       const handler = await getServerEntry();
+      // Static asset requests must never carry a locale prefix. Some crawlers /
+      // preload hints rewrite absolute /__l5e/... paths as /en/__l5e/... when a
+      // page is served under a locale prefix, producing hard 404s. Strip the
+      // locale segment before delegating so the asset resolves normally.
+      const assetUrl = new URL(request.url);
+      const localeAsset = assetUrl.pathname.match(/^\/(en|fa|ar|zh|hi)(\/(?:__l5e|assets)\/.*)$/);
+      if (localeAsset) {
+        assetUrl.pathname = localeAsset[2];
+        return Response.redirect(assetUrl.toString(), 301);
+      }
       const response = await paraglideMiddleware(request, async () => {
         return handler.fetch(request, env, ctx);
       });

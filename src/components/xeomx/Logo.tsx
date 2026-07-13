@@ -49,7 +49,7 @@ export function Logo({
           className="font-display font-bold tracking-tight leading-none"
           style={{ fontSize: Math.round(size * 0.62) }}
         >
-          XEO<span className="text-gradient-magenta">MX</span>
+          XEO<span className="text-gradient-magenta" aria-hidden="true">MX</span>
         </span>
       )}
     </span>

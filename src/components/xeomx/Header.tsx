@@ -33,7 +33,7 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
             <button
               type="button"
               aria-label="Open menu"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface/60 text-foreground transition hover:border-magenta/40 lg:hidden"
+              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-border bg-surface/60 text-foreground transition hover:border-magenta/40 lg:hidden"
             >
               <Menu className="h-4 w-4" />
             </button>
@@ -100,7 +100,7 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
           </Link>
         </nav>
 
-        <div className="ms-auto flex flex-1 items-center gap-3 sm:flex-none">
+        <div className="ms-auto flex shrink-0 items-center gap-2 sm:flex-none sm:gap-3">
           <label className="group relative flex w-full items-center sm:w-80">
             <Search className="absolute start-3 h-4 w-4 text-muted-foreground" />
             <input

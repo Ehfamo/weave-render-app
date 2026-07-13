@@ -86,7 +86,7 @@ function ExplorePage() {
         <div className="pointer-events-none absolute -right-32 bottom-0 h-80 w-80 rounded-full opacity-20 blur-3xl" style={{ background: "var(--gradient-magenta)" }} />
 
         <div className="relative mx-auto max-w-[1400px] px-4 py-16 sm:px-8 sm:py-24">
-          <Link to="/" className="mb-8 inline-flex items-center gap-2 text-xs text-muted-foreground transition hover:text-foreground">
+          <Link to="/" className="mb-8 inline-flex items-center gap-2 py-2 text-xs text-muted-foreground transition hover:text-foreground">
             <ArrowLeft className="h-3.5 w-3.5" /> {m.explore_hero_back()}
           </Link>
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-amber-300/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200">

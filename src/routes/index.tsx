@@ -211,9 +211,8 @@ function Index() {
               alt={featured.title}
               width={340}
               height={453}
-              loading="eager"
-              decoding="sync"
-              fetchPriority="high"
+              loading="lazy"
+              decoding="async"
               className="aspect-[3/4] w-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div className="absolute inset-x-0 bottom-0 p-5">

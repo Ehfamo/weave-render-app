@@ -1,4 +1,4 @@
-import logoSymbol from "@/assets/logo-symbol.png";
+import logoSymbol from "@/assets/logo-symbol.webp";
 
 type LogoProps = {
   /** "full" = mark + wordmark, "symbol" = mark only, "wordmark" = text only */
@@ -12,7 +12,7 @@ type LogoProps = {
 
 /**
  * Official XEOMX brand mark.
- * Source of truth: /src/assets/logo-symbol.png (extracted from the brand guide).
+ * Source of truth: /src/assets/logo-symbol.webp (extracted from the brand guide).
  * Do not swap this component's imagery without a brand review.
  */
 export function Logo({

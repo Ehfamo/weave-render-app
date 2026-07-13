@@ -191,6 +191,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "manifest", href: "/site.webmanifest" },
       { rel: "preconnect", href: "https://ovqhdzppfbdvnzuglukf.supabase.co", crossOrigin: "anonymous" },
       { rel: "dns-prefetch", href: "https://ovqhdzppfbdvnzuglukf.supabase.co" },
+      // Warm the custom-domain origin early so the LCP asset request skips a
+      // fresh TLS+DNS roundtrip on cold mobile connections.
+      { rel: "preconnect", href: "https://xeomx.com", crossOrigin: "anonymous" },
+      { rel: "dns-prefetch", href: "https://xeomx.com" },
       ...LOCALES.map((loc) => ({
         rel: "alternate",
         hrefLang: loc,

@@ -27,7 +27,7 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
     "You";
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-[1400px] items-center gap-4 px-4 py-3 sm:px-8">
+      <div className="mx-auto flex w-full max-w-[1400px] items-center gap-2 px-3 py-3 sm:gap-4 sm:px-8">
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger asChild>
             <button
@@ -100,8 +100,8 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
           </Link>
         </nav>
 
-        <div className="ms-auto flex shrink-0 items-center gap-2 sm:flex-none sm:gap-3">
-          <label className="group relative flex w-full items-center sm:w-80">
+        <div className="ms-auto flex min-w-0 shrink-0 items-center gap-1.5 sm:flex-none sm:gap-3">
+          <label className="group relative hidden w-full items-center sm:flex sm:w-80">
             <Search className="absolute start-3 h-4 w-4 text-muted-foreground" />
             <input
               value={query ?? ""}
@@ -151,14 +151,14 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
               <Link
                 to="/auth"
                 search={{ next: undefined }}
-                className="inline-flex rounded-full border border-border bg-surface/60 px-3 py-2 text-xs text-foreground transition hover:border-magenta/40 sm:px-4 sm:text-sm"
+                className="inline-flex shrink-0 rounded-full border border-border bg-surface/60 px-2.5 py-2 text-xs text-foreground transition hover:border-magenta/40 sm:px-4 sm:text-sm"
               >
                 {m.nav_sign_in()}
               </Link>
               <Link
                 to="/auth"
                 search={{ next: undefined }}
-                className="rounded-full px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+                className="hidden shrink-0 rounded-full px-4 py-2 text-sm font-medium text-white transition hover:opacity-90 sm:inline-flex"
                 style={{ background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)" }}
               >
                 {m.nav_go_pro()}

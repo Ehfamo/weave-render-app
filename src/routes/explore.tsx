@@ -23,7 +23,15 @@ export const Route = createFileRoute("/explore")({
       { property: "og:type", content: "website" },
       { property: "og:url", content: pageUrl("/explore") },
     ],
-    links: [{ rel: "canonical", href: pageUrl("/explore") }],
+    links: [
+      { rel: "canonical", href: pageUrl("/explore") },
+      {
+        rel: "preload",
+        as: "image",
+        href: heroUpload.url,
+        fetchpriority: "high",
+      } as unknown as Record<string, string>,
+    ],
   }),
   component: ExplorePage,
 });

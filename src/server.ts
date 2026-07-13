@@ -120,6 +120,19 @@ function applySecurityHeaders(response: Response, request: Request): Response {
     h.set("cache-control", "private, no-store");
   }
 
+  // Long-lived immutable cache for CDN assets, fonts, images, JS/CSS bundles.
+  // These paths are content-hashed or asset-id addressed, so they are safe to cache aggressively.
+  if (!isHtml && !h.has("cache-control")) {
+    const p = new URL(request.url).pathname;
+    const isImmutable =
+      p.startsWith("/__l5e/") ||
+      p.startsWith("/assets/") ||
+      /\.(?:js|css|woff2?|ttf|otf|eot|webp|avif|jpe?g|png|gif|svg|ico|mp4|webm|wasm)$/i.test(p);
+    if (isImmutable) {
+      h.set("cache-control", "public, max-age=31536000, immutable");
+    }
+  }
+
   // Belt & braces: block clickjacking for HTML on custom domains too.
   void request;
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers: h });

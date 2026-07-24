@@ -17,6 +17,7 @@ export const Route = createFileRoute("/studio")({
       { property: "og:description", content: m.studio_head_desc() },
       { property: "og:type", content: "website" },
       { property: "og:url", content: pageUrl("/studio") },
+      { name: "robots", content: "noindex,follow" },
     ],
     links: [{ rel: "canonical", href: pageUrl("/studio") }],
   }),

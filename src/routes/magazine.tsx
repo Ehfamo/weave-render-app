@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ArrowRight, Search, Clock } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
 import { pageUrl } from "@/lib/seo";
+import { FeatureStatusBadge } from "@/components/xeomx/status/FeatureStatusBadge";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -91,6 +92,11 @@ export const ARTICLES: Article[] = [
     readTime: 8,
   },
 ];
+
+// Slugs whose article body is fully written. Others render as
+// ARTICLE COMING SOON on the detail route and get a status badge here.
+// Keep in sync with LIVE_ARTICLE_SLUGS in ./magazine.$slug.tsx
+const LIVE_ARTICLE_SLUGS = new Set(["nocturne-baroque-muse"]);
 
 const COLLECTIONS = [
   { slug: "cyber-noir-series", title: "Cyber Noir Series", count: 24, tone: "news" as Category },
@@ -380,6 +386,7 @@ function HeroFeature({ article }: { article: Article }) {
 
 function ArticleCard({ article, size }: { article: Article; size: "md" | "sm" }) {
   const titleSize = size === "md" ? "var(--font-size-h3)" : "var(--font-size-body-lg)";
+  const isLive = LIVE_ARTICLE_SLUGS.has(article.slug);
   return (
     <Link
       to="/magazine/$slug"
@@ -389,17 +396,20 @@ function ArticleCard({ article, size }: { article: Article; size: "md" | "sm" })
     >
       <div aria-hidden style={{ aspectRatio: "16/10", background: CAT_GRADIENT[article.category] }} />
       <div className="flex flex-col" style={{ padding: "var(--space-4)", gap: "var(--space-3)" }}>
-        <span
-          style={{
-            fontSize: "var(--font-size-micro)",
-            color: CAT_COLOR[article.category],
-            textTransform: "uppercase",
-            letterSpacing: "0.2em",
-            fontWeight: 600,
-          }}
-        >
-          {catLabel(article.category)}
-        </span>
+        <div className="flex items-center gap-2">
+          <span
+            style={{
+              fontSize: "var(--font-size-micro)",
+              color: CAT_COLOR[article.category],
+              textTransform: "uppercase",
+              letterSpacing: "0.2em",
+              fontWeight: 600,
+            }}
+          >
+            {catLabel(article.category)}
+          </span>
+          {!isLive ? <FeatureStatusBadge status="coming_soon" size="xs" /> : null}
+        </div>
         <h3
           className="font-display font-semibold"
           style={{ fontSize: titleSize, color: "var(--text-primary)", lineHeight: 1.25, letterSpacing: "-0.01em" }}

@@ -3,6 +3,7 @@ import { pageUrl } from "@/lib/seo";
 import { motion } from "motion/react";
 import { Check } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
+import { PreviewNotice } from "@/components/xeomx/status/PreviewNotice";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -15,6 +16,7 @@ export const Route = createFileRoute("/pricing")({
       { property: "og:description", content: m.pricing_head_desc() },
       { property: "og:type", content: "website" },
       { property: "og:url", content: pageUrl("/pricing") },
+      { name: "robots", content: "noindex,follow" },
     ],
     links: [{ rel: "canonical", href: pageUrl("/pricing") }],
   }),
@@ -76,6 +78,9 @@ function PricingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
+      <div className="mx-auto max-w-[1200px]" style={{ paddingInline: "var(--space-4)", paddingTop: "var(--space-6)" }}>
+        <PreviewNotice status="coming_soon" body={m.pricing_preview_notice()} />
+      </div>
       <section
         className="mx-auto max-w-[1200px] text-center"
         style={{ paddingInline: "var(--space-4)", paddingTop: "var(--space-9)", paddingBottom: "var(--space-7)" }}

@@ -34,6 +34,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PromptIdRouteImport } from './routes/prompt.$id'
 import { Route as MagazineSlugRouteImport } from './routes/magazine.$slug'
 import { Route as ExploreSlugRouteImport } from './routes/explore_.$slug'
+import { Route as CreatorsHandleRouteImport } from './routes/creators.$handle'
 import { Route as CollectionsIdRouteImport } from './routes/collections.$id'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -162,6 +163,11 @@ const ExploreSlugRoute = ExploreSlugRouteImport.update({
   path: '/explore/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CreatorsHandleRoute = CreatorsHandleRouteImport.update({
+  id: '/$handle',
+  path: '/$handle',
+  getParentRoute: () => CreatorsRoute,
+} as any)
 const CollectionsIdRoute = CollectionsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -184,7 +190,7 @@ export interface FileRoutesByFullPath {
   '/collections': typeof CollectionsRouteWithChildren
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
-  '/creators': typeof CreatorsRoute
+  '/creators': typeof CreatorsRouteWithChildren
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -203,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/collections/$id': typeof CollectionsIdRoute
+  '/creators/$handle': typeof CreatorsHandleRoute
   '/explore/$slug': typeof ExploreSlugRoute
   '/magazine/$slug': typeof MagazineSlugRoute
   '/prompt/$id': typeof PromptIdRoute
@@ -213,7 +220,7 @@ export interface FileRoutesByTo {
   '/collections': typeof CollectionsRouteWithChildren
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
-  '/creators': typeof CreatorsRoute
+  '/creators': typeof CreatorsRouteWithChildren
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -232,6 +239,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/collections/$id': typeof CollectionsIdRoute
+  '/creators/$handle': typeof CreatorsHandleRoute
   '/explore/$slug': typeof ExploreSlugRoute
   '/magazine/$slug': typeof MagazineSlugRoute
   '/prompt/$id': typeof PromptIdRoute
@@ -244,7 +252,7 @@ export interface FileRoutesById {
   '/collections': typeof CollectionsRouteWithChildren
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
-  '/creators': typeof CreatorsRoute
+  '/creators': typeof CreatorsRouteWithChildren
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -263,6 +271,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/collections/$id': typeof CollectionsIdRoute
+  '/creators/$handle': typeof CreatorsHandleRoute
   '/explore_/$slug': typeof ExploreSlugRoute
   '/magazine/$slug': typeof MagazineSlugRoute
   '/prompt/$id': typeof PromptIdRoute
@@ -294,6 +303,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/saved'
     | '/collections/$id'
+    | '/creators/$handle'
     | '/explore/$slug'
     | '/magazine/$slug'
     | '/prompt/$id'
@@ -323,6 +333,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/saved'
     | '/collections/$id'
+    | '/creators/$handle'
     | '/explore/$slug'
     | '/magazine/$slug'
     | '/prompt/$id'
@@ -353,6 +364,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/saved'
     | '/collections/$id'
+    | '/creators/$handle'
     | '/explore_/$slug'
     | '/magazine/$slug'
     | '/prompt/$id'
@@ -365,7 +377,7 @@ export interface RootRouteChildren {
   CollectionsRoute: typeof CollectionsRouteWithChildren
   ContactRoute: typeof ContactRoute
   CookiesRoute: typeof CookiesRoute
-  CreatorsRoute: typeof CreatorsRoute
+  CreatorsRoute: typeof CreatorsRouteWithChildren
   ExploreRoute: typeof ExploreRoute
   FeedRoute: typeof FeedRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -562,6 +574,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExploreSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/creators/$handle': {
+      id: '/creators/$handle'
+      path: '/$handle'
+      fullPath: '/creators/$handle'
+      preLoaderRoute: typeof CreatorsHandleRouteImport
+      parentRoute: typeof CreatorsRoute
+    }
     '/collections/$id': {
       id: '/collections/$id'
       path: '/$id'
@@ -611,6 +630,18 @@ const CollectionsRouteWithChildren = CollectionsRoute._addFileChildren(
   CollectionsRouteChildren,
 )
 
+interface CreatorsRouteChildren {
+  CreatorsHandleRoute: typeof CreatorsHandleRoute
+}
+
+const CreatorsRouteChildren: CreatorsRouteChildren = {
+  CreatorsHandleRoute: CreatorsHandleRoute,
+}
+
+const CreatorsRouteWithChildren = CreatorsRoute._addFileChildren(
+  CreatorsRouteChildren,
+)
+
 interface MagazineRouteChildren {
   MagazineSlugRoute: typeof MagazineSlugRoute
 }
@@ -630,7 +661,7 @@ const rootRouteChildren: RootRouteChildren = {
   CollectionsRoute: CollectionsRouteWithChildren,
   ContactRoute: ContactRoute,
   CookiesRoute: CookiesRoute,
-  CreatorsRoute: CreatorsRoute,
+  CreatorsRoute: CreatorsRouteWithChildren,
   ExploreRoute: ExploreRoute,
   FeedRoute: FeedRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,

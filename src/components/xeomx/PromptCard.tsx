@@ -3,6 +3,7 @@ import { Bookmark, Copy, Crown, Lock, Play, Share2, Shuffle, Sparkles } from "lu
 import { useState } from "react";
 import type { Prompt } from "@/lib/prompts";
 import { SignalBadge } from "./Signal";
+import { DemoDataBadge } from "./status/DemoDataBadge";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -133,13 +134,12 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
               {prompt.title}
             </Link>
           </h3>
-          <p className="text-xs text-muted-foreground">
-            {prompt.author} · {prompt.views} {m.prompt_views()}
-          </p>
-          <div className="flex items-center gap-3 pt-1 text-[11px] text-muted-foreground">
+          <p className="text-xs text-muted-foreground">{prompt.author}</p>
+          <div className="flex items-center gap-2 pt-1 text-[11px] text-muted-foreground">
             <span className="inline-flex items-center gap-1"><Copy className="h-3 w-3" /> {fmt(prompt.copies)}</span>
             <span className="inline-flex items-center gap-1"><Bookmark className="h-3 w-3" /> {fmt(prompt.saves)}</span>
             <span className="inline-flex items-center gap-1"><Shuffle className="h-3 w-3" /> {fmt(prompt.remixes)}</span>
+            <DemoDataBadge variant="sample" className="ms-auto" />
           </div>
         </div>
         <button

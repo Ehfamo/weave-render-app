@@ -327,24 +327,27 @@ function Detail() {
                   <div className="flex gap-2">
                     <button
                       type="button"
-                      onClick={() => { if (requireAuth()) saveMut.mutate(!engagement?.saved); }}
+                      onClick={onSaveClick}
+                      aria-label={m.prompt_stat_saves()}
                       aria-pressed={!!engagement?.saved}
-                      className={`grid h-9 w-9 place-items-center rounded-full border transition ${engagement?.saved ? "border-magenta/60 bg-magenta/15 text-magenta" : "border-border bg-surface/60 hover:border-magenta/40"}`}
+                      className={`grid h-11 w-11 place-items-center rounded-full border transition ${engagement?.saved ? "border-magenta/60 bg-magenta/15 text-magenta" : "border-border bg-surface/60 hover:border-magenta/40"}`}
                     >
                       <Bookmark className="h-4 w-4" />
                     </button>
                     <button
                       type="button"
-                      onClick={() => { if (requireAuth()) likeMut.mutate(!engagement?.liked); }}
+                      onClick={onLikeClick}
+                      aria-label="Like prompt"
                       aria-pressed={!!engagement?.liked}
-                      className={`grid h-9 w-9 place-items-center rounded-full border transition ${engagement?.liked ? "border-magenta/60 bg-magenta/15 text-magenta" : "border-border bg-surface/60 hover:border-magenta/40"}`}
+                      className={`grid h-11 w-11 place-items-center rounded-full border transition ${engagement?.liked ? "border-magenta/60 bg-magenta/15 text-magenta" : "border-border bg-surface/60 hover:border-magenta/40"}`}
                     >
                       <Heart className={`h-4 w-4 ${engagement?.liked ? "fill-current" : ""}`} />
                     </button>
                     <button
                       type="button"
                       onClick={onShare}
-                      className="grid h-9 w-9 place-items-center rounded-full border border-border bg-surface/60 transition hover:border-magenta/40"
+                      aria-label="Share prompt"
+                      className="grid h-11 w-11 place-items-center rounded-full border border-border bg-surface/60 transition hover:border-magenta/40"
                     >
                       <Share2 className="h-4 w-4" />
                     </button>

@@ -395,3 +395,55 @@ export async function searchAll(query: string) {
   const prompts = await fetchPromptsList({ search: s, limit: 20 });
   return { prompts };
 }
+
+// -------------------- Saved library --------------------
+
+export async function fetchSavedPromptsForUser(userId: string): Promise<Prompt[]> {
+  const { data, error } = await supabase
+    .from("saves")
+    .select(
+      "created_at, prompt:prompts!inner(" + PROMPT_LIST_SELECT + ")"
+    )
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (error) throw error;
+  const rows = (data ?? []) as unknown as Array<{ prompt: PromptRow | null }>;
+  return rows
+    .map((r) => r.prompt)
+    .filter((p): p is PromptRow => !!p && p.is_published)
+    .map(toPromptCard);
+}
+
+// -------------------- Creator profile --------------------
+
+export type CreatorProfile = {
+  id: string;
+  username: string | null;
+  display_name: string | null;
+  bio: string | null;
+  avatar_url: string | null;
+};
+
+export async function fetchProfileByUsername(username: string): Promise<CreatorProfile | null> {
+  const clean = username.replace(/^@/, "").toLowerCase();
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, username, display_name, bio, avatar_url")
+    .ilike("username", clean)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as CreatorProfile | null) ?? null;
+}
+
+export async function fetchPromptsByAuthor(authorId: string, limit = 24): Promise<Prompt[]> {
+  const { data, error } = await supabase
+    .from("prompts")
+    .select(PROMPT_LIST_SELECT)
+    .eq("author_id", authorId)
+    .eq("is_published", true)
+    .order("published_at", { ascending: false, nullsFirst: false })
+    .limit(limit);
+  if (error) throw error;
+  return (data as unknown as PromptRow[]).map(toPromptCard);
+}

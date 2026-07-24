@@ -107,15 +107,18 @@ export const Route = createFileRoute("/prompt/$id")({
 });
 
 function Detail() {
-  const { prompt, promptId } = Route.useLoaderData();
+  const { prompt, promptId, source } = Route.useLoaderData();
   const params = Route.useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [copied, setCopied] = useState(false);
   const locked = prompt.state === "soon";
+  const isPreview = source === "local";
+  const [saveComingSoon, setSaveComingSoon] = useState(false);
 
-  // Record a view once per mount
+  // Record a view once per mount (DB-backed prompts only)
   useEffect(() => {
+    if (!promptId) return;
     recordPromptView(promptId).catch(() => {});
   }, [promptId]);
 
@@ -126,8 +129,8 @@ function Detail() {
 
   const { data: engagement } = useQuery({
     queryKey: ["engagement", promptId, uid],
-    queryFn: () => fetchViewerEngagement(promptId),
-    enabled: !!uid,
+    queryFn: () => fetchViewerEngagement(promptId as string),
+    enabled: !!uid && !!promptId,
   });
 
   const requireAuth = () => {
@@ -139,22 +142,33 @@ function Detail() {
   };
 
   const likeMut = useMutation({
-    mutationFn: (on: boolean) => togglePromptLike(promptId, on),
+    mutationFn: (on: boolean) => togglePromptLike(promptId as string, on),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["engagement", promptId, uid] });
       queryClient.invalidateQueries({ queryKey: ["prompt", params.id] });
     },
+    onError: () => toast.error("Couldn't update like — try again."),
   });
   const saveMut = useMutation({
-    mutationFn: (on: boolean) => togglePromptSave(promptId, on),
+    mutationFn: (on: boolean) => togglePromptSave(promptId as string, on),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["engagement", promptId, uid] });
     },
+    onError: () => toast.error("Couldn't save prompt — try again."),
   });
 
   const { data: related = [] } = useQuery<Prompt[]>({
     queryKey: ["related", promptId],
     queryFn: async () => {
+      if (!promptId) {
+        // Local preview: derive related from local catalog via slug + category.
+        const rel = (prompt.related ?? [])
+          .map((slug) => PROMPTS.find((p) => p.id === slug))
+          .filter((p): p is Prompt => !!p)
+          .slice(0, 4);
+        if (rel.length) return rel;
+        return PROMPTS.filter((p) => p.id !== prompt.id && p.category === prompt.category).slice(0, 4);
+      }
       const res = await fetchPromptBySlug(params.id);
       if (!res) return [];
       return fetchRelatedPrompts(res.row, 4);
@@ -163,9 +177,30 @@ function Detail() {
 
   const onCopy = async () => {
     if (locked) return;
-    await navigator.clipboard.writeText(prompt.prompt);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1600);
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error("clipboard_unavailable");
+      await navigator.clipboard.writeText(prompt.prompt);
+      setCopied(true);
+      toast.success(m.prompt_copied_button());
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      toast.error("Couldn't copy — select the text manually.");
+    }
+  };
+
+  const onSaveClick = () => {
+    if (isPreview) {
+      setSaveComingSoon(true);
+      return;
+    }
+    if (requireAuth()) saveMut.mutate(!engagement?.saved);
+  };
+  const onLikeClick = () => {
+    if (isPreview) {
+      setSaveComingSoon(true);
+      return;
+    }
+    if (requireAuth()) likeMut.mutate(!engagement?.liked);
   };
 
   const engine = null;

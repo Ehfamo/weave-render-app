@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Mail, Apple, Github, ArrowLeft } from "lucide-react";
+import { Loader2, Mail, Apple, Github, ArrowLeft, MessageSquare } from "lucide-react";
 import { Logo } from "@/components/xeomx/Logo";
 import { motion } from "motion/react";
 import { lovable } from "@/integrations/lovable/index";
@@ -260,6 +260,26 @@ function AuthPage() {
               >
                 <Github className="h-4 w-4" />
                 {m.auth_continue_github()}
+                <span className="ms-1 rounded-full border border-border/60 px-2 py-0.5 text-[10px] uppercase tracking-wide">
+                  {m.auth_coming_soon()}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                disabled
+                aria-disabled="true"
+                className="inline-flex w-full items-center justify-center gap-3 text-sm font-medium text-muted-foreground opacity-60 cursor-not-allowed"
+                style={{
+                  border: "1px solid var(--border-default)",
+                  backgroundColor: "var(--surface-glass)",
+                  borderRadius: "var(--radius-sm)",
+                  paddingInline: "var(--space-5)",
+                  paddingBlock: "var(--space-3)",
+                }}
+              >
+                <MessageSquare className="h-4 w-4" />
+                {m.auth_continue_discord()}
                 <span className="ms-1 rounded-full border border-border/60 px-2 py-0.5 text-[10px] uppercase tracking-wide">
                   {m.auth_coming_soon()}
                 </span>

@@ -4,6 +4,9 @@ import { ArrowLeft, Bookmark, Check, Copy, Crown, Heart, Lock, Share2, Shuffle, 
 import { motion } from "motion/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Prompt } from "@/lib/prompts";
+import { getPrompt as getLocalPrompt, PROMPTS } from "@/lib/prompts";
+import { toast } from "sonner";
+import { ComingSoonModal } from "@/components/xeomx/status/ComingSoonModal";
 import {
   fetchPromptBySlug,
   fetchRelatedPrompts,
@@ -25,19 +28,34 @@ import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/prompt/$id")({
   loader: async ({ params }) => {
-    const res = await fetchPromptBySlug(params.id);
-    if (!res) throw notFound();
-    return { prompt: res.prompt, promptId: res.row.id };
+    // Prefer real DB row. If not yet imported to DB, fall back to the local
+    // curated catalog so known slugs render as PREVIEW instead of 404.
+    try {
+      const res = await fetchPromptBySlug(params.id);
+      if (res) return { prompt: res.prompt, promptId: res.row.id, source: "db" as const };
+    } catch {
+      /* fall through to local */
+    }
+    const local = getLocalPrompt(params.id);
+    if (local) return { prompt: local, promptId: null, source: "local" as const };
+    throw notFound();
   },
   head: ({ loaderData, params }) => {
-    if (!loaderData) return { meta: [{ name: "robots", content: "noindex" }] };
+    if (!loaderData) {
+      return {
+        meta: [
+          { title: "Prompt not found — XeomX" },
+          { name: "robots", content: "noindex" },
+        ],
+      };
+    }
     const { prompt } = loaderData;
     const absoluteCover = prompt.cover.startsWith("http")
       ? prompt.cover
       : `${SITE_URL}${prompt.cover}`;
     const url = pageUrl(`/prompt/${params.id}`);
-    return {
-      meta: [
+    const isPreview = loaderData.source === "local";
+    const meta = [
         { title: `${prompt.title} — XeomX` },
         { name: "description", content: prompt.prompt.slice(0, 150) },
         { property: "og:title", content: `${prompt.title} — XeomX` },
@@ -52,15 +70,28 @@ export const Route = createFileRoute("/prompt/$id")({
         { name: "twitter:title", content: `${prompt.title} — XeomX` },
         { name: "twitter:description", content: prompt.prompt.slice(0, 150) },
         { name: "twitter:image", content: absoluteCover },
-      ],
+    ];
+    if (isPreview) meta.push({ name: "robots", content: "noindex" });
+    return {
+      meta,
       links: [{ rel: "canonical", href: url }],
     };
   },
   notFoundComponent: () => (
     <div className="grid min-h-screen place-items-center bg-background px-4 text-center">
-      <div>
+      <div className="max-w-md">
         <h1 className="font-display text-4xl">{m.prompt_not_found()}</h1>
-        <Link to="/" className="mt-4 inline-block text-magenta">{m.nav_back_discovery()}</Link>
+        <p className="mt-3 text-sm text-muted-foreground">
+          {m.root_404_desc?.() ?? ""}
+        </p>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <Link to="/explore" className="rounded-full bg-magenta px-5 py-2 text-sm font-medium text-white">
+            {m.root_404_cta_explore?.() ?? "Discover"}
+          </Link>
+          <Link to="/" className="rounded-full border border-border px-5 py-2 text-sm">
+            {m.nav_back_discovery()}
+          </Link>
+        </div>
       </div>
     </div>
   ),
@@ -76,15 +107,18 @@ export const Route = createFileRoute("/prompt/$id")({
 });
 
 function Detail() {
-  const { prompt, promptId } = Route.useLoaderData();
+  const { prompt, promptId, source } = Route.useLoaderData();
   const params = Route.useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [copied, setCopied] = useState(false);
   const locked = prompt.state === "soon";
+  const isPreview = source === "local";
+  const [saveComingSoon, setSaveComingSoon] = useState(false);
 
-  // Record a view once per mount
+  // Record a view once per mount (DB-backed prompts only)
   useEffect(() => {
+    if (!promptId) return;
     recordPromptView(promptId).catch(() => {});
   }, [promptId]);
 
@@ -95,8 +129,8 @@ function Detail() {
 
   const { data: engagement } = useQuery({
     queryKey: ["engagement", promptId, uid],
-    queryFn: () => fetchViewerEngagement(promptId),
-    enabled: !!uid,
+    queryFn: () => fetchViewerEngagement(promptId as string),
+    enabled: !!uid && !!promptId,
   });
 
   const requireAuth = () => {
@@ -108,22 +142,34 @@ function Detail() {
   };
 
   const likeMut = useMutation({
-    mutationFn: (on: boolean) => togglePromptLike(promptId, on),
+    mutationFn: (on: boolean) => togglePromptLike(promptId as string, on),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["engagement", promptId, uid] });
       queryClient.invalidateQueries({ queryKey: ["prompt", params.id] });
     },
+    onError: () => toast.error("Couldn't update like — try again."),
   });
   const saveMut = useMutation({
-    mutationFn: (on: boolean) => togglePromptSave(promptId, on),
+    mutationFn: (on: boolean) => togglePromptSave(promptId as string, on),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["engagement", promptId, uid] });
     },
+    onError: () => toast.error("Couldn't save prompt — try again."),
   });
 
   const { data: related = [] } = useQuery<Prompt[]>({
     queryKey: ["related", promptId],
     queryFn: async () => {
+      if (!promptId) {
+        // Local preview: derive related from local catalog via slug + category.
+        const relatedIds: string[] = prompt.related ?? [];
+        const rel: Prompt[] = relatedIds
+          .map((slug: string) => PROMPTS.find((p: Prompt) => p.id === slug))
+          .filter((p: Prompt | undefined): p is Prompt => !!p)
+          .slice(0, 4);
+        if (rel.length) return rel;
+        return PROMPTS.filter((p: Prompt) => p.id !== prompt.id && p.category === prompt.category).slice(0, 4);
+      }
       const res = await fetchPromptBySlug(params.id);
       if (!res) return [];
       return fetchRelatedPrompts(res.row, 4);
@@ -132,9 +178,30 @@ function Detail() {
 
   const onCopy = async () => {
     if (locked) return;
-    await navigator.clipboard.writeText(prompt.prompt);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1600);
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error("clipboard_unavailable");
+      await navigator.clipboard.writeText(prompt.prompt);
+      setCopied(true);
+      toast.success(m.prompt_copied_button());
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      toast.error("Couldn't copy — select the text manually.");
+    }
+  };
+
+  const onSaveClick = () => {
+    if (isPreview) {
+      setSaveComingSoon(true);
+      return;
+    }
+    if (requireAuth()) saveMut.mutate(!engagement?.saved);
+  };
+  const onLikeClick = () => {
+    if (isPreview) {
+      setSaveComingSoon(true);
+      return;
+    }
+    if (requireAuth()) likeMut.mutate(!engagement?.liked);
   };
 
   const engine = null;
@@ -260,24 +327,27 @@ function Detail() {
                   <div className="flex gap-2">
                     <button
                       type="button"
-                      onClick={() => { if (requireAuth()) saveMut.mutate(!engagement?.saved); }}
+                      onClick={onSaveClick}
+                      aria-label={m.prompt_stat_saves()}
                       aria-pressed={!!engagement?.saved}
-                      className={`grid h-9 w-9 place-items-center rounded-full border transition ${engagement?.saved ? "border-magenta/60 bg-magenta/15 text-magenta" : "border-border bg-surface/60 hover:border-magenta/40"}`}
+                      className={`grid h-11 w-11 place-items-center rounded-full border transition ${engagement?.saved ? "border-magenta/60 bg-magenta/15 text-magenta" : "border-border bg-surface/60 hover:border-magenta/40"}`}
                     >
                       <Bookmark className="h-4 w-4" />
                     </button>
                     <button
                       type="button"
-                      onClick={() => { if (requireAuth()) likeMut.mutate(!engagement?.liked); }}
+                      onClick={onLikeClick}
+                      aria-label="Like prompt"
                       aria-pressed={!!engagement?.liked}
-                      className={`grid h-9 w-9 place-items-center rounded-full border transition ${engagement?.liked ? "border-magenta/60 bg-magenta/15 text-magenta" : "border-border bg-surface/60 hover:border-magenta/40"}`}
+                      className={`grid h-11 w-11 place-items-center rounded-full border transition ${engagement?.liked ? "border-magenta/60 bg-magenta/15 text-magenta" : "border-border bg-surface/60 hover:border-magenta/40"}`}
                     >
                       <Heart className={`h-4 w-4 ${engagement?.liked ? "fill-current" : ""}`} />
                     </button>
                     <button
                       type="button"
                       onClick={onShare}
-                      className="grid h-9 w-9 place-items-center rounded-full border border-border bg-surface/60 transition hover:border-magenta/40"
+                      aria-label="Share prompt"
+                      className="grid h-11 w-11 place-items-center rounded-full border border-border bg-surface/60 transition hover:border-magenta/40"
                     >
                       <Share2 className="h-4 w-4" />
                     </button>
@@ -344,7 +414,13 @@ function Detail() {
 
       {engine ? null : null}
 
-      <CommentsSection promptId={promptId} viewerId={uid} onAuthRequired={() => navigate({ to: "/auth", search: { next: undefined } })} />
+      {promptId ? (
+        <CommentsSection
+          promptId={promptId}
+          viewerId={uid}
+          onAuthRequired={() => navigate({ to: "/auth", search: { next: undefined } })}
+        />
+      ) : null}
 
       <section className="mx-auto max-w-[1200px] px-4 pb-16 sm:px-8">
         <div className="mb-6 flex items-end justify-between">
@@ -395,6 +471,14 @@ function Detail() {
       <footer className="border-t border-border/60 px-4 py-10 text-center text-xs text-muted-foreground sm:px-8">
         {m.prompt_footer()}
       </footer>
+
+      <ComingSoonModal
+        open={saveComingSoon}
+        onClose={() => setSaveComingSoon(false)}
+        featureKey="promptSave"
+        title={m.coming_soon_notice_title?.() ?? "Coming soon"}
+        description="This prompt is a preview from our curated catalog. Save & Like will unlock once it's imported into your library."
+      />
     </div>
   );
 }

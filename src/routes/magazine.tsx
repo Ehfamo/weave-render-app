@@ -386,6 +386,7 @@ function HeroFeature({ article }: { article: Article }) {
 
 function ArticleCard({ article, size }: { article: Article; size: "md" | "sm" }) {
   const titleSize = size === "md" ? "var(--font-size-h3)" : "var(--font-size-body-lg)";
+  const isLive = LIVE_ARTICLE_SLUGS.has(article.slug);
   return (
     <Link
       to="/magazine/$slug"
@@ -395,17 +396,20 @@ function ArticleCard({ article, size }: { article: Article; size: "md" | "sm" })
     >
       <div aria-hidden style={{ aspectRatio: "16/10", background: CAT_GRADIENT[article.category] }} />
       <div className="flex flex-col" style={{ padding: "var(--space-4)", gap: "var(--space-3)" }}>
-        <span
-          style={{
-            fontSize: "var(--font-size-micro)",
-            color: CAT_COLOR[article.category],
-            textTransform: "uppercase",
-            letterSpacing: "0.2em",
-            fontWeight: 600,
-          }}
-        >
-          {catLabel(article.category)}
-        </span>
+        <div className="flex items-center gap-2">
+          <span
+            style={{
+              fontSize: "var(--font-size-micro)",
+              color: CAT_COLOR[article.category],
+              textTransform: "uppercase",
+              letterSpacing: "0.2em",
+              fontWeight: 600,
+            }}
+          >
+            {catLabel(article.category)}
+          </span>
+          {!isLive ? <FeatureStatusBadge status="coming_soon" size="xs" /> : null}
+        </div>
         <h3
           className="font-display font-semibold"
           style={{ fontSize: titleSize, color: "var(--text-primary)", lineHeight: 1.25, letterSpacing: "-0.01em" }}

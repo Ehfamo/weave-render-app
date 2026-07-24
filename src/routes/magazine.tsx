@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ArrowRight, Search, Clock } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
 import { pageUrl } from "@/lib/seo";
+import { FeatureStatusBadge } from "@/components/xeomx/status/FeatureStatusBadge";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -91,6 +92,11 @@ export const ARTICLES: Article[] = [
     readTime: 8,
   },
 ];
+
+// Slugs whose article body is fully written. Others render as
+// ARTICLE COMING SOON on the detail route and get a status badge here.
+// Keep in sync with LIVE_ARTICLE_SLUGS in ./magazine.$slug.tsx
+const LIVE_ARTICLE_SLUGS = new Set(["nocturne-baroque-muse"]);
 
 const COLLECTIONS = [
   { slug: "cyber-noir-series", title: "Cyber Noir Series", count: 24, tone: "news" as Category },

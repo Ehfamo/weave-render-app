@@ -13,6 +13,7 @@ import { Route as XeomxAiRouteImport } from './routes/xeomx-ai'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as PromptHubRouteImport } from './routes/prompt-hub'
@@ -33,7 +34,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PromptIdRouteImport } from './routes/prompt.$id'
 import { Route as MagazineSlugRouteImport } from './routes/magazine.$slug'
 import { Route as ExploreSlugRouteImport } from './routes/explore_.$slug'
+import { Route as CreatorsHandleRouteImport } from './routes/creators.$handle'
 import { Route as CollectionsIdRouteImport } from './routes/collections.$id'
+import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
 const XeomxAiRoute = XeomxAiRouteImport.update({
@@ -54,6 +57,11 @@ const StudioRoute = StudioRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -155,10 +163,20 @@ const ExploreSlugRoute = ExploreSlugRouteImport.update({
   path: '/explore/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CreatorsHandleRoute = CreatorsHandleRouteImport.update({
+  id: '/$handle',
+  path: '/$handle',
+  getParentRoute: () => CreatorsRoute,
+} as any)
 const CollectionsIdRoute = CollectionsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => CollectionsRoute,
+} as any)
+const AuthenticatedSavedRoute = AuthenticatedSavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
@@ -172,7 +190,7 @@ export interface FileRoutesByFullPath {
   '/collections': typeof CollectionsRouteWithChildren
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
-  '/creators': typeof CreatorsRoute
+  '/creators': typeof CreatorsRouteWithChildren
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -183,12 +201,15 @@ export interface FileRoutesByFullPath {
   '/prompt-hub': typeof PromptHubRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
   '/xeomx-ai': typeof XeomxAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/saved': typeof AuthenticatedSavedRoute
   '/collections/$id': typeof CollectionsIdRoute
+  '/creators/$handle': typeof CreatorsHandleRoute
   '/explore/$slug': typeof ExploreSlugRoute
   '/magazine/$slug': typeof MagazineSlugRoute
   '/prompt/$id': typeof PromptIdRoute
@@ -199,7 +220,7 @@ export interface FileRoutesByTo {
   '/collections': typeof CollectionsRouteWithChildren
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
-  '/creators': typeof CreatorsRoute
+  '/creators': typeof CreatorsRouteWithChildren
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -210,12 +231,15 @@ export interface FileRoutesByTo {
   '/prompt-hub': typeof PromptHubRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
   '/xeomx-ai': typeof XeomxAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/saved': typeof AuthenticatedSavedRoute
   '/collections/$id': typeof CollectionsIdRoute
+  '/creators/$handle': typeof CreatorsHandleRoute
   '/explore/$slug': typeof ExploreSlugRoute
   '/magazine/$slug': typeof MagazineSlugRoute
   '/prompt/$id': typeof PromptIdRoute
@@ -228,7 +252,7 @@ export interface FileRoutesById {
   '/collections': typeof CollectionsRouteWithChildren
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
-  '/creators': typeof CreatorsRoute
+  '/creators': typeof CreatorsRouteWithChildren
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -239,12 +263,15 @@ export interface FileRoutesById {
   '/prompt-hub': typeof PromptHubRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
   '/xeomx-ai': typeof XeomxAiRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/collections/$id': typeof CollectionsIdRoute
+  '/creators/$handle': typeof CreatorsHandleRoute
   '/explore_/$slug': typeof ExploreSlugRoute
   '/magazine/$slug': typeof MagazineSlugRoute
   '/prompt/$id': typeof PromptIdRoute
@@ -268,12 +295,15 @@ export interface FileRouteTypes {
     | '/prompt-hub'
     | '/refund-policy'
     | '/reset-password'
+    | '/search'
     | '/settings'
     | '/studio'
     | '/terms'
     | '/xeomx-ai'
     | '/dashboard'
+    | '/saved'
     | '/collections/$id'
+    | '/creators/$handle'
     | '/explore/$slug'
     | '/magazine/$slug'
     | '/prompt/$id'
@@ -295,12 +325,15 @@ export interface FileRouteTypes {
     | '/prompt-hub'
     | '/refund-policy'
     | '/reset-password'
+    | '/search'
     | '/settings'
     | '/studio'
     | '/terms'
     | '/xeomx-ai'
     | '/dashboard'
+    | '/saved'
     | '/collections/$id'
+    | '/creators/$handle'
     | '/explore/$slug'
     | '/magazine/$slug'
     | '/prompt/$id'
@@ -323,12 +356,15 @@ export interface FileRouteTypes {
     | '/prompt-hub'
     | '/refund-policy'
     | '/reset-password'
+    | '/search'
     | '/settings'
     | '/studio'
     | '/terms'
     | '/xeomx-ai'
     | '/_authenticated/dashboard'
+    | '/_authenticated/saved'
     | '/collections/$id'
+    | '/creators/$handle'
     | '/explore_/$slug'
     | '/magazine/$slug'
     | '/prompt/$id'
@@ -341,7 +377,7 @@ export interface RootRouteChildren {
   CollectionsRoute: typeof CollectionsRouteWithChildren
   ContactRoute: typeof ContactRoute
   CookiesRoute: typeof CookiesRoute
-  CreatorsRoute: typeof CreatorsRoute
+  CreatorsRoute: typeof CreatorsRouteWithChildren
   ExploreRoute: typeof ExploreRoute
   FeedRoute: typeof FeedRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -352,6 +388,7 @@ export interface RootRouteChildren {
   PromptHubRoute: typeof PromptHubRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRoute
   StudioRoute: typeof StudioRoute
   TermsRoute: typeof TermsRoute
@@ -388,6 +425,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -530,12 +574,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExploreSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/creators/$handle': {
+      id: '/creators/$handle'
+      path: '/$handle'
+      fullPath: '/creators/$handle'
+      preLoaderRoute: typeof CreatorsHandleRouteImport
+      parentRoute: typeof CreatorsRoute
+    }
     '/collections/$id': {
       id: '/collections/$id'
       path: '/$id'
       fullPath: '/collections/$id'
       preLoaderRoute: typeof CollectionsIdRouteImport
       parentRoute: typeof CollectionsRoute
+    }
+    '/_authenticated/saved': {
+      id: '/_authenticated/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof AuthenticatedSavedRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
@@ -549,10 +607,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSavedRoute: AuthenticatedSavedRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -568,6 +628,18 @@ const CollectionsRouteChildren: CollectionsRouteChildren = {
 
 const CollectionsRouteWithChildren = CollectionsRoute._addFileChildren(
   CollectionsRouteChildren,
+)
+
+interface CreatorsRouteChildren {
+  CreatorsHandleRoute: typeof CreatorsHandleRoute
+}
+
+const CreatorsRouteChildren: CreatorsRouteChildren = {
+  CreatorsHandleRoute: CreatorsHandleRoute,
+}
+
+const CreatorsRouteWithChildren = CreatorsRoute._addFileChildren(
+  CreatorsRouteChildren,
 )
 
 interface MagazineRouteChildren {
@@ -589,7 +661,7 @@ const rootRouteChildren: RootRouteChildren = {
   CollectionsRoute: CollectionsRouteWithChildren,
   ContactRoute: ContactRoute,
   CookiesRoute: CookiesRoute,
-  CreatorsRoute: CreatorsRoute,
+  CreatorsRoute: CreatorsRouteWithChildren,
   ExploreRoute: ExploreRoute,
   FeedRoute: FeedRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
@@ -600,6 +672,7 @@ const rootRouteChildren: RootRouteChildren = {
   PromptHubRoute: PromptHubRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SearchRoute: SearchRoute,
   SettingsRoute: SettingsRoute,
   StudioRoute: StudioRoute,
   TermsRoute: TermsRoute,

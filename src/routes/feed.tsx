@@ -36,6 +36,12 @@ function Feed() {
       >
         <ArrowLeft className="h-3.5 w-3.5" /> {m.nav_back_discover()}
       </Link>
+      <span
+        className="fixed end-4 top-4 z-30 inline-flex items-center gap-1 rounded-full border border-magenta/40 bg-background/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-magenta backdrop-blur sm:end-6 sm:top-6"
+        aria-label="Beta feature — curated feed"
+      >
+        Beta · Curated
+      </span>
       {isLoading ? (
         <div className="grid h-[100svh] place-items-center text-sm text-muted-foreground">Loading feed…</div>
       ) : error ? (

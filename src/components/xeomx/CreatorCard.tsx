@@ -1,5 +1,6 @@
 import { Crown, Sparkles, TrendingUp, Check } from "lucide-react";
 import type { Creator } from "@/lib/prompts";
+import { Link } from "@tanstack/react-router";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -22,6 +23,8 @@ export function CreatorCard({
 }) {
   const t = tierMap[c.tier];
   const Icon = t.Icon;
+  const cleanHandle = c.handle.replace(/^@/, "");
+  const canLink = /^[a-z0-9_]{3,32}$/i.test(cleanHandle);
   return (
     <div
       className="group surface-raised relative w-[260px] shrink-0 overflow-hidden rounded-3xl transition-transform hover:scale-[1.02] hover:border-magenta/40"
@@ -39,12 +42,23 @@ export function CreatorCard({
       </div>
       <div style={{ padding: "var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
         <div>
-          <h3
-            className="font-display font-semibold tracking-tight"
-            style={{ fontSize: "var(--font-size-h3)" }}
-          >
-            {c.name}
-          </h3>
+          {canLink ? (
+            <Link
+              to="/creators/$handle"
+              params={{ handle: cleanHandle }}
+              className="font-display font-semibold tracking-tight transition hover:text-magenta"
+              style={{ fontSize: "var(--font-size-h3)" }}
+            >
+              {c.name}
+            </Link>
+          ) : (
+            <h3
+              className="font-display font-semibold tracking-tight"
+              style={{ fontSize: "var(--font-size-h3)" }}
+            >
+              {c.name}
+            </h3>
+          )}
           <p style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>{c.handle}</p>
         </div>
         <p

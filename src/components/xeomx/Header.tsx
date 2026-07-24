@@ -1,5 +1,5 @@
-import { Link } from "@tanstack/react-router";
-import { Search, Sparkles, LogOut, LayoutDashboard, Settings, Menu } from "lucide-react";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Search, Sparkles, LogOut, LayoutDashboard, Settings, Menu, Bookmark } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +20,12 @@ import {
 export function Header({ onSearch, query }: { onSearch?: (v: string) => void; query?: string }) {
   const { user } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const nextForSignIn =
+    pathname && pathname !== "/" && !pathname.startsWith("/auth") ? pathname : undefined;
+  const [localQ, setLocalQ] = useState("");
+  const inputValue = query ?? localQ;
   const avatar = user?.user_metadata?.avatar_url as string | undefined;
   const name =
     (user?.user_metadata?.full_name as string | undefined) ||
@@ -101,17 +107,29 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
         </nav>
 
         <div className="ms-auto flex min-w-0 shrink-0 items-center gap-1.5 sm:flex-none sm:gap-3">
-          <label className="group relative hidden w-full items-center sm:flex sm:w-80">
-            <Search className="absolute start-3 h-4 w-4 text-muted-foreground" />
+          <form
+            role="search"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const q = inputValue.trim();
+              if (q.length < 2) return;
+              navigate({ to: "/search", search: { q } });
+            }}
+            className="group relative hidden w-full items-center sm:flex sm:w-80"
+          >
+            <Search className="pointer-events-none absolute start-3 h-4 w-4 text-muted-foreground" />
             <input
-              value={query ?? ""}
-              onChange={(e) => onSearch?.(e.target.value)}
+              value={inputValue}
+              onChange={(e) => {
+                if (onSearch) onSearch(e.target.value);
+                else setLocalQ(e.target.value);
+              }}
               placeholder={m.search_placeholder()}
               aria-label={m.search_placeholder()}
               type="search"
               className="w-full rounded-full border border-border bg-surface/60 py-2 ps-9 pe-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-magenta/50 focus:outline-none focus:ring-2 focus:ring-magenta/30"
             />
-          </label>
+          </form>
           <LanguageSwitcher />
           {user ? (
             <DropdownMenu>
@@ -136,6 +154,11 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/saved" className="flex items-center gap-2">
+                    <Bookmark className="h-4 w-4" /> Saved
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/settings" className="flex items-center gap-2">
                     <Settings className="h-4 w-4" /> {m.nav_settings()}
                   </Link>
@@ -150,14 +173,14 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
             <>
               <Link
                 to="/auth"
-                search={{ next: undefined }}
+                search={{ next: nextForSignIn }}
                 className="inline-flex shrink-0 rounded-full border border-border bg-surface/60 px-2.5 py-2 text-xs text-foreground transition hover:border-magenta/40 sm:px-4 sm:text-sm"
               >
                 {m.nav_sign_in()}
               </Link>
               <Link
                 to="/auth"
-                search={{ next: undefined }}
+                search={{ next: nextForSignIn }}
                 className="hidden shrink-0 rounded-full px-4 py-2 text-sm font-medium text-white transition hover:opacity-90 sm:inline-flex"
                 style={{ background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)" }}
               >

@@ -135,7 +135,11 @@ function Detail() {
 
   const requireAuth = () => {
     if (!uid) {
-      navigate({ to: "/auth", search: { next: undefined } });
+      const next =
+        typeof window !== "undefined"
+          ? window.location.pathname + window.location.search
+          : undefined;
+      navigate({ to: "/auth", search: { next } });
       return false;
     }
     return true;
@@ -418,7 +422,13 @@ function Detail() {
         <CommentsSection
           promptId={promptId}
           viewerId={uid}
-          onAuthRequired={() => navigate({ to: "/auth", search: { next: undefined } })}
+          onAuthRequired={() => {
+            const next =
+              typeof window !== "undefined"
+                ? window.location.pathname + window.location.search
+                : undefined;
+            navigate({ to: "/auth", search: { next } });
+          }}
         />
       ) : null}
 

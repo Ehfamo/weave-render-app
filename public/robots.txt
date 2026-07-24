@@ -5,4 +5,4 @@ Disallow: /profile-edit
 Disallow: /settings
 Disallow: /auth
 
-Sitemap: https://weave-render-app.lovable.app/sitemap.xml
+Sitemap: https://xeomx.com/sitemap.xml

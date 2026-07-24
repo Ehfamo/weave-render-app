@@ -3,7 +3,7 @@ import { localizeHref } from "@/paraglide/runtime.js";
 
 export const SITE_URL: string =
   (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, "") ??
-  "https://weave-render-app.lovable.app";
+  "https://xeomx.com";
 
 /** Build an absolute, locale-prefixed URL for canonical / og:url. */
 export function pageUrl(path: string): string {

@@ -69,7 +69,7 @@ function AuthPage() {
     return () => sub.subscription.unsubscribe();
   }, [navigate, dest]);
 
-  async function signInOAuth(provider: "google" | "apple") {
+  async function signInOAuth(provider: "google") {
     setLoading(provider);
     setError(null);
     const result = await lovable.auth.signInWithOAuth(provider, {
@@ -90,7 +90,9 @@ function AuthPage() {
     else setLoading(null);
   }
 
-  // GitHub OAuth intentionally disabled — not available on Lovable Cloud.
+  // Apple, GitHub, and Discord OAuth intentionally disabled — provider
+  // configuration not verified for launch. Surfaced as "Coming soon" chips
+  // per the Feature Status registry.
 
   async function sendMagicLink(e: React.FormEvent) {
     e.preventDefault();

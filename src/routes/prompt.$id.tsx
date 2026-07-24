@@ -414,7 +414,13 @@ function Detail() {
 
       {engine ? null : null}
 
-      <CommentsSection promptId={promptId} viewerId={uid} onAuthRequired={() => navigate({ to: "/auth", search: { next: undefined } })} />
+      {promptId ? (
+        <CommentsSection
+          promptId={promptId}
+          viewerId={uid}
+          onAuthRequired={() => navigate({ to: "/auth", search: { next: undefined } })}
+        />
+      ) : null}
 
       <section className="mx-auto max-w-[1200px] px-4 pb-16 sm:px-8">
         <div className="mb-6 flex items-end justify-between">
@@ -465,6 +471,14 @@ function Detail() {
       <footer className="border-t border-border/60 px-4 py-10 text-center text-xs text-muted-foreground sm:px-8">
         {m.prompt_footer()}
       </footer>
+
+      <ComingSoonModal
+        open={saveComingSoon}
+        onClose={() => setSaveComingSoon(false)}
+        featureKey="promptSave"
+        title={m.coming_soon_notice_title?.() ?? "Coming soon"}
+        description="This prompt is a preview from our curated catalog. Save & Like will unlock once it's imported into your library."
+      />
     </div>
   );
 }

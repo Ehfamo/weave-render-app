@@ -452,19 +452,8 @@ function AuthorCard({ author, gradient }: { author: string; gradient: string }) 
         </span>
         <div>
           <div style={{ fontSize: "var(--font-size-body)", color: "var(--text-primary)" }}>{author}</div>
-          <div style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>Nocturne collective · 12 stories</div>
         </div>
       </div>
-      <p
-        style={{
-          marginTop: "var(--space-3)",
-          fontSize: "var(--font-size-caption)",
-          lineHeight: 1.6,
-          color: "var(--text-tertiary)",
-        }}
-      >
-        Cinematographer of prompts. Working in the space between baroque portraiture and near-future cinema.
-      </p>
     </div>
   );
 }

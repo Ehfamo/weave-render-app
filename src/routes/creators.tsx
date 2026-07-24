@@ -123,7 +123,7 @@ function CreatorsPage() {
                 disabled={!authorId || follow.isPending || (!!uid && uid === authorId)}
                 onFollow={() => {
                   if (!authorId) return;
-                  if (!uid) { navigate({ to: "/auth", search: { next: undefined } }); return; }
+                  if (!uid) { navigate({ to: "/auth", search: { next: "/creators" } }); return; }
                   follow.mutate({ id: authorId, on: !following });
                 }}
               />

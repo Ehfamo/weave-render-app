@@ -4,6 +4,9 @@ import { ArrowLeft, Bookmark, Check, Copy, Crown, Heart, Lock, Share2, Shuffle, 
 import { motion } from "motion/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Prompt } from "@/lib/prompts";
+import { getPrompt as getLocalPrompt, PROMPTS } from "@/lib/prompts";
+import { toast } from "sonner";
+import { ComingSoonModal } from "@/components/xeomx/status/ComingSoonModal";
 import {
   fetchPromptBySlug,
   fetchRelatedPrompts,
@@ -25,19 +28,34 @@ import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/prompt/$id")({
   loader: async ({ params }) => {
-    const res = await fetchPromptBySlug(params.id);
-    if (!res) throw notFound();
-    return { prompt: res.prompt, promptId: res.row.id };
+    // Prefer real DB row. If not yet imported to DB, fall back to the local
+    // curated catalog so known slugs render as PREVIEW instead of 404.
+    try {
+      const res = await fetchPromptBySlug(params.id);
+      if (res) return { prompt: res.prompt, promptId: res.row.id, source: "db" as const };
+    } catch {
+      /* fall through to local */
+    }
+    const local = getLocalPrompt(params.id);
+    if (local) return { prompt: local, promptId: null, source: "local" as const };
+    throw notFound();
   },
   head: ({ loaderData, params }) => {
-    if (!loaderData) return { meta: [{ name: "robots", content: "noindex" }] };
+    if (!loaderData) {
+      return {
+        meta: [
+          { title: "Prompt not found — XeomX" },
+          { name: "robots", content: "noindex" },
+        ],
+      };
+    }
     const { prompt } = loaderData;
     const absoluteCover = prompt.cover.startsWith("http")
       ? prompt.cover
       : `${SITE_URL}${prompt.cover}`;
     const url = pageUrl(`/prompt/${params.id}`);
-    return {
-      meta: [
+    const isPreview = loaderData.source === "local";
+    const meta = [
         { title: `${prompt.title} — XeomX` },
         { name: "description", content: prompt.prompt.slice(0, 150) },
         { property: "og:title", content: `${prompt.title} — XeomX` },
@@ -52,15 +70,28 @@ export const Route = createFileRoute("/prompt/$id")({
         { name: "twitter:title", content: `${prompt.title} — XeomX` },
         { name: "twitter:description", content: prompt.prompt.slice(0, 150) },
         { name: "twitter:image", content: absoluteCover },
-      ],
+    ];
+    if (isPreview) meta.push({ name: "robots", content: "noindex" });
+    return {
+      meta,
       links: [{ rel: "canonical", href: url }],
     };
   },
   notFoundComponent: () => (
     <div className="grid min-h-screen place-items-center bg-background px-4 text-center">
-      <div>
+      <div className="max-w-md">
         <h1 className="font-display text-4xl">{m.prompt_not_found()}</h1>
-        <Link to="/" className="mt-4 inline-block text-magenta">{m.nav_back_discovery()}</Link>
+        <p className="mt-3 text-sm text-muted-foreground">
+          {m.root_404_desc?.() ?? ""}
+        </p>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <Link to="/explore" className="rounded-full bg-magenta px-5 py-2 text-sm font-medium text-white">
+            {m.root_404_cta_explore?.() ?? "Discover"}
+          </Link>
+          <Link to="/" className="rounded-full border border-border px-5 py-2 text-sm">
+            {m.nav_back_discovery()}
+          </Link>
+        </div>
       </div>
     </div>
   ),

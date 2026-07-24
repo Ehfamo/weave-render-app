@@ -226,9 +226,25 @@ function AuthPage() {
                   <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.4-1.6 4.1-5.5 4.1-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.2.8 3.9 1.5l2.7-2.6C17 3.4 14.7 2.4 12 2.4 6.7 2.4 2.4 6.7 2.4 12s4.3 9.6 9.6 9.6c5.5 0 9.2-3.9 9.2-9.4 0-.6-.1-1.1-.2-1.6H12z" />
                 </svg>
               </OAuthButton>
-              <OAuthButton onClick={() => signInOAuth("apple")} loading={loading === "apple"} label={m.auth_continue_apple()}>
+              <button
+                type="button"
+                disabled
+                aria-disabled="true"
+                className="inline-flex w-full items-center justify-center gap-3 text-sm font-medium text-muted-foreground opacity-60 cursor-not-allowed"
+                style={{
+                  border: "1px solid var(--border-default)",
+                  backgroundColor: "var(--surface-glass)",
+                  borderRadius: "var(--radius-sm)",
+                  paddingInline: "var(--space-5)",
+                  paddingBlock: "var(--space-3)",
+                }}
+              >
                 <Apple className="h-4 w-4" />
-              </OAuthButton>
+                {m.auth_continue_apple()}
+                <span className="ms-1 rounded-full border border-border/60 px-2 py-0.5 text-[10px] uppercase tracking-wide">
+                  {m.auth_coming_soon()}
+                </span>
+              </button>
               <button
                 type="button"
                 disabled

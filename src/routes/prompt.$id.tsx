@@ -162,12 +162,13 @@ function Detail() {
     queryFn: async () => {
       if (!promptId) {
         // Local preview: derive related from local catalog via slug + category.
-        const rel = (prompt.related ?? [])
-          .map((slug) => PROMPTS.find((p) => p.id === slug))
-          .filter((p): p is Prompt => !!p)
+        const relatedIds: string[] = prompt.related ?? [];
+        const rel: Prompt[] = relatedIds
+          .map((slug: string) => PROMPTS.find((p: Prompt) => p.id === slug))
+          .filter((p: Prompt | undefined): p is Prompt => !!p)
           .slice(0, 4);
         if (rel.length) return rel;
-        return PROMPTS.filter((p) => p.id !== prompt.id && p.category === prompt.category).slice(0, 4);
+        return PROMPTS.filter((p: Prompt) => p.id !== prompt.id && p.category === prompt.category).slice(0, 4);
       }
       const res = await fetchPromptBySlug(params.id);
       if (!res) return [];

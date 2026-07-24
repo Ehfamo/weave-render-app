@@ -189,8 +189,8 @@ function Index() {
               }}
             >
               {[
-                ["12,480", m.hero_stat_prompts()],
-                ["1.4M", m.hero_stat_renders()],
+                ["—", m.hero_stat_prompts()],
+                ["—", m.hero_stat_renders()],
                 ["Tier 01", m.hero_stat_drop()],
               ].map(([v, l]) => (
                 <div key={l}>

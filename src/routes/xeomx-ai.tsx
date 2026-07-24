@@ -8,6 +8,7 @@ import {
   Shuffle, Maximize2, MoveRight, Pencil, Code2, Eye, Terminal, FileText,
 } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
+import { PreviewNotice } from "@/components/xeomx/status/PreviewNotice";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/xeomx-ai")({
       { property: "og:description", content: m.xai_head_desc() },
       { property: "og:type", content: "website" },
       { property: "og:url", content: pageUrl("/xeomx-ai") },
+      { name: "robots", content: "noindex,follow" },
     ],
     links: [{ rel: "canonical", href: pageUrl("/xeomx-ai") }],
   }),
@@ -80,6 +82,9 @@ function XeomxAIPage() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--surface-primary)" }}>
       <Header />
+      <div style={{ paddingInline: "var(--space-6)", paddingTop: "var(--space-4)" }}>
+        <PreviewNotice status="preview" />
+      </div>
 
       {/* Sub-header: wordmark + intent bar + chips */}
       <div

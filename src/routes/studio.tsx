@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Sparkles } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
+import { PreviewNotice } from "@/components/xeomx/status/PreviewNotice";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/studio")({
       { property: "og:description", content: m.studio_head_desc() },
       { property: "og:type", content: "website" },
       { property: "og:url", content: pageUrl("/studio") },
+      { name: "robots", content: "noindex,follow" },
     ],
     links: [{ rel: "canonical", href: pageUrl("/studio") }],
   }),
@@ -62,6 +64,9 @@ function StudioPage() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--surface-primary)" }}>
       <Header />
+      <div style={{ paddingInline: "var(--space-6)", paddingTop: "var(--space-4)" }}>
+        <PreviewNotice status="preview" />
+      </div>
 
       {/* Studio sub-header */}
       <div

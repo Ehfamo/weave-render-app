@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { Layers, ArrowUpRight } from "lucide-react";
 import type { Collection } from "@/lib/prompts";
+import { FeatureStatusBadge } from "@/components/xeomx/status/FeatureStatusBadge";
 
-export function CollectionCard({ c }: { c: Collection }) {
+export function CollectionCard({ c, status = "live" }: { c: Collection; status?: "live" | "preview" }) {
   return (
     <Link
       to="/collections/$id"
@@ -17,9 +18,12 @@ export function CollectionCard({ c }: { c: Collection }) {
       <div className="relative aspect-[16/10] overflow-hidden">
         <img src={c.cover} alt={c.title} loading="lazy" decoding="async" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-        <span className="absolute start-4 top-4 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.22em]" style={{ background: "var(--gradient-gold)", color: "oklch(0.18 0.02 60)" }}>
-          {c.badge}
-        </span>
+        <div className="absolute start-4 top-4 flex items-center gap-2">
+          <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.22em]" style={{ background: "var(--gradient-gold)", color: "oklch(0.18 0.02 60)" }}>
+            {c.badge}
+          </span>
+          {status === "preview" ? <FeatureStatusBadge status="preview" size="xs" /> : null}
+        </div>
         <span
           className="absolute end-4 top-4 inline-flex items-center gap-1 rounded-full border border-border/60 bg-background/60 px-2 py-1 uppercase tracking-[0.2em] text-muted-foreground backdrop-blur"
           style={{ fontSize: "var(--font-size-caption)" }}

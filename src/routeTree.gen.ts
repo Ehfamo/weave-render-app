@@ -13,6 +13,7 @@ import { Route as XeomxAiRouteImport } from './routes/xeomx-ai'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as PromptHubRouteImport } from './routes/prompt-hub'
@@ -55,6 +56,11 @@ const StudioRoute = StudioRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -189,6 +195,7 @@ export interface FileRoutesByFullPath {
   '/prompt-hub': typeof PromptHubRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
@@ -217,6 +224,7 @@ export interface FileRoutesByTo {
   '/prompt-hub': typeof PromptHubRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
@@ -247,6 +255,7 @@ export interface FileRoutesById {
   '/prompt-hub': typeof PromptHubRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
@@ -277,6 +286,7 @@ export interface FileRouteTypes {
     | '/prompt-hub'
     | '/refund-policy'
     | '/reset-password'
+    | '/search'
     | '/settings'
     | '/studio'
     | '/terms'
@@ -305,6 +315,7 @@ export interface FileRouteTypes {
     | '/prompt-hub'
     | '/refund-policy'
     | '/reset-password'
+    | '/search'
     | '/settings'
     | '/studio'
     | '/terms'
@@ -334,6 +345,7 @@ export interface FileRouteTypes {
     | '/prompt-hub'
     | '/refund-policy'
     | '/reset-password'
+    | '/search'
     | '/settings'
     | '/studio'
     | '/terms'
@@ -364,6 +376,7 @@ export interface RootRouteChildren {
   PromptHubRoute: typeof PromptHubRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRoute
   StudioRoute: typeof StudioRoute
   TermsRoute: typeof TermsRoute
@@ -400,6 +413,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -621,6 +641,7 @@ const rootRouteChildren: RootRouteChildren = {
   PromptHubRoute: PromptHubRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SearchRoute: SearchRoute,
   SettingsRoute: SettingsRoute,
   StudioRoute: StudioRoute,
   TermsRoute: TermsRoute,

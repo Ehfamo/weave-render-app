@@ -22,6 +22,7 @@ const IndexRails = lazy(() =>
 import { Logo } from "@/components/xeomx/Logo";
 import { HeroBackground, heroPreloadLinks } from "@/components/xeomx/HeroBackground";
 import { pageUrl } from "@/lib/seo";
+import { DemoDataBadge } from "@/components/xeomx/status/DemoDataBadge";
 
 const CATEGORY_LABELS: Record<string, () => string> = {
   All: () => m.cat_all(),
@@ -180,7 +181,7 @@ function Index() {
 
             <motion.dl
               variants={heroItemVariants}
-              className="grid max-w-md grid-cols-3 text-start"
+              className="relative grid max-w-md grid-cols-3 text-start"
               style={{
                 marginTop: "var(--space-7)",
                 gap: "var(--space-5)",
@@ -188,9 +189,13 @@ function Index() {
                 borderTop: "1px solid var(--border-subtle)",
               }}
             >
+              <DemoDataBadge
+                variant="sample"
+                className="absolute -top-3 start-0"
+              />
               {[
-                ["—", m.hero_stat_prompts()],
-                ["—", m.hero_stat_renders()],
+                ["12,480", m.hero_stat_prompts()],
+                ["1.4M", m.hero_stat_renders()],
                 ["Tier 01", m.hero_stat_drop()],
               ].map(([v, l]) => (
                 <div key={l}>

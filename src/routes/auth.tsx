@@ -90,9 +90,27 @@ function AuthPage() {
     else setLoading(null);
   }
 
-  // Apple, GitHub, and Discord OAuth intentionally disabled — provider
-  // configuration not verified for launch. Surfaced as "Coming soon" chips
-  // per the Feature Status registry.
+  // Apple and Discord OAuth intentionally disabled — surfaced as "Coming
+  // soon" chips per the Feature Status registry. GitHub is a supported
+  // provider; if the Supabase project has it configured the flow succeeds,
+  // otherwise Supabase returns a friendly error surfaced via toast.
+  async function signInGithub() {
+    setLoading("github");
+    setError(null);
+    const redirectTo = `${window.location.origin}/auth${
+      dest !== "/dashboard" ? `?next=${encodeURIComponent(dest)}` : ""
+    }`;
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "github",
+      options: { redirectTo },
+    });
+    if (error) {
+      const msg = friendlyAuthError(error.message);
+      setError(msg);
+      toast.error(msg);
+      setLoading(null);
+    }
+  }
 
   async function sendMagicLink(e: React.FormEvent) {
     e.preventDefault();
@@ -245,25 +263,9 @@ function AuthPage() {
                   {m.auth_coming_soon()}
                 </span>
               </button>
-              <button
-                type="button"
-                disabled
-                aria-disabled="true"
-                className="inline-flex w-full items-center justify-center gap-3 text-sm font-medium text-muted-foreground opacity-60 cursor-not-allowed"
-                style={{
-                  border: "1px solid var(--border-default)",
-                  backgroundColor: "var(--surface-glass)",
-                  borderRadius: "var(--radius-sm)",
-                  paddingInline: "var(--space-5)",
-                  paddingBlock: "var(--space-3)",
-                }}
-              >
+              <OAuthButton onClick={signInGithub} loading={loading === "github"} label={m.auth_continue_github()}>
                 <Github className="h-4 w-4" />
-                {m.auth_continue_github()}
-                <span className="ms-1 rounded-full border border-border/60 px-2 py-0.5 text-[10px] uppercase tracking-wide">
-                  {m.auth_coming_soon()}
-                </span>
-              </button>
+              </OAuthButton>
 
               <button
                 type="button"

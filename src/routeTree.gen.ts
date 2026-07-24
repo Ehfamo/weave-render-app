@@ -34,6 +34,7 @@ import { Route as PromptIdRouteImport } from './routes/prompt.$id'
 import { Route as MagazineSlugRouteImport } from './routes/magazine.$slug'
 import { Route as ExploreSlugRouteImport } from './routes/explore_.$slug'
 import { Route as CollectionsIdRouteImport } from './routes/collections.$id'
+import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
 const XeomxAiRoute = XeomxAiRouteImport.update({
@@ -160,6 +161,11 @@ const CollectionsIdRoute = CollectionsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => CollectionsRoute,
 } as any)
+const AuthenticatedSavedRoute = AuthenticatedSavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -188,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/xeomx-ai': typeof XeomxAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/saved': typeof AuthenticatedSavedRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore/$slug': typeof ExploreSlugRoute
   '/magazine/$slug': typeof MagazineSlugRoute
@@ -215,6 +222,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/xeomx-ai': typeof XeomxAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/saved': typeof AuthenticatedSavedRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore/$slug': typeof ExploreSlugRoute
   '/magazine/$slug': typeof MagazineSlugRoute
@@ -244,6 +252,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/xeomx-ai': typeof XeomxAiRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/collections/$id': typeof CollectionsIdRoute
   '/explore_/$slug': typeof ExploreSlugRoute
   '/magazine/$slug': typeof MagazineSlugRoute
@@ -273,6 +282,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/xeomx-ai'
     | '/dashboard'
+    | '/saved'
     | '/collections/$id'
     | '/explore/$slug'
     | '/magazine/$slug'
@@ -300,6 +310,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/xeomx-ai'
     | '/dashboard'
+    | '/saved'
     | '/collections/$id'
     | '/explore/$slug'
     | '/magazine/$slug'
@@ -328,6 +339,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/xeomx-ai'
     | '/_authenticated/dashboard'
+    | '/_authenticated/saved'
     | '/collections/$id'
     | '/explore_/$slug'
     | '/magazine/$slug'
@@ -537,6 +549,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CollectionsIdRouteImport
       parentRoute: typeof CollectionsRoute
     }
+    '/_authenticated/saved': {
+      id: '/_authenticated/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof AuthenticatedSavedRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -549,10 +568,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSavedRoute: AuthenticatedSavedRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

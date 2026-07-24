@@ -4,14 +4,20 @@ import { ArrowLeft, Share2, Bookmark, Clock } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
 import { ARTICLES } from "./magazine";
 import { pageUrl } from "@/lib/seo";
+import { PreviewNotice } from "@/components/xeomx/status/PreviewNotice";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
+
+// Slugs that have a real, unique body authored below. Every other known
+// article renders as ARTICLE COMING SOON — never with a copied body.
+const LIVE_ARTICLE_SLUGS = new Set(["nocturne-baroque-muse"]);
 
 export const Route = createFileRoute("/magazine/$slug")({
   loader: ({ params }) => {
     const article = ARTICLES.find((a) => a.slug === params.slug);
     if (!article) throw notFound();
-    return { article };
+    const isLive = LIVE_ARTICLE_SLUGS.has(article.slug);
+    return { article, isLive };
   },
   head: ({ loaderData, params }) => {
     const url = pageUrl(`/magazine/${params.slug}`);
@@ -20,6 +26,7 @@ export const Route = createFileRoute("/magazine/$slug")({
         meta: [{ title: m.magazine_not_found_title() }, { name: "robots", content: "noindex" }],
       };
     }
+    const noindex = !loaderData.isLive;
     return {
       meta: [
         { title: `${loaderData.article.title} — XeomX Magazine` },
@@ -28,6 +35,7 @@ export const Route = createFileRoute("/magazine/$slug")({
         { property: "og:description", content: loaderData.article.dek },
         { property: "og:type", content: "article" },
         { property: "og:url", content: url },
+        ...(noindex ? [{ name: "robots", content: "noindex" }] : []),
       ],
       links: [{ rel: "canonical", href: url }],
     };
@@ -103,7 +111,7 @@ const BODY: { heading: string; paragraphs: string[] }[] = [
 ];
 
 function ArticlePage() {
-  const { article } = Route.useLoaderData();
+  const { article, isLive } = Route.useLoaderData();
   const related = ARTICLES.filter((a) => a.slug !== article.slug).slice(0, 3);
   const cat = article.category as keyof typeof CAT_COLOR;
   const color = CAT_COLOR[cat];
@@ -193,13 +201,20 @@ function ArticlePage() {
               </span>
               <span style={{ color: "var(--text-secondary)" }}>{article.author}</span>
             </span>
-            <span aria-hidden>·</span>
-            <span>Jul 4, 2026</span>
-            <span aria-hidden>·</span>
-            <span className="inline-flex items-center" style={{ gap: "var(--space-2)" }}>
-              <Clock className="h-3.5 w-3.5" /> {article.readTime} {m.magazine_read_time()}
-            </span>
+            {isLive ? (
+              <>
+                <span aria-hidden>·</span>
+                <span className="inline-flex items-center" style={{ gap: "var(--space-2)" }}>
+                  <Clock className="h-3.5 w-3.5" /> {article.readTime} {m.magazine_read_time()}
+                </span>
+              </>
+            ) : null}
           </div>
+          {!isLive ? (
+            <div style={{ marginTop: "var(--space-5)" }}>
+              <PreviewNotice status="coming_soon" />
+            </div>
+          ) : null}
         </header>
 
         {/* Hero image */}
@@ -226,7 +241,7 @@ function ArticlePage() {
               className="mx-auto"
               style={{ maxWidth: 700, width: "100%" }}
             >
-              {BODY.map((section, i) => (
+              {isLive ? BODY.map((section, i) => (
                 <section key={section.heading} style={{ marginBottom: "var(--space-7)" }}>
                   <h2
                     id={`section-${i}`}
@@ -270,13 +285,33 @@ function ArticlePage() {
                     </blockquote>
                   )}
                 </section>
-              ))}
+              )) : (
+                <div className="rounded-3xl border border-dashed border-border/60 p-8 text-center">
+                  <p style={{ fontSize: "var(--font-size-body)", color: "var(--text-secondary)", lineHeight: 1.6 }}>
+                    This story is being written. We publish each piece only when the reporting and prompt work is complete.
+                  </p>
+                  <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                    <Link
+                      to="/magazine"
+                      className="rounded-full border border-border px-4 py-2 text-sm text-foreground"
+                    >
+                      {m.magazine_back()}
+                    </Link>
+                    <Link
+                      to="/explore"
+                      className="rounded-full bg-magenta px-4 py-2 text-sm text-white"
+                    >
+                      Discover prompts
+                    </Link>
+                  </div>
+                </div>
+              )}
             </article>
 
             {/* Sidebar */}
             <aside className="hidden lg:block">
               <div className="sticky" style={{ top: "var(--space-7)", display: "grid", gap: "var(--space-4)" }}>
-                <TocCard sections={BODY.map((b) => b.heading)} />
+                {isLive ? <TocCard sections={BODY.map((b) => b.heading)} /> : null}
                 <AuthorCard author={article.author} gradient={gradient} />
                 <FeaturedCollectionCard tone={article.category} />
               </div>

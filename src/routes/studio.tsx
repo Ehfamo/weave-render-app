@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Sparkles } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
+import { PreviewNotice } from "@/components/xeomx/status/PreviewNotice";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
@@ -62,6 +63,9 @@ function StudioPage() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--surface-primary)" }}>
       <Header />
+      <div style={{ paddingInline: "var(--space-6)", paddingTop: "var(--space-4)" }}>
+        <PreviewNotice status="preview" />
+      </div>
 
       {/* Studio sub-header */}
       <div

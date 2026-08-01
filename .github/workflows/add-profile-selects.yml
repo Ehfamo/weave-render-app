@@ -1,0 +1,137 @@
+name: Add Profile Selects
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  add-selects:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Convert profile fields to selects
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path("src/routes/profile-edit.tsx")
+          text = path.read_text()
+
+          replacements = {
+              "country": [
+                  ("", "انتخاب کشور"),
+                  ("Iran", "ایران"),
+                  ("Netherlands", "هلند"),
+                  ("Germany", "آلمان"),
+                  ("France", "فرانسه"),
+                  ("United Kingdom", "بریتانیا"),
+                  ("United States", "آمریکا"),
+                  ("Canada", "کانادا"),
+                  ("Turkey", "ترکیه"),
+                  ("United Arab Emirates", "امارات"),
+                  ("Azerbaijan", "آذربایجان"),
+              ],
+              "language": [
+                  ("", "انتخاب زبان"),
+                  ("fa", "فارسی"),
+                  ("en", "English"),
+                  ("nl", "Nederlands"),
+                  ("de", "Deutsch"),
+                  ("fr", "Français"),
+                  ("tr", "Türkçe"),
+                  ("ar", "العربية"),
+              ],
+              "timezone": [
+                  ("", "انتخاب منطقه زمانی"),
+                  ("Asia/Tehran", "تهران"),
+                  ("Europe/Amsterdam", "آمستردام"),
+                  ("Europe/Berlin", "برلین"),
+                  ("Europe/Paris", "پاریس"),
+                  ("Europe/London", "لندن"),
+                  ("Asia/Dubai", "دبی"),
+                  ("Asia/Istanbul", "استانبول"),
+                  ("America/New_York", "نیویورک"),
+                  ("America/Los_Angeles", "لس‌آنجلس"),
+              ],
+          }
+
+          for field, options in replacements.items():
+              pattern = re.compile(
+                  rf'<input(?=[^>]*name=["\']{field}["\'])[^>]*/?>',
+                  re.DOTALL,
+              )
+              match = pattern.search(text)
+
+              if not match:
+                  raise SystemExit(f"Input field not found: {field}")
+
+              original = match.group(0)
+
+              value = re.search(r'value=\{{([^}}]+)\}}', original)
+              change = re.search(r'onChange=\{([^}]+)\}', original)
+              class_name = re.search(r'className=(["\'][^"\']+["\'])', original)
+
+              value_expr = value.group(1) if value else f'form.{field}'
+              change_expr = change.group(1) if change else (
+                  f'(event) => setForm((current) => '
+                  f'({{ ...current, {field}: event.target.value }}))'
+              )
+              classes = class_name.group(1) if class_name else (
+                  '"w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3"'
+              )
+
+              option_markup = "\n".join(
+                  f'              <option value="{value}">{label}</option>'
+                  for value, label in options
+              )
+
+              select = f'''<select
+                name="{field}"
+                value={{{value_expr}}}
+                onChange={{{change_expr}}}
+                className={classes}
+              >
+{option_markup}
+              </select>'''
+
+              text = text[:match.start()] + select + text[match.end():]
+
+          path.write_text(text)
+          PY
+
+      - name: Format and verify
+        run: |
+          npx prettier --write src/routes/profile-edit.tsx
+          npm run lint
+          npx tsc --noEmit
+          npm run build
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add src/routes/profile-edit.tsx
+
+          if git diff --cached --quiet; then
+            echo "No changes needed."
+            exit 0
+          fi
+
+          git commit -m "feat: add profile selection fields"
+          git push

@@ -1,3 +1,4 @@
+/* eslint-disable no-control-regex */
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
 import { createHash, randomUUID } from "crypto";

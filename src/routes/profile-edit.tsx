@@ -165,13 +165,11 @@ function ProfileEdit() {
     try {
       const ext = avatarFile.name.split(".").pop()?.toLowerCase() || "jpg";
       const path = `${user.id}/avatar-${Date.now()}.${ext}`;
-      const { error: upErr } = await supabase.storage
-        .from("avatars")
-        .upload(path, avatarFile, {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: avatarFile.type,
-        });
+      const { error: upErr } = await supabase.storage.from("avatars").upload(path, avatarFile, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: avatarFile.type,
+      });
       if (upErr) throw upErr;
       // Best-effort delete of previous avatar so the bucket doesn't accrete.
       if (avatarPath && avatarPath !== path) {

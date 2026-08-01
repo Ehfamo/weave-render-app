@@ -1,0 +1,38 @@
+name: Sync Package Lock
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-lock:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Regenerate package lock
+        run: npm install --package-lock-only
+
+      - name: Commit updated package-lock.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet -- package-lock.json; then
+            echo "No package-lock.json changes needed."
+            exit 0
+          fi
+
+          git add package-lock.json
+          git commit -m "chore: sync package lock"
+          git push

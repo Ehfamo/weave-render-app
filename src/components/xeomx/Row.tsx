@@ -16,7 +16,9 @@ export function Row({ title, tag, ids }: { title: string; tag: string; ids: stri
       <div className="flex items-end justify-between gap-4 px-4 sm:px-8">
         <div>
           <p className="text-[11px] uppercase tracking-[0.28em] text-magenta/80">{tag}</p>
-          <h2 className="mt-1 font-display text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h2>
+          <h2 className="mt-1 font-display text-2xl font-semibold tracking-tight sm:text-3xl">
+            {title}
+          </h2>
         </div>
         <div className="hidden items-center gap-2 sm:flex">
           <button

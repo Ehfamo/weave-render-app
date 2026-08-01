@@ -58,8 +58,16 @@ function ForgotPassword() {
             "radial-gradient(ellipse 80% 50% at 50% 0%, oklch(0.45 0.25 340 / 0.35), transparent 60%)",
         }}
       />
-      <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center" style={{ paddingInline: "var(--space-5)" }}>
-        <Link to="/" aria-label="XEOMX — Home" className="flex items-center" style={{ marginBottom: "var(--space-6)" }}>
+      <div
+        className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center"
+        style={{ paddingInline: "var(--space-5)" }}
+      >
+        <Link
+          to="/"
+          aria-label="XEOMX — Home"
+          className="flex items-center"
+          style={{ marginBottom: "var(--space-6)" }}
+        >
           <Logo variant="full" size={36} ariaLabel="XEOMX" />
         </Link>
 
@@ -72,27 +80,56 @@ function ForgotPassword() {
           role="region"
           aria-labelledby="fp-title"
         >
-          <Link to="/auth" search={{ next: undefined }} className="inline-flex items-center gap-1 transition hover:text-foreground" style={{ marginBottom: "var(--space-4)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>
+          <Link
+            to="/auth"
+            search={{ next: undefined }}
+            className="inline-flex items-center gap-1 transition hover:text-foreground"
+            style={{
+              marginBottom: "var(--space-4)",
+              fontSize: "var(--font-size-caption)",
+              color: "var(--text-muted)",
+            }}
+          >
             <ArrowLeft className="h-3 w-3" /> Back to sign in
           </Link>
-          <h1 id="fp-title" className="font-display font-bold tracking-tight text-foreground" style={{ fontSize: "clamp(1.5rem, 4vw, var(--font-size-h1))" }}>
+          <h1
+            id="fp-title"
+            className="font-display font-bold tracking-tight text-foreground"
+            style={{ fontSize: "clamp(1.5rem, 4vw, var(--font-size-h1))" }}
+          >
             Forgot your password?
           </h1>
-          <p style={{ marginTop: "var(--space-2)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>
+          <p
+            style={{
+              marginTop: "var(--space-2)",
+              fontSize: "var(--font-size-caption)",
+              color: "var(--text-muted)",
+            }}
+          >
             Enter the email tied to your account and we'll send you a secure reset link.
           </p>
 
           {sent ? (
-            <div className="flex flex-col items-start" style={{ marginTop: "var(--space-5)", gap: "var(--space-3)" }}>
-              <div className="inline-flex items-center gap-2 text-sm" style={{ color: "var(--action-primary)" }}>
+            <div
+              className="flex flex-col items-start"
+              style={{ marginTop: "var(--space-5)", gap: "var(--space-3)" }}
+            >
+              <div
+                className="inline-flex items-center gap-2 text-sm"
+                style={{ color: "var(--action-primary)" }}
+              >
                 <CheckCircle2 className="h-4 w-4" aria-hidden /> Check your email
               </div>
               <p style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>
-                If an account exists for <strong className="text-foreground">{email}</strong>, a password-reset link is on its way. The link expires in 60 minutes.
+                If an account exists for <strong className="text-foreground">{email}</strong>, a
+                password-reset link is on its way. The link expires in 60 minutes.
               </p>
               <button
                 type="button"
-                onClick={() => { setSent(false); setEmail(""); }}
+                onClick={() => {
+                  setSent(false);
+                  setEmail("");
+                }}
                 className="text-sm transition hover:text-foreground"
                 style={{ color: "var(--text-muted)" }}
               >
@@ -100,8 +137,15 @@ function ForgotPassword() {
               </button>
             </div>
           ) : (
-            <form onSubmit={submit} className="flex flex-col" style={{ marginTop: "var(--space-6)", gap: "var(--space-3)" }} noValidate>
-              <label className="text-xs font-medium text-muted-foreground" htmlFor="fp-email">Email</label>
+            <form
+              onSubmit={submit}
+              className="flex flex-col"
+              style={{ marginTop: "var(--space-6)", gap: "var(--space-3)" }}
+              noValidate
+            >
+              <label className="text-xs font-medium text-muted-foreground" htmlFor="fp-email">
+                Email
+              </label>
               <input
                 id="fp-email"
                 type="email"
@@ -122,7 +166,13 @@ function ForgotPassword() {
                 placeholder="you@example.com"
               />
               {error && (
-                <p id="fp-error" role="alert" style={{ fontSize: "var(--font-size-micro)", color: "var(--action-secondary)" }}>{error}</p>
+                <p
+                  id="fp-error"
+                  role="alert"
+                  style={{ fontSize: "var(--font-size-micro)", color: "var(--action-secondary)" }}
+                >
+                  {error}
+                </p>
               )}
               <button
                 type="submit"
@@ -136,7 +186,11 @@ function ForgotPassword() {
                   paddingBlock: "var(--space-3)",
                 }}
               >
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Mail className="h-4 w-4" aria-hidden />}
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                ) : (
+                  <Mail className="h-4 w-4" aria-hidden />
+                )}
                 Send reset link
               </button>
             </form>

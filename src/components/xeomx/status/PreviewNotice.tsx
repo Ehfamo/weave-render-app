@@ -23,15 +23,15 @@ export function PreviewNotice({
     (status === "coming_soon"
       ? m.coming_soon_notice_title()
       : status === "beta"
-      ? m.beta_notice_title()
-      : m.preview_notice_title());
+        ? m.beta_notice_title()
+        : m.preview_notice_title());
   const message =
     body ??
     (status === "coming_soon"
       ? m.coming_soon_notice_body()
       : status === "beta"
-      ? m.beta_notice_body()
-      : m.preview_notice_body());
+        ? m.beta_notice_body()
+        : m.preview_notice_body());
   return (
     <div
       role="note"

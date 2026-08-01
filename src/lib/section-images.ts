@@ -94,7 +94,10 @@ const CATEGORY_IMAGES: Record<string, string> = {
 
 // Per-slug unique cinematic images (every card gets its own artwork).
 const SLUG_IMAGES: Record<string, string> = {
-  landing, login, dashboard, home,
+  landing,
+  login,
+  dashboard,
+  home,
   "studio-canvas": studioCanvas,
   "visual-workflow": visualWorkflow,
   "video-studio": videoStudio,

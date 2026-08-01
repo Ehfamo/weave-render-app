@@ -78,12 +78,19 @@ function PricingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
-      <div className="mx-auto max-w-[1200px]" style={{ paddingInline: "var(--space-4)", paddingTop: "var(--space-6)" }}>
+      <div
+        className="mx-auto max-w-[1200px]"
+        style={{ paddingInline: "var(--space-4)", paddingTop: "var(--space-6)" }}
+      >
         <PreviewNotice status="coming_soon" body={m.pricing_preview_notice()} />
       </div>
       <section
         className="mx-auto max-w-[1200px] text-center"
-        style={{ paddingInline: "var(--space-4)", paddingTop: "var(--space-9)", paddingBottom: "var(--space-7)" }}
+        style={{
+          paddingInline: "var(--space-4)",
+          paddingTop: "var(--space-9)",
+          paddingBottom: "var(--space-7)",
+        }}
       >
         <p
           className="uppercase tracking-[0.28em]"
@@ -99,7 +106,8 @@ function PricingPage() {
             maxWidth: "720px",
           }}
         >
-          {m.pricing_title_1()} <span className="text-gradient-magenta italic">{m.pricing_title_2()}</span>
+          {m.pricing_title_1()}{" "}
+          <span className="text-gradient-magenta italic">{m.pricing_title_2()}</span>
         </h1>
         <p
           className="mx-auto"
@@ -148,9 +156,7 @@ function PlanCard({ plan }: { plan: Plan }) {
       style={{
         padding: "var(--space-6)",
         borderRadius: "var(--radius-lg)",
-        border: featured
-          ? "1px solid var(--action-primary)"
-          : "1px solid var(--border-default)",
+        border: featured ? "1px solid var(--action-primary)" : "1px solid var(--border-default)",
         boxShadow: featured ? "0 0 0 4px rgba(255,107,26,0.10)" : undefined,
       }}
     >
@@ -173,10 +179,7 @@ function PlanCard({ plan }: { plan: Plan }) {
         </span>
       )}
 
-      <h3
-        className="font-display font-semibold"
-        style={{ fontSize: "var(--font-size-h3)" }}
-      >
+      <h3 className="font-display font-semibold" style={{ fontSize: "var(--font-size-h3)" }}>
         {plan.name}
       </h3>
 
@@ -200,10 +203,7 @@ function PlanCard({ plan }: { plan: Plan }) {
         </span>
       </div>
 
-      <ul
-        className="flex flex-col"
-        style={{ marginTop: "var(--space-6)", gap: "var(--space-3)" }}
-      >
+      <ul className="flex flex-col" style={{ marginTop: "var(--space-6)", gap: "var(--space-3)" }}>
         {plan.features.map((f) => (
           <li
             key={f}

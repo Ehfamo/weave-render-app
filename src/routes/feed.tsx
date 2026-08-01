@@ -13,7 +13,10 @@ export const Route = createFileRoute("/feed")({
       { title: "Viral Feed — XeomX" },
       { name: "description", content: "Full-screen viral prompt feed. Scroll, copy, remix." },
       { property: "og:title", content: "Viral Feed — XeomX" },
-      { property: "og:description", content: "Full-screen viral prompt feed. Scroll, copy, remix." },
+      {
+        property: "og:description",
+        content: "Full-screen viral prompt feed. Scroll, copy, remix.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:url", content: pageUrl("/feed") },
     ],
@@ -23,7 +26,11 @@ export const Route = createFileRoute("/feed")({
 });
 
 function Feed() {
-  const { data: queue = [], isLoading, error } = useQuery({
+  const {
+    data: queue = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["viral-feed"],
     queryFn: () => fetchViralPrompts(20),
     staleTime: 60_000,
@@ -43,15 +50,22 @@ function Feed() {
         Beta · Curated
       </span>
       {isLoading ? (
-        <div className="grid h-[100svh] place-items-center text-sm text-muted-foreground">Loading feed…</div>
+        <div className="grid h-[100svh] place-items-center text-sm text-muted-foreground">
+          Loading feed…
+        </div>
       ) : error ? (
-        <div className="grid h-[100svh] place-items-center text-sm text-destructive">Failed to load feed.</div>
+        <div className="grid h-[100svh] place-items-center text-sm text-destructive">
+          Failed to load feed.
+        </div>
       ) : queue.length === 0 ? (
         <div className="grid h-[100svh] place-items-center px-6 text-center">
           <div>
             <h2 className="font-display text-2xl">No prompts yet</h2>
             <p className="mt-2 text-sm text-muted-foreground">Be the first to publish a prompt.</p>
-            <Link to="/studio" className="mt-4 inline-block rounded-full border border-border px-4 py-2 text-sm">
+            <Link
+              to="/studio"
+              className="mt-4 inline-block rounded-full border border-border px-4 py-2 text-sm"
+            >
               Open Studio
             </Link>
           </div>

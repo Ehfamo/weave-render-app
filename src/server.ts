@@ -77,7 +77,8 @@ function applySecurityHeaders(response: Response, request: Request): Response {
   if (!h.has("referrer-policy")) h.set("referrer-policy", "strict-origin-when-cross-origin");
   if (!h.has("x-dns-prefetch-control")) h.set("x-dns-prefetch-control", "on");
   if (!h.has("origin-agent-cluster")) h.set("origin-agent-cluster", "?1");
-  if (!h.has("cross-origin-opener-policy")) h.set("cross-origin-opener-policy", "same-origin-allow-popups");
+  if (!h.has("cross-origin-opener-policy"))
+    h.set("cross-origin-opener-policy", "same-origin-allow-popups");
   if (!h.has("cross-origin-resource-policy")) h.set("cross-origin-resource-policy", "same-site");
   if (!h.has("permissions-policy")) {
     h.set(
@@ -111,7 +112,11 @@ function applySecurityHeaders(response: Response, request: Request): Response {
   // Flip to Content-Security-Policy after a clean reporting window.
   const contentType = h.get("content-type") ?? "";
   const isHtml = contentType.includes("text/html");
-  if (isHtml && !h.has("content-security-policy-report-only") && !h.has("content-security-policy")) {
+  if (
+    isHtml &&
+    !h.has("content-security-policy-report-only") &&
+    !h.has("content-security-policy")
+  ) {
     h.set("content-security-policy-report-only", CSP_REPORT_ONLY);
   }
 
@@ -135,7 +140,11 @@ function applySecurityHeaders(response: Response, request: Request): Response {
 
   // Belt & braces: block clickjacking for HTML on custom domains too.
   void request;
-  return new Response(response.body, { status: response.status, statusText: response.statusText, headers: h });
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: h,
+  });
 }
 
 export default {
@@ -143,7 +152,10 @@ export default {
     // Force HTTPS at the edge. Cloudflare terminates TLS; x-forwarded-proto tells us the client scheme.
     const proto = request.headers.get("x-forwarded-proto");
     const url = new URL(request.url);
-    if (proto === "http" || (url.protocol === "http:" && url.hostname !== "localhost" && !url.hostname.endsWith(".local"))) {
+    if (
+      proto === "http" ||
+      (url.protocol === "http:" && url.hostname !== "localhost" && !url.hostname.endsWith(".local"))
+    ) {
       const httpsUrl = new URL(request.url);
       httpsUrl.protocol = "https:";
       return new Response(null, {

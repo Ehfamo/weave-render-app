@@ -25,10 +25,7 @@ export const Route = createFileRoute("/creators/$handle")({
   head: ({ loaderData, params }) => {
     if (!loaderData) {
       return {
-        meta: [
-          { title: "Creator not found — XeomX" },
-          { name: "robots", content: "noindex" },
-        ],
+        meta: [{ title: "Creator not found — XeomX" }, { name: "robots", content: "noindex" }],
       };
     }
     const { profile } = loaderData;
@@ -60,7 +57,10 @@ export const Route = createFileRoute("/creators/$handle")({
           That handle doesn't match a XeomX creator.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link to="/creators" className="rounded-full bg-magenta px-5 py-2 text-sm font-medium text-white">
+          <Link
+            to="/creators"
+            className="rounded-full bg-magenta px-5 py-2 text-sm font-medium text-white"
+          >
             All creators
           </Link>
           <Link to="/" className="rounded-full border border-border px-5 py-2 text-sm">
@@ -74,7 +74,10 @@ export const Route = createFileRoute("/creators/$handle")({
     <div className="grid min-h-screen place-items-center bg-background px-4 text-center">
       <div>
         <h1 className="font-display text-2xl">Couldn't load this profile</h1>
-        <button onClick={reset} className="mt-4 rounded-full border border-border px-4 py-2 text-sm">
+        <button
+          onClick={reset}
+          className="mt-4 rounded-full border border-border px-4 py-2 text-sm"
+        >
           Retry
         </button>
       </div>
@@ -94,7 +97,11 @@ function CreatorDetail() {
     supabase.auth.getUser().then((r) => setUid(r.data.user?.id ?? null));
   }, []);
 
-  const { data: prompts = [], isLoading, error } = useQuery({
+  const {
+    data: prompts = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["creator-prompts", profile.id],
     queryFn: () => fetchPromptsByAuthor(profile.id, 48),
     staleTime: 60_000,
@@ -198,7 +205,10 @@ function CreatorDetail() {
           {isLoading ? (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-                <div key={i} className="aspect-[4/5] animate-pulse rounded-2xl border border-border/60 bg-surface/40" />
+                <div
+                  key={i}
+                  className="aspect-[4/5] animate-pulse rounded-2xl border border-border/60 bg-surface/40"
+                />
               ))}
             </div>
           ) : error ? (

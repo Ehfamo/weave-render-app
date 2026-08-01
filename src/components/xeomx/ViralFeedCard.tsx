@@ -49,7 +49,9 @@ export function ViralFeedCard({ p }: { p: Prompt }) {
             >
               <Icon className="h-5 w-5" />
             </span>
-            <span style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>{label}</span>
+            <span style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>
+              {label}
+            </span>
           </button>
         ))}
       </div>
@@ -64,7 +66,9 @@ export function ViralFeedCard({ p }: { p: Prompt }) {
           </span>
           <SignalBadge signal={p.signal ?? null} score={p.viralScore} />
         </div>
-        <h2 className="font-display text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">{p.title}</h2>
+        <h2 className="font-display text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">
+          {p.title}
+        </h2>
         <p
           className="line-clamp-3 max-w-xl"
           style={{ fontSize: "var(--font-size-body)", color: "var(--text-secondary)" }}

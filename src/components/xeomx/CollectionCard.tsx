@@ -3,7 +3,13 @@ import { Layers, ArrowUpRight } from "lucide-react";
 import type { Collection } from "@/lib/prompts";
 import { FeatureStatusBadge } from "@/components/xeomx/status/FeatureStatusBadge";
 
-export function CollectionCard({ c, status = "live" }: { c: Collection; status?: "live" | "preview" }) {
+export function CollectionCard({
+  c,
+  status = "live",
+}: {
+  c: Collection;
+  status?: "live" | "preview";
+}) {
   return (
     <Link
       to="/collections/$id"
@@ -16,10 +22,19 @@ export function CollectionCard({ c, status = "live" }: { c: Collection; status?:
       }}
     >
       <div className="relative aspect-[16/10] overflow-hidden">
-        <img src={c.cover} alt={c.title} loading="lazy" decoding="async" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+        <img
+          src={c.cover}
+          alt={c.title}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
         <div className="absolute start-4 top-4 flex items-center gap-2">
-          <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.22em]" style={{ background: "var(--gradient-gold)", color: "oklch(0.18 0.02 60)" }}>
+          <span
+            className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.22em]"
+            style={{ background: "var(--gradient-gold)", color: "oklch(0.18 0.02 60)" }}
+          >
             {c.badge}
           </span>
           {status === "preview" ? <FeatureStatusBadge status="preview" size="xs" /> : null}
@@ -41,7 +56,9 @@ export function CollectionCard({ c, status = "live" }: { c: Collection; status?:
           </h3>
           <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition group-hover:text-gold" />
         </div>
-        <p style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>{c.subtitle}</p>
+        <p style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>
+          {c.subtitle}
+        </p>
       </div>
     </Link>
   );

@@ -78,7 +78,11 @@ function SearchPage() {
   const q = (search.q ?? "").trim();
   const enabled = q.length >= 2;
 
-  const { data: dbResults = [], isLoading, error } = useQuery({
+  const {
+    data: dbResults = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["search", q, category],
     enabled,
     queryFn: () =>
@@ -128,7 +132,10 @@ function SearchPage() {
             e.preventDefault();
             navigate({
               to: "/search",
-              search: { q: input || undefined, category: category === "All" ? undefined : category },
+              search: {
+                q: input || undefined,
+                category: category === "All" ? undefined : category,
+              },
             });
           }}
           className="relative mt-4 flex items-center"
@@ -143,7 +150,12 @@ function SearchPage() {
             placeholder="Search prompts, creators, categories…"
             aria-label="Search prompts"
             className="w-full rounded-full border border-border bg-surface/60 text-sm text-foreground placeholder:text-muted-foreground focus:border-magenta/50 focus:outline-none focus:ring-2 focus:ring-magenta/30"
-            style={{ paddingInlineStart: "var(--space-8)", paddingInlineEnd: "var(--space-8)", paddingBlock: "var(--space-3)", minHeight: 44 }}
+            style={{
+              paddingInlineStart: "var(--space-8)",
+              paddingInlineEnd: "var(--space-8)",
+              paddingBlock: "var(--space-3)",
+              minHeight: 44,
+            }}
           />
           {input && (
             <button
@@ -189,7 +201,10 @@ function SearchPage() {
           ) : isLoading ? (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-                <div key={i} className="aspect-[4/5] animate-pulse rounded-2xl border border-border/60 bg-surface/40" />
+                <div
+                  key={i}
+                  className="aspect-[4/5] animate-pulse rounded-2xl border border-border/60 bg-surface/40"
+                />
               ))}
             </div>
           ) : error ? (
@@ -197,7 +212,9 @@ function SearchPage() {
           ) : dbResults.length === 0 && previewOnly.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-border/60 p-10 text-center">
               <h2 className="font-display text-2xl">No results for "{q}"</h2>
-              <p className="mt-2 text-sm text-muted-foreground">Try a different phrase or clear filters.</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Try a different phrase or clear filters.
+              </p>
               <Link
                 to="/explore"
                 className="mt-4 inline-flex rounded-full border border-border px-4 py-2 text-sm"

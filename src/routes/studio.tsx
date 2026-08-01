@@ -27,9 +27,21 @@ export const Route = createFileRoute("/studio")({
 type StudioState = "empty" | "generating" | "result";
 
 const PRESETS = [
-  { id: "cinematic", label: () => m.studio_preset_cinematic(), gradient: "linear-gradient(135deg, #ff6b1a, #b40f5b)" },
-  { id: "anime", label: () => m.studio_preset_anime(), gradient: "linear-gradient(135deg, #ff2e8a, #4da3ff)" },
-  { id: "editorial", label: () => m.studio_preset_editorial(), gradient: "linear-gradient(135deg, #ffc14d, #ff6b1a)" },
+  {
+    id: "cinematic",
+    label: () => m.studio_preset_cinematic(),
+    gradient: "linear-gradient(135deg, #ff6b1a, #b40f5b)",
+  },
+  {
+    id: "anime",
+    label: () => m.studio_preset_anime(),
+    gradient: "linear-gradient(135deg, #ff2e8a, #4da3ff)",
+  },
+  {
+    id: "editorial",
+    label: () => m.studio_preset_editorial(),
+    gradient: "linear-gradient(135deg, #ffc14d, #ff6b1a)",
+  },
 ];
 
 const HISTORY = [
@@ -77,7 +89,10 @@ function StudioPage() {
         }}
         className="flex items-center justify-between"
       >
-        <h1 style={{ fontSize: "var(--font-size-h3)", color: "var(--text-primary)" }} className="font-semibold">
+        <h1
+          style={{ fontSize: "var(--font-size-h3)", color: "var(--text-primary)" }}
+          className="font-semibold"
+        >
           {m.studio_title()}
         </h1>
         <div className="flex items-center" style={{ gap: "var(--space-4)" }}>
@@ -245,7 +260,11 @@ function StudioPage() {
                   letterSpacing: "0.08em",
                 }}
               >
-                {s === "empty" ? m.studio_state_empty() : s === "generating" ? m.studio_state_generating() : m.studio_state_result()}
+                {s === "empty"
+                  ? m.studio_state_empty()
+                  : s === "generating"
+                    ? m.studio_state_generating()
+                    : m.studio_state_result()}
               </button>
             ))}
           </div>
@@ -346,7 +365,10 @@ function EmptyCanvas() {
       >
         {m.studio_empty_title()}
       </p>
-      <div className="grid grid-cols-3" style={{ gap: "var(--space-3)", width: "100%", maxWidth: 380 }}>
+      <div
+        className="grid grid-cols-3"
+        style={{ gap: "var(--space-3)", width: "100%", maxWidth: 380 }}
+      >
         {PRESETS.map((p) => (
           <div
             key={p.id}
@@ -360,9 +382,15 @@ function EmptyCanvas() {
           >
             <div
               className="flex h-full w-full items-end"
-              style={{ padding: "var(--space-2)", background: "linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.55) 100%)" }}
+              style={{
+                padding: "var(--space-2)",
+                background: "linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.55) 100%)",
+              }}
             >
-              <span style={{ fontSize: "var(--font-size-micro)", color: "#fff" }} className="font-semibold">
+              <span
+                style={{ fontSize: "var(--font-size-micro)", color: "#fff" }}
+                className="font-semibold"
+              >
                 {p.label()}
               </span>
             </div>
@@ -431,7 +459,10 @@ function ResultCanvas() {
     >
       <div
         className="absolute h-full w-full"
-        style={{ background: "radial-gradient(80% 60% at 30% 30%, rgba(255,255,255,0.18), transparent 60%)" }}
+        style={{
+          background:
+            "radial-gradient(80% 60% at 30% 30%, rgba(255,255,255,0.18), transparent 60%)",
+        }}
       />
       <div
         className="absolute"

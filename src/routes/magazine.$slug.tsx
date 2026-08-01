@@ -48,7 +48,10 @@ export const Route = createFileRoute("/magazine/$slug")({
         className="mx-auto text-center"
         style={{ maxWidth: 640, paddingInline: "var(--space-5)", paddingBlock: "var(--space-9)" }}
       >
-        <h1 className="font-display" style={{ fontSize: "var(--font-size-h1)", color: "var(--text-primary)" }}>
+        <h1
+          className="font-display"
+          style={{ fontSize: "var(--font-size-h1)", color: "var(--text-primary)" }}
+        >
           {m.magazine_not_found_title()}
         </h1>
         <Link
@@ -83,7 +86,11 @@ const CAT_GRADIENT = {
 } as const;
 
 function catLabel(c: "spotlight" | "tutorial" | "news") {
-  return c === "spotlight" ? m.magazine_cat_spotlight() : c === "tutorial" ? m.magazine_cat_tutorial() : m.magazine_cat_news();
+  return c === "spotlight"
+    ? m.magazine_cat_spotlight()
+    : c === "tutorial"
+      ? m.magazine_cat_tutorial()
+      : m.magazine_cat_news();
 }
 
 const BODY: { heading: string; paragraphs: string[] }[] = [
@@ -129,7 +136,10 @@ function ArticlePage() {
         style={{ maxWidth: 1200, paddingInline: "var(--space-5)", paddingBlock: "var(--space-7)" }}
       >
         {/* Top bar */}
-        <div className="flex items-center justify-between" style={{ marginBottom: "var(--space-6)" }}>
+        <div
+          className="flex items-center justify-between"
+          style={{ marginBottom: "var(--space-6)" }}
+        >
           <Link
             to="/magazine"
             className="inline-flex items-center gap-2 transition hover:text-white"
@@ -234,61 +244,66 @@ function ArticlePage() {
           className="grid gap-8"
           style={{ marginTop: "var(--space-7)", gridTemplateColumns: "minmax(0, 1fr)" }}
         >
-          <div
-            className="grid gap-8 lg:[grid-template-columns:minmax(0,1fr)_280px]"
-          >
-            <article
-              className="mx-auto"
-              style={{ maxWidth: 700, width: "100%" }}
-            >
-              {isLive ? BODY.map((section, i) => (
-                <section key={section.heading} style={{ marginBottom: "var(--space-7)" }}>
-                  <h2
-                    id={`section-${i}`}
-                    className="font-display font-semibold"
-                    style={{
-                      fontSize: "var(--font-size-h2)",
-                      color: "var(--text-primary)",
-                      letterSpacing: "-0.01em",
-                      marginBottom: "var(--space-4)",
-                    }}
-                  >
-                    {section.heading}
-                  </h2>
-                  {section.paragraphs.map((p, j) => (
-                    <p
-                      key={j}
+          <div className="grid gap-8 lg:[grid-template-columns:minmax(0,1fr)_280px]">
+            <article className="mx-auto" style={{ maxWidth: 700, width: "100%" }}>
+              {isLive ? (
+                BODY.map((section, i) => (
+                  <section key={section.heading} style={{ marginBottom: "var(--space-7)" }}>
+                    <h2
+                      id={`section-${i}`}
+                      className="font-display font-semibold"
                       style={{
-                        fontSize: "var(--font-size-body-lg)",
-                        lineHeight: 1.75,
-                        color: "var(--text-secondary)",
+                        fontSize: "var(--font-size-h2)",
+                        color: "var(--text-primary)",
+                        letterSpacing: "-0.01em",
                         marginBottom: "var(--space-4)",
                       }}
                     >
-                      {p}
-                    </p>
-                  ))}
-                  {i === 1 && (
-                    <blockquote
-                      style={{
-                        marginBlock: "var(--space-6)",
-                        paddingInlineStart: "var(--space-5)",
-                        borderInlineStart: `3px solid var(--color-orange-400)`,
-                        fontStyle: "italic",
-                        fontSize: "var(--font-size-h3)",
-                        lineHeight: 1.5,
-                        color: "var(--color-orange-400)",
-                        fontFamily: "var(--font-display)",
-                      }}
-                    >
-                      "A prompt is a small blueprint. Nothing is left to the model's default sense of taste — because the default is always the mean of the internet."
-                    </blockquote>
-                  )}
-                </section>
-              )) : (
+                      {section.heading}
+                    </h2>
+                    {section.paragraphs.map((p, j) => (
+                      <p
+                        key={j}
+                        style={{
+                          fontSize: "var(--font-size-body-lg)",
+                          lineHeight: 1.75,
+                          color: "var(--text-secondary)",
+                          marginBottom: "var(--space-4)",
+                        }}
+                      >
+                        {p}
+                      </p>
+                    ))}
+                    {i === 1 && (
+                      <blockquote
+                        style={{
+                          marginBlock: "var(--space-6)",
+                          paddingInlineStart: "var(--space-5)",
+                          borderInlineStart: `3px solid var(--color-orange-400)`,
+                          fontStyle: "italic",
+                          fontSize: "var(--font-size-h3)",
+                          lineHeight: 1.5,
+                          color: "var(--color-orange-400)",
+                          fontFamily: "var(--font-display)",
+                        }}
+                      >
+                        "A prompt is a small blueprint. Nothing is left to the model's default sense
+                        of taste — because the default is always the mean of the internet."
+                      </blockquote>
+                    )}
+                  </section>
+                ))
+              ) : (
                 <div className="rounded-3xl border border-dashed border-border/60 p-8 text-center">
-                  <p style={{ fontSize: "var(--font-size-body)", color: "var(--text-secondary)", lineHeight: 1.6 }}>
-                    This story is being written. We publish each piece only when the reporting and prompt work is complete.
+                  <p
+                    style={{
+                      fontSize: "var(--font-size-body)",
+                      color: "var(--text-secondary)",
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    This story is being written. We publish each piece only when the reporting and
+                    prompt work is complete.
                   </p>
                   <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
                     <Link
@@ -310,7 +325,10 @@ function ArticlePage() {
 
             {/* Sidebar */}
             <aside className="hidden lg:block">
-              <div className="sticky" style={{ top: "var(--space-7)", display: "grid", gap: "var(--space-4)" }}>
+              <div
+                className="sticky"
+                style={{ top: "var(--space-7)", display: "grid", gap: "var(--space-4)" }}
+              >
                 {isLive ? <TocCard sections={BODY.map((b) => b.heading)} /> : null}
                 <AuthorCard author={article.author} gradient={gradient} />
                 <FeaturedCollectionCard tone={article.category} />
@@ -323,7 +341,11 @@ function ArticlePage() {
         <section style={{ marginTop: "var(--space-9)" }}>
           <h2
             className="font-display font-semibold"
-            style={{ fontSize: "var(--font-size-h2)", color: "var(--text-primary)", marginBottom: "var(--space-5)" }}
+            style={{
+              fontSize: "var(--font-size-h2)",
+              color: "var(--text-primary)",
+              marginBottom: "var(--space-5)",
+            }}
           >
             {m.magazine_related()}
           </h2>
@@ -334,37 +356,48 @@ function ArticlePage() {
             {related.map((a) => {
               const ac = a.category as keyof typeof CAT_COLOR;
               return (
-              <Link
-                key={a.slug}
-                to="/magazine/$slug"
-                params={{ slug: a.slug }}
-                className="surface-raised group overflow-hidden rounded-2xl transition hover:scale-[1.02]"
-                style={{ transitionDuration: "var(--motion-duration-base)" }}
-              >
-                <div aria-hidden style={{ aspectRatio: "16/10", background: CAT_GRADIENT[ac] }} />
-                <div style={{ padding: "var(--space-4)" }}>
-                  <div
-                    style={{
-                      fontSize: "var(--font-size-micro)",
-                      color: CAT_COLOR[ac],
-                      textTransform: "uppercase",
-                      letterSpacing: "0.2em",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {catLabel(ac)}
+                <Link
+                  key={a.slug}
+                  to="/magazine/$slug"
+                  params={{ slug: a.slug }}
+                  className="surface-raised group overflow-hidden rounded-2xl transition hover:scale-[1.02]"
+                  style={{ transitionDuration: "var(--motion-duration-base)" }}
+                >
+                  <div aria-hidden style={{ aspectRatio: "16/10", background: CAT_GRADIENT[ac] }} />
+                  <div style={{ padding: "var(--space-4)" }}>
+                    <div
+                      style={{
+                        fontSize: "var(--font-size-micro)",
+                        color: CAT_COLOR[ac],
+                        textTransform: "uppercase",
+                        letterSpacing: "0.2em",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {catLabel(ac)}
+                    </div>
+                    <div
+                      className="font-display"
+                      style={{
+                        marginTop: "var(--space-2)",
+                        fontSize: "var(--font-size-body-lg)",
+                        color: "var(--text-primary)",
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {a.title}
+                    </div>
+                    <div
+                      style={{
+                        marginTop: "var(--space-3)",
+                        fontSize: "var(--font-size-caption)",
+                        color: "var(--text-muted)",
+                      }}
+                    >
+                      {a.author} · {a.readTime} {m.magazine_read_time()}
+                    </div>
                   </div>
-                  <div
-                    className="font-display"
-                    style={{ marginTop: "var(--space-2)", fontSize: "var(--font-size-body-lg)", color: "var(--text-primary)", lineHeight: 1.3 }}
-                  >
-                    {a.title}
-                  </div>
-                  <div style={{ marginTop: "var(--space-3)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>
-                    {a.author} · {a.readTime} {m.magazine_read_time()}
-                  </div>
-                </div>
-              </Link>
+                </Link>
               );
             })}
           </div>
@@ -451,7 +484,9 @@ function AuthorCard({ author, gradient }: { author: string; gradient: string }) 
           {author.replace("@", "").slice(0, 1).toUpperCase()}
         </span>
         <div>
-          <div style={{ fontSize: "var(--font-size-body)", color: "var(--text-primary)" }}>{author}</div>
+          <div style={{ fontSize: "var(--font-size-body)", color: "var(--text-primary)" }}>
+            {author}
+          </div>
         </div>
       </div>
     </div>
@@ -479,11 +514,21 @@ function FeaturedCollectionCard({ tone }: { tone: "spotlight" | "tutorial" | "ne
         </div>
         <div
           className="font-display"
-          style={{ marginTop: "var(--space-2)", fontSize: "var(--font-size-body-lg)", color: "var(--text-primary)" }}
+          style={{
+            marginTop: "var(--space-2)",
+            fontSize: "var(--font-size-body-lg)",
+            color: "var(--text-primary)",
+          }}
         >
           Nocturne Portraits
         </div>
-        <div style={{ marginTop: "var(--space-2)", fontSize: "var(--font-size-caption)", color: "var(--action-primary)" }}>
+        <div
+          style={{
+            marginTop: "var(--space-2)",
+            fontSize: "var(--font-size-caption)",
+            color: "var(--action-primary)",
+          }}
+        >
           {m.magazine_view_collection()} →
         </div>
       </div>

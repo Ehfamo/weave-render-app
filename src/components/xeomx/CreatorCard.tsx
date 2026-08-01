@@ -34,13 +34,28 @@ export function CreatorCard({
       }}
     >
       <div className="relative aspect-[5/4] overflow-hidden">
-        <img src={c.cover} alt={c.name} loading="lazy" decoding="async" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+        <img
+          src={c.cover}
+          alt={c.name}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
-        <span className={`absolute start-3 top-3 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.2em] backdrop-blur ${t.cls}`}>
+        <span
+          className={`absolute start-3 top-3 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.2em] backdrop-blur ${t.cls}`}
+        >
           <Icon className="h-3 w-3" /> {c.tier}
         </span>
       </div>
-      <div style={{ padding: "var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
+      <div
+        style={{
+          padding: "var(--space-4)",
+          display: "flex",
+          flexDirection: "column",
+          gap: "var(--space-2)",
+        }}
+      >
         <div>
           {canLink ? (
             <Link
@@ -59,7 +74,9 @@ export function CreatorCard({
               {c.name}
             </h3>
           )}
-          <p style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>{c.handle}</p>
+          <p style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>
+            {c.handle}
+          </p>
         </div>
         <p
           className="line-clamp-2"
@@ -94,7 +111,13 @@ export function CreatorCard({
             transitionTimingFunction: "var(--motion-ease)",
           }}
         >
-          {following ? (<><Check className="mr-1 h-3.5 w-3.5" /> Following</>) : "Follow"}
+          {following ? (
+            <>
+              <Check className="mr-1 h-3.5 w-3.5" /> Following
+            </>
+          ) : (
+            "Follow"
+          )}
         </button>
       </div>
     </div>

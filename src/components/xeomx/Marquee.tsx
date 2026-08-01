@@ -10,7 +10,11 @@ export function TickerMarquee({ items }: { items: string[] }) {
     >
       <div className="xeomx-marquee-track flex w-max gap-10 py-3 ps-10">
         {loop.map((t, i) => (
-          <span key={i} aria-hidden={i >= items.length} className="inline-flex shrink-0 items-center gap-2 text-[11px] uppercase tracking-[0.28em] text-muted-foreground">
+          <span
+            key={i}
+            aria-hidden={i >= items.length}
+            className="inline-flex shrink-0 items-center gap-2 text-[11px] uppercase tracking-[0.28em] text-muted-foreground"
+          >
             <Flame className="h-3 w-3 text-magenta" />
             <span className="text-foreground/80">{t}</span>
           </span>

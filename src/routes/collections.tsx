@@ -1,7 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { fetchCollections } from "@/lib/marketplace";
-import { COLLECTIONS as LOCAL_COLLECTIONS, PROMPTS as LOCAL_PROMPTS, type Collection } from "@/lib/prompts";
+import {
+  COLLECTIONS as LOCAL_COLLECTIONS,
+  PROMPTS as LOCAL_PROMPTS,
+  type Collection,
+} from "@/lib/prompts";
 import { Header } from "@/components/xeomx/Header";
 import { CollectionCard } from "@/components/xeomx/CollectionCard";
 import { motion } from "motion/react";
@@ -13,7 +17,10 @@ export const Route = createFileRoute("/collections")({
   head: () => ({
     meta: [
       { title: "Collections — XeomX" },
-      { name: "description", content: "Curated prompt packs. Build a SaaS in 10 prompts. Master AI automation." },
+      {
+        name: "description",
+        content: "Curated prompt packs. Build a SaaS in 10 prompts. Master AI automation.",
+      },
       { property: "og:title", content: "Collections — XeomX" },
       { property: "og:description", content: "Curated prompt packs. Structured learning paths." },
       { property: "og:type", content: "website" },
@@ -25,7 +32,11 @@ export const Route = createFileRoute("/collections")({
 });
 
 function CollectionsPage() {
-  const { data: liveCollections = [], isLoading, error } = useQuery({
+  const {
+    data: liveCollections = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["collections", "public"],
     queryFn: () => fetchCollections(48),
     staleTime: 60_000,
@@ -33,12 +44,12 @@ function CollectionsPage() {
   // Merge in known Preview collections from the local catalog that don't yet
   // exist as Supabase rows. Real count == validly linked local prompts.
   const liveIds = new Set(liveCollections.map((c) => c.id));
-  const previewCollections: Collection[] = LOCAL_COLLECTIONS
-    .filter((c) => !liveIds.has(c.id))
-    .map((c) => ({
+  const previewCollections: Collection[] = LOCAL_COLLECTIONS.filter((c) => !liveIds.has(c.id)).map(
+    (c) => ({
       ...c,
       count: c.ids.filter((pid) => LOCAL_PROMPTS.some((p) => p.id === pid)).length,
-    }));
+    }),
+  );
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
@@ -62,7 +73,8 @@ function CollectionsPage() {
             fontSize: "clamp(2.25rem, 5vw, var(--font-size-h1))",
           }}
         >
-          {m.collections_title_1()} <span className="text-gradient-gold italic">{m.collections_title_2()}</span>
+          {m.collections_title_1()}{" "}
+          <span className="text-gradient-gold italic">{m.collections_title_2()}</span>
         </h1>
         <p
           className="max-w-xl"
@@ -78,7 +90,10 @@ function CollectionsPage() {
         {isLoading ? (
           <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="h-64 animate-pulse rounded-3xl border border-border/60 bg-surface/40" />
+              <div
+                key={i}
+                className="h-64 animate-pulse rounded-3xl border border-border/60 bg-surface/40"
+              />
             ))}
           </div>
         ) : error && previewCollections.length === 0 ? (
@@ -86,36 +101,38 @@ function CollectionsPage() {
         ) : liveCollections.length === 0 && previewCollections.length === 0 ? (
           <div className="mt-16 rounded-3xl border border-dashed border-border/60 p-10 text-center">
             <h2 className="font-display text-2xl">No public collections yet</h2>
-            <p className="mt-2 text-sm text-muted-foreground">Curators are building the first packs. Check back soon.</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Curators are building the first packs. Check back soon.
+            </p>
           </div>
         ) : (
-        <motion.div
-          className="grid lg:grid-cols-2"
-          style={{ marginTop: "var(--space-10)", gap: "var(--space-6)" }}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-80px" }}
-          variants={{ show: { transition: { staggerChildren: 0.04 } } }}
-        >
-          {liveCollections.map((c) => (
-            <motion.div
-              key={c.id}
-              variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <CollectionCard c={c} status="live" />
-            </motion.div>
-          ))}
-          {previewCollections.map((c) => (
-            <motion.div
-              key={`preview-${c.id}`}
-              variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <CollectionCard c={c} status="preview" />
-            </motion.div>
-          ))}
-        </motion.div>
+          <motion.div
+            className="grid lg:grid-cols-2"
+            style={{ marginTop: "var(--space-10)", gap: "var(--space-6)" }}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-80px" }}
+            variants={{ show: { transition: { staggerChildren: 0.04 } } }}
+          >
+            {liveCollections.map((c) => (
+              <motion.div
+                key={c.id}
+                variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <CollectionCard c={c} status="live" />
+              </motion.div>
+            ))}
+            {previewCollections.map((c) => (
+              <motion.div
+                key={`preview-${c.id}`}
+                variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <CollectionCard c={c} status="preview" />
+              </motion.div>
+            ))}
+          </motion.div>
         )}
       </section>
     </div>

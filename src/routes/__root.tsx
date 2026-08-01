@@ -120,7 +120,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">{m.root_error_title()}</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          {m.root_error_title()}
+        </h1>
         <p className="mt-2 text-sm text-muted-foreground">{m.root_error_desc()}</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -147,7 +149,8 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => {
     let title = "XeomX — Cinematic AI Prompt Marketplace";
-    let desc = "Discover, remix and own the world's most cinematic AI prompts. Netflix-style discovery, viral feed, premium drops.";
+    let desc =
+      "Discover, remix and own the world's most cinematic AI prompts. Netflix-style discovery, viral feed, premium drops.";
     try {
       title = m.root_head_title();
       desc = m.root_head_desc();
@@ -155,67 +158,71 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       /* fall back to English defaults during prerender */
     }
     return {
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title },
-      { name: "description", content: desc },
-      { name: "author", content: "XeomX" },
-      { name: "theme-color", content: "#0F0F14" },
-      { name: "apple-mobile-web-app-title", content: "XEOMX" },
-      { name: "application-name", content: "XEOMX" },
-      { name: "msapplication-TileColor", content: "#0F0F14" },
-      { property: "og:title", content: title },
-      { property: "og:description", content: desc },
-      { property: "og:site_name", content: "XeomX" },
-      { property: "og:type", content: "website" },
-      { property: "og:image", content: `${SITE_URL}/og-image.png` },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@xeomxai" },
-      { name: "twitter:creator", content: "@xeomxai" },
-      { name: "twitter:title", content: title },
-      { name: "twitter:description", content: desc },
-      { name: "twitter:image", content: `${SITE_URL}/og-image.png` },
-    ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-      { rel: "icon", type: "image/x-icon", href: "/favicon.ico", sizes: "any" },
-      { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32.png" },
-      { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16.png" },
-      { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
-      { rel: "manifest", href: "/site.webmanifest" },
-      { rel: "preconnect", href: "https://ovqhdzppfbdvnzuglukf.supabase.co", crossOrigin: "anonymous" },
-      { rel: "dns-prefetch", href: "https://ovqhdzppfbdvnzuglukf.supabase.co" },
-      // Warm the custom-domain origin early so the LCP asset request skips a
-      // fresh TLS+DNS roundtrip on cold mobile connections.
-      { rel: "preconnect", href: "https://xeomx.com", crossOrigin: "anonymous" },
-      { rel: "dns-prefetch", href: "https://xeomx.com" },
-      ...LOCALES.map((loc) => ({
-        rel: "alternate",
-        hrefLang: loc,
-        href: `${SITE_URL}/${loc}/`,
-      })),
-      { rel: "alternate", hrefLang: "x-default", href: `${SITE_URL}/en/` },
-    ],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          name: "XeomX",
-          url: SITE_URL,
-          logo: `${SITE_URL}/android-chrome-512.png`,
-          sameAs: ["https://twitter.com/xeomxai"],
-        }),
-      },
-    ],
-  };
+      meta: [
+        { charSet: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        { title },
+        { name: "description", content: desc },
+        { name: "author", content: "XeomX" },
+        { name: "theme-color", content: "#0F0F14" },
+        { name: "apple-mobile-web-app-title", content: "XEOMX" },
+        { name: "application-name", content: "XEOMX" },
+        { name: "msapplication-TileColor", content: "#0F0F14" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:site_name", content: "XeomX" },
+        { property: "og:type", content: "website" },
+        { property: "og:image", content: `${SITE_URL}/og-image.png` },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:site", content: "@xeomxai" },
+        { name: "twitter:creator", content: "@xeomxai" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
+        { name: "twitter:image", content: `${SITE_URL}/og-image.png` },
+      ],
+      links: [
+        {
+          rel: "stylesheet",
+          href: appCss,
+        },
+        { rel: "icon", type: "image/x-icon", href: "/favicon.ico", sizes: "any" },
+        { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32.png" },
+        { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16.png" },
+        { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
+        { rel: "manifest", href: "/site.webmanifest" },
+        {
+          rel: "preconnect",
+          href: "https://ovqhdzppfbdvnzuglukf.supabase.co",
+          crossOrigin: "anonymous",
+        },
+        { rel: "dns-prefetch", href: "https://ovqhdzppfbdvnzuglukf.supabase.co" },
+        // Warm the custom-domain origin early so the LCP asset request skips a
+        // fresh TLS+DNS roundtrip on cold mobile connections.
+        { rel: "preconnect", href: "https://xeomx.com", crossOrigin: "anonymous" },
+        { rel: "dns-prefetch", href: "https://xeomx.com" },
+        ...LOCALES.map((loc) => ({
+          rel: "alternate",
+          hrefLang: loc,
+          href: `${SITE_URL}/${loc}/`,
+        })),
+        { rel: "alternate", hrefLang: "x-default", href: `${SITE_URL}/en/` },
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "XeomX",
+            url: SITE_URL,
+            logo: `${SITE_URL}/android-chrome-512.png`,
+            sameAs: ["https://twitter.com/xeomxai"],
+          }),
+        },
+      ],
+    };
   },
   shellComponent: RootShell,
   component: RootComponent,
@@ -265,7 +272,8 @@ function RootComponent() {
       // eslint-disable-next-line no-console
       console.warn = noop;
     };
-    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback;
+    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void) => number })
+      .requestIdleCallback;
     if (typeof ric === "function") ric(runSuppress);
     else setTimeout(runSuppress, 0);
   }, []);

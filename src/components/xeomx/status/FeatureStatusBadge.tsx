@@ -11,10 +11,14 @@ const STYLES: Record<FeatureStatus, string> = {
 
 function label(status: FeatureStatus): string {
   switch (status) {
-    case "live":        return m.feature_status_live();
-    case "beta":        return m.feature_status_beta();
-    case "preview":     return m.feature_status_preview();
-    case "coming_soon": return m.feature_status_coming_soon();
+    case "live":
+      return m.feature_status_live();
+    case "beta":
+      return m.feature_status_beta();
+    case "preview":
+      return m.feature_status_preview();
+    case "coming_soon":
+      return m.feature_status_coming_soon();
   }
 }
 

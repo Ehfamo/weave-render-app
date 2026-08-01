@@ -92,8 +92,16 @@ function ResetPassword() {
             "radial-gradient(ellipse 80% 50% at 50% 0%, oklch(0.45 0.25 340 / 0.35), transparent 60%)",
         }}
       />
-      <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center" style={{ paddingInline: "var(--space-5)" }}>
-        <Link to="/" aria-label="XEOMX — Home" className="flex items-center" style={{ marginBottom: "var(--space-6)" }}>
+      <div
+        className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center"
+        style={{ paddingInline: "var(--space-5)" }}
+      >
+        <Link
+          to="/"
+          aria-label="XEOMX — Home"
+          className="flex items-center"
+          style={{ marginBottom: "var(--space-6)" }}
+        >
           <Logo variant="full" size={36} ariaLabel="XEOMX" />
         </Link>
 
@@ -106,21 +114,36 @@ function ResetPassword() {
           role="region"
           aria-labelledby="rp-title"
         >
-          <h1 id="rp-title" className="font-display font-bold tracking-tight text-foreground" style={{ fontSize: "clamp(1.5rem, 4vw, var(--font-size-h1))" }}>
+          <h1
+            id="rp-title"
+            className="font-display font-bold tracking-tight text-foreground"
+            style={{ fontSize: "clamp(1.5rem, 4vw, var(--font-size-h1))" }}
+          >
             Choose a new password
           </h1>
 
           {!ready ? (
-            <div className="flex items-center gap-2" style={{ marginTop: "var(--space-5)", color: "var(--text-muted)" }}>
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> <span className="text-sm">Verifying reset link…</span>
+            <div
+              className="flex items-center gap-2"
+              style={{ marginTop: "var(--space-5)", color: "var(--text-muted)" }}
+            >
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />{" "}
+              <span className="text-sm">Verifying reset link…</span>
             </div>
           ) : recoveryValid === false ? (
-            <div className="flex flex-col items-start" style={{ marginTop: "var(--space-5)", gap: "var(--space-3)" }}>
-              <div className="inline-flex items-center gap-2 text-sm" style={{ color: "var(--action-secondary)" }}>
+            <div
+              className="flex flex-col items-start"
+              style={{ marginTop: "var(--space-5)", gap: "var(--space-3)" }}
+            >
+              <div
+                className="inline-flex items-center gap-2 text-sm"
+                style={{ color: "var(--action-secondary)" }}
+              >
                 <AlertTriangle className="h-4 w-4" aria-hidden /> Link expired or invalid
               </div>
               <p style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>
-                Reset links expire after 60 minutes and can only be used once. Request a new one to continue.
+                Reset links expire after 60 minutes and can only be used once. Request a new one to
+                continue.
               </p>
               <Link
                 to="/forgot-password"
@@ -131,8 +154,14 @@ function ResetPassword() {
               </Link>
             </div>
           ) : done ? (
-            <div className="flex flex-col items-start" style={{ marginTop: "var(--space-5)", gap: "var(--space-3)" }}>
-              <div className="inline-flex items-center gap-2 text-sm" style={{ color: "var(--action-primary)" }}>
+            <div
+              className="flex flex-col items-start"
+              style={{ marginTop: "var(--space-5)", gap: "var(--space-3)" }}
+            >
+              <div
+                className="inline-flex items-center gap-2 text-sm"
+                style={{ color: "var(--action-primary)" }}
+              >
                 <CheckCircle2 className="h-4 w-4" aria-hidden /> Password updated
               </div>
               <p style={{ fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>
@@ -140,8 +169,15 @@ function ResetPassword() {
               </p>
             </div>
           ) : (
-            <form onSubmit={submit} className="flex flex-col" style={{ marginTop: "var(--space-6)", gap: "var(--space-3)" }} noValidate>
-              <label className="text-xs font-medium text-muted-foreground" htmlFor="rp-pw">New password</label>
+            <form
+              onSubmit={submit}
+              className="flex flex-col"
+              style={{ marginTop: "var(--space-6)", gap: "var(--space-3)" }}
+              noValidate
+            >
+              <label className="text-xs font-medium text-muted-foreground" htmlFor="rp-pw">
+                New password
+              </label>
               <input
                 id="rp-pw"
                 type="password"
@@ -161,7 +197,11 @@ function ResetPassword() {
               />
               <StrengthMeter strength={strength} id="rp-pw-hints" />
 
-              <label className="text-xs font-medium text-muted-foreground" htmlFor="rp-confirm" style={{ marginTop: "var(--space-2)" }}>
+              <label
+                className="text-xs font-medium text-muted-foreground"
+                htmlFor="rp-confirm"
+                style={{ marginTop: "var(--space-2)" }}
+              >
                 Confirm new password
               </label>
               <input
@@ -182,9 +222,21 @@ function ResetPassword() {
                 }}
               />
               {confirm.length > 0 && confirm !== password && (
-                <p role="alert" style={{ fontSize: "var(--font-size-micro)", color: "var(--action-secondary)" }}>Passwords don't match</p>
+                <p
+                  role="alert"
+                  style={{ fontSize: "var(--font-size-micro)", color: "var(--action-secondary)" }}
+                >
+                  Passwords don't match
+                </p>
               )}
-              {error && <p role="alert" style={{ fontSize: "var(--font-size-micro)", color: "var(--action-secondary)" }}>{error}</p>}
+              {error && (
+                <p
+                  role="alert"
+                  style={{ fontSize: "var(--font-size-micro)", color: "var(--action-secondary)" }}
+                >
+                  {error}
+                </p>
+              )}
 
               <button
                 type="submit"
@@ -198,7 +250,11 @@ function ResetPassword() {
                   paddingBlock: "var(--space-3)",
                 }}
               >
-                {saving ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <KeyRound className="h-4 w-4" aria-hidden />}
+                {saving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                ) : (
+                  <KeyRound className="h-4 w-4" aria-hidden />
+                )}
                 Update password
               </button>
             </form>
@@ -209,8 +265,19 @@ function ResetPassword() {
   );
 }
 
-export function StrengthMeter({ strength, id }: { strength: ReturnType<typeof scorePassword>; id?: string }) {
-  const color = strength.score >= 3 ? "var(--action-primary)" : strength.score >= 2 ? "#eab308" : "var(--action-secondary)";
+export function StrengthMeter({
+  strength,
+  id,
+}: {
+  strength: ReturnType<typeof scorePassword>;
+  id?: string;
+}) {
+  const color =
+    strength.score >= 3
+      ? "var(--action-primary)"
+      : strength.score >= 2
+        ? "#eab308"
+        : "var(--action-secondary)";
   return (
     <div id={id} aria-live="polite">
       <div
@@ -233,7 +300,9 @@ export function StrengthMeter({ strength, id }: { strength: ReturnType<typeof sc
       <div className="flex items-center justify-between" style={{ marginTop: "var(--space-1)" }}>
         <span style={{ fontSize: "var(--font-size-micro)", color }}>{strength.label}</span>
         {strength.hints[0] && (
-          <span style={{ fontSize: "var(--font-size-micro)", color: "var(--text-muted)" }}>{strength.hints[0]}</span>
+          <span style={{ fontSize: "var(--font-size-micro)", color: "var(--text-muted)" }}>
+            {strength.hints[0]}
+          </span>
         )}
       </div>
     </div>

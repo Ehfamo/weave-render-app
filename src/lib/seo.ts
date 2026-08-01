@@ -2,8 +2,7 @@
 import { localizeHref } from "@/paraglide/runtime.js";
 
 export const SITE_URL: string =
-  (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, "") ??
-  "https://xeomx.com";
+  (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, "") ?? "https://xeomx.com";
 
 /** Build an absolute, locale-prefixed URL for canonical / og:url. */
 export function pageUrl(path: string): string {
@@ -22,13 +21,7 @@ export type SeoInput = {
   type?: "website" | "article";
 };
 
-export function buildSeo({
-  path,
-  title,
-  description,
-  image,
-  type = "website",
-}: SeoInput) {
+export function buildSeo({ path, title, description, image, type = "website" }: SeoInput) {
   const url = pageUrl(path);
   const meta: Array<Record<string, string>> = [
     { title },
@@ -42,7 +35,9 @@ export function buildSeo({
     { name: "twitter:description", content: description },
   ];
   if (image) {
-    const absImage = /^https?:\/\//.test(image) ? image : `${SITE_URL}${image.startsWith("/") ? "" : "/"}${image}`;
+    const absImage = /^https?:\/\//.test(image)
+      ? image
+      : `${SITE_URL}${image.startsWith("/") ? "" : "/"}${image}`;
     meta.push(
       { property: "og:image", content: absImage },
       { property: "og:image:width", content: "1200" },

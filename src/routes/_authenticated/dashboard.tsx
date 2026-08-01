@@ -3,11 +3,32 @@ import { pageUrl } from "@/lib/seo";
 import { useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Bell, ChevronDown, Sparkles, Box, Users, DollarSign, TrendingUp,
-  Plus, BarChart3, LogOut, ArrowRight, Award, Star, Trophy, AlertCircle, Eye,
+  Bell,
+  ChevronDown,
+  Sparkles,
+  Box,
+  Users,
+  DollarSign,
+  TrendingUp,
+  Plus,
+  BarChart3,
+  LogOut,
+  ArrowRight,
+  Award,
+  Star,
+  Trophy,
+  AlertCircle,
+  Eye,
 } from "lucide-react";
 import {
-  Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Line, LineChart,
+  Area,
+  AreaChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+  Line,
+  LineChart,
 } from "recharts";
 import { motion } from "motion/react";
 import { supabase } from "@/integrations/supabase/client";
@@ -83,7 +104,11 @@ function formatCompact(n: number) {
 
 function formatMoney(cents: number) {
   const dollars = cents / 100;
-  return dollars.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: dollars >= 100 ? 0 : 2 });
+  return dollars.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: dollars >= 100 ? 0 : 2,
+  });
 }
 
 function pctDelta(curr: number, prev: number): string | null {
@@ -107,7 +132,10 @@ function Dashboard() {
     enabled: !!user,
     queryFn: async (): Promise<Profile | null> => {
       const { data, error } = await supabase
-        .from("profiles").select("*").eq("id", user!.id).maybeSingle();
+        .from("profiles")
+        .select("*")
+        .eq("id", user!.id)
+        .maybeSingle();
       if (error) throw error;
       return data as Profile | null;
     },
@@ -126,9 +154,24 @@ function Dashboard() {
 
       const [statsRes, earnCurrRes, earnPrevRes, unreadRes, promptsRes] = await Promise.all([
         supabase.from("creator_stats").select("*").eq("user_id", uid).maybeSingle(),
-        supabase.from("earnings").select("amount_cents").eq("user_id", uid).eq("status", "paid").gte("occurred_at", monthStart),
-        supabase.from("earnings").select("amount_cents").eq("user_id", uid).eq("status", "paid").gte("occurred_at", prevMonthStart).lt("occurred_at", monthStart),
-        supabase.from("notifications").select("*", { count: "exact", head: true }).eq("user_id", uid).is("read_at", null),
+        supabase
+          .from("earnings")
+          .select("amount_cents")
+          .eq("user_id", uid)
+          .eq("status", "paid")
+          .gte("occurred_at", monthStart),
+        supabase
+          .from("earnings")
+          .select("amount_cents")
+          .eq("user_id", uid)
+          .eq("status", "paid")
+          .gte("occurred_at", prevMonthStart)
+          .lt("occurred_at", monthStart),
+        supabase
+          .from("notifications")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", uid)
+          .is("read_at", null),
         supabase.from("prompts").select("id, title, slug, cover_url").eq("author_id", uid),
       ]);
 
@@ -176,7 +219,8 @@ function Dashboard() {
 
       // Per-prompt totals (last 30d)
       const perPromptTotal = new Map<string, number>();
-      for (const v of views) perPromptTotal.set(v.prompt_id, (perPromptTotal.get(v.prompt_id) ?? 0) + 1);
+      for (const v of views)
+        perPromptTotal.set(v.prompt_id, (perPromptTotal.get(v.prompt_id) ?? 0) + 1);
 
       const topPrompts: TopPrompt[] = prompts
         .map((p) => ({
@@ -191,7 +235,10 @@ function Dashboard() {
         .slice(0, 3);
 
       const earnedCents = (earnCurrRes.data ?? []).reduce((s, r) => s + (r.amount_cents ?? 0), 0);
-      const earnedCentsPrev = (earnPrevRes.data ?? []).reduce((s, r) => s + (r.amount_cents ?? 0), 0);
+      const earnedCentsPrev = (earnPrevRes.data ?? []).reduce(
+        (s, r) => s + (r.amount_cents ?? 0),
+        0,
+      );
 
       return {
         stats: (statsRes.data as CreatorStats | null) ?? null,
@@ -236,10 +283,12 @@ function Dashboard() {
     >
       <TopNav avatarUrl={avatarUrl} onSignOut={signOut} unreadCount={d?.unreadCount ?? 0} />
       <main className="mx-auto max-w-[1200px] px-4 pb-16 pt-8 sm:px-6 lg:px-8">
-        <HeroSection username={username} avatarUrl={avatarUrl} totalViews={d?.stats?.views_count ?? 0} />
-        {isError ? (
-          <ErrorBanner onRetry={() => dashboardQ.refetch()} />
-        ) : null}
+        <HeroSection
+          username={username}
+          avatarUrl={avatarUrl}
+          totalViews={d?.stats?.views_count ?? 0}
+        />
+        {isError ? <ErrorBanner onRetry={() => dashboardQ.refetch()} /> : null}
         <StatsRow loading={isLoading} data={d} />
         <AnalyticsCard loading={isLoading} trend={d?.trend ?? []} total={d?.totalViews30d ?? 0} />
         <StudioHighlights loading={isLoading} top={d?.topPrompts ?? []} stats={d?.stats ?? null} />
@@ -250,9 +299,20 @@ function Dashboard() {
   );
 }
 
-function TopNav({ avatarUrl, onSignOut, unreadCount }: { avatarUrl: string; onSignOut: () => void; unreadCount: number }) {
+function TopNav({
+  avatarUrl,
+  onSignOut,
+  unreadCount,
+}: {
+  avatarUrl: string;
+  onSignOut: () => void;
+  unreadCount: number;
+}) {
   return (
-    <header className="sticky top-0 z-40 backdrop-blur-xl" style={{ background: "rgba(8,6,10,0.55)" }}>
+    <header
+      className="sticky top-0 z-40 backdrop-blur-xl"
+      style={{ background: "rgba(8,6,10,0.55)" }}
+    >
       <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
         <Link to="/" className="text-2xl font-bold tracking-tight">
           Xeom<span style={{ color: "#ff2d87" }}>X</span>
@@ -290,7 +350,15 @@ function TopNav({ avatarUrl, onSignOut, unreadCount }: { avatarUrl: string; onSi
   );
 }
 
-function HeroSection({ username, avatarUrl, totalViews }: { username: string; avatarUrl: string; totalViews: number }) {
+function HeroSection({
+  username,
+  avatarUrl,
+  totalViews,
+}: {
+  username: string;
+  avatarUrl: string;
+  totalViews: number;
+}) {
   const hasReach = totalViews > 0;
   return (
     <motion.section
@@ -308,7 +376,15 @@ function HeroSection({ username, avatarUrl, totalViews }: { username: string; av
           className="relative h-[168px] w-[168px] overflow-hidden rounded-full"
           style={{ boxShadow: "0 0 0 2px #ff5a28, 0 0 40px rgba(255,90,40,0.55)" }}
         >
-          <img src={avatarUrl} alt={username} className="h-full w-full object-cover" width={336} height={336} decoding="async" fetchPriority="high" />
+          <img
+            src={avatarUrl}
+            alt={username}
+            className="h-full w-full object-cover"
+            width={336}
+            height={336}
+            decoding="async"
+            fetchPriority="high"
+          />
         </div>
         <div
           className="absolute -bottom-1 right-2 grid h-11 w-11 place-items-center"
@@ -384,9 +460,28 @@ function StatsRow({ loading, data }: { loading: boolean; data: DashboardData | u
   return (
     <section className="mt-10 grid gap-6 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
       <PrimaryStat loading={loading} value={data?.stats?.prompt_count ?? 0} />
-      <SecondaryStat loading={loading} icon={Eye} label="Views (30d)" value={formatCompact(data?.totalViews30d ?? 0)} color="#ff2d87" />
-      <SecondaryStat loading={loading} icon={DollarSign} label="Earned this month" value={formatMoney(data?.earnedCents ?? 0)} delta={earnDelta} color="#ff8a3d" />
-      <SecondaryStat loading={loading} icon={Users} label="Followers" value={formatCompact(data?.stats?.followers_count ?? 0)} color="#ff2d87" />
+      <SecondaryStat
+        loading={loading}
+        icon={Eye}
+        label="Views (30d)"
+        value={formatCompact(data?.totalViews30d ?? 0)}
+        color="#ff2d87"
+      />
+      <SecondaryStat
+        loading={loading}
+        icon={DollarSign}
+        label="Earned this month"
+        value={formatMoney(data?.earnedCents ?? 0)}
+        delta={earnDelta}
+        color="#ff8a3d"
+      />
+      <SecondaryStat
+        loading={loading}
+        icon={Users}
+        label="Followers"
+        value={formatCompact(data?.stats?.followers_count ?? 0)}
+        color="#ff2d87"
+      />
     </section>
   );
 }
@@ -421,16 +516,32 @@ function PrimaryStat({ loading, value }: { loading: boolean; value: number }) {
         {loading ? <SkeletonBox className="h-[6rem] w-40" /> : formatCompact(value)}
       </div>
       <p className="mt-2 text-sm text-white/50">
-        {loading ? <SkeletonBox className="h-4 w-32" /> : value > 0 ? "Across your library" : "No prompts yet"}
+        {loading ? (
+          <SkeletonBox className="h-4 w-32" />
+        ) : value > 0 ? (
+          "Across your library"
+        ) : (
+          "No prompts yet"
+        )}
       </p>
     </motion.div>
   );
 }
 
 function SecondaryStat({
-  icon: Icon, label, value, delta, color, loading,
+  icon: Icon,
+  label,
+  value,
+  delta,
+  color,
+  loading,
 }: {
-  icon: typeof Users; label: string; value: string; delta?: string | null; color: string; loading: boolean;
+  icon: typeof Users;
+  label: string;
+  value: string;
+  delta?: string | null;
+  color: string;
+  loading: boolean;
 }) {
   return (
     <motion.div
@@ -465,11 +576,21 @@ function SecondaryStat({
   );
 }
 
-function AnalyticsCard({ loading, trend, total }: { loading: boolean; trend: { d: string; v: number }[]; total: number }) {
+function AnalyticsCard({
+  loading,
+  trend,
+  total,
+}: {
+  loading: boolean;
+  trend: { d: string; v: number }[];
+  total: number;
+}) {
   const ticks = useMemo(() => {
     if (trend.length < 5) return undefined;
     const step = Math.floor(trend.length / 4);
-    return [0, step, step * 2, step * 3, trend.length - 1].map((i) => trend[i]?.d).filter(Boolean) as string[];
+    return [0, step, step * 2, step * 3, trend.length - 1]
+      .map((i) => trend[i]?.d)
+      .filter(Boolean) as string[];
   }, [trend]);
   const hasData = total > 0;
   return (
@@ -490,7 +611,10 @@ function AnalyticsCard({ loading, trend, total }: { loading: boolean; trend: { d
           <h3 className="text-xl font-semibold">Views overview</h3>
           <p className="mt-1 text-sm text-white/50">Last 30 days</p>
         </div>
-        <Link to="/studio" className="inline-flex items-center gap-1.5 text-sm font-medium text-[#ff2d87] hover:opacity-90">
+        <Link
+          to="/studio"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-[#ff2d87] hover:opacity-90"
+        >
           Open studio <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
@@ -513,13 +637,19 @@ function AnalyticsCard({ loading, trend, total }: { loading: boolean; trend: { d
                 </linearGradient>
               </defs>
               <XAxis
-                dataKey="d" stroke="rgba(255,255,255,0.35)" fontSize={11}
-                tickLine={false} axisLine={false}
+                dataKey="d"
+                stroke="rgba(255,255,255,0.35)"
+                fontSize={11}
+                tickLine={false}
+                axisLine={false}
                 ticks={ticks}
               />
               <YAxis
-                stroke="rgba(255,255,255,0.35)" fontSize={11}
-                tickLine={false} axisLine={false} width={44}
+                stroke="rgba(255,255,255,0.35)"
+                fontSize={11}
+                tickLine={false}
+                axisLine={false}
+                width={44}
                 allowDecimals={false}
               />
               <Tooltip
@@ -527,8 +657,10 @@ function AnalyticsCard({ loading, trend, total }: { loading: boolean; trend: { d
                 content={<RenderTip />}
               />
               <Area
-                type="monotone" dataKey="v"
-                stroke="url(#renderStroke)" strokeWidth={2.5}
+                type="monotone"
+                dataKey="v"
+                stroke="url(#renderStroke)"
+                strokeWidth={2.5}
                 fill="url(#renderFill)"
                 activeDot={{ r: 7, fill: "#ff8a3d", stroke: "#fff", strokeWidth: 2 }}
               />
@@ -540,14 +672,24 @@ function AnalyticsCard({ loading, trend, total }: { loading: boolean; trend: { d
   );
 }
 
-function RenderTip({ active, payload, label }: {
-  active?: boolean; payload?: Array<{ value: number }>; label?: string;
+function RenderTip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: Array<{ value: number }>;
+  label?: string;
 }) {
   if (!active || !payload?.length) return null;
   return (
     <div
       className="rounded-xl px-4 py-3"
-      style={{ background: "#141014", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 12px 30px rgba(0,0,0,0.5)" }}
+      style={{
+        background: "#141014",
+        border: "1px solid rgba(255,255,255,0.08)",
+        boxShadow: "0 12px 30px rgba(0,0,0,0.5)",
+      }}
     >
       <div className="text-xs text-white/60">{label}</div>
       <div className="mt-1 text-lg font-semibold">{payload[0].value.toLocaleString()}</div>
@@ -556,7 +698,15 @@ function RenderTip({ active, payload, label }: {
   );
 }
 
-function StudioHighlights({ loading, top, stats }: { loading: boolean; top: TopPrompt[]; stats: CreatorStats | null }) {
+function StudioHighlights({
+  loading,
+  top,
+  stats,
+}: {
+  loading: boolean;
+  top: TopPrompt[];
+  stats: CreatorStats | null;
+}) {
   return (
     <section className="mt-10">
       <div className="flex items-center justify-between">
@@ -597,14 +747,22 @@ function TrendingCard({ loading, top }: { loading: boolean; top: TopPrompt | und
         <SkeletonBox className="h-[200px] w-full rounded-2xl" />
       ) : !top || top.views === 0 ? (
         <div className="flex h-[200px] flex-col items-start justify-center gap-3">
-          <span className="grid h-8 w-8 place-items-center rounded-full" style={{ background: "rgba(255,45,135,0.18)" }}>
+          <span
+            className="grid h-8 w-8 place-items-center rounded-full"
+            style={{ background: "rgba(255,45,135,0.18)" }}
+          >
             <TrendingUp className="h-4 w-4 text-[#ff2d87]" />
           </span>
           <div>
             <p className="text-lg font-semibold">No trending prompt yet</p>
-            <p className="mt-1 text-sm text-white/60">Publish a prompt to start collecting views.</p>
+            <p className="mt-1 text-sm text-white/60">
+              Publish a prompt to start collecting views.
+            </p>
           </div>
-          <Link to="/studio" className="mt-1 inline-flex items-center gap-1.5 text-sm text-[#ff2d87]">
+          <Link
+            to="/studio"
+            className="mt-1 inline-flex items-center gap-1.5 text-sm text-[#ff2d87]"
+          >
             Create prompt <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -612,7 +770,12 @@ function TrendingCard({ loading, top }: { loading: boolean; top: TopPrompt | und
         <div className="grid grid-cols-[140px_1fr] gap-5 sm:grid-cols-[180px_1fr]">
           <div className="relative h-[200px] overflow-hidden rounded-2xl bg-white/[0.03]">
             {top.cover_url ? (
-              <img src={top.cover_url} alt={top.title} className="h-full w-full object-cover" loading="lazy" />
+              <img
+                src={top.cover_url}
+                alt={top.title}
+                className="h-full w-full object-cover"
+                loading="lazy"
+              />
             ) : (
               <div className="grid h-full w-full place-items-center text-white/30">
                 <Box className="h-8 w-8" />
@@ -627,9 +790,7 @@ function TrendingCard({ loading, top }: { loading: boolean; top: TopPrompt | und
               <Sparkles className="h-3 w-3" /> Your top prompt (30d)
             </span>
             <h4 className="mt-2 truncate text-2xl font-bold">{top.title}</h4>
-            <p className="mt-2 text-sm text-white/60">
-              Leading your library in views this month.
-            </p>
+            <p className="mt-2 text-sm text-white/60">Leading your library in views this month.</p>
             <div className="mt-4 grid grid-cols-1 gap-4 text-white">
               <MiniStat value={formatCompact(top.views)} label="views (30d)" />
             </div>
@@ -663,7 +824,10 @@ function AchievementCard({ loading, stats }: { loading: boolean; stats: CreatorS
   return (
     <HighlightShell glow="rgba(255,138,61,0.14)">
       <div className="flex h-full flex-col">
-        <span className="grid h-8 w-8 place-items-center rounded-full" style={{ background: "rgba(255,138,61,0.18)" }}>
+        <span
+          className="grid h-8 w-8 place-items-center rounded-full"
+          style={{ background: "rgba(255,138,61,0.18)" }}
+        >
           <Award className="h-4 w-4 text-[#ff8a3d]" />
         </span>
         <p className="mt-6 text-sm text-[#ff8a3d]">Total likes</p>
@@ -678,10 +842,24 @@ function AchievementCard({ loading, stats }: { loading: boolean; stats: CreatorS
           {loading ? <SkeletonBox className="h-10 w-24" /> : formatCompact(likes)}
         </div>
         <p className="mt-3 text-sm text-white/70">
-          {likes > 0 ? <>Across your<br />published prompts</> : <>No likes yet —<br />share your work</>}
+          {likes > 0 ? (
+            <>
+              Across your
+              <br />
+              published prompts
+            </>
+          ) : (
+            <>
+              No likes yet —<br />
+              share your work
+            </>
+          )}
         </p>
         <div className="mt-auto flex justify-end pt-4">
-          <Link to="/explore" className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-[#ff8a3d] transition hover:bg-white/[0.06]">
+          <Link
+            to="/explore"
+            className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-[#ff8a3d] transition hover:bg-white/[0.06]"
+          >
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -695,7 +873,10 @@ function FollowersCard({ loading, stats }: { loading: boolean; stats: CreatorSta
   return (
     <HighlightShell glow="rgba(255,45,135,0.14)">
       <div className="flex h-full flex-col">
-        <span className="grid h-8 w-8 place-items-center rounded-full" style={{ background: "rgba(255,45,135,0.18)" }}>
+        <span
+          className="grid h-8 w-8 place-items-center rounded-full"
+          style={{ background: "rgba(255,45,135,0.18)" }}
+        >
           <Users className="h-4 w-4 text-[#ff2d87]" />
         </span>
         <p className="mt-6 text-sm text-white/70">Followers</p>
@@ -710,10 +891,24 @@ function FollowersCard({ loading, stats }: { loading: boolean; stats: CreatorSta
           {loading ? <SkeletonBox className="h-10 w-24" /> : formatCompact(followers)}
         </div>
         <p className="mt-3 text-sm text-white/70">
-          {followers > 0 ? <>Creators watching<br />your work</> : <>Grow your reach —<br />share your profile</>}
+          {followers > 0 ? (
+            <>
+              Creators watching
+              <br />
+              your work
+            </>
+          ) : (
+            <>
+              Grow your reach —<br />
+              share your profile
+            </>
+          )}
         </p>
         <div className="mt-auto flex justify-end pt-4">
-          <Link to="/creators" className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-[#ff2d87] transition hover:bg-white/[0.06]">
+          <Link
+            to="/creators"
+            className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-[#ff2d87] transition hover:bg-white/[0.06]"
+          >
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -734,7 +929,10 @@ function BottomRow({ loading, top }: { loading: boolean; top: TopPrompt[] }) {
 function TopPromptsCard({ loading, top }: { loading: boolean; top: TopPrompt[] }) {
   const items = top.filter((p) => p.views > 0);
   return (
-    <div className="rounded-[22px] p-6" style={{ background: "#100b0f", border: "1px solid rgba(255,255,255,0.06)" }}>
+    <div
+      className="rounded-[22px] p-6"
+      style={{ background: "#100b0f", border: "1px solid rgba(255,255,255,0.06)" }}
+    >
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Top performing prompts</h3>
         <Link to="/explore" className="inline-flex items-center gap-1.5 text-sm text-[#ff2d87]">
@@ -752,7 +950,10 @@ function TopPromptsCard({ loading, top }: { loading: boolean; top: TopPrompt[] }
       ) : items.length === 0 ? (
         <div className="mt-6 rounded-2xl border border-dashed border-white/10 p-8 text-center">
           <p className="text-sm text-white/60">No prompt views in the last 30 days yet.</p>
-          <Link to="/studio" className="mt-3 inline-flex items-center gap-1.5 text-sm text-[#ff2d87]">
+          <Link
+            to="/studio"
+            className="mt-3 inline-flex items-center gap-1.5 text-sm text-[#ff2d87]"
+          >
             Publish your first prompt <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -760,10 +961,17 @@ function TopPromptsCard({ loading, top }: { loading: boolean; top: TopPrompt[] }
         <ul className="mt-5 divide-y divide-white/5">
           {items.map((p, idx) => (
             <li key={p.id} className="grid grid-cols-[28px_56px_1fr_120px] items-center gap-4 py-3">
-              <span className="text-sm font-semibold text-[#ff2d87]">{String(idx + 1).padStart(2, "0")}</span>
+              <span className="text-sm font-semibold text-[#ff2d87]">
+                {String(idx + 1).padStart(2, "0")}
+              </span>
               <div className="h-12 w-14 overflow-hidden rounded-lg bg-white/[0.04]">
                 {p.cover_url ? (
-                  <img src={p.cover_url} alt={p.title} className="h-full w-full object-cover" loading="lazy" />
+                  <img
+                    src={p.cover_url}
+                    alt={p.title}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
                 ) : (
                   <div className="grid h-full w-full place-items-center text-white/30">
                     <Box className="h-4 w-4" />
@@ -777,7 +985,13 @@ function TopPromptsCard({ loading, top }: { loading: boolean; top: TopPrompt[] }
               <div className="h-10">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={p.spark} margin={{ top: 2, right: 2, left: 2, bottom: 2 }}>
-                    <Line type="monotone" dataKey="y" stroke={TOP_COLORS[idx % TOP_COLORS.length]} strokeWidth={2} dot={false} />
+                    <Line
+                      type="monotone"
+                      dataKey="y"
+                      stroke={TOP_COLORS[idx % TOP_COLORS.length]}
+                      strokeWidth={2}
+                      dot={false}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -791,13 +1005,40 @@ function TopPromptsCard({ loading, top }: { loading: boolean; top: TopPrompt[] }
 
 function QuickActionsCard() {
   const actions = [
-    { icon: Plus, title: "Create new", desc: "Start from scratch", color: "#ff2d87", to: "/studio" as const },
-    { icon: Box, title: "Browse explore", desc: "Discover prompts", color: "#ff8a3d", to: "/explore" as const },
-    { icon: BarChart3, title: "Edit profile", desc: "Update your account", color: "#ff2d87", to: "/profile-edit" as const },
-    { icon: DollarSign, title: "Pricing", desc: "Upgrade your plan", color: "#ff8a3d", to: "/pricing" as const },
+    {
+      icon: Plus,
+      title: "Create new",
+      desc: "Start from scratch",
+      color: "#ff2d87",
+      to: "/studio" as const,
+    },
+    {
+      icon: Box,
+      title: "Browse explore",
+      desc: "Discover prompts",
+      color: "#ff8a3d",
+      to: "/explore" as const,
+    },
+    {
+      icon: BarChart3,
+      title: "Edit profile",
+      desc: "Update your account",
+      color: "#ff2d87",
+      to: "/profile-edit" as const,
+    },
+    {
+      icon: DollarSign,
+      title: "Pricing",
+      desc: "Upgrade your plan",
+      color: "#ff8a3d",
+      to: "/pricing" as const,
+    },
   ];
   return (
-    <div className="rounded-[22px] p-6" style={{ background: "#100b0f", border: "1px solid rgba(255,255,255,0.06)" }}>
+    <div
+      className="rounded-[22px] p-6"
+      style={{ background: "#100b0f", border: "1px solid rgba(255,255,255,0.06)" }}
+    >
       <h3 className="text-lg font-semibold">Quick actions</h3>
       <div className="mt-5 grid grid-cols-2 gap-3">
         {actions.map((a) => (
@@ -805,7 +1046,10 @@ function QuickActionsCard() {
             key={a.title}
             to={a.to}
             className="group flex items-center gap-3 rounded-2xl p-4 transition hover:bg-white/[0.03]"
-            style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
+            style={{
+              background: "rgba(255,255,255,0.02)",
+              border: "1px solid rgba(255,255,255,0.05)",
+            }}
           >
             <span
               className="grid h-11 w-11 shrink-0 place-items-center rounded-xl"
@@ -837,9 +1081,15 @@ function MilestoneBanner({ stats }: { stats: CreatorStats | null }) {
       className="mt-6 rounded-[22px] p-[1px]"
       style={{ background: "linear-gradient(90deg, #ff8a3d, #ff2d87, #c026d3)" }}
     >
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-[21px] px-6 py-5" style={{ background: "#100b0f" }}>
+      <div
+        className="flex flex-wrap items-center justify-between gap-4 rounded-[21px] px-6 py-5"
+        style={{ background: "#100b0f" }}
+      >
         <div className="flex items-center gap-4">
-          <span className="grid h-11 w-11 place-items-center rounded-xl" style={{ background: "rgba(255,138,61,0.15)" }}>
+          <span
+            className="grid h-11 w-11 place-items-center rounded-xl"
+            style={{ background: "rgba(255,138,61,0.15)" }}
+          >
             <Sparkles className="h-5 w-5 text-[#ff8a3d]" />
           </span>
           <div>
@@ -878,7 +1128,9 @@ function EmptyChart() {
     <div className="grid h-full w-full place-items-center rounded-2xl border border-dashed border-white/10">
       <div className="text-center">
         <p className="text-sm font-medium text-white/70">No views in the last 30 days</p>
-        <p className="mt-1 text-xs text-white/40">Publish and share a prompt to start collecting data.</p>
+        <p className="mt-1 text-xs text-white/40">
+          Publish and share a prompt to start collecting data.
+        </p>
         <Link to="/studio" className="mt-3 inline-flex items-center gap-1.5 text-xs text-[#ff2d87]">
           Open studio <ArrowRight className="h-3 w-3" />
         </Link>

@@ -3,9 +3,27 @@ import { pageUrl } from "@/lib/seo";
 import { useState } from "react";
 import { motion } from "motion/react";
 import {
-  Sparkles, ChevronDown, Command, Bell, Wand2, Info, RefreshCw,
-  Filter, CheckCircle2, Orbit, CircleDot, Activity, RotateCcw,
-  Shuffle, Maximize2, MoveRight, Pencil, Code2, Eye, Terminal, FileText,
+  Sparkles,
+  ChevronDown,
+  Command,
+  Bell,
+  Wand2,
+  Info,
+  RefreshCw,
+  Filter,
+  CheckCircle2,
+  Orbit,
+  CircleDot,
+  Activity,
+  RotateCcw,
+  Shuffle,
+  Maximize2,
+  MoveRight,
+  Pencil,
+  Code2,
+  Eye,
+  Terminal,
+  FileText,
 } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
 import { PreviewNotice } from "@/components/xeomx/status/PreviewNotice";
@@ -70,12 +88,54 @@ function XeomxAIPage() {
   const [intention, setIntention] = useState<string>(m.xai_intention_example());
 
   const thread: ThreadItem[] = [
-    { type: "narrative", title: m.xai_thread_intent(), time: "00:00", desc: m.xai_thread_intent_desc(), tag: m.xai_chip_cinematic(), color: "var(--color-magenta-500)" },
-    { type: "visual", title: m.xai_thread_image(), time: "00:04", desc: m.xai_thread_image_desc(), thumb: SCENE_GRADIENT, color: "var(--color-orange-500)" },
-    { type: "narrative", title: m.xai_thread_narrative(), time: "00:12", desc: m.xai_thread_narrative_desc(), tag: m.xai_chip_story(), color: "var(--color-magenta-500)" },
-    { type: "visual", title: m.xai_thread_ui(), time: "00:24", desc: m.xai_thread_ui_desc(), tag: m.xai_chip_prototype(), color: "var(--color-success)" },
-    { type: "code", title: m.xai_thread_code(), time: "00:31", desc: m.xai_thread_code_desc(), tag: m.xai_chip_code(), color: "var(--color-info)" },
-    { type: "motion", title: m.xai_thread_video(), time: "00:44", desc: m.xai_thread_video_desc(), tag: m.xai_chip_shortfilm(), color: "var(--color-error)" },
+    {
+      type: "narrative",
+      title: m.xai_thread_intent(),
+      time: "00:00",
+      desc: m.xai_thread_intent_desc(),
+      tag: m.xai_chip_cinematic(),
+      color: "var(--color-magenta-500)",
+    },
+    {
+      type: "visual",
+      title: m.xai_thread_image(),
+      time: "00:04",
+      desc: m.xai_thread_image_desc(),
+      thumb: SCENE_GRADIENT,
+      color: "var(--color-orange-500)",
+    },
+    {
+      type: "narrative",
+      title: m.xai_thread_narrative(),
+      time: "00:12",
+      desc: m.xai_thread_narrative_desc(),
+      tag: m.xai_chip_story(),
+      color: "var(--color-magenta-500)",
+    },
+    {
+      type: "visual",
+      title: m.xai_thread_ui(),
+      time: "00:24",
+      desc: m.xai_thread_ui_desc(),
+      tag: m.xai_chip_prototype(),
+      color: "var(--color-success)",
+    },
+    {
+      type: "code",
+      title: m.xai_thread_code(),
+      time: "00:31",
+      desc: m.xai_thread_code_desc(),
+      tag: m.xai_chip_code(),
+      color: "var(--color-info)",
+    },
+    {
+      type: "motion",
+      title: m.xai_thread_video(),
+      time: "00:44",
+      desc: m.xai_thread_video_desc(),
+      tag: m.xai_chip_shortfilm(),
+      color: "var(--color-error)",
+    },
   ];
   const visibleThread = filter === "all" ? thread : thread.filter((t) => t.type === filter);
 
@@ -97,8 +157,12 @@ function XeomxAIPage() {
         className="flex flex-col"
       >
         <div className="flex items-center" style={{ gap: "var(--space-5)" }}>
-          <button className="inline-flex items-center gap-1 font-semibold" style={{ fontSize: "var(--font-size-body-lg)", color: "var(--text-primary)" }}>
-            {m.nav_xeomx_ai()} <ChevronDown className="h-4 w-4" style={{ color: "var(--text-muted)" }} />
+          <button
+            className="inline-flex items-center gap-1 font-semibold"
+            style={{ fontSize: "var(--font-size-body-lg)", color: "var(--text-primary)" }}
+          >
+            {m.nav_xeomx_ai()}{" "}
+            <ChevronDown className="h-4 w-4" style={{ color: "var(--text-muted)" }} />
           </button>
 
           {/* Intent bar */}
@@ -139,28 +203,47 @@ function XeomxAIPage() {
 
           {/* Right cluster */}
           <div className="flex items-center" style={{ gap: "var(--space-2)" }}>
-            <IconBtn><Command className="h-4 w-4" /></IconBtn>
-            <IconBtn><Sparkles className="h-4 w-4" /></IconBtn>
-            <IconBtn><Wand2 className="h-4 w-4" /></IconBtn>
+            <IconBtn>
+              <Command className="h-4 w-4" />
+            </IconBtn>
+            <IconBtn>
+              <Sparkles className="h-4 w-4" />
+            </IconBtn>
+            <IconBtn>
+              <Wand2 className="h-4 w-4" />
+            </IconBtn>
             <div className="relative">
-              <IconBtn><Bell className="h-4 w-4" /></IconBtn>
+              <IconBtn>
+                <Bell className="h-4 w-4" />
+              </IconBtn>
               <span
                 className="absolute grid place-items-center rounded-full font-semibold text-white"
                 style={{
-                  insetBlockStart: -2, insetInlineEnd: -2, width: 16, height: 16,
-                  fontSize: 10, background: "var(--action-primary)",
+                  insetBlockStart: -2,
+                  insetInlineEnd: -2,
+                  width: 16,
+                  height: 16,
+                  fontSize: 10,
+                  background: "var(--action-primary)",
                 }}
-              >3</span>
+              >
+                3
+              </span>
             </div>
             <div
               className="grid place-items-center rounded-full text-xs font-semibold text-white"
               style={{ width: 32, height: 32, background: "var(--gradient-magenta)" }}
-            >U</div>
+            >
+              U
+            </div>
           </div>
         </div>
 
         {/* Chips */}
-        <div className="flex flex-wrap items-center" style={{ gap: "var(--space-2)", marginBlockStart: "var(--space-4)" }}>
+        <div
+          className="flex flex-wrap items-center"
+          style={{ gap: "var(--space-2)", marginBlockStart: "var(--space-4)" }}
+        >
           {CHIPS.map((c) => {
             const active = chip === c.id;
             return (
@@ -186,8 +269,10 @@ function XeomxAIPage() {
       </div>
 
       {/* 3-column workspace */}
-      <div className="grid" style={{ gridTemplateColumns: "300px 1fr 320px", minHeight: "calc(100vh - 200px)" }}>
-
+      <div
+        className="grid"
+        style={{ gridTemplateColumns: "300px 1fr 320px", minHeight: "calc(100vh - 200px)" }}
+      >
         {/* LEFT RAIL */}
         <aside style={leftRailStyle}>
           {/* Section header */}
@@ -199,12 +284,17 @@ function XeomxAIPage() {
             <button
               className="inline-flex items-center gap-1"
               style={{
-                paddingInline: "var(--space-2)", paddingBlock: 4, borderRadius: "var(--radius-xs)",
-                background: "var(--surface-glass)", border: "1px solid var(--border-default)",
-                fontSize: "var(--font-size-micro)", color: "var(--text-secondary)",
+                paddingInline: "var(--space-2)",
+                paddingBlock: 4,
+                borderRadius: "var(--radius-xs)",
+                background: "var(--surface-glass)",
+                border: "1px solid var(--border-default)",
+                fontSize: "var(--font-size-micro)",
+                color: "var(--text-secondary)",
               }}
             >
-              <Sparkles className="h-3 w-3" style={{ color: "var(--color-orange-500)" }} /> {m.xai_auto_enhance()}
+              <Sparkles className="h-3 w-3" style={{ color: "var(--color-orange-500)" }} />{" "}
+              {m.xai_auto_enhance()}
             </button>
           </div>
 
@@ -217,18 +307,26 @@ function XeomxAIPage() {
                 onChange={(e) => setIntention(e.target.value.slice(0, 500))}
                 className="surface-elevated w-full resize-none focus:outline-none"
                 style={{
-                  minHeight: 96, padding: "var(--space-3)", borderRadius: "var(--radius-sm)",
-                  color: "var(--text-primary)", fontSize: "var(--font-size-caption)",
-                  border: "1px solid var(--border-default)", lineHeight: 1.5,
+                  minHeight: 96,
+                  padding: "var(--space-3)",
+                  borderRadius: "var(--radius-sm)",
+                  color: "var(--text-primary)",
+                  fontSize: "var(--font-size-caption)",
+                  border: "1px solid var(--border-default)",
+                  lineHeight: 1.5,
                 }}
               />
               <span
                 className="absolute"
                 style={{
-                  insetBlockEnd: "var(--space-2)", insetInlineEnd: "var(--space-2)",
-                  fontSize: "var(--font-size-micro)", color: "var(--text-muted)",
+                  insetBlockEnd: "var(--space-2)",
+                  insetInlineEnd: "var(--space-2)",
+                  fontSize: "var(--font-size-micro)",
+                  color: "var(--text-muted)",
                 }}
-              >{m.xai_char_count({ count: intention.length })}</span>
+              >
+                {m.xai_char_count({ count: intention.length })}
+              </span>
             </div>
           </div>
 
@@ -238,14 +336,28 @@ function XeomxAIPage() {
             <div
               className="surface-elevated"
               style={{
-                padding: "var(--space-3)", borderRadius: "var(--radius-sm)",
+                padding: "var(--space-3)",
+                borderRadius: "var(--radius-sm)",
                 borderInlineStart: "2px solid var(--action-primary)",
               }}
             >
-              <div style={{ fontSize: "var(--font-size-caption)", color: "var(--text-primary)", fontWeight: 600 }}>
+              <div
+                style={{
+                  fontSize: "var(--font-size-caption)",
+                  color: "var(--text-primary)",
+                  fontWeight: 600,
+                }}
+              >
                 {m.xai_mode_cinematic_title()}
               </div>
-              <div style={{ fontSize: "var(--font-size-micro)", color: "var(--text-muted)", marginBlockStart: 4, lineHeight: 1.5 }}>
+              <div
+                style={{
+                  fontSize: "var(--font-size-micro)",
+                  color: "var(--text-muted)",
+                  marginBlockStart: 4,
+                  lineHeight: 1.5,
+                }}
+              >
                 {m.xai_mode_cinematic_desc()}
               </div>
             </div>
@@ -268,14 +380,17 @@ function XeomxAIPage() {
                       key={a}
                       onClick={() => setAspect(a)}
                       style={{
-                        paddingInline: "var(--space-2)", paddingBlock: 4,
+                        paddingInline: "var(--space-2)",
+                        paddingBlock: 4,
                         borderRadius: "var(--radius-xs)",
                         fontSize: "var(--font-size-micro)",
                         background: active ? "var(--action-primary)" : "var(--surface-glass)",
                         color: active ? "#fff" : "var(--text-secondary)",
                         border: `1px solid ${active ? "var(--action-primary)" : "var(--border-default)"}`,
                       }}
-                    >{a}</button>
+                    >
+                      {a}
+                    </button>
                   );
                 })}
               </div>
@@ -291,16 +406,22 @@ function XeomxAIPage() {
               <div
                 className="relative"
                 style={{
-                  height: 8, borderRadius: 999, marginBlockStart: 8,
+                  height: 8,
+                  borderRadius: 999,
+                  marginBlockStart: 8,
                   background: "linear-gradient(90deg, #ff6b1a, #ff2e8a, #b40f5b, #4da3ff)",
                 }}
               >
                 <div
                   className="absolute rounded-full"
                   style={{
-                    insetBlockStart: -4, insetInlineStart: "42%",
-                    width: 16, height: 16, background: "#fff",
-                    boxShadow: "var(--elevation-elevated)", border: "2px solid var(--surface-primary)",
+                    insetBlockStart: -4,
+                    insetInlineStart: "42%",
+                    width: 16,
+                    height: 16,
+                    background: "#fff",
+                    boxShadow: "var(--elevation-elevated)",
+                    border: "2px solid var(--surface-primary)",
                   }}
                 />
               </div>
@@ -310,15 +431,37 @@ function XeomxAIPage() {
             <div>
               <div className="flex items-center justify-between">
                 <span style={microLabel}>{m.xai_detail_intensity()}</span>
-                <span style={{ fontSize: "var(--font-size-micro)", color: "var(--color-orange-400)" }}>90%</span>
+                <span
+                  style={{ fontSize: "var(--font-size-micro)", color: "var(--color-orange-400)" }}
+                >
+                  90%
+                </span>
               </div>
-              <div className="relative" style={{ height: 4, borderRadius: 999, background: "var(--surface-glass)", marginBlockStart: 8 }}>
-                <div style={{ width: "90%", height: "100%", borderRadius: 999, background: "var(--action-primary)" }} />
+              <div
+                className="relative"
+                style={{
+                  height: 4,
+                  borderRadius: 999,
+                  background: "var(--surface-glass)",
+                  marginBlockStart: 8,
+                }}
+              >
+                <div
+                  style={{
+                    width: "90%",
+                    height: "100%",
+                    borderRadius: 999,
+                    background: "var(--action-primary)",
+                  }}
+                />
                 <div
                   className="absolute rounded-full"
                   style={{
-                    insetBlockStart: -4, insetInlineStart: "calc(90% - 6px)",
-                    width: 12, height: 12, background: "#fff",
+                    insetBlockStart: -4,
+                    insetInlineStart: "calc(90% - 6px)",
+                    width: 12,
+                    height: 12,
+                    background: "#fff",
                     boxShadow: "var(--elevation-raised)",
                   }}
                 />
@@ -357,17 +500,23 @@ function XeomxAIPage() {
                 boxShadow: "var(--elevation-elevated)",
               }}
             >
-              <span className="inline-flex w-full items-center justify-center" style={{ gap: "var(--space-2)" }}>
+              <span
+                className="inline-flex w-full items-center justify-center"
+                style={{ gap: "var(--space-2)" }}
+              >
                 <Sparkles className="h-4 w-4" /> {m.xai_generate()}
                 <span
                   style={{
                     marginInlineStart: "auto",
-                    paddingInline: 6, paddingBlock: 2,
+                    paddingInline: 6,
+                    paddingBlock: 2,
                     borderRadius: "var(--radius-xs)",
                     background: "rgba(0,0,0,0.25)",
                     fontSize: "var(--font-size-micro)",
                   }}
-                >{m.xai_shortcut_cmdenter()}</span>
+                >
+                  {m.xai_shortcut_cmdenter()}
+                </span>
               </span>
             </button>
             <button
@@ -380,12 +529,21 @@ function XeomxAIPage() {
                 fontSize: "var(--font-size-caption)",
                 color: "var(--text-secondary)",
               }}
-            >{m.xai_surprise()}</button>
+            >
+              {m.xai_surprise()}
+            </button>
           </div>
         </aside>
 
         {/* CENTER */}
-        <section style={{ padding: "var(--space-5)", display: "flex", flexDirection: "column", gap: "var(--space-5)" }}>
+        <section
+          style={{
+            padding: "var(--space-5)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "var(--space-5)",
+          }}
+        >
           {/* Engine strip */}
           <div
             className="flex items-center justify-between"
@@ -399,13 +557,33 @@ function XeomxAIPage() {
             <div className="flex items-center" style={{ gap: "var(--space-3)" }}>
               <EnginePulse />
               <div>
-                <div className="inline-flex items-center" style={{ gap: 6, fontSize: "var(--font-size-caption)", color: "var(--text-primary)" }}>
+                <div
+                  className="inline-flex items-center"
+                  style={{
+                    gap: 6,
+                    fontSize: "var(--font-size-caption)",
+                    color: "var(--text-primary)",
+                  }}
+                >
                   <span className="font-semibold">{m.xai_engine()}</span>
                   <CheckCircle2 className="h-3.5 w-3.5" style={{ color: "var(--color-info)" }} />
                 </div>
-                <div className="inline-flex items-center" style={{ gap: 6, marginBlockStart: 2, fontSize: "var(--font-size-micro)", color: "var(--text-muted)" }}>
+                <div
+                  className="inline-flex items-center"
+                  style={{
+                    gap: 6,
+                    marginBlockStart: 2,
+                    fontSize: "var(--font-size-micro)",
+                    color: "var(--text-muted)",
+                  }}
+                >
                   <motion.span
-                    style={{ width: 6, height: 6, borderRadius: 999, background: "var(--color-success)" }}
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: 999,
+                      background: "var(--color-success)",
+                    }}
                     animate={{ opacity: [0.4, 1, 0.4] }}
                     transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
                   />
@@ -415,9 +593,21 @@ function XeomxAIPage() {
             </div>
 
             <div className="hidden items-center md:flex" style={{ gap: "var(--space-4)" }}>
-              <EngineIndicator icon={<Orbit className="h-3.5 w-3.5" />} label={m.xai_reasoning()} dotColor="var(--color-magenta-500)" />
-              <EngineIndicator icon={<CircleDot className="h-3.5 w-3.5" />} label={m.xai_memory()} dotColor="var(--color-orange-500)" />
-              <EngineIndicator icon={<Activity className="h-3.5 w-3.5" />} label={m.xai_world_state()} dotColor="var(--color-info)" />
+              <EngineIndicator
+                icon={<Orbit className="h-3.5 w-3.5" />}
+                label={m.xai_reasoning()}
+                dotColor="var(--color-magenta-500)"
+              />
+              <EngineIndicator
+                icon={<CircleDot className="h-3.5 w-3.5" />}
+                label={m.xai_memory()}
+                dotColor="var(--color-orange-500)"
+              />
+              <EngineIndicator
+                icon={<Activity className="h-3.5 w-3.5" />}
+                label={m.xai_world_state()}
+                dotColor="var(--color-info)"
+              />
             </div>
           </div>
 
@@ -425,7 +615,8 @@ function XeomxAIPage() {
           <div
             className="relative overflow-hidden"
             style={{
-              width: "100%", aspectRatio: "16 / 9",
+              width: "100%",
+              aspectRatio: "16 / 9",
               borderRadius: "var(--radius-lg)",
               background: SCENE_GRADIENT,
               border: "1px solid var(--border-default)",
@@ -433,14 +624,26 @@ function XeomxAIPage() {
             }}
           >
             {/* Cinematic overlays */}
-            <div className="absolute inset-0" style={{ background: "radial-gradient(70% 60% at 30% 30%, rgba(255,255,255,0.12), transparent 60%)" }} />
-            <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.55) 100%)" }} />
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(70% 60% at 30% 30%, rgba(255,255,255,0.12), transparent 60%)",
+              }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{
+                background: "linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.55) 100%)",
+              }}
+            />
 
             {/* Floating toolbar */}
             <div
               className="absolute flex items-center"
               style={{
-                insetBlockEnd: "var(--space-4)", insetInlineStart: "50%",
+                insetBlockEnd: "var(--space-4)",
+                insetInlineStart: "50%",
                 transform: "translateX(-50%)",
                 gap: "var(--space-1)",
                 padding: "var(--space-1)",
@@ -459,7 +662,10 @@ function XeomxAIPage() {
           </div>
 
           {/* Filmstrip */}
-          <div className="grid" style={{ gridTemplateColumns: "repeat(5, 1fr)", gap: "var(--space-2)" }}>
+          <div
+            className="grid"
+            style={{ gridTemplateColumns: "repeat(5, 1fr)", gap: "var(--space-2)" }}
+          >
             {VARIANT_GRADIENTS.map((g, i) => (
               <div
                 key={i}
@@ -468,7 +674,8 @@ function XeomxAIPage() {
                   aspectRatio: "16 / 10",
                   borderRadius: "var(--radius-sm)",
                   background: g,
-                  border: i === 0 ? "2px solid var(--action-primary)" : "1px solid var(--border-subtle)",
+                  border:
+                    i === 0 ? "2px solid var(--action-primary)" : "1px solid var(--border-subtle)",
                 }}
               />
             ))}
@@ -491,12 +698,26 @@ function XeomxAIPage() {
                 borderBlockEnd: "1px solid var(--border-subtle)",
               }}
             >
-              {([
-                { id: "code", label: m.xai_tab_code(), icon: <Code2 className="h-3.5 w-3.5" /> },
-                { id: "preview", label: m.xai_tab_preview(), icon: <Eye className="h-3.5 w-3.5" /> },
-                { id: "console", label: m.xai_tab_console(), icon: <Terminal className="h-3.5 w-3.5" /> },
-                { id: "files", label: m.xai_tab_files(), icon: <FileText className="h-3.5 w-3.5" /> },
-              ] as const).map((t) => {
+              {(
+                [
+                  { id: "code", label: m.xai_tab_code(), icon: <Code2 className="h-3.5 w-3.5" /> },
+                  {
+                    id: "preview",
+                    label: m.xai_tab_preview(),
+                    icon: <Eye className="h-3.5 w-3.5" />,
+                  },
+                  {
+                    id: "console",
+                    label: m.xai_tab_console(),
+                    icon: <Terminal className="h-3.5 w-3.5" />,
+                  },
+                  {
+                    id: "files",
+                    label: m.xai_tab_files(),
+                    icon: <FileText className="h-3.5 w-3.5" />,
+                  },
+                ] as const
+              ).map((t) => {
                 const active = tab === t.id;
                 return (
                   <button
@@ -505,7 +726,8 @@ function XeomxAIPage() {
                     className="inline-flex items-center"
                     style={{
                       gap: 6,
-                      paddingInline: "var(--space-3)", paddingBlock: "var(--space-2)",
+                      paddingInline: "var(--space-3)",
+                      paddingBlock: "var(--space-2)",
                       fontSize: "var(--font-size-caption)",
                       color: active ? "var(--text-primary)" : "var(--text-muted)",
                       borderBlockEnd: `2px solid ${active ? "var(--action-primary)" : "transparent"}`,
@@ -523,15 +745,29 @@ function XeomxAIPage() {
                 style={{
                   padding: "var(--space-4)",
                   fontFamily: "ui-monospace, 'JetBrains Mono', 'Menlo', monospace",
-                  fontSize: 12, lineHeight: 1.7,
+                  fontSize: 12,
+                  lineHeight: 1.7,
                   background: "var(--surface-primary)",
                   borderInlineEnd: "1px solid var(--border-subtle)",
                 }}
               >
                 {CODE_LINES.map((line, i) => (
                   <div key={i} className="flex">
-                    <span style={{ width: 24, color: "var(--text-disabled)", textAlign: "end", paddingInlineEnd: 8, userSelect: "none" }}>{i + 1}</span>
-                    <span style={{ color: "var(--text-primary)" }} dangerouslySetInnerHTML={{ __html: line }} />
+                    <span
+                      style={{
+                        width: 24,
+                        color: "var(--text-disabled)",
+                        textAlign: "end",
+                        paddingInlineEnd: 8,
+                        userSelect: "none",
+                      }}
+                    >
+                      {i + 1}
+                    </span>
+                    <span
+                      style={{ color: "var(--text-primary)" }}
+                      dangerouslySetInnerHTML={{ __html: line }}
+                    />
                   </div>
                 ))}
               </div>
@@ -541,19 +777,29 @@ function XeomxAIPage() {
                 className="relative overflow-hidden"
                 style={{ background: SCENE_GRADIENT, minHeight: 260 }}
               >
-                <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.6) 100%)" }} />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.6) 100%)",
+                  }}
+                />
                 <div
                   className="relative flex h-full flex-col items-center justify-center"
                   style={{ padding: "var(--space-6)", gap: "var(--space-3)", textAlign: "center" }}
                 >
-                  <h3 className="font-display font-bold" style={{ fontSize: "var(--font-size-h1)", color: "#fff", lineHeight: 1.05 }}>
+                  <h3
+                    className="font-display font-bold"
+                    style={{ fontSize: "var(--font-size-h1)", color: "#fff", lineHeight: 1.05 }}
+                  >
                     {m.xai_preview_headline()}
                   </h3>
                   <button
                     className="inline-flex items-center font-semibold text-white"
                     style={{
                       gap: "var(--space-2)",
-                      paddingInline: "var(--space-5)", paddingBlock: "var(--space-2)",
+                      paddingInline: "var(--space-5)",
+                      paddingBlock: "var(--space-2)",
                       borderRadius: "var(--radius-sm)",
                       background: "var(--action-primary)",
                       fontSize: "var(--font-size-body)",
@@ -588,26 +834,40 @@ function XeomxAIPage() {
                   key={f.id}
                   onClick={() => setFilter(f.id as typeof filter)}
                   style={{
-                    paddingInline: "var(--space-2)", paddingBlock: 3,
+                    paddingInline: "var(--space-2)",
+                    paddingBlock: 3,
                     borderRadius: "var(--radius-xs)",
                     fontSize: "var(--font-size-micro)",
                     background: active ? "var(--surface-elevated)" : "transparent",
                     color: active ? "var(--text-primary)" : "var(--text-muted)",
                     border: `1px solid ${active ? "var(--border-strong)" : "var(--border-subtle)"}`,
                   }}
-                >{f.label}</button>
+                >
+                  {f.label}
+                </button>
               );
             })}
           </div>
 
           {/* Timeline */}
-          <div className="relative" style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)", marginBlockStart: "var(--space-2)" }}>
+          <div
+            className="relative"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "var(--space-4)",
+              marginBlockStart: "var(--space-2)",
+            }}
+          >
             <div
               aria-hidden
               className="absolute"
               style={{
-                insetInlineStart: 5, insetBlockStart: 4, insetBlockEnd: 4,
-                width: 1, background: "var(--border-default)",
+                insetInlineStart: 5,
+                insetBlockStart: 4,
+                insetBlockEnd: 4,
+                width: 1,
+                background: "var(--border-default)",
               }}
             />
             {visibleThread.map((item, i) => (
@@ -622,19 +882,36 @@ function XeomxAIPage() {
                 <span
                   className="absolute rounded-full"
                   style={{
-                    insetInlineStart: 0, insetBlockStart: 4,
-                    width: 11, height: 11,
+                    insetInlineStart: 0,
+                    insetBlockStart: 4,
+                    width: 11,
+                    height: 11,
                     background: item.color,
                     boxShadow: `0 0 0 3px var(--surface-primary)`,
                   }}
                 />
                 <div className="flex items-start justify-between" style={{ gap: "var(--space-2)" }}>
-                  <span style={{ fontSize: "var(--font-size-caption)", color: "var(--text-primary)", fontWeight: 600 }}>
+                  <span
+                    style={{
+                      fontSize: "var(--font-size-caption)",
+                      color: "var(--text-primary)",
+                      fontWeight: 600,
+                    }}
+                  >
                     {item.title}
                   </span>
-                  <span style={{ fontSize: "var(--font-size-micro)", color: "var(--text-muted)" }}>{item.time}</span>
+                  <span style={{ fontSize: "var(--font-size-micro)", color: "var(--text-muted)" }}>
+                    {item.time}
+                  </span>
                 </div>
-                <p style={{ fontSize: "var(--font-size-micro)", color: "var(--text-tertiary)", marginBlockStart: 4, lineHeight: 1.5 }}>
+                <p
+                  style={{
+                    fontSize: "var(--font-size-micro)",
+                    color: "var(--text-tertiary)",
+                    marginBlockStart: 4,
+                    lineHeight: 1.5,
+                  }}
+                >
                   {item.desc}
                 </p>
                 {item.tag && (
@@ -642,14 +919,17 @@ function XeomxAIPage() {
                     className="inline-block"
                     style={{
                       marginBlockStart: "var(--space-2)",
-                      paddingInline: "var(--space-2)", paddingBlock: 2,
+                      paddingInline: "var(--space-2)",
+                      paddingBlock: 2,
                       borderRadius: "var(--radius-xs)",
                       fontSize: "var(--font-size-micro)",
                       background: "var(--surface-glass)",
                       color: "var(--text-secondary)",
                       border: "1px solid var(--border-default)",
                     }}
-                  >{item.tag}</span>
+                  >
+                    {item.tag}
+                  </span>
                 )}
                 {item.thumb && (
                   <div
@@ -673,7 +953,9 @@ function XeomxAIPage() {
               fontSize: "var(--font-size-caption)",
               color: "var(--action-primary)",
             }}
-          >{m.xai_view_all()}</button>
+          >
+            {m.xai_view_all()}
+          </button>
         </aside>
       </div>
 
@@ -682,7 +964,8 @@ function XeomxAIPage() {
         className="flex items-center justify-between"
         style={{
           borderBlockStart: "1px solid var(--border-subtle)",
-          paddingInline: "var(--space-6)", paddingBlock: "var(--space-2)",
+          paddingInline: "var(--space-6)",
+          paddingBlock: "var(--space-2)",
           fontSize: "var(--font-size-micro)",
           color: "var(--text-muted)",
           background: "var(--surface-primary)",
@@ -708,20 +991,27 @@ const leftRailStyle: React.CSSProperties = {
   background: "var(--surface-primary)",
   borderInlineEnd: "1px solid var(--border-subtle)",
   padding: "var(--space-5)",
-  display: "flex", flexDirection: "column", gap: "var(--space-4)",
+  display: "flex",
+  flexDirection: "column",
+  gap: "var(--space-4)",
 };
 const rightRailStyle: React.CSSProperties = {
   background: "var(--surface-primary)",
   borderInlineStart: "1px solid var(--border-subtle)",
   padding: "var(--space-5)",
-  display: "flex", flexDirection: "column", gap: "var(--space-3)",
+  display: "flex",
+  flexDirection: "column",
+  gap: "var(--space-3)",
 };
 const labelStyle: React.CSSProperties = {
-  fontSize: "var(--font-size-micro)", color: "var(--text-muted)",
-  letterSpacing: "0.12em", textTransform: "uppercase",
+  fontSize: "var(--font-size-micro)",
+  color: "var(--text-muted)",
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
 };
 const microLabel: React.CSSProperties = {
-  fontSize: "var(--font-size-micro)", color: "var(--text-muted)",
+  fontSize: "var(--font-size-micro)",
+  color: "var(--text-muted)",
 };
 
 /* ---------- subcomponents ---------- */
@@ -730,11 +1020,16 @@ function IconBtn({ children }: { children: React.ReactNode }) {
     <button
       className="grid place-items-center"
       style={{
-        width: 32, height: 32, borderRadius: "var(--radius-sm)",
-        background: "var(--surface-glass)", border: "1px solid var(--border-default)",
+        width: 32,
+        height: 32,
+        borderRadius: "var(--radius-sm)",
+        background: "var(--surface-glass)",
+        border: "1px solid var(--border-default)",
         color: "var(--text-secondary)",
       }}
-    >{children}</button>
+    >
+      {children}
+    </button>
   );
 }
 
@@ -746,7 +1041,8 @@ function DropdownRow({ label, value }: { label: string; value: string }) {
         className="flex w-full items-center justify-between"
         style={{
           marginBlockStart: 6,
-          paddingInline: "var(--space-3)", paddingBlock: "var(--space-2)",
+          paddingInline: "var(--space-3)",
+          paddingBlock: "var(--space-2)",
           borderRadius: "var(--radius-sm)",
           background: "var(--surface-glass)",
           border: "1px solid var(--border-default)",
@@ -767,7 +1063,8 @@ function ToolBtn({ icon, label }: { icon: React.ReactNode; label: string }) {
       className="inline-flex items-center"
       style={{
         gap: 6,
-        paddingInline: "var(--space-3)", paddingBlock: "var(--space-2)",
+        paddingInline: "var(--space-3)",
+        paddingBlock: "var(--space-2)",
         borderRadius: 999,
         fontSize: "var(--font-size-micro)",
         color: "var(--text-primary)",
@@ -779,9 +1076,20 @@ function ToolBtn({ icon, label }: { icon: React.ReactNode; label: string }) {
   );
 }
 
-function EngineIndicator({ icon, label, dotColor }: { icon: React.ReactNode; label: string; dotColor: string }) {
+function EngineIndicator({
+  icon,
+  label,
+  dotColor,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  dotColor: string;
+}) {
   return (
-    <div className="inline-flex items-center" style={{ gap: 6, fontSize: "var(--font-size-micro)", color: "var(--text-secondary)" }}>
+    <div
+      className="inline-flex items-center"
+      style={{ gap: 6, fontSize: "var(--font-size-micro)", color: "var(--text-secondary)" }}
+    >
       <span style={{ color: "var(--text-muted)" }}>{icon}</span>
       {label}
       <span style={{ width: 5, height: 5, borderRadius: 999, background: dotColor }} />
@@ -805,13 +1113,18 @@ function EnginePulse() {
       <div
         className="absolute rounded-full"
         style={{
-          inset: 4, background: "var(--surface-secondary)",
+          inset: 4,
+          background: "var(--surface-secondary)",
           border: "1px solid var(--border-default)",
         }}
       />
       <motion.div
         className="absolute rounded-full"
-        style={{ inset: 12, background: "var(--action-primary)", boxShadow: "0 0 12px var(--action-primary)" }}
+        style={{
+          inset: 12,
+          background: "var(--action-primary)",
+          boxShadow: "0 0 12px var(--action-primary)",
+        }}
         animate={{ scale: [0.85, 1.05, 0.85], opacity: [0.6, 1, 0.6] }}
         transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -822,7 +1135,9 @@ function EnginePulse() {
 function StatusDot({ label }: { label: string }) {
   return (
     <span className="inline-flex items-center" style={{ gap: 6 }}>
-      <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--color-success)" }} />
+      <span
+        style={{ width: 6, height: 6, borderRadius: 999, background: "var(--color-success)" }}
+      />
       {label}
     </span>
   );
@@ -830,8 +1145,8 @@ function StatusDot({ label }: { label: string }) {
 
 /* ---------- code editor mock lines (pre-tinted) ---------- */
 const K = "color:var(--color-orange-500)"; // keyword
-const S = "color:var(--color-gold-500)";   // string
-const C = "color:var(--text-disabled)";    // comment
+const S = "color:var(--color-gold-500)"; // string
+const C = "color:var(--text-disabled)"; // comment
 const P = "color:var(--text-primary)";
 const CODE_LINES = [
   `<span style="${C}">// cinematic scene — generated</span>`,

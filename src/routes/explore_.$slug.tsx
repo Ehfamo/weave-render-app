@@ -37,7 +37,11 @@ export const Route = createFileRoute("/explore_/$slug")({
       <div className="mx-auto max-w-xl px-6 py-32 text-center">
         <h1 className="font-display text-4xl font-bold">{m.section_not_found()}</h1>
         <p className="mt-3 text-muted-foreground">{m.section_not_found_desc()}</p>
-        <Link to="/explore" className="mt-6 inline-flex rounded-full px-5 py-2 text-sm font-semibold text-black" style={{ background: "var(--gradient-gold)" }}>
+        <Link
+          to="/explore"
+          className="mt-6 inline-flex rounded-full px-5 py-2 text-sm font-semibold text-black"
+          style={{ background: "var(--gradient-gold)" }}
+        >
           {m.section_back_to_explore()}
         </Link>
       </div>
@@ -47,7 +51,8 @@ export const Route = createFileRoute("/explore_/$slug")({
 });
 
 function SectionPage() {
-  const loaderData = Route.useLoaderData() as { section: NonNullable<ReturnType<typeof getSection>> } | undefined;
+  const loaderData = Route.useLoaderData() as
+    { section: NonNullable<ReturnType<typeof getSection>> } | undefined;
   const section = loaderData?.section;
 
   if (!section) throw notFound();
@@ -62,7 +67,11 @@ function SectionPage() {
         <div className="mx-auto max-w-xl px-6 py-32 text-center">
           <h1 className="font-display text-3xl font-bold">{section.name}</h1>
           <p className="mt-3 text-muted-foreground">{m.section_live_message()}</p>
-          <Link to="/" className="mt-6 inline-flex rounded-full px-5 py-2 text-sm font-semibold text-black" style={{ background: "var(--gradient-gold)" }}>
+          <Link
+            to="/"
+            className="mt-6 inline-flex rounded-full px-5 py-2 text-sm font-semibold text-black"
+            style={{ background: "var(--gradient-gold)" }}
+          >
             {m.section_open()}
           </Link>
         </div>

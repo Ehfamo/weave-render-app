@@ -15,12 +15,7 @@ type LogoProps = {
  * Source of truth: /src/assets/logo-symbol.webp (extracted from the brand guide).
  * Do not swap this component's imagery without a brand review.
  */
-export function Logo({
-  variant = "full",
-  size = 32,
-  className,
-  ariaLabel,
-}: LogoProps) {
+export function Logo({ variant = "full", size = 32, className, ariaLabel }: LogoProps) {
   const showSymbol = variant !== "wordmark";
   const showWordmark = variant !== "symbol";
   const decorative = !ariaLabel;
@@ -49,7 +44,10 @@ export function Logo({
           className="font-display font-bold tracking-tight leading-none"
           style={{ fontSize: Math.round(size * 0.62) }}
         >
-          XEO<span className="text-gradient-magenta" aria-hidden="true">MX</span>
+          XEO
+          <span className="text-gradient-magenta" aria-hidden="true">
+            MX
+          </span>
         </span>
       )}
     </span>

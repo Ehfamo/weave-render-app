@@ -35,7 +35,9 @@ export const Route = createFileRoute("/collections/$id")({
     if (!loaderData) return { meta: [{ name: "robots", content: "noindex" }] };
     const url = pageUrl(`/collections/${params.id}`);
     const cover = loaderData.collection.cover;
-    const absCover = /^https?:\/\//.test(cover) ? cover : `${SITE_URL}${cover.startsWith("/") ? "" : "/"}${cover}`;
+    const absCover = /^https?:\/\//.test(cover)
+      ? cover
+      : `${SITE_URL}${cover.startsWith("/") ? "" : "/"}${cover}`;
     const isPreview = loaderData.source === "local";
     return {
       meta: [
@@ -58,15 +60,24 @@ export const Route = createFileRoute("/collections/$id")({
       <div>
         <h1 className="font-display text-4xl">{m.collections_not_found()}</h1>
         <div className="mt-6 flex items-center justify-center gap-4">
-          <Link to="/collections" className="rounded-full border border-border px-4 py-2 text-sm text-foreground">{m.nav_back_all_collections()}</Link>
-          <Link to="/explore" className="rounded-full bg-magenta px-4 py-2 text-sm text-white">Discover prompts</Link>
+          <Link
+            to="/collections"
+            className="rounded-full border border-border px-4 py-2 text-sm text-foreground"
+          >
+            {m.nav_back_all_collections()}
+          </Link>
+          <Link to="/explore" className="rounded-full bg-magenta px-4 py-2 text-sm text-white">
+            Discover prompts
+          </Link>
         </div>
       </div>
     </div>
   ),
   errorComponent: ({ reset }) => (
     <div className="grid min-h-screen place-items-center bg-background px-4 text-center">
-      <button onClick={reset} className="rounded-full border border-border px-4 py-2">{m.common_retry()}</button>
+      <button onClick={reset} className="rounded-full border border-border px-4 py-2">
+        {m.common_retry()}
+      </button>
     </div>
   ),
   component: CollectionDetail,
@@ -81,7 +92,11 @@ function CollectionDetail() {
       <Header />
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
-          <img src={collection.cover} alt="" className="h-full w-full object-cover opacity-40 blur-2xl" />
+          <img
+            src={collection.cover}
+            alt=""
+            className="h-full w-full object-cover opacity-40 blur-2xl"
+          />
           <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/85 to-background" />
         </div>
         <div
@@ -109,10 +124,17 @@ function CollectionDetail() {
             style={{ marginTop: "var(--space-8)", gap: "var(--space-10)" }}
           >
             <div className="overflow-hidden rounded-3xl border border-border">
-              <img src={collection.cover} alt={collection.title} className="aspect-[16/10] w-full object-cover" />
+              <img
+                src={collection.cover}
+                alt={collection.title}
+                className="aspect-[16/10] w-full object-cover"
+              />
             </div>
             <div>
-              <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.22em]" style={{ background: "var(--gradient-gold)", color: "oklch(0.18 0.02 60)" }}>
+              <span
+                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.22em]"
+                style={{ background: "var(--gradient-gold)", color: "oklch(0.18 0.02 60)" }}
+              >
                 {collection.badge}
               </span>
               <h1
@@ -142,7 +164,8 @@ function CollectionDetail() {
                   color: "var(--text-muted)",
                 }}
               >
-                <Layers className="h-3 w-3" /> {m.collections_prompts_in_pack({ count: String(prompts.length) })}
+                <Layers className="h-3 w-3" />{" "}
+                {m.collections_prompts_in_pack({ count: String(prompts.length) })}
               </p>
             </div>
           </div>

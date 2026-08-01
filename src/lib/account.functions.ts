@@ -18,9 +18,7 @@ export const deleteAccount = createServerFn({ method: "POST" })
     try {
       const { data: files } = await supabaseAdmin.storage.from("avatars").list(userId);
       if (files?.length) {
-        await supabaseAdmin.storage
-          .from("avatars")
-          .remove(files.map((f) => `${userId}/${f.name}`));
+        await supabaseAdmin.storage.from("avatars").remove(files.map((f) => `${userId}/${f.name}`));
       }
     } catch {
       /* ignore */

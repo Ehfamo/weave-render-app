@@ -4,7 +4,15 @@ import { motion } from "motion/react";
 import { ExploreCard } from "./ExploreCard";
 import { type ExploreSection } from "@/lib/explore-sections";
 
-export function ExploreRow({ title, sections, rowIndex = 0 }: { title: string; sections: ExploreSection[]; rowIndex?: number }) {
+export function ExploreRow({
+  title,
+  sections,
+  rowIndex = 0,
+}: {
+  title: string;
+  sections: ExploreSection[];
+  rowIndex?: number;
+}) {
   const ref = useRef<HTMLDivElement>(null);
 
   const scroll = (dir: 1 | -1) => {

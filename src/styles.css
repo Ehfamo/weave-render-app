@@ -9,9 +9,21 @@
 
 /* Belt-and-braces: guarantee every custom face uses `font-display: swap` so
    text is never blocked during initial paint on low-end mobile devices. */
-@font-face { font-family: "Inter Variable"; font-display: swap; src: local("Inter"); }
-@font-face { font-family: "Vazirmatn Variable"; font-display: swap; src: local("Vazirmatn"); }
-@font-face { font-family: "Fraunces"; font-display: swap; src: local("Fraunces"); }
+@font-face {
+  font-family: "Inter Variable";
+  font-display: swap;
+  src: local("Inter");
+}
+@font-face {
+  font-family: "Vazirmatn Variable";
+  font-display: swap;
+  src: local("Vazirmatn");
+}
+@font-face {
+  font-family: "Fraunces";
+  font-display: swap;
+  src: local("Fraunces");
+}
 
 /* XeomX — cinematic AI prompt marketplace.
  * Aesthetic: deep obsidian + baroque gold + neon magenta accent.
@@ -55,14 +67,14 @@
   --font-sans: "InterVariable", "Inter", system-ui, sans-serif;
   --font-rtl: "VazirmatnVariable", "Vazirmatn", system-ui, sans-serif;
   /* XeomX design system font-size tokens (8-step scale, do not extend) */
-  --font-size-display: 4rem;      /* 64px Bold */
-  --font-size-h1: 2.5rem;         /* 40px Bold */
-  --font-size-h2: 1.75rem;        /* 28px Semi-Bold */
-  --font-size-h3: 1.25rem;        /* 20px Medium */
+  --font-size-display: 4rem; /* 64px Bold */
+  --font-size-h1: 2.5rem; /* 40px Bold */
+  --font-size-h2: 1.75rem; /* 28px Semi-Bold */
+  --font-size-h3: 1.25rem; /* 20px Medium */
   --font-size-body-lg: 1.0625rem; /* 17px Regular */
-  --font-size-body: 0.9375rem;    /* 15px Regular */
+  --font-size-body: 0.9375rem; /* 15px Regular */
   --font-size-caption: 0.8125rem; /* 13px Medium */
-  --font-size-micro: 0.6875rem;   /* 11px Medium */
+  --font-size-micro: 0.6875rem; /* 11px Medium */
   /* Spacing scale (strict) */
   --space-1: 4px;
   --space-2: 8px;
@@ -142,7 +154,11 @@
   --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.68 0.28 0 / 60%);
   /* Gradients & shadows */
-  --gradient-spotlight: radial-gradient(60% 60% at 50% 0%, oklch(0.68 0.28 0 / 0.35), transparent 70%);
+  --gradient-spotlight: radial-gradient(
+    60% 60% at 50% 0%,
+    oklch(0.68 0.28 0 / 0.35),
+    transparent 70%
+  );
   --gradient-gold: linear-gradient(135deg, oklch(0.86 0.14 85), oklch(0.7 0.16 60));
   --gradient-magenta: linear-gradient(135deg, oklch(0.72 0.3 0), oklch(0.55 0.25 350));
   --shadow-glow: 0 10px 40px -10px oklch(0.68 0.28 0 / 0.45);
@@ -213,7 +229,7 @@
 
   /* Semantic — borders */
   --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.10);
+  --border-default: rgba(255, 255, 255, 0.1);
   --border-strong: rgba(255, 255, 255, 0.18);
 
   /* Semantic — action */
@@ -281,7 +297,13 @@
     background-attachment: fixed;
   }
 
-  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
 
   /* RTL locales swap the default UI font to Vazirmatn */
   html[dir="rtl"] body,
@@ -292,7 +314,9 @@
 
   /* Reduced motion — neutralise non-essential animation */
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
@@ -335,8 +359,12 @@
     background-clip: text;
     color: transparent;
   }
-  .scrollbar-hidden::-webkit-scrollbar { display: none; }
-  .scrollbar-hidden { scrollbar-width: none; }
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hidden {
+    scrollbar-width: none;
+  }
   .mask-fade-x {
     mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
   }

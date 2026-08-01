@@ -26,7 +26,13 @@ export const Route = createFileRoute("/_authenticated/saved")({
 
 function SavedLibrary() {
   const { user } = useAuth();
-  const { data = [], isLoading, error, refetch, isRefetching } = useQuery({
+  const {
+    data = [],
+    isLoading,
+    error,
+    refetch,
+    isRefetching,
+  } = useQuery({
     queryKey: ["saved-library", user?.id],
     enabled: !!user,
     queryFn: () => fetchSavedPromptsForUser(user!.id),
@@ -40,7 +46,10 @@ function SavedLibrary() {
         className="mx-auto max-w-[1400px]"
         style={{ paddingInline: "var(--space-4)", paddingBlock: "var(--space-6)" }}
       >
-        <p className="uppercase tracking-[0.28em] text-magenta/80" style={{ fontSize: "var(--font-size-micro)" }}>
+        <p
+          className="uppercase tracking-[0.28em] text-magenta/80"
+          style={{ fontSize: "var(--font-size-micro)" }}
+        >
           Your library
         </p>
         <h1
@@ -51,7 +60,11 @@ function SavedLibrary() {
         </h1>
         <p
           className="max-w-xl"
-          style={{ marginTop: "var(--space-3)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}
+          style={{
+            marginTop: "var(--space-3)",
+            fontSize: "var(--font-size-caption)",
+            color: "var(--text-muted)",
+          }}
         >
           Everything you've bookmarked, synced across devices.
         </p>
@@ -59,13 +72,18 @@ function SavedLibrary() {
         {isLoading ? (
           <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-              <div key={i} className="aspect-[4/5] animate-pulse rounded-2xl border border-border/60 bg-surface/40" />
+              <div
+                key={i}
+                className="aspect-[4/5] animate-pulse rounded-2xl border border-border/60 bg-surface/40"
+              />
             ))}
           </div>
         ) : error ? (
           <div className="mt-10 rounded-3xl border border-dashed border-border/60 p-10 text-center">
             <h2 className="font-display text-2xl">Couldn't load your library</h2>
-            <p className="mt-2 text-sm text-muted-foreground">Check your connection and try again.</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Check your connection and try again.
+            </p>
             <button
               onClick={() => refetch()}
               disabled={isRefetching}

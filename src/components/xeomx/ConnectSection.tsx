@@ -49,16 +49,19 @@ export function ConnectSection() {
             {m.connect_eyebrow()}
           </span>
           <h2 className="mt-4 font-display text-4xl font-semibold leading-[0.95] tracking-tight sm:text-5xl">
-            {m.connect_title_1()}{" "}
-            <span className="text-gradient-magenta italic">XeomX</span>
+            {m.connect_title_1()} <span className="text-gradient-magenta italic">XeomX</span>
           </h2>
-          <p className="mt-4 text-sm text-muted-foreground sm:text-base">
-            {m.connect_desc()}
-          </p>
+          <p className="mt-4 text-sm text-muted-foreground sm:text-base">{m.connect_desc()}</p>
           <div className="mt-6 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-            <span className="rounded-full border border-border bg-background/50 px-3 py-1">{m.connect_verified()}</span>
-            <span className="rounded-full border border-border bg-background/50 px-3 py-1">{m.connect_official()}</span>
-            <span className="rounded-full border border-border bg-background/50 px-3 py-1">{m.connect_global()}</span>
+            <span className="rounded-full border border-border bg-background/50 px-3 py-1">
+              {m.connect_verified()}
+            </span>
+            <span className="rounded-full border border-border bg-background/50 px-3 py-1">
+              {m.connect_official()}
+            </span>
+            <span className="rounded-full border border-border bg-background/50 px-3 py-1">
+              {m.connect_global()}
+            </span>
           </div>
         </div>
 

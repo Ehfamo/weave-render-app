@@ -1,6 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Loader2, CheckCircle2, Paperclip, X, Clock, MailCheck, ShieldCheck, Copy, ExternalLink } from "lucide-react";
+import {
+  Loader2,
+  CheckCircle2,
+  Paperclip,
+  X,
+  Clock,
+  MailCheck,
+  ShieldCheck,
+  Copy,
+  ExternalLink,
+} from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -24,7 +34,11 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 
-type Props = { open: boolean; onOpenChange: (v: boolean) => void; initialCategory?: ContactCategory };
+type Props = {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  initialCategory?: ContactCategory;
+};
 
 const CATEGORY_LABELS: Record<ContactCategory, string> = {
   general: "General",
@@ -64,7 +78,21 @@ const FAQ_SHORTCUTS: Array<{ label: string; to?: string; href?: string }> = [
 ];
 
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
-const ALLOWED_EXT = ["png","jpg","jpeg","gif","webp","heic","pdf","txt","log","csv","json","md","zip"];
+const ALLOWED_EXT = [
+  "png",
+  "jpg",
+  "jpeg",
+  "gif",
+  "webp",
+  "heic",
+  "pdf",
+  "txt",
+  "log",
+  "csv",
+  "json",
+  "md",
+  "zip",
+];
 
 function validateFile(file: File): string | null {
   if (file.size <= 0) return "File is empty";
@@ -155,7 +183,10 @@ export function SupportDrawer({ open, onOpenChange, initialCategory = "general" 
       setUploadPct(30);
       const { error: upErr } = await supabase.storage
         .from(bucket)
-        .uploadToSignedUrl(path, token, f, { upsert: false, contentType: f.type || "application/octet-stream" });
+        .uploadToSignedUrl(path, token, f, {
+          upsert: false,
+          contentType: f.type || "application/octet-stream",
+        });
       if (upErr) throw upErr;
       setUploadPct(100);
       setUploadedPath(path);
@@ -415,7 +446,9 @@ export function SupportDrawer({ open, onOpenChange, initialCategory = "general" 
                     className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-dashed border-border/60 bg-surface/40 px-3 py-2 text-xs text-muted-foreground transition hover:border-border hover:text-foreground"
                   >
                     <Paperclip className="h-3.5 w-3.5" aria-hidden />
-                    {file ? `${file.name} · ${formatBytes(file.size)}` : "Attach a file (optional, ≤ 10 MB)"}
+                    {file
+                      ? `${file.name} · ${formatBytes(file.size)}`
+                      : "Attach a file (optional, ≤ 10 MB)"}
                     {file && (
                       <button
                         type="button"

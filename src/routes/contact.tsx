@@ -1,6 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Mail, LifeBuoy, CreditCard, Briefcase, Newspaper, Handshake, Clock, MessageCircle } from "lucide-react";
+import {
+  Mail,
+  LifeBuoy,
+  CreditCard,
+  Briefcase,
+  Newspaper,
+  Handshake,
+  Clock,
+  MessageCircle,
+} from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
 import { SupportDrawer } from "@/components/xeomx/SupportDrawer";
 import { buildSeo, SITE_URL, pageUrl } from "@/lib/seo";
@@ -35,7 +44,12 @@ export const Route = createFileRoute("/contact")({
             url: SITE_URL,
             email: "hello@xeomx.com",
             contactPoint: [
-              { "@type": "ContactPoint", contactType: "customer support", email: "hello@xeomx.com", availableLanguage: ["en", "fa", "ar", "zh", "hi"] },
+              {
+                "@type": "ContactPoint",
+                contactType: "customer support",
+                email: "hello@xeomx.com",
+                availableLanguage: ["en", "fa", "ar", "zh", "hi"],
+              },
             ],
           }),
         },
@@ -63,18 +77,63 @@ const DEPARTMENTS: Array<{
   Icon: typeof Mail;
   sla: string;
 }> = [
-  { category: "general", title: "General", desc: "Questions, feedback, hello.", Icon: Mail, sla: "≤ 24h" },
-  { category: "support", title: "Technical Support", desc: "Bugs, account, prompt issues.", Icon: LifeBuoy, sla: "≤ 12h" },
-  { category: "billing", title: "Billing & Payments", desc: "Invoices, refunds, subscriptions.", Icon: CreditCard, sla: "≤ 24h" },
-  { category: "partnerships", title: "Partnerships", desc: "Integrations, co-marketing, deals.", Icon: Handshake, sla: "≤ 3d" },
-  { category: "press", title: "Press & Media", desc: "Interviews, brand kit, quotes.", Icon: Newspaper, sla: "≤ 3d" },
-  { category: "careers", title: "Careers", desc: "Join the team.", Icon: Briefcase, sla: "Rolling" },
+  {
+    category: "general",
+    title: "General",
+    desc: "Questions, feedback, hello.",
+    Icon: Mail,
+    sla: "≤ 24h",
+  },
+  {
+    category: "support",
+    title: "Technical Support",
+    desc: "Bugs, account, prompt issues.",
+    Icon: LifeBuoy,
+    sla: "≤ 12h",
+  },
+  {
+    category: "billing",
+    title: "Billing & Payments",
+    desc: "Invoices, refunds, subscriptions.",
+    Icon: CreditCard,
+    sla: "≤ 24h",
+  },
+  {
+    category: "partnerships",
+    title: "Partnerships",
+    desc: "Integrations, co-marketing, deals.",
+    Icon: Handshake,
+    sla: "≤ 3d",
+  },
+  {
+    category: "press",
+    title: "Press & Media",
+    desc: "Interviews, brand kit, quotes.",
+    Icon: Newspaper,
+    sla: "≤ 3d",
+  },
+  {
+    category: "careers",
+    title: "Careers",
+    desc: "Join the team.",
+    Icon: Briefcase,
+    sla: "Rolling",
+  },
 ];
 
 const FAQS = [
-  { q: "How fast will I get a reply?", a: "Support responds within 12 business hours. Other departments within 1–3 business days." },
-  { q: "Can I request a refund?", a: "Yes — see our Refund Policy. Contact Billing with your order ID and we'll take it from there." },
-  { q: "Do you offer partnerships or affiliate deals?", a: "Absolutely. Reach out via the Partnerships category with a short overview." },
+  {
+    q: "How fast will I get a reply?",
+    a: "Support responds within 12 business hours. Other departments within 1–3 business days.",
+  },
+  {
+    q: "Can I request a refund?",
+    a: "Yes — see our Refund Policy. Contact Billing with your order ID and we'll take it from there.",
+  },
+  {
+    q: "Do you offer partnerships or affiliate deals?",
+    a: "Absolutely. Reach out via the Partnerships category with a short overview.",
+  },
   { q: "Where can I follow XeomX?", a: "@xeomxai on X. More platforms rolling out soon." },
 ];
 
@@ -93,12 +152,18 @@ function ContactPage() {
       <main className="mx-auto max-w-[1100px] px-4 py-16 sm:px-8">
         {/* Hero */}
         <section className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Contact & Support</p>
-          <h1 className="mt-3 font-display font-bold" style={{ fontSize: "var(--font-size-display)" }}>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            Contact & Support
+          </p>
+          <h1
+            className="mt-3 font-display font-bold"
+            style={{ fontSize: "var(--font-size-display)" }}
+          >
             We're here to help.
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground">
-            Pick a department and we'll connect you with the right team. Most replies land in under a day.
+            Pick a department and we'll connect you with the right team. Most replies land in under
+            a day.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <button
@@ -120,7 +185,10 @@ function ContactPage() {
 
         {/* Department cards */}
         <section aria-labelledby="departments" className="mt-16">
-          <h2 id="departments" className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+          <h2
+            id="departments"
+            className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground"
+          >
             Choose a department
           </h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -149,24 +217,32 @@ function ContactPage() {
         {/* Business hours + response */}
         <section className="mt-16 grid gap-4 rounded-2xl border border-border/60 bg-surface/30 p-6 sm:grid-cols-3">
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Business hours</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+              Business hours
+            </h3>
             <p className="mt-2 text-sm text-foreground">Mon–Fri · 9:00–18:00 (UTC)</p>
             <p className="text-xs text-muted-foreground">Closed on major holidays.</p>
           </div>
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Support SLA</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+              Support SLA
+            </h3>
             <p className="mt-2 text-sm text-foreground">First reply within 12h</p>
             <p className="text-xs text-muted-foreground">Priority given to paid plans.</p>
           </div>
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Languages</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+              Languages
+            </h3>
             <p className="mt-2 text-sm text-foreground">EN · فارسی · العربية · 中文 · हिन्दी</p>
           </div>
         </section>
 
         {/* FAQ */}
         <section aria-labelledby="faq" className="mt-16">
-          <h2 id="faq" className="font-display text-2xl font-bold">Frequently asked</h2>
+          <h2 id="faq" className="font-display text-2xl font-bold">
+            Frequently asked
+          </h2>
           <div className="mt-4 divide-y divide-border/60 rounded-2xl border border-border/60 bg-surface/30">
             {FAQS.map((f) => (
               <details key={f.q} className="group p-5">
@@ -181,8 +257,15 @@ function ContactPage() {
 
         {/* Company info */}
         <section className="mt-16 border-t border-border/60 pt-8 text-sm text-muted-foreground">
-          <p><span className="text-foreground">XeomX</span> — Cinematic AI prompt marketplace.</p>
-          <p className="mt-1">General: <a className="text-foreground hover:underline" href="mailto:hello@xeomx.com">hello@xeomx.com</a></p>
+          <p>
+            <span className="text-foreground">XeomX</span> — Cinematic AI prompt marketplace.
+          </p>
+          <p className="mt-1">
+            General:{" "}
+            <a className="text-foreground hover:underline" href="mailto:hello@xeomx.com">
+              hello@xeomx.com
+            </a>
+          </p>
         </section>
       </main>
 

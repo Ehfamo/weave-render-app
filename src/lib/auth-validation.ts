@@ -13,9 +13,21 @@ export type PasswordStrength = {
 };
 
 const COMMON_PASSWORDS = new Set([
-  "password", "password1", "password123", "12345678", "123456789",
-  "qwerty123", "iloveyou", "letmein1", "welcome1", "admin123",
-  "111111", "123123", "abc12345", "1q2w3e4r", "qwertyui",
+  "password",
+  "password1",
+  "password123",
+  "12345678",
+  "123456789",
+  "qwerty123",
+  "iloveyou",
+  "letmein1",
+  "welcome1",
+  "admin123",
+  "111111",
+  "123123",
+  "abc12345",
+  "1q2w3e4r",
+  "qwertyui",
 ]);
 
 export function scorePassword(pw: string): PasswordStrength {
@@ -90,9 +102,12 @@ export function friendlyAuthError(message: string | undefined): string {
   if (m.includes("invalid login")) return "Wrong email or password.";
   if (m.includes("email not confirmed")) return "Please verify your email first.";
   if (m.includes("user already registered")) return "An account already exists for that email.";
-  if (m.includes("rate limit") || m.includes("too many")) return "Too many attempts. Please wait a minute and try again.";
-  if (m.includes("password") && m.includes("weak")) return "Password is too weak — pick something stronger.";
-  if (m.includes("pwned") || m.includes("breach")) return "This password has appeared in a data breach. Please choose another.";
+  if (m.includes("rate limit") || m.includes("too many"))
+    return "Too many attempts. Please wait a minute and try again.";
+  if (m.includes("password") && m.includes("weak"))
+    return "Password is too weak — pick something stronger.";
+  if (m.includes("pwned") || m.includes("breach"))
+    return "This password has appeared in a data breach. Please choose another.";
   if (m.includes("network")) return "Network error. Check your connection and retry.";
   return message;
 }

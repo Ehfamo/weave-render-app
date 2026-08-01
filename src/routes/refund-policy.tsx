@@ -27,7 +27,11 @@ function RefundPage() {
       <Header />
       <motion.article
         className="mx-auto"
-        style={{ maxWidth: "700px", paddingInline: "var(--space-4)", paddingBlock: "var(--space-12)" }}
+        style={{
+          maxWidth: "700px",
+          paddingInline: "var(--space-4)",
+          paddingBlock: "var(--space-12)",
+        }}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
@@ -35,7 +39,11 @@ function RefundPage() {
         <Link
           to="/"
           className="inline-flex items-center gap-2 transition hover:text-foreground"
-          style={{ marginBottom: "var(--space-8)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}
+          style={{
+            marginBottom: "var(--space-8)",
+            fontSize: "var(--font-size-caption)",
+            color: "var(--text-muted)",
+          }}
         >
           <ArrowLeft className="h-3.5 w-3.5" /> {m.explore_hero_back()}
         </Link>
@@ -47,13 +55,22 @@ function RefundPage() {
         </h1>
         <p
           className="uppercase tracking-[0.2em]"
-          style={{ marginTop: "var(--space-3)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}
+          style={{
+            marginTop: "var(--space-3)",
+            fontSize: "var(--font-size-caption)",
+            color: "var(--text-muted)",
+          }}
         >
           {m.legal_updated()}
         </p>
         <div
           className="whitespace-pre-line"
-          style={{ marginTop: "var(--space-8)", fontSize: "var(--font-size-body)", lineHeight: 1.7, color: "var(--text-muted)" }}
+          style={{
+            marginTop: "var(--space-8)",
+            fontSize: "var(--font-size-body)",
+            lineHeight: 1.7,
+            color: "var(--text-muted)",
+          }}
         >
           {m.refund_body()}
         </div>

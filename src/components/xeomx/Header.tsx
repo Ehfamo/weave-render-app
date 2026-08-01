@@ -28,9 +28,7 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
   const inputValue = query ?? localQ;
   const avatar = user?.user_metadata?.avatar_url as string | undefined;
   const name =
-    (user?.user_metadata?.full_name as string | undefined) ||
-    user?.email?.split("@")[0] ||
-    "You";
+    (user?.user_metadata?.full_name as string | undefined) || user?.email?.split("@")[0] || "You";
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-[1400px] items-center gap-2 px-3 py-3 sm:gap-4 sm:px-8">
@@ -44,25 +42,89 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
               <Menu className="h-4 w-4" />
             </button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-72 border-border bg-background p-0 rtl:[&]:!inset-y-0 rtl:[&]:!right-0 rtl:[&]:!left-auto rtl:[&]:border-l-0 rtl:[&]:border-r">
+          <SheetContent
+            side="left"
+            className="w-72 border-border bg-background p-0 rtl:[&]:!inset-y-0 rtl:[&]:!right-0 rtl:[&]:!left-auto rtl:[&]:border-l-0 rtl:[&]:border-r"
+          >
             <SheetTitle className="sr-only">Navigation</SheetTitle>
             <nav className="flex flex-col gap-1 p-4 pt-10">
-              <Link to="/" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }} activeOptions={{ exact: true }}>{m.nav_discover()}</Link>
-              <Link to="/feed" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>{m.nav_feed()}</Link>
-              <Link to="/collections" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>{m.nav_collections()}</Link>
-              <Link to="/creators" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>{m.nav_creators()}</Link>
-              <Link to="/explore" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>{m.nav_explore()}</Link>
-              <Link to="/studio" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>{m.nav_studio()}</Link>
-              <Link to="/magazine" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>{m.nav_magazine()}</Link>
+              <Link
+                to="/"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground"
+                activeProps={{ className: "bg-surface text-foreground" }}
+                activeOptions={{ exact: true }}
+              >
+                {m.nav_discover()}
+              </Link>
+              <Link
+                to="/feed"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground"
+                activeProps={{ className: "bg-surface text-foreground" }}
+              >
+                {m.nav_feed()}
+              </Link>
+              <Link
+                to="/collections"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground"
+                activeProps={{ className: "bg-surface text-foreground" }}
+              >
+                {m.nav_collections()}
+              </Link>
+              <Link
+                to="/creators"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground"
+                activeProps={{ className: "bg-surface text-foreground" }}
+              >
+                {m.nav_creators()}
+              </Link>
+              <Link
+                to="/explore"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground"
+                activeProps={{ className: "bg-surface text-foreground" }}
+              >
+                {m.nav_explore()}
+              </Link>
+              <Link
+                to="/studio"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground"
+                activeProps={{ className: "bg-surface text-foreground" }}
+              >
+                {m.nav_studio()}
+              </Link>
+              <Link
+                to="/magazine"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground"
+                activeProps={{ className: "bg-surface text-foreground" }}
+              >
+                {m.nav_magazine()}
+              </Link>
               <Link
                 to="/xeomx-ai"
                 onClick={() => setMobileOpen(false)}
                 className="mt-1 inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition"
-                style={{ background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)", color: "#fff" }}
+                style={{
+                  background: "var(--gradient-magenta)",
+                  boxShadow: "var(--shadow-glow)",
+                  color: "#fff",
+                }}
               >
                 <Sparkles className="h-3.5 w-3.5" /> {m.nav_xeomx_ai()}
               </Link>
-              <Link to="/pricing" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>{m.nav_pricing()}</Link>
+              <Link
+                to="/pricing"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground"
+                activeProps={{ className: "bg-surface text-foreground" }}
+              >
+                {m.nav_pricing()}
+              </Link>
             </nav>
           </SheetContent>
         </Sheet>
@@ -72,36 +134,73 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
-          <Link to="/" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }} activeOptions={{ exact: true }}>
+          <Link
+            to="/"
+            className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground"
+            activeProps={{ className: "bg-surface text-foreground" }}
+            activeOptions={{ exact: true }}
+          >
             {m.nav_discover()}
           </Link>
-          <Link to="/feed" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
+          <Link
+            to="/feed"
+            className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground"
+            activeProps={{ className: "bg-surface text-foreground" }}
+          >
             {m.nav_feed()}
           </Link>
-          <Link to="/collections" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
+          <Link
+            to="/collections"
+            className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground"
+            activeProps={{ className: "bg-surface text-foreground" }}
+          >
             {m.nav_collections()}
           </Link>
-          <Link to="/creators" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
+          <Link
+            to="/creators"
+            className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground"
+            activeProps={{ className: "bg-surface text-foreground" }}
+          >
             {m.nav_creators()}
           </Link>
-          <Link to="/explore" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
+          <Link
+            to="/explore"
+            className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground"
+            activeProps={{ className: "bg-surface text-foreground" }}
+          >
             {m.nav_explore()}
           </Link>
-          <Link to="/studio" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
+          <Link
+            to="/studio"
+            className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground"
+            activeProps={{ className: "bg-surface text-foreground" }}
+          >
             {m.nav_studio()}
           </Link>
-          <Link to="/magazine" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
+          <Link
+            to="/magazine"
+            className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground"
+            activeProps={{ className: "bg-surface text-foreground" }}
+          >
             {m.nav_magazine()}
           </Link>
           <Link
             to="/xeomx-ai"
             className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-foreground transition"
-            style={{ background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)", color: "#fff" }}
+            style={{
+              background: "var(--gradient-magenta)",
+              boxShadow: "var(--shadow-glow)",
+              color: "#fff",
+            }}
             activeProps={{ className: "ring-2 ring-magenta/50" }}
           >
             <Sparkles className="h-3.5 w-3.5" /> {m.nav_xeomx_ai()}
           </Link>
-          <Link to="/pricing" className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground" activeProps={{ className: "bg-surface text-foreground" }}>
+          <Link
+            to="/pricing"
+            className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-surface hover:text-foreground"
+            activeProps={{ className: "bg-surface text-foreground" }}
+          >
             {m.nav_pricing()}
           </Link>
         </nav>
@@ -136,9 +235,21 @@ export function Header({ onSearch, query }: { onSearch?: (v: string) => void; qu
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 rounded-full border border-border bg-surface/60 p-1 pe-3 transition hover:border-magenta/40">
                   {avatar ? (
-                    <img src={avatar} alt={name} width={28} height={28} loading="lazy" decoding="async" className="h-7 w-7 rounded-full object-cover" referrerPolicy="no-referrer" />
+                    <img
+                      src={avatar}
+                      alt={name}
+                      width={28}
+                      height={28}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-7 w-7 rounded-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
                   ) : (
-                    <span className="grid h-7 w-7 place-items-center rounded-full text-xs font-semibold text-white" style={{ background: "var(--gradient-magenta)" }}>
+                    <span
+                      className="grid h-7 w-7 place-items-center rounded-full text-xs font-semibold text-white"
+                      style={{ background: "var(--gradient-magenta)" }}
+                    >
                       {name.slice(0, 1).toUpperCase()}
                     </span>
                   )}

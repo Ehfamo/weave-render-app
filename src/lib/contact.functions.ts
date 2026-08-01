@@ -45,10 +45,35 @@ export const TEAM_LABEL: Record<ContactCategory, string> = {
 // Attachment limits mirrored on the client.
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024; // 10 MB
 const ALLOWED_ATTACHMENT_EXT = new Set([
-  "png","jpg","jpeg","gif","webp","heic","pdf","txt","log","csv","json","md","zip",
+  "png",
+  "jpg",
+  "jpeg",
+  "gif",
+  "webp",
+  "heic",
+  "pdf",
+  "txt",
+  "log",
+  "csv",
+  "json",
+  "md",
+  "zip",
 ]);
 const BLOCKED_ATTACHMENT_EXT = new Set([
-  "exe","bat","cmd","sh","ps1","js","jar","msi","dmg","app","scr","vbs","apk","dll",
+  "exe",
+  "bat",
+  "cmd",
+  "sh",
+  "ps1",
+  "js",
+  "jar",
+  "msi",
+  "dmg",
+  "app",
+  "scr",
+  "vbs",
+  "apk",
+  "dll",
 ]);
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -87,7 +112,8 @@ function validate(raw: unknown): ContactInput {
   const category = String(r.category ?? "") as ContactCategory;
   const website = typeof r.website === "string" ? r.website : "";
   const attachmentPath = typeof r.attachmentPath === "string" ? r.attachmentPath.slice(0, 500) : "";
-  const attachmentName = typeof r.attachmentName === "string" ? sanitize(r.attachmentName, 200) : "";
+  const attachmentName =
+    typeof r.attachmentName === "string" ? sanitize(r.attachmentName, 200) : "";
   const attachmentSize =
     typeof r.attachmentSize === "number" && Number.isFinite(r.attachmentSize)
       ? Math.max(0, Math.floor(r.attachmentSize))
@@ -106,7 +132,12 @@ function validate(raw: unknown): ContactInput {
   }
 
   return {
-    name, email, subject, message, category, website,
+    name,
+    email,
+    subject,
+    message,
+    category,
+    website,
     attachmentPath: attachmentPath || undefined,
     attachmentName: attachmentName || undefined,
     attachmentSize: attachmentSize || undefined,
@@ -133,9 +164,7 @@ export const submitContact = createServerFn({ method: "POST" })
       getRequestHeader("x-forwarded-for")?.split(",")[0]?.trim() ||
       getRequestHeader("x-real-ip") ||
       "unknown";
-    const ipHash = createHash("sha256")
-      .update(`${ipRaw}:xeomx-contact`)
-      .digest("hex");
+    const ipHash = createHash("sha256").update(`${ipRaw}:xeomx-contact`).digest("hex");
     const userAgent = (getRequestHeader("user-agent") || "").slice(0, 500);
 
     // Rate limit: max 5 submissions per IP per 10 minutes.

@@ -38,7 +38,11 @@ const CAT_GRADIENT: Record<Category, string> = {
 };
 
 function catLabel(c: Category) {
-  return c === "spotlight" ? m.magazine_cat_spotlight() : c === "tutorial" ? m.magazine_cat_tutorial() : m.magazine_cat_news();
+  return c === "spotlight"
+    ? m.magazine_cat_spotlight()
+    : c === "tutorial"
+      ? m.magazine_cat_tutorial()
+      : m.magazine_cat_news();
 }
 
 type Article = {
@@ -100,9 +104,24 @@ const LIVE_ARTICLE_SLUGS = new Set(["nocturne-baroque-muse"]);
 
 const COLLECTIONS = [
   { slug: "cyber-noir-series", title: "Cyber Noir Series", count: 24, tone: "news" as Category },
-  { slug: "future-of-ai-cinema", title: "The Future of AI Cinema", count: 18, tone: "tutorial" as Category },
-  { slug: "nocturne-portraits", title: "Nocturne Portraits", count: 32, tone: "spotlight" as Category },
-  { slug: "editorial-picks", title: "Editorial Picks · 2026", count: 12, tone: "tutorial" as Category },
+  {
+    slug: "future-of-ai-cinema",
+    title: "The Future of AI Cinema",
+    count: 18,
+    tone: "tutorial" as Category,
+  },
+  {
+    slug: "nocturne-portraits",
+    title: "Nocturne Portraits",
+    count: 32,
+    tone: "spotlight" as Category,
+  },
+  {
+    slug: "editorial-picks",
+    title: "Editorial Picks · 2026",
+    count: 12,
+    tone: "tutorial" as Category,
+  },
 ];
 
 const FILTERS: { id: "all" | Category; label: () => string }[] = [
@@ -135,11 +154,17 @@ function MagazinePage() {
       </motion.section>
 
       {/* CURATION */}
-      <section className="mx-auto" style={{ maxWidth: 1400, paddingInline: "var(--space-5)", paddingBottom: "var(--space-8)" }}>
+      <section
+        className="mx-auto"
+        style={{ maxWidth: 1400, paddingInline: "var(--space-5)", paddingBottom: "var(--space-8)" }}
+      >
         <SectionHeader title={m.magazine_editors_curation()} />
         <div
           className="grid gap-4"
-          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", marginTop: "var(--space-5)" }}
+          style={{
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            marginTop: "var(--space-5)",
+          }}
         >
           {curation.map((a, i) => (
             <motion.div
@@ -155,8 +180,14 @@ function MagazinePage() {
       </section>
 
       {/* EDITORIAL FLOW */}
-      <section className="mx-auto" style={{ maxWidth: 1400, paddingInline: "var(--space-5)", paddingBottom: "var(--space-8)" }}>
-        <div className="flex flex-wrap items-center justify-between" style={{ gap: "var(--space-4)" }}>
+      <section
+        className="mx-auto"
+        style={{ maxWidth: 1400, paddingInline: "var(--space-5)", paddingBottom: "var(--space-8)" }}
+      >
+        <div
+          className="flex flex-wrap items-center justify-between"
+          style={{ gap: "var(--space-4)" }}
+        >
           <SectionHeader title={m.magazine_editorial_flow()} />
           <div className="flex flex-wrap" style={{ gap: "var(--space-2)" }}>
             {FILTERS.map((f) => {
@@ -181,10 +212,7 @@ function MagazinePage() {
             })}
           </div>
         </div>
-        <div
-          className="scrollbar-hidden overflow-x-auto"
-          style={{ marginTop: "var(--space-5)" }}
-        >
+        <div className="scrollbar-hidden overflow-x-auto" style={{ marginTop: "var(--space-5)" }}>
           <div className="flex" style={{ gap: "var(--space-4)", paddingBottom: "var(--space-3)" }}>
             {flow.map((a, i) => (
               <motion.div
@@ -202,11 +230,17 @@ function MagazinePage() {
       </section>
 
       {/* COLLECTIONS */}
-      <section className="mx-auto" style={{ maxWidth: 1400, paddingInline: "var(--space-5)", paddingBottom: "var(--space-9)" }}>
+      <section
+        className="mx-auto"
+        style={{ maxWidth: 1400, paddingInline: "var(--space-5)", paddingBottom: "var(--space-9)" }}
+      >
         <SectionHeader title={m.magazine_collections_row()} />
         <div
           className="grid gap-4"
-          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", marginTop: "var(--space-5)" }}
+          style={{
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            marginTop: "var(--space-5)",
+          }}
         >
           {COLLECTIONS.map((c) => (
             <Link
@@ -215,10 +249,7 @@ function MagazinePage() {
               className="surface-raised group block overflow-hidden rounded-2xl transition hover:scale-[1.02]"
               style={{ transitionDuration: "var(--motion-duration-base)" }}
             >
-              <div
-                aria-hidden
-                style={{ aspectRatio: "16/10", background: CAT_GRADIENT[c.tone] }}
-              />
+              <div aria-hidden style={{ aspectRatio: "16/10", background: CAT_GRADIENT[c.tone] }} />
               <div style={{ padding: "var(--space-4)" }}>
                 <div
                   style={{
@@ -232,11 +263,21 @@ function MagazinePage() {
                 </div>
                 <div
                   className="font-display"
-                  style={{ marginTop: "var(--space-2)", fontSize: "var(--font-size-h3)", color: "var(--text-primary)" }}
+                  style={{
+                    marginTop: "var(--space-2)",
+                    fontSize: "var(--font-size-h3)",
+                    color: "var(--text-primary)",
+                  }}
                 >
                   {c.title}
                 </div>
-                <div style={{ marginTop: "var(--space-2)", fontSize: "var(--font-size-caption)", color: "var(--text-muted)" }}>
+                <div
+                  style={{
+                    marginTop: "var(--space-2)",
+                    fontSize: "var(--font-size-caption)",
+                    color: "var(--text-muted)",
+                  }}
+                >
                   {c.count} prompts
                 </div>
               </div>
@@ -261,7 +302,11 @@ function MagazineSubnav() {
         <div className="flex items-center" style={{ gap: "var(--space-6)" }}>
           <span
             className="font-display font-bold"
-            style={{ fontSize: "var(--font-size-h3)", color: "var(--text-primary)", letterSpacing: "-0.01em" }}
+            style={{
+              fontSize: "var(--font-size-h3)",
+              color: "var(--text-primary)",
+              letterSpacing: "-0.01em",
+            }}
           >
             {m.magazine_title()}
           </span>
@@ -304,7 +349,11 @@ function SectionHeader({ title }: { title: string }) {
   return (
     <h2
       className="font-display font-semibold"
-      style={{ fontSize: "var(--font-size-h2)", color: "var(--text-primary)", letterSpacing: "-0.01em" }}
+      style={{
+        fontSize: "var(--font-size-h2)",
+        color: "var(--text-primary)",
+        letterSpacing: "-0.01em",
+      }}
     >
       {title}
     </h2>
@@ -330,8 +379,7 @@ function HeroFeature({ article }: { article: Article }) {
         <div
           className="absolute inset-0"
           style={{
-            background:
-              "radial-gradient(60% 60% at 50% 100%, rgba(0,0,0,0.55), transparent 70%)",
+            background: "radial-gradient(60% 60% at 50% 100%, rgba(0,0,0,0.55), transparent 70%)",
           }}
         />
       </div>
@@ -361,7 +409,13 @@ function HeroFeature({ article }: { article: Article }) {
         >
           {article.title}
         </h1>
-        <p style={{ fontSize: "var(--font-size-body-lg)", color: "var(--text-secondary)", lineHeight: 1.6 }}>
+        <p
+          style={{
+            fontSize: "var(--font-size-body-lg)",
+            color: "var(--text-secondary)",
+            lineHeight: 1.6,
+          }}
+        >
           {article.dek}
         </p>
         <MetaRow author={article.author} readTime={article.readTime} />
@@ -394,7 +448,10 @@ function ArticleCard({ article, size }: { article: Article; size: "md" | "sm" })
       className="surface-raised group block h-full overflow-hidden rounded-2xl transition hover:scale-[1.02]"
       style={{ transitionDuration: "var(--motion-duration-base)" }}
     >
-      <div aria-hidden style={{ aspectRatio: "16/10", background: CAT_GRADIENT[article.category] }} />
+      <div
+        aria-hidden
+        style={{ aspectRatio: "16/10", background: CAT_GRADIENT[article.category] }}
+      />
       <div className="flex flex-col" style={{ padding: "var(--space-4)", gap: "var(--space-3)" }}>
         <div className="flex items-center gap-2">
           <span
@@ -412,7 +469,12 @@ function ArticleCard({ article, size }: { article: Article; size: "md" | "sm" })
         </div>
         <h3
           className="font-display font-semibold"
-          style={{ fontSize: titleSize, color: "var(--text-primary)", lineHeight: 1.25, letterSpacing: "-0.01em" }}
+          style={{
+            fontSize: titleSize,
+            color: "var(--text-primary)",
+            lineHeight: 1.25,
+            letterSpacing: "-0.01em",
+          }}
         >
           {article.title}
         </h3>
@@ -422,7 +484,15 @@ function ArticleCard({ article, size }: { article: Article; size: "md" | "sm" })
   );
 }
 
-function MetaRow({ author, readTime, compact = false }: { author: string; readTime: number; compact?: boolean }) {
+function MetaRow({
+  author,
+  readTime,
+  compact = false,
+}: {
+  author: string;
+  readTime: number;
+  compact?: boolean;
+}) {
   return (
     <div
       className="flex items-center"

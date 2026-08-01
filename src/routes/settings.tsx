@@ -2,7 +2,17 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { pageUrl } from "@/lib/seo";
 import { useState } from "react";
 import { motion } from "motion/react";
-import { User, ShieldCheck, Bell, CreditCard, Languages, Palette, KeyRound, ChevronRight, Lock } from "lucide-react";
+import {
+  User,
+  ShieldCheck,
+  Bell,
+  CreditCard,
+  Languages,
+  Palette,
+  KeyRound,
+  ChevronRight,
+  Lock,
+} from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
 // @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
@@ -22,7 +32,8 @@ export const Route = createFileRoute("/settings")({
   component: SettingsPage,
 });
 
-type SectionKey = "profile" | "account" | "privacy" | "notifications" | "billing" | "language" | "appearance";
+type SectionKey =
+  "profile" | "account" | "privacy" | "notifications" | "billing" | "language" | "appearance";
 
 function SettingsPage() {
   const [active, setActive] = useState<SectionKey>("account");
@@ -46,15 +57,15 @@ function SettingsPage() {
       >
         <h1
           className="font-display font-semibold tracking-tight"
-          style={{ fontSize: "clamp(2rem, 4vw, var(--font-size-h1))", marginBottom: "var(--space-7)" }}
+          style={{
+            fontSize: "clamp(2rem, 4vw, var(--font-size-h1))",
+            marginBottom: "var(--space-7)",
+          }}
         >
           {m.settings_title()}
         </h1>
 
-        <div
-          className="grid lg:grid-cols-[240px_minmax(0,1fr)]"
-          style={{ gap: "var(--space-7)" }}
-        >
+        <div className="grid lg:grid-cols-[240px_minmax(0,1fr)]" style={{ gap: "var(--space-7)" }}>
           <aside>
             <nav
               className="flex flex-col"
@@ -93,7 +104,11 @@ function SettingsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
           >
-            {active === "account" ? <AccountSection /> : <StubSection label={nav.find((n) => n.key === active)!.label} />}
+            {active === "account" ? (
+              <AccountSection />
+            ) : (
+              <StubSection label={nav.find((n) => n.key === active)!.label} />
+            )}
           </motion.section>
         </div>
       </div>

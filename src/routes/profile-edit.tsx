@@ -3,8 +3,18 @@ import { pageUrl } from "@/lib/seo";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "motion/react";
 import {
-  Upload, Check, X, Globe, MapPin, Languages, Clock, ArrowLeft, Sparkles, Loader2,
-  Trash2, ShieldAlert,
+  Upload,
+  Check,
+  X,
+  Globe,
+  MapPin,
+  Languages,
+  Clock,
+  ArrowLeft,
+  Sparkles,
+  Loader2,
+  Trash2,
+  ShieldAlert,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -108,14 +118,25 @@ function ProfileEdit() {
       }
       setProfileLoading(false);
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
   useEffect(() => {
     const norm = normalizeUsername(username);
-    if (!norm) { setAvailability("idle"); return; }
-    if (validateUsernameFormat(norm)) { setAvailability("invalid"); return; }
-    if (norm === normalizeUsername(initialUsername)) { setAvailability("available"); return; }
+    if (!norm) {
+      setAvailability("idle");
+      return;
+    }
+    if (validateUsernameFormat(norm)) {
+      setAvailability("invalid");
+      return;
+    }
+    if (norm === normalizeUsername(initialUsername)) {
+      setAvailability("available");
+      return;
+    }
     setAvailability("checking");
     const handle = setTimeout(async () => {
       const { data, error } = await supabase.rpc("username_available", { _username: norm });
@@ -146,11 +167,18 @@ function ProfileEdit() {
       const path = `${user.id}/avatar-${Date.now()}.${ext}`;
       const { error: upErr } = await supabase.storage
         .from("avatars")
-        .upload(path, avatarFile, { cacheControl: "3600", upsert: false, contentType: avatarFile.type });
+        .upload(path, avatarFile, {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: avatarFile.type,
+        });
       if (upErr) throw upErr;
       // Best-effort delete of previous avatar so the bucket doesn't accrete.
       if (avatarPath && avatarPath !== path) {
-        await supabase.storage.from("avatars").remove([avatarPath]).catch(() => {});
+        await supabase.storage
+          .from("avatars")
+          .remove([avatarPath])
+          .catch(() => {});
       }
       setAvatarPath(path);
       const { data } = supabase.storage.from("avatars").getPublicUrl(path);
@@ -163,10 +191,19 @@ function ProfileEdit() {
   async function removeAvatar() {
     if (!user) return;
     if (avatarPath) {
-      await supabase.storage.from("avatars").remove([avatarPath]).catch(() => {});
+      await supabase.storage
+        .from("avatars")
+        .remove([avatarPath])
+        .catch(() => {});
     }
-    const { error } = await supabase.from("profiles").update({ avatar_url: null }).eq("id", user.id);
-    if (error) { toast.error(error.message); return; }
+    const { error } = await supabase
+      .from("profiles")
+      .update({ avatar_url: null })
+      .eq("id", user.id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setAvatar(avatarImg);
     setAvatarFile(null);
     setAvatarPath(null);
@@ -176,7 +213,10 @@ function ProfileEdit() {
   }
 
   async function onDeleteAccount() {
-    if (confirmText !== "DELETE") { toast.error('Type DELETE to confirm.'); return; }
+    if (confirmText !== "DELETE") {
+      toast.error("Type DELETE to confirm.");
+      return;
+    }
     setDeleting(true);
     try {
       await deleteAccount();
@@ -190,20 +230,31 @@ function ProfileEdit() {
     }
   }
 
-  const fieldErrors = useMemo(() => ({
-    displayName: validateDisplayName(displayName),
-    username: validateUsernameFormat(normalizeUsername(username)),
-    bio: validateBio(bio),
-    website: validateWebsite(website.trim()),
-  }), [displayName, username, bio, website]);
+  const fieldErrors = useMemo(
+    () => ({
+      displayName: validateDisplayName(displayName),
+      username: validateUsernameFormat(normalizeUsername(username)),
+      bio: validateBio(bio),
+      website: validateWebsite(website.trim()),
+    }),
+    [displayName, username, bio, website],
+  );
 
-  const canSave = !saving && !uploading && !fieldErrors.displayName && !fieldErrors.username
-    && !fieldErrors.bio && !fieldErrors.website
-    && (availability === "available" || availability === "idle");
+  const canSave =
+    !saving &&
+    !uploading &&
+    !fieldErrors.displayName &&
+    !fieldErrors.username &&
+    !fieldErrors.bio &&
+    !fieldErrors.website &&
+    (availability === "available" || availability === "idle");
 
   async function save() {
     if (!user) return;
-    if (!canSave) { toast.error("Please fix the highlighted fields."); return; }
+    if (!canSave) {
+      toast.error("Please fix the highlighted fields.");
+      return;
+    }
     setSaving(true);
     try {
       let avatarUrl: string | null = null;
@@ -255,9 +306,15 @@ function ProfileEdit() {
           "radial-gradient(1000px 600px at 15% -10%, rgba(255,90,40,0.10), transparent 60%), radial-gradient(800px 600px at 95% 20%, rgba(255,45,135,0.10), transparent 60%), #08060a",
       }}
     >
-      <header className="sticky top-0 z-40 backdrop-blur-xl" style={{ background: "rgba(8,6,10,0.55)" }}>
+      <header
+        className="sticky top-0 z-40 backdrop-blur-xl"
+        style={{ background: "rgba(8,6,10,0.55)" }}
+      >
         <div className="mx-auto flex max-w-[900px] items-center justify-between px-4 py-5 sm:px-6">
-          <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white">
+          <Link
+            to="/dashboard"
+            className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white"
+          >
             <ArrowLeft className="h-4 w-4" aria-hidden /> Back to dashboard
           </Link>
           <span className="text-xl font-bold">
@@ -267,13 +324,21 @@ function ProfileEdit() {
       </header>
 
       <main className="mx-auto max-w-[900px] px-4 pb-16 pt-6 sm:px-6">
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
           <h1 className="text-4xl font-bold tracking-tight">Edit profile</h1>
           <p className="mt-2 text-white/60">Update how you appear across XeomX.</p>
         </motion.div>
 
         {profileLoading ? (
-          <div className="mt-8 flex items-center gap-2 text-white/60" role="status" aria-live="polite">
+          <div
+            className="mt-8 flex items-center gap-2 text-white/60"
+            role="status"
+            aria-live="polite"
+          >
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Loading your profile…
           </div>
         ) : (
@@ -281,8 +346,14 @@ function ProfileEdit() {
             <Card>
               <div className="flex items-center gap-6">
                 <div className="relative">
-                  <div className="absolute -inset-2 rounded-full opacity-70 blur-xl" style={{ background: "radial-gradient(circle, #ff5a28, transparent 70%)" }} />
-                  <div className="relative h-24 w-24 overflow-hidden rounded-full" style={{ boxShadow: "0 0 0 2px #ff5a28" }}>
+                  <div
+                    className="absolute -inset-2 rounded-full opacity-70 blur-xl"
+                    style={{ background: "radial-gradient(circle, #ff5a28, transparent 70%)" }}
+                  />
+                  <div
+                    className="relative h-24 w-24 overflow-hidden rounded-full"
+                    style={{ boxShadow: "0 0 0 2px #ff5a28" }}
+                  >
                     <img src={avatar} alt="Your avatar" className="h-full w-full object-cover" />
                   </div>
                 </div>
@@ -295,7 +366,11 @@ function ProfileEdit() {
                     disabled={uploading}
                     className="mt-3 inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm hover:bg-white/[0.05] disabled:opacity-60"
                   >
-                    {uploading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Upload className="h-4 w-4" aria-hidden />}
+                    {uploading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                    ) : (
+                      <Upload className="h-4 w-4" aria-hidden />
+                    )}
                     {uploading ? "Uploading…" : "Upload new"}
                   </button>
                   {hasAvatar && (
@@ -321,12 +396,25 @@ function ProfileEdit() {
             </Card>
 
             <Card>
-              <Field label="Display name" hint={fieldErrors.displayName ? <ErrText>{fieldErrors.displayName}</ErrText> : null}>
-                <Input value={displayName} onChange={setDisplayName} placeholder="Your name" autoComplete="name" />
+              <Field
+                label="Display name"
+                hint={fieldErrors.displayName ? <ErrText>{fieldErrors.displayName}</ErrText> : null}
+              >
+                <Input
+                  value={displayName}
+                  onChange={setDisplayName}
+                  placeholder="Your name"
+                  autoComplete="name"
+                />
               </Field>
-              <Field label="Username" hint={<UsernameHint state={availability} format={fieldErrors.username} />}>
+              <Field
+                label="Username"
+                hint={<UsernameHint state={availability} format={fieldErrors.username} />}
+              >
                 <div className="relative">
-                  <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/40">@</span>
+                  <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/40">
+                    @
+                  </span>
                   <input
                     value={username}
                     onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s+/g, ""))}
@@ -337,7 +425,10 @@ function ProfileEdit() {
                   />
                 </div>
               </Field>
-              <Field label="Bio" hint={fieldErrors.bio ? <ErrText>{fieldErrors.bio}</ErrText> : null}>
+              <Field
+                label="Bio"
+                hint={fieldErrors.bio ? <ErrText>{fieldErrors.bio}</ErrText> : null}
+              >
                 <textarea
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
@@ -345,13 +436,24 @@ function ProfileEdit() {
                   maxLength={300}
                   className="w-full resize-none rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm outline-none focus:border-[#ff8a3d]"
                 />
-                <p className="mt-1 text-right text-xs text-white/40" aria-live="polite">{bio.length}/300</p>
+                <p className="mt-1 text-right text-xs text-white/40" aria-live="polite">
+                  {bio.length}/300
+                </p>
               </Field>
             </Card>
 
             <Card>
-              <Field label="Website" icon={Globe} hint={fieldErrors.website ? <ErrText>{fieldErrors.website}</ErrText> : null}>
-                <Input value={website} onChange={setWebsite} placeholder="https://…" autoComplete="url" />
+              <Field
+                label="Website"
+                icon={Globe}
+                hint={fieldErrors.website ? <ErrText>{fieldErrors.website}</ErrText> : null}
+              >
+                <Input
+                  value={website}
+                  onChange={setWebsite}
+                  placeholder="https://…"
+                  autoComplete="url"
+                />
               </Field>
               <Field label="Country" icon={MapPin}>
                 <Input value={country} onChange={setCountry} autoComplete="country-name" />
@@ -376,9 +478,16 @@ function ProfileEdit() {
                 onClick={save}
                 disabled={!canSave}
                 className="inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-semibold text-black disabled:opacity-60"
-                style={{ background: "linear-gradient(90deg,#ff8a3d,#ff2d87)", boxShadow: "0 8px 24px rgba(255,90,40,0.35)" }}
+                style={{
+                  background: "linear-gradient(90deg,#ff8a3d,#ff2d87)",
+                  boxShadow: "0 8px 24px rgba(255,90,40,0.35)",
+                }}
               >
-                {saving ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Sparkles className="h-4 w-4" aria-hidden />}
+                {saving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                ) : (
+                  <Sparkles className="h-4 w-4" aria-hidden />
+                )}
                 {saving ? "Saving…" : "Save changes"}
               </button>
             </div>
@@ -386,17 +495,22 @@ function ProfileEdit() {
             {/* Danger zone: permanent account deletion */}
             <div
               className="mt-8 rounded-[22px] p-6"
-              style={{ background: "rgba(255,45,45,0.04)", border: "1px solid rgba(255,80,80,0.25)" }}
+              style={{
+                background: "rgba(255,45,45,0.04)",
+                border: "1px solid rgba(255,80,80,0.25)",
+              }}
               role="region"
               aria-labelledby="danger-zone"
             >
               <div className="flex items-start gap-3">
                 <ShieldAlert className="mt-0.5 h-5 w-5 text-rose-400" aria-hidden />
                 <div className="flex-1">
-                  <h2 id="danger-zone" className="font-semibold text-rose-200">Delete account</h2>
+                  <h2 id="danger-zone" className="font-semibold text-rose-200">
+                    Delete account
+                  </h2>
                   <p className="mt-1 text-sm text-white/60">
-                    Permanently deletes your account, profile, prompts, collections and
-                    avatars. This action cannot be undone.
+                    Permanently deletes your account, profile, prompts, collections and avatars.
+                    This action cannot be undone.
                   </p>
                   {!confirmDelete ? (
                     <button
@@ -408,7 +522,10 @@ function ProfileEdit() {
                     </button>
                   ) : (
                     <div className="mt-4 space-y-3">
-                      <label htmlFor="confirm-del" className="block text-xs uppercase tracking-wider text-white/60">
+                      <label
+                        htmlFor="confirm-del"
+                        className="block text-xs uppercase tracking-wider text-white/60"
+                      >
                         Type <span className="font-mono text-rose-300">DELETE</span> to confirm
                       </label>
                       <input
@@ -420,11 +537,16 @@ function ProfileEdit() {
                         aria-describedby="confirm-del-help"
                         className="w-full max-w-xs rounded-xl border border-rose-500/30 bg-white/[0.03] px-4 py-2.5 text-sm outline-none focus:border-rose-400"
                       />
-                      <p id="confirm-del-help" className="text-xs text-white/40">This is irreversible.</p>
+                      <p id="confirm-del-help" className="text-xs text-white/40">
+                        This is irreversible.
+                      </p>
                       <div className="flex gap-2">
                         <button
                           type="button"
-                          onClick={() => { setConfirmDelete(false); setConfirmText(""); }}
+                          onClick={() => {
+                            setConfirmDelete(false);
+                            setConfirmText("");
+                          }}
                           className="rounded-full border border-white/15 px-4 py-2 text-sm hover:bg-white/[0.05]"
                         >
                           Cancel
@@ -435,7 +557,11 @@ function ProfileEdit() {
                           disabled={deleting || confirmText !== "DELETE"}
                           className="inline-flex items-center gap-2 rounded-full bg-rose-500 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-400 disabled:opacity-60"
                         >
-                          {deleting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Trash2 className="h-4 w-4" aria-hidden />}
+                          {deleting ? (
+                            <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                          ) : (
+                            <Trash2 className="h-4 w-4" aria-hidden />
+                          )}
                           Permanently delete
                         </button>
                       </div>
@@ -453,16 +579,25 @@ function ProfileEdit() {
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
-    <div className="space-y-5 rounded-[22px] p-6" style={{ background: "#100b0f", border: "1px solid rgba(255,255,255,0.06)" }}>
+    <div
+      className="space-y-5 rounded-[22px] p-6"
+      style={{ background: "#100b0f", border: "1px solid rgba(255,255,255,0.06)" }}
+    >
       {children}
     </div>
   );
 }
 
 function Field({
-  label, hint, icon: Icon, children,
+  label,
+  hint,
+  icon: Icon,
+  children,
 }: {
-  label: string; hint?: React.ReactNode; icon?: typeof Globe; children: React.ReactNode;
+  label: string;
+  hint?: React.ReactNode;
+  icon?: typeof Globe;
+  children: React.ReactNode;
 }) {
   return (
     <div>
@@ -478,9 +613,15 @@ function Field({
 }
 
 function Input({
-  value, onChange, placeholder, autoComplete,
+  value,
+  onChange,
+  placeholder,
+  autoComplete,
 }: {
-  value: string; onChange: (v: string) => void; placeholder?: string; autoComplete?: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  autoComplete?: string;
 }) {
   return (
     <input
@@ -494,13 +635,27 @@ function Input({
 }
 
 function ErrText({ children }: { children: React.ReactNode }) {
-  return <span className="inline-flex items-center gap-1 text-rose-400"><X className="h-3 w-3" aria-hidden /> {children}</span>;
+  return (
+    <span className="inline-flex items-center gap-1 text-rose-400">
+      <X className="h-3 w-3" aria-hidden /> {children}
+    </span>
+  );
 }
 
 function UsernameHint({ state, format }: { state: Availability; format: string | null }) {
   if (format) return <ErrText>{format}</ErrText>;
-  if (state === "checking") return <span className="inline-flex items-center gap-1 text-white/50"><Loader2 className="h-3 w-3 animate-spin" aria-hidden /> Checking…</span>;
-  if (state === "available") return <span className="inline-flex items-center gap-1 text-emerald-400"><Check className="h-3 w-3" aria-hidden /> Available</span>;
+  if (state === "checking")
+    return (
+      <span className="inline-flex items-center gap-1 text-white/50">
+        <Loader2 className="h-3 w-3 animate-spin" aria-hidden /> Checking…
+      </span>
+    );
+  if (state === "available")
+    return (
+      <span className="inline-flex items-center gap-1 text-emerald-400">
+        <Check className="h-3 w-3" aria-hidden /> Available
+      </span>
+    );
   if (state === "taken") return <ErrText>Already taken</ErrText>;
   if (state === "invalid") return <ErrText>Not a valid username</ErrText>;
   return null;

@@ -55,8 +55,11 @@ export function toPromptCard(row: PromptRow): Prompt {
   const likes = firstCount(row.likes);
   const saves = firstCount(row.saves);
   const author = row.author?.username ? `@${row.author.username}` : "@creator";
-  const state: Prompt["state"] =
-    !row.is_published ? "soon" : row.price_cents > 0 ? "premium" : "free";
+  const state: Prompt["state"] = !row.is_published
+    ? "soon"
+    : row.price_cents > 0
+      ? "premium"
+      : "free";
   return {
     id: row.slug,
     title: row.title,
@@ -93,11 +96,7 @@ export async function fetchPromptsList(opts?: {
   orderBy?: "recent" | "trending";
 }) {
   const limit = opts?.limit ?? 24;
-  let q = supabase
-    .from("prompts")
-    .select(PROMPT_LIST_SELECT)
-    .eq("is_published", true)
-    .limit(limit);
+  let q = supabase.from("prompts").select(PROMPT_LIST_SELECT).eq("is_published", true).limit(limit);
 
   if (opts?.category && opts.category !== "All") q = q.eq("category", opts.category);
   if (opts?.search) {
@@ -166,7 +165,11 @@ export async function togglePromptLike(promptId: string, on: boolean) {
     const { error } = await supabase.from("likes").insert({ prompt_id: promptId, user_id: uid });
     if (error && !/duplicate/i.test(error.message)) throw error;
   } else {
-    const { error } = await supabase.from("likes").delete().eq("prompt_id", promptId).eq("user_id", uid);
+    const { error } = await supabase
+      .from("likes")
+      .delete()
+      .eq("prompt_id", promptId)
+      .eq("user_id", uid);
     if (error) throw error;
   }
 }
@@ -179,7 +182,11 @@ export async function togglePromptSave(promptId: string, on: boolean) {
     const { error } = await supabase.from("saves").insert({ prompt_id: promptId, user_id: uid });
     if (error && !/duplicate/i.test(error.message)) throw error;
   } else {
-    const { error } = await supabase.from("saves").delete().eq("prompt_id", promptId).eq("user_id", uid);
+    const { error } = await supabase
+      .from("saves")
+      .delete()
+      .eq("prompt_id", promptId)
+      .eq("user_id", uid);
     if (error) throw error;
   }
 }
@@ -190,10 +197,16 @@ export async function toggleFollow(followeeId: string, on: boolean) {
   if (!uid) throw new Error("auth_required");
   if (uid === followeeId) return;
   if (on) {
-    const { error } = await supabase.from("follows").insert({ follower_id: uid, followee_id: followeeId });
+    const { error } = await supabase
+      .from("follows")
+      .insert({ follower_id: uid, followee_id: followeeId });
     if (error && !/duplicate/i.test(error.message)) throw error;
   } else {
-    const { error } = await supabase.from("follows").delete().eq("follower_id", uid).eq("followee_id", followeeId);
+    const { error } = await supabase
+      .from("follows")
+      .delete()
+      .eq("follower_id", uid)
+      .eq("followee_id", followeeId);
     if (error) throw error;
   }
 }
@@ -203,8 +216,18 @@ export async function fetchViewerEngagement(promptId: string) {
   const uid = userRes?.user?.id;
   if (!uid) return { liked: false, saved: false, following: false };
   const [likeRes, saveRes] = await Promise.all([
-    supabase.from("likes").select("prompt_id").eq("prompt_id", promptId).eq("user_id", uid).maybeSingle(),
-    supabase.from("saves").select("prompt_id").eq("prompt_id", promptId).eq("user_id", uid).maybeSingle(),
+    supabase
+      .from("likes")
+      .select("prompt_id")
+      .eq("prompt_id", promptId)
+      .eq("user_id", uid)
+      .maybeSingle(),
+    supabase
+      .from("saves")
+      .select("prompt_id")
+      .eq("prompt_id", promptId)
+      .eq("user_id", uid)
+      .maybeSingle(),
   ]);
   return {
     liked: !!likeRes.data,
@@ -235,13 +258,19 @@ export type CommentRow = {
   body: string;
   created_at: string;
   parent_id: string | null;
-  author?: { username: string | null; display_name: string | null; avatar_url: string | null } | null;
+  author?: {
+    username: string | null;
+    display_name: string | null;
+    avatar_url: string | null;
+  } | null;
 };
 
 export async function fetchComments(promptId: string): Promise<CommentRow[]> {
   const { data, error } = await supabase
     .from("comments")
-    .select("id, prompt_id, author_id, body, created_at, parent_id, author:profiles!comments_author_id_profiles_fkey(username, display_name, avatar_url)")
+    .select(
+      "id, prompt_id, author_id, body, created_at, parent_id, author:profiles!comments_author_id_profiles_fkey(username, display_name, avatar_url)",
+    )
     .eq("prompt_id", promptId)
     .order("created_at", { ascending: false })
     .limit(100);
@@ -255,7 +284,9 @@ export async function postComment(promptId: string, body: string) {
   const { data: userRes } = await supabase.auth.getUser();
   const uid = userRes?.user?.id;
   if (!uid) throw new Error("auth_required");
-  const { error } = await supabase.from("comments").insert({ prompt_id: promptId, author_id: uid, body: trimmed });
+  const { error } = await supabase
+    .from("comments")
+    .insert({ prompt_id: promptId, author_id: uid, body: trimmed });
   if (error) throw error;
 }
 
@@ -283,7 +314,9 @@ function toCollectionCard(row: CollectionRow): Collection {
   return {
     id: row.slug,
     title: row.title,
-    subtitle: row.description || (row.owner?.username ? `Curated by @${row.owner.username}` : "Curated pack"),
+    subtitle:
+      row.description ||
+      (row.owner?.username ? `Curated by @${row.owner.username}` : "Curated pack"),
     count: firstCount(row.collection_items),
     cover: row.cover_url || fallbackCover(row.slug),
     ids: [],
@@ -401,9 +434,7 @@ export async function searchAll(query: string) {
 export async function fetchSavedPromptsForUser(userId: string): Promise<Prompt[]> {
   const { data, error } = await supabase
     .from("saves")
-    .select(
-      "created_at, prompt:prompts!inner(" + PROMPT_LIST_SELECT + ")"
-    )
+    .select("created_at, prompt:prompts!inner(" + PROMPT_LIST_SELECT + ")")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(200);

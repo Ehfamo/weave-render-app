@@ -8,9 +8,21 @@ import { DemoDataBadge } from "./status/DemoDataBadge";
 import { m } from "@/paraglide/messages.js";
 
 const stateChip = {
-  free: { labelKey: "common_free" as const, className: "bg-foreground/10 text-foreground border border-foreground/15", icon: Sparkles },
-  premium: { labelKey: "common_premium" as const, className: "bg-[var(--gradient-gold)] text-[oklch(0.18_0.02_60)] border border-gold/40", icon: Crown },
-  soon: { labelKey: "common_coming_soon" as const, className: "bg-magenta/15 text-magenta border border-magenta/30", icon: Lock },
+  free: {
+    labelKey: "common_free" as const,
+    className: "bg-foreground/10 text-foreground border border-foreground/15",
+    icon: Sparkles,
+  },
+  premium: {
+    labelKey: "common_premium" as const,
+    className: "bg-[var(--gradient-gold)] text-[oklch(0.18_0.02_60)] border border-gold/40",
+    icon: Crown,
+  },
+  soon: {
+    labelKey: "common_coming_soon" as const,
+    className: "bg-magenta/15 text-magenta border border-magenta/30",
+    icon: Lock,
+  },
 } as const;
 
 export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm" | "md" | "lg" }) {
@@ -70,7 +82,10 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
         {/* depth blur sheen on hover */}
         <div
           className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-          style={{ background: "radial-gradient(60% 50% at 50% 40%, oklch(0.68 0.28 0 / 0.18), transparent 70%)" }}
+          style={{
+            background:
+              "radial-gradient(60% 50% at 50% 40%, oklch(0.68 0.28 0 / 0.18), transparent 70%)",
+          }}
         />
 
         {/* top row chips */}
@@ -80,8 +95,8 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
               prompt.state === "premium"
                 ? "text-gold-foreground"
                 : prompt.state === "soon"
-                ? "text-magenta"
-                : "text-foreground"
+                  ? "text-magenta"
+                  : "text-foreground"
             } ${chip.className}`}
             style={prompt.state === "premium" ? { background: "var(--gradient-gold)" } : undefined}
           >
@@ -130,15 +145,25 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
       <div className="space-y-3 p-4">
         <div className="space-y-1">
           <h3 className="font-display text-lg font-semibold leading-tight tracking-tight text-foreground">
-            <Link to="/prompt/$id" params={{ id: prompt.id }} className="outline-none hover:text-magenta focus-visible:text-magenta">
+            <Link
+              to="/prompt/$id"
+              params={{ id: prompt.id }}
+              className="outline-none hover:text-magenta focus-visible:text-magenta"
+            >
               {prompt.title}
             </Link>
           </h3>
           <p className="text-xs text-muted-foreground">{prompt.author}</p>
           <div className="flex items-center gap-2 pt-1 text-[11px] text-muted-foreground">
-            <span className="inline-flex items-center gap-1"><Copy className="h-3 w-3" /> {fmt(prompt.copies)}</span>
-            <span className="inline-flex items-center gap-1"><Bookmark className="h-3 w-3" /> {fmt(prompt.saves)}</span>
-            <span className="inline-flex items-center gap-1"><Shuffle className="h-3 w-3" /> {fmt(prompt.remixes)}</span>
+            <span className="inline-flex items-center gap-1">
+              <Copy className="h-3 w-3" /> {fmt(prompt.copies)}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Bookmark className="h-3 w-3" /> {fmt(prompt.saves)}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Shuffle className="h-3 w-3" /> {fmt(prompt.remixes)}
+            </span>
             <DemoDataBadge variant="sample" className="ms-auto" />
           </div>
         </div>
@@ -149,7 +174,11 @@ export function PromptCard({ prompt, size = "md" }: { prompt: Prompt; size?: "sm
           className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border bg-surface-2/60 px-3 py-2 text-xs font-medium text-foreground transition hover:border-magenta/40 hover:bg-magenta/10 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <Copy className="h-3.5 w-3.5" />
-          {prompt.state === "soon" ? m.common_locked() : copied ? m.common_copied() : m.prompt_copy_button()}
+          {prompt.state === "soon"
+            ? m.common_locked()
+            : copied
+              ? m.common_copied()
+              : m.prompt_copy_button()}
         </button>
       </div>
     </div>

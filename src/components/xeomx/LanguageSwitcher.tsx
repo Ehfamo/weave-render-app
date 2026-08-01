@@ -32,7 +32,8 @@ export function LanguageSwitcher() {
   const activeNative = LOCALES.find((l) => l.code === current)?.native ?? "English";
 
   const buildHref = (code: string): string => {
-    const path = typeof window !== "undefined" ? window.location.pathname + window.location.search : "/";
+    const path =
+      typeof window !== "undefined" ? window.location.pathname + window.location.search : "/";
     try {
       return localizeHref(path, { locale: code });
     } catch {

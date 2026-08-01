@@ -37,16 +37,20 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "XeomX — Cinematic AI Prompt Marketplace" },
-      { name: "description", content: "Discover, remix and own the world's most cinematic AI prompts. Netflix-style discovery, viral feed, premium drops." },
+      {
+        name: "description",
+        content:
+          "Discover, remix and own the world's most cinematic AI prompts. Netflix-style discovery, viral feed, premium drops.",
+      },
       { property: "og:title", content: "XeomX — Cinematic AI Prompt Marketplace" },
-      { property: "og:description", content: "Discover, remix and own the world's most cinematic AI prompts." },
+      {
+        property: "og:description",
+        content: "Discover, remix and own the world's most cinematic AI prompts.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:url", content: pageUrl("/") },
     ],
-    links: [
-      { rel: "canonical", href: pageUrl("/") },
-      ...heroPreloadLinks,
-    ],
+    links: [{ rel: "canonical", href: pageUrl("/") }, ...heroPreloadLinks],
   }),
   component: Index,
 });
@@ -130,7 +134,10 @@ function Index() {
             <motion.h1
               variants={heroItemVariants}
               className="font-display font-bold leading-[0.95] tracking-tight"
-              style={{ marginTop: "var(--space-4)", fontSize: "clamp(2.5rem, 6vw, var(--font-size-display))" }}
+              style={{
+                marginTop: "var(--space-4)",
+                fontSize: "clamp(2.5rem, 6vw, var(--font-size-display))",
+              }}
             >
               {m.hero_title_line_1()}
               <br />
@@ -189,10 +196,7 @@ function Index() {
                 borderTop: "1px solid var(--border-subtle)",
               }}
             >
-              <DemoDataBadge
-                variant="sample"
-                className="absolute -top-3 start-0"
-              />
+              <DemoDataBadge variant="sample" className="absolute -top-3 start-0" />
               {[
                 ["12,480", m.hero_stat_prompts()],
                 ["1.4M", m.hero_stat_renders()],
@@ -200,7 +204,9 @@ function Index() {
               ].map(([v, l]) => (
                 <div key={l}>
                   <dt className="font-display text-2xl font-semibold tracking-tight">{v}</dt>
-                  <dd className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">{l}</dd>
+                  <dd className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+                    {l}
+                  </dd>
                 </div>
               ))}
             </motion.dl>
@@ -222,11 +228,18 @@ function Index() {
               className="aspect-[3/4] w-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div className="absolute inset-x-0 bottom-0 p-5">
-              <span className="rounded-full px-2.5 py-1 text-[11px] font-medium" style={{ background: "var(--gradient-gold)", color: "oklch(0.18 0.02 60)" }}>
+              <span
+                className="rounded-full px-2.5 py-1 text-[11px] font-medium"
+                style={{ background: "var(--gradient-gold)", color: "oklch(0.18 0.02 60)" }}
+              >
                 Premium
               </span>
-              <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight">{featured.title}</h2>
-              <p className="text-xs text-muted-foreground">{featured.author} · {featured.views} views</p>
+              <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight">
+                {featured.title}
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                {featured.author} · {featured.views} views
+              </p>
             </div>
           </Link>
         </div>
@@ -250,7 +263,11 @@ function Index() {
                     ? "border-transparent text-white"
                     : "border-border bg-surface/40 text-muted-foreground hover:border-magenta/40 hover:text-foreground"
                 }`}
-                style={active ? { background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)" } : undefined}
+                style={
+                  active
+                    ? { background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)" }
+                    : undefined
+                }
               >
                 {label}
               </button>
@@ -262,10 +279,7 @@ function Index() {
         </div>
       </div>
 
-      <main
-        className="mx-auto max-w-[1400px] space-y-16 py-12"
-        style={{ contain: "content" }}
-      >
+      <main className="mx-auto max-w-[1400px] space-y-16 py-12" style={{ contain: "content" }}>
         {isFiltering ? (
           <section className="space-y-6 px-4 sm:px-8">
             <h2 className="font-display text-2xl font-semibold sm:text-3xl">
@@ -304,48 +318,151 @@ function Index() {
         </Suspense>
       )}
 
-      <footer className="mt-16 border-t border-border/60 bg-surface/30" style={{ contain: "content" }}>
+      <footer
+        className="mt-16 border-t border-border/60 bg-surface/30"
+        style={{ contain: "content" }}
+      >
         <div className="mx-auto max-w-[1400px] px-4 py-12 sm:px-8">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <div>
               <Logo variant="full" size={28} ariaLabel="XEOMX" />
-              <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{m.footer_tagline()}</p>
+              <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+                {m.footer_tagline()}
+              </p>
             </div>
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.footer_platform()}</h3>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+                {m.footer_platform()}
+              </h3>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/" className="transition hover:text-foreground">{m.nav_discover()}</Link></li>
-                <li><Link to="/feed" className="transition hover:text-foreground">{m.nav_feed()}</Link></li>
-                <li><Link to="/collections" className="transition hover:text-foreground">{m.nav_collections()}</Link></li>
-                <li><Link to="/creators" className="transition hover:text-foreground">{m.nav_creators()}</Link></li>
-                <li><Link to="/explore" className="transition hover:text-foreground">{m.nav_explore()}</Link></li>
+                <li>
+                  <Link to="/" className="transition hover:text-foreground">
+                    {m.nav_discover()}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/feed" className="transition hover:text-foreground">
+                    {m.nav_feed()}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/collections" className="transition hover:text-foreground">
+                    {m.nav_collections()}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/creators" className="transition hover:text-foreground">
+                    {m.nav_creators()}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/explore" className="transition hover:text-foreground">
+                    {m.nav_explore()}
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.footer_coming_soon()}</h3>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+                {m.footer_coming_soon()}
+              </h3>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/explore/$slug" params={{ slug: "studio-canvas" }} className="transition hover:text-foreground">Studio Canvas</Link></li>
-                <li><Link to="/explore/$slug" params={{ slug: "agent-store" }} className="transition hover:text-foreground">Agent Store</Link></li>
-                <li><Link to="/explore/$slug" params={{ slug: "ai-compare" }} className="transition hover:text-foreground">AI Compare Arena</Link></li>
-                <li><Link to="/explore/$slug" params={{ slug: "academy" }} className="transition hover:text-foreground">Academy</Link></li>
-                <li><Link to="/explore/$slug" params={{ slug: "founders" }} className="transition hover:text-foreground">Founders Access</Link></li>
+                <li>
+                  <Link
+                    to="/explore/$slug"
+                    params={{ slug: "studio-canvas" }}
+                    className="transition hover:text-foreground"
+                  >
+                    Studio Canvas
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/explore/$slug"
+                    params={{ slug: "agent-store" }}
+                    className="transition hover:text-foreground"
+                  >
+                    Agent Store
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/explore/$slug"
+                    params={{ slug: "ai-compare" }}
+                    className="transition hover:text-foreground"
+                  >
+                    AI Compare Arena
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/explore/$slug"
+                    params={{ slug: "academy" }}
+                    className="transition hover:text-foreground"
+                  >
+                    Academy
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/explore/$slug"
+                    params={{ slug: "founders" }}
+                    className="transition hover:text-foreground"
+                  >
+                    Founders Access
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{m.footer_legal()}</h3>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+                {m.footer_legal()}
+              </h3>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/terms" className="transition hover:text-foreground">{m.footer_terms()}</Link></li>
-                <li><Link to="/privacy" className="transition hover:text-foreground">{m.footer_privacy()}</Link></li>
-                <li><Link to="/cookies" className="transition hover:text-foreground">{m.footer_cookie()}</Link></li>
-                <li><Link to="/refund-policy" className="transition hover:text-foreground">{m.footer_refund()}</Link></li>
-                <li><Link to="/contact" className="transition hover:text-foreground">Contact</Link></li>
-                <li><a href="mailto:hello@xeomx.com" className="transition hover:text-foreground">hello@xeomx.com</a></li>
+                <li>
+                  <Link to="/terms" className="transition hover:text-foreground">
+                    {m.footer_terms()}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/privacy" className="transition hover:text-foreground">
+                    {m.footer_privacy()}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/cookies" className="transition hover:text-foreground">
+                    {m.footer_cookie()}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/refund-policy" className="transition hover:text-foreground">
+                    {m.footer_refund()}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/contact" className="transition hover:text-foreground">
+                    Contact
+                  </Link>
+                </li>
+                <li>
+                  <a href="mailto:hello@xeomx.com" className="transition hover:text-foreground">
+                    hello@xeomx.com
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
           <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border/60 pt-6 sm:flex-row">
             <p className="text-xs text-muted-foreground">{m.footer_rights()}</p>
-            <p className="text-xs text-muted-foreground">{m.footer_built()} · <span className="text-gradient-gold">{m.footer_sections({ count: String(CORE_SECTIONS.length + EXPLORE_SECTIONS.length) })}</span> · {m.footer_powered()}</p>
+            <p className="text-xs text-muted-foreground">
+              {m.footer_built()} ·{" "}
+              <span className="text-gradient-gold">
+                {m.footer_sections({
+                  count: String(CORE_SECTIONS.length + EXPLORE_SECTIONS.length),
+                })}
+              </span>{" "}
+              · {m.footer_powered()}
+            </p>
           </div>
         </div>
       </footer>

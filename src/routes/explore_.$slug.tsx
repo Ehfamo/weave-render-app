@@ -5,7 +5,6 @@ import { LaunchingSoon } from "@/components/xeomx/ComingSoon/LaunchingSoon";
 import { InDevelopment } from "@/components/xeomx/ComingSoon/InDevelopment";
 import { Vision } from "@/components/xeomx/ComingSoon/Vision";
 import { pageUrl } from "@/lib/seo";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/explore_/$slug")({

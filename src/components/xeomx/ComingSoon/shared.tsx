@@ -2,7 +2,6 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Loader2, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 export function BackToExplore() {

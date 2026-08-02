@@ -5,7 +5,6 @@ import { CollectionCard } from "./CollectionCard";
 import { CreatorCard } from "./CreatorCard";
 import { SignalBadge } from "./Signal";
 import heroImg from "@/assets/hero.jpg";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 export function IndexRails() {

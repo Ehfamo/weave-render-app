@@ -1,4 +1,3 @@
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 /**

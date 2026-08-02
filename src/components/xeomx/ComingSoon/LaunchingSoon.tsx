@@ -2,7 +2,6 @@ import { Check } from "lucide-react";
 import { type ExploreSection } from "@/lib/explore-sections";
 import { getIcon } from "@/lib/icon-map";
 import { BackToExplore, NotifyForm } from "./shared";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 export function LaunchingSoon({ section }: { section: ExploreSection }) {

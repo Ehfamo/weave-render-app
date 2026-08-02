@@ -4,7 +4,6 @@ import { useState } from "react";
 import type { Prompt } from "@/lib/prompts";
 import { SignalBadge } from "./Signal";
 import { DemoDataBadge } from "./status/DemoDataBadge";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 const stateChip = {

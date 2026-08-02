@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchViralPrompts } from "@/lib/marketplace";
 import { ViralFeedCard } from "@/components/xeomx/ViralFeedCard";
 import { pageUrl } from "@/lib/seo";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/feed")({

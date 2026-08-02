@@ -5,7 +5,6 @@ import { motion } from "motion/react";
 import { CATEGORIES, PROMPTS, ROWS } from "@/lib/prompts";
 import { CORE_SECTIONS, EXPLORE_SECTIONS } from "@/lib/explore-sections";
 import { Header } from "@/components/xeomx/Header";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 import { Row } from "@/components/xeomx/Row";
 import { PromptCard } from "@/components/xeomx/PromptCard";

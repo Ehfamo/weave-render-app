@@ -5,7 +5,6 @@ import { ArrowRight, Search, Clock } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
 import { pageUrl } from "@/lib/seo";
 import { FeatureStatusBadge } from "@/components/xeomx/status/FeatureStatusBadge";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/magazine")({

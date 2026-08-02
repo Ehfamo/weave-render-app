@@ -8,7 +8,6 @@ import { toast } from "sonner";
 import { pageUrl } from "@/lib/seo";
 import { scorePassword, friendlyAuthError } from "@/lib/auth-validation";
 import { StrengthMeter } from "@/routes/reset-password";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/auth")({

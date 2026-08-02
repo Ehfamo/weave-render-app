@@ -1,6 +1,5 @@
 import type { FeatureStatus } from "@/lib/feature-status";
 import { FeatureStatusBadge } from "./FeatureStatusBadge";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 /**

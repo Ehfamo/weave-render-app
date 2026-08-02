@@ -1,8 +1,5 @@
 declare module "@/paraglide/messages.js" {
-  export const m: Record<
-    string,
-    (inputs?: Record<string, string | number>) => string
-  >;
+  export const m: Record<string, (inputs?: Record<string, string | number>) => string>;
 }
 
 declare module "@/paraglide/runtime.js" {

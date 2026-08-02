@@ -478,5 +478,14 @@
   "beta_notice_body": "यह भाग काम कर रहा है पर अभी विकसित हो रहा है। तेज़ बदलाव संभव हैं।",
   "auth_continue_discord": "Discord से जारी रखें",
   "pricing_preview_notice": "इस पेज पर दिखाई गई योजनाएँ प्रीव्यू हैं और लॉन्च से पहले बदल सकती हैं। फ़िलहाल कोई भुगतान नहीं लिया जा रहा।",
-  "common_close": "बंद करें"
+  "common_close": "बंद करें",
+  "profile_region_country": "देश या क्षेत्र",
+  "profile_region_country_placeholder": "अपना देश या क्षेत्र चुनें",
+  "profile_region_language": "भाषा",
+  "profile_region_language_placeholder": "अपनी भाषा चुनें",
+  "profile_region_timezone": "समय क्षेत्र",
+  "profile_region_timezone_placeholder": "अपना समय क्षेत्र चुनें",
+  "profile_region_timezone_search": "समय क्षेत्र खोजें…",
+  "profile_region_timezone_empty": "कोई समय क्षेत्र नहीं मिला।",
+  "profile_region_current_value": "वर्तमान मान"
 }

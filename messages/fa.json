@@ -478,5 +478,14 @@
   "beta_notice_body": "این بخش کار می‌کند اما هنوز در حال بهبود است. تغییرات سریع در راه است.",
   "auth_continue_discord": "ادامه با Discord",
   "pricing_preview_notice": "پلن‌های نمایش‌داده‌شده صرفاً پیش‌نمایش هستند و ممکن است تغییر کنند. در حال حاضر هیچ پرداختی دریافت نمی‌شود.",
-  "common_close": "بستن"
+  "common_close": "بستن",
+  "profile_region_country": "کشور",
+  "profile_region_country_placeholder": "کشور خود را انتخاب کنید",
+  "profile_region_language": "زبان",
+  "profile_region_language_placeholder": "زبان خود را انتخاب کنید",
+  "profile_region_timezone": "منطقه زمانی",
+  "profile_region_timezone_placeholder": "منطقه زمانی خود را انتخاب کنید",
+  "profile_region_timezone_search": "جست‌وجوی منطقه زمانی…",
+  "profile_region_timezone_empty": "منطقه زمانی پیدا نشد.",
+  "profile_region_current_value": "مقدار فعلی"
 }

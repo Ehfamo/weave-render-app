@@ -478,5 +478,14 @@
   "beta_notice_body": "此部分可用,但仍在完善中。可能会有快速变动。",
   "auth_continue_discord": "使用 Discord 继续",
   "pricing_preview_notice": "此页显示的方案为预览,可能在发布前调整。目前不收取任何费用。",
-  "common_close": "关闭"
+  "common_close": "关闭",
+  "profile_region_country": "国家或地区",
+  "profile_region_country_placeholder": "选择国家或地区",
+  "profile_region_language": "语言",
+  "profile_region_language_placeholder": "选择语言",
+  "profile_region_timezone": "时区",
+  "profile_region_timezone_placeholder": "选择时区",
+  "profile_region_timezone_search": "搜索时区…",
+  "profile_region_timezone_empty": "未找到时区。",
+  "profile_region_current_value": "当前值"
 }

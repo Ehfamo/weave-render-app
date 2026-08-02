@@ -1,8 +1,8 @@
 // Ambient declarations for Paraglide's generated (untyped) output.
-declare module "@/paraglide/messages.js" {
+declare module "*/paraglide/messages.js" {
   export const m: Record<string, (...args: unknown[]) => string>;
 }
-declare module "@/paraglide/runtime.js" {
+declare module "*/paraglide/runtime.js" {
   export const locales: readonly string[];
   export const baseLocale: string;
   export function getLocale(): string;
@@ -18,7 +18,7 @@ declare module "@/paraglide/runtime.js" {
   const runtime: Record<string, unknown>;
   export default runtime;
 }
-declare module "@/paraglide/server.js" {
+declare module "*/paraglide/server.js" {
   export function paraglideMiddleware<T>(
     request: Request,
     resolve: (args: { request: Request; locale: string }) => T | Promise<T>,

@@ -10,7 +10,6 @@ import { Header } from "@/components/xeomx/Header";
 import { CollectionCard } from "@/components/xeomx/CollectionCard";
 import { motion } from "motion/react";
 import { pageUrl } from "@/lib/seo";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/collections")({

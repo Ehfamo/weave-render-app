@@ -3,7 +3,6 @@ import { pageUrl } from "@/lib/seo";
 import { ArrowLeft } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
 import { motion } from "motion/react";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/cookies")({

@@ -10,7 +10,6 @@ import { PromptCard } from "@/components/xeomx/PromptCard";
 import { CORE_SECTIONS, EXPLORE_CATEGORIES, EXPLORE_SECTIONS } from "@/lib/explore-sections";
 import { searchAll } from "@/lib/marketplace";
 import { HeroBackground, heroPreloadLinks } from "@/components/xeomx/HeroBackground";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/explore")({

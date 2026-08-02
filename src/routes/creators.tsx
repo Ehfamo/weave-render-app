@@ -7,7 +7,6 @@ import { Header } from "@/components/xeomx/Header";
 import { CreatorCard } from "@/components/xeomx/CreatorCard";
 import { pageUrl } from "@/lib/seo";
 import { useEffect, useState } from "react";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/creators")({

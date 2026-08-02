@@ -7,9 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
-// @ts-expect-error - paraglide generated runtime
 import { getLocale, localizeHref } from "@/paraglide/runtime.js";
 
 type LocaleOption = { code: string; label: string; native: string };

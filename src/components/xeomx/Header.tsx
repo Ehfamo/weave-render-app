@@ -5,7 +5,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { LanguageSwitcher } from "@/components/xeomx/LanguageSwitcher";
 import { Logo } from "@/components/xeomx/Logo";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import {

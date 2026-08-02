@@ -14,9 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { SupportButton } from "@/components/xeomx/SupportButton";
-// @ts-expect-error - paraglide generated runtime
 import { getLocale } from "../paraglide/runtime.js";
-// @ts-expect-error - paraglide generated messages
 import { m } from "../paraglide/messages.js";
 import { SITE_URL } from "../lib/seo";
 

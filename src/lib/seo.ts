@@ -1,4 +1,3 @@
-// @ts-expect-error - paraglide generated runtime
 import { localizeHref } from "@/paraglide/runtime.js";
 
 export const SITE_URL: string =

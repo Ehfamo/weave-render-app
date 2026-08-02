@@ -1,7 +1,6 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
-// @ts-expect-error - paraglide generated runtime
 import { deLocalizeUrl, localizeUrl } from "./paraglide/runtime.js";
 
 export const getRouter = () => {

@@ -4,7 +4,6 @@ import type { FeatureKey } from "@/lib/feature-status";
 import { FEATURES } from "@/lib/feature-status";
 import { FeatureStatusBadge } from "./FeatureStatusBadge";
 import { NotifyForm } from "@/components/xeomx/ComingSoon/shared";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 export function ComingSoonModal({

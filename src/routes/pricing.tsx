@@ -4,7 +4,6 @@ import { motion } from "motion/react";
 import { Check } from "lucide-react";
 import { Header } from "@/components/xeomx/Header";
 import { PreviewNotice } from "@/components/xeomx/status/PreviewNotice";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/pricing")({

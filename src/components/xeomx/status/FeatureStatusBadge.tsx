@@ -1,5 +1,4 @@
 import type { FeatureStatus } from "@/lib/feature-status";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 const STYLES: Record<FeatureStatus, string> = {

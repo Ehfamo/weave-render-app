@@ -7,7 +7,6 @@ import { Header } from "@/components/xeomx/Header";
 import { PromptCard } from "@/components/xeomx/PromptCard";
 import { PreviewNotice } from "@/components/xeomx/status/PreviewNotice";
 import { pageUrl, SITE_URL } from "@/lib/seo";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/collections/$id")({

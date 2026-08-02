@@ -1,6 +1,5 @@
 import { Flame, Rocket, Trophy, Zap } from "lucide-react";
 import type { ViralSignal } from "@/lib/prompts";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 const map = {

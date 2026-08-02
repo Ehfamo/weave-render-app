@@ -1,7 +1,6 @@
 import { Crown, Sparkles, TrendingUp, Check } from "lucide-react";
 import type { Creator } from "@/lib/prompts";
 import { Link } from "@tanstack/react-router";
-// @ts-expect-error - paraglide generated messages
 import { m } from "@/paraglide/messages.js";
 
 const tierMap = {

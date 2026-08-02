@@ -41,43 +41,49 @@ jobs:
           from pathlib import Path
 
           profile_path = Path("src/routes/profile-edit.tsx")
+
+          if not profile_path.exists():
+              raise SystemExit("src/routes/profile-edit.tsx was not found.")
+
           source = profile_path.read_text(encoding="utf-8")
 
-          # ------------------------------------------------------------
-          # React useMemo import
-          # ------------------------------------------------------------
-          react_import = re.search(
-              r'import\s*\{([^}]+)\}\s*from\s*["\']react["\'];',
-              source,
+          # ----------------------------------------------------------
+          # Add useMemo to React import
+          # ----------------------------------------------------------
+          react_pattern = re.compile(
+              r'import\s*\{(?P<members>.*?)\}\s*from\s*["\']react["\'];',
+              re.DOTALL,
           )
 
-          if not react_import:
+          react_match = react_pattern.search(source)
+
+          if not react_match:
               raise SystemExit("React named import was not found.")
 
           react_members = [
               item.strip()
-              for item in react_import.group(1).split(",")
+              for item in react_match.group("members").split(",")
               if item.strip()
           ]
 
           if "useMemo" not in react_members:
               react_members.append("useMemo")
 
-              replacement = (
+              react_replacement = (
                   'import { '
                   + ", ".join(react_members)
                   + ' } from "react";'
               )
 
               source = (
-                  source[:react_import.start()]
-                  + replacement
-                  + source[react_import.end():]
+                  source[:react_match.start()]
+                  + react_replacement
+                  + source[react_match.end():]
               )
 
-          # ------------------------------------------------------------
-          # Required imports
-          # ------------------------------------------------------------
+          # ----------------------------------------------------------
+          # Add Select import
+          # ----------------------------------------------------------
           select_import = '''import {
             Select,
             SelectContent,
@@ -86,15 +92,20 @@ jobs:
             SelectValue,
           } from "@/components/ui/select";'''
 
-          if '@/components/ui/select' not in source:
+          if "@/components/ui/select" not in source:
               import_matches = list(
-                  re.finditer(r'^import .+?;\s*$', source, flags=re.MULTILINE)
+                  re.finditer(
+                      r'^import[\s\S]*?;\s*$',
+                      source,
+                      flags=re.MULTILINE,
+                  )
               )
 
               if not import_matches:
-                  raise SystemExit("No import block was found.")
+                  raise SystemExit("Import section was not found.")
 
               insert_at = import_matches[-1].end()
+
               source = (
                   source[:insert_at]
                   + "\n"
@@ -102,39 +113,46 @@ jobs:
                   + source[insert_at:]
               )
 
-          paraglide_imports = '''import { m } from "@/paraglide/messages.js";
-          import { getLocale } from "@/paraglide/runtime.js";'''
+          # ----------------------------------------------------------
+          # Add Paraglide imports
+          # ----------------------------------------------------------
+          missing_imports = []
 
-          missing_paraglide = []
-
-          if '@/paraglide/messages.js' not in source:
-              missing_paraglide.append(
+          if "@/paraglide/messages.js" not in source:
+              missing_imports.append(
                   'import { m } from "@/paraglide/messages.js";'
               )
 
-          if '@/paraglide/runtime.js' not in source:
-              missing_paraglide.append(
+          if "@/paraglide/runtime.js" not in source:
+              missing_imports.append(
                   'import { getLocale } from "@/paraglide/runtime.js";'
               )
 
-          if missing_paraglide:
+          if missing_imports:
               import_matches = list(
-                  re.finditer(r'^import .+?;\s*$', source, flags=re.MULTILINE)
+                  re.finditer(
+                      r'^import[\s\S]*?;\s*$',
+                      source,
+                      flags=re.MULTILINE,
+                  )
               )
+
+              if not import_matches:
+                  raise SystemExit("Import section was not found.")
 
               insert_at = import_matches[-1].end()
 
               source = (
                   source[:insert_at]
                   + "\n"
-                  + "\n".join(missing_paraglide)
+                  + "\n".join(missing_imports)
                   + source[insert_at:]
               )
 
-          # ------------------------------------------------------------
-          # Locale, country and timezone helpers
-          # ------------------------------------------------------------
-          helpers = r'''
+          # ----------------------------------------------------------
+          # Add locale, country and timezone helpers
+          # ----------------------------------------------------------
+          helpers = '''
           const ACTIVE_LOCALES = ["en", "fa", "ar", "zh", "hi"] as const;
 
           type ActiveLocale = (typeof ACTIVE_LOCALES)[number];
@@ -151,7 +169,7 @@ jobs:
           VN YE ZM ZW
           `
             .trim()
-            .split(/\s+/);
+            .split(/\\s+/);
 
           function getCurrentLocale(): ActiveLocale {
             try {
@@ -188,15 +206,9 @@ jobs:
 
           if "const ACTIVE_LOCALES =" not in source:
               component_match = re.search(
-                  r'export\s+default\s+function\s+ProfileEdit\b',
+                  r'(?:export\s+default\s+)?function\s+ProfileEdit\b',
                   source,
               )
-
-              if not component_match:
-                  component_match = re.search(
-                      r'function\s+ProfileEdit\b',
-                      source,
-                  )
 
               if not component_match:
                   raise SystemExit("ProfileEdit component was not found.")
@@ -207,25 +219,30 @@ jobs:
                   + source[component_match.start():]
               )
 
-          # ------------------------------------------------------------
-          # Default language state
-          # ------------------------------------------------------------
-          source, language_state_count = re.subn(
-              r'const \[language,\s*setLanguage\]\s*=\s*useState\(\s*["\']["\']\s*\);',
-              'const [language, setLanguage] = useState(getCurrentLocale());',
+          # ----------------------------------------------------------
+          # Set the default language to the current locale
+          # ----------------------------------------------------------
+          language_state_pattern = re.compile(
+              r'const\s*\[\s*language\s*,\s*setLanguage\s*\]\s*='
+              r'\s*useState(?:<[^>]+>)?\(\s*["\']["\']\s*\)\s*;'
+          )
+
+          source, language_state_count = language_state_pattern.subn(
+              "const [language, setLanguage] = useState(getCurrentLocale());",
               source,
               count=1,
           )
 
-          if language_state_count == 0 and (
-              "useState(getCurrentLocale())" not in source
+          if (
+              language_state_count == 0
+              and "useState(getCurrentLocale())" not in source
           ):
               raise SystemExit("Language state declaration was not found.")
 
-          # ------------------------------------------------------------
-          # Localized option lists inside ProfileEdit
-          # ------------------------------------------------------------
-          options_code = r'''
+          # ----------------------------------------------------------
+          # Add localized options inside ProfileEdit
+          # ----------------------------------------------------------
+          options_code = '''
             const currentLocale = getCurrentLocale();
 
             const regionNames = useMemo(
@@ -277,7 +294,7 @@ jobs:
 
           if "const countryOptions = useMemo" not in source:
               file_ref_match = re.search(
-                  r'(\s*const\s+fileRef\s*=\s*useRef[^;]*;)',
+                  r'const\s+fileRef\s*=\s*useRef[\s\S]*?;',
                   source,
               )
 
@@ -291,35 +308,41 @@ jobs:
                   + source[file_ref_match.end():]
               )
 
-          # ------------------------------------------------------------
-          # Validate profile language loaded from Supabase
-          # ------------------------------------------------------------
-          source, loaded_language_count = re.subn(
-              r'setLanguage\(\s*data\.language\s*\?\?\s*["\']["\']\s*\);',
+          # ----------------------------------------------------------
+          # Validate language loaded from Supabase
+          # ----------------------------------------------------------
+          loaded_language_pattern = re.compile(
+              r'setLanguage\(\s*data\.language\s*\?\?\s*["\']["\']\s*\)\s*;'
+          )
+
+          source, loaded_language_count = loaded_language_pattern.subn(
               '''setLanguage(
                     ACTIVE_LOCALES.includes(data.language as ActiveLocale)
                       ? (data.language as ActiveLocale)
-                      : currentLocale,
+                      : getCurrentLocale(),
                   );''',
               source,
               count=1,
           )
 
-          if loaded_language_count == 0 and (
-              "ACTIVE_LOCALES.includes(data.language as ActiveLocale)"
+          if (
+              loaded_language_count == 0
+              and "ACTIVE_LOCALES.includes(data.language as ActiveLocale)"
               not in source
           ):
               raise SystemExit("Loaded language assignment was not found.")
 
-          # ------------------------------------------------------------
-          # Replace the three text inputs
-          # ------------------------------------------------------------
-          old_country = '''<Field label="Country" icon={MapPin}>
-            <Input value={country} onChange={setCountry} autoComplete="country-name" />
-          </Field>'''
-
-          new_country = '''<Field label={m.profile_edit_country_label()} icon={MapPin}>
-            <Select value={country || undefined} onValueChange={setCountry}>
+          # ----------------------------------------------------------
+          # New Select fields
+          # ----------------------------------------------------------
+          new_country = '''<Field
+            label={m.profile_edit_country_label()}
+            icon={MapPin}
+          >
+            <Select
+              value={country || undefined}
+              onValueChange={setCountry}
+            >
               <SelectTrigger
                 aria-label={m.profile_edit_country_label()}
                 className="h-auto w-full rounded-xl border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white shadow-none focus:ring-[#ff8a3d]"
@@ -334,7 +357,10 @@ jobs:
                 className="max-h-72 border-white/10 bg-[#100b0f] text-white"
               >
                 {countryOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <SelectItem
+                    key={option.value}
+                    value={option.value}
+                  >
                     {option.label}
                   </SelectItem>
                 ))}
@@ -342,12 +368,14 @@ jobs:
             </Select>
           </Field>'''
 
-          old_language = '''<Field label="Language" icon={Languages}>
-            <Input value={language} onChange={setLanguage} autoComplete="language" />
-          </Field>'''
-
-          new_language = '''<Field label={m.language()} icon={Languages}>
-            <Select value={language || undefined} onValueChange={setLanguage}>
+          new_language = '''<Field
+            label={m.language()}
+            icon={Languages}
+          >
+            <Select
+              value={language || undefined}
+              onValueChange={setLanguage}
+            >
               <SelectTrigger
                 aria-label={m.language()}
                 className="h-auto w-full rounded-xl border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white shadow-none focus:ring-[#ff8a3d]"
@@ -362,7 +390,10 @@ jobs:
                 className="max-h-72 border-white/10 bg-[#100b0f] text-white"
               >
                 {languageOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <SelectItem
+                    key={option.value}
+                    value={option.value}
+                  >
                     {option.label}
                   </SelectItem>
                 ))}
@@ -370,12 +401,14 @@ jobs:
             </Select>
           </Field>'''
 
-          old_timezone = '''<Field label="Timezone" icon={Clock}>
-            <Input value={timezone} onChange={setTimezone} />
-          </Field>'''
-
-          new_timezone = '''<Field label={m.profile_edit_timezone_label()} icon={Clock}>
-            <Select value={timezone || undefined} onValueChange={setTimezone}>
+          new_timezone = '''<Field
+            label={m.profile_edit_timezone_label()}
+            icon={Clock}
+          >
+            <Select
+              value={timezone || undefined}
+              onValueChange={setTimezone}
+            >
               <SelectTrigger
                 aria-label={m.profile_edit_timezone_label()}
                 className="h-auto w-full rounded-xl border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white shadow-none focus:ring-[#ff8a3d]"
@@ -390,7 +423,10 @@ jobs:
                 className="max-h-72 border-white/10 bg-[#100b0f] text-white"
               >
                 {timezoneOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <SelectItem
+                    key={option.value}
+                    value={option.value}
+                  >
                     {option.label}
                   </SelectItem>
                 ))}
@@ -398,25 +434,68 @@ jobs:
             </Select>
           </Field>'''
 
-          replacements = [
-              ("country", old_country, new_country),
-              ("language", old_language, new_language),
-              ("timezone", old_timezone, new_timezone),
+          # ----------------------------------------------------------
+          # Replace fields using flexible regex
+          # ----------------------------------------------------------
+          field_replacements = [
+              (
+                  "country",
+                  re.compile(
+                      r'<Field\b[^>]*label=["\']Country["\'][^>]*>'
+                      r'[\s\S]*?<Input\b[\s\S]*?/>'
+                      r'[\s\S]*?</Field>',
+                      re.IGNORECASE,
+                  ),
+                  new_country,
+                  "m.profile_edit_country_label()",
+              ),
+              (
+                  "language",
+                  re.compile(
+                      r'<Field\b[^>]*label=["\']Language["\'][^>]*>'
+                      r'[\s\S]*?<Input\b[\s\S]*?/>'
+                      r'[\s\S]*?</Field>',
+                      re.IGNORECASE,
+                  ),
+                  new_language,
+                  "m.profile_edit_language_placeholder()",
+              ),
+              (
+                  "timezone",
+                  re.compile(
+                      r'<Field\b[^>]*label=["\']Timezone["\'][^>]*>'
+                      r'[\s\S]*?<Input\b[\s\S]*?/>'
+                      r'[\s\S]*?</Field>',
+                      re.IGNORECASE,
+                  ),
+                  new_timezone,
+                  "m.profile_edit_timezone_label()",
+              ),
           ]
 
-          for name, old, new in replacements:
-              if old in source:
-                  source = source.replace(old, new, 1)
-              elif new not in source:
+          for field_name, pattern, replacement, marker in field_replacements:
+              if marker in source:
+                  print(f"{field_name} field is already updated.")
+                  continue
+
+              source, count = pattern.subn(
+                  replacement,
+                  source,
+                  count=1,
+              )
+
+              if count != 1:
                   raise SystemExit(
-                      f"The existing {name} field did not match the expected code."
+                      f"Could not safely replace the {field_name} field."
                   )
+
+              print(f"{field_name} field was updated.")
 
           profile_path.write_text(source, encoding="utf-8")
 
-          # ------------------------------------------------------------
-          # Translation messages
-          # ------------------------------------------------------------
+          # ----------------------------------------------------------
+          # Add translation keys
+          # ----------------------------------------------------------
           translations = {
               "en": {
                   "profile_edit_country_label": "Country",
@@ -459,9 +538,14 @@ jobs:
               path = Path(f"messages/{locale}.json")
 
               if not path.exists():
-                  raise SystemExit(f"Translation file not found: {path}")
+                  raise SystemExit(
+                      f"Translation file was not found: {path}"
+                  )
 
-              data = json.loads(path.read_text(encoding="utf-8"))
+              data = json.loads(
+                  path.read_text(encoding="utf-8")
+              )
+
               data.update(values)
 
               path.write_text(
@@ -474,7 +558,7 @@ jobs:
                   encoding="utf-8",
               )
 
-          print("Profile selects and translations were updated successfully.")
+          print("Profile fields and translations were updated.")
           PY
 
       - name: Format modified files
@@ -527,5 +611,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git commit -m "fix(profile): add localized country language and timezone selects"
+          git commit -m "fix(profile): add localized profile selects"
           git push origin HEAD:main

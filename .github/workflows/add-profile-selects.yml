@@ -6,10 +6,6 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: add-localized-profile-selects
-  cancel-in-progress: false
-
 jobs:
   update-profile:
     runs-on: ubuntu-latest
@@ -21,7 +17,6 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-          persist-credentials: true
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -32,127 +27,31 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Update profile selects and translations
+      - name: Update profile fields
         shell: bash
         run: |
           python3 <<'PY'
           import json
-          import re
           from pathlib import Path
 
-          profile_path = Path("src/routes/profile-edit.tsx")
+          path = Path("src/routes/profile-edit.tsx")
+          source = path.read_text(encoding="utf-8")
 
-          if not profile_path.exists():
-              raise SystemExit("src/routes/profile-edit.tsx was not found.")
+          old_import = '''import { useEffect, useMemo, useRef, useState } from "react";'''
 
-          source = profile_path.read_text(encoding="utf-8")
+          new_import = '''import { useEffect, useMemo, useRef, useState } from "react";
+          import { m } from "@/paraglide/messages.js";
+          import { getLocale } from "@/paraglide/runtime.js";'''
 
-          # ----------------------------------------------------------
-          # Add useMemo to React import
-          # ----------------------------------------------------------
-          react_pattern = re.compile(
-              r'import\s*\{(?P<members>.*?)\}\s*from\s*["\']react["\'];',
-              re.DOTALL,
-          )
+          if old_import in source:
+              source = source.replace(old_import, new_import, 1)
+          elif "@/paraglide/messages.js" not in source:
+              raise SystemExit("React import was not found.")
 
-          react_match = react_pattern.search(source)
+          availability = '''type Availability = "idle" | "checking" | "available" | "taken" | "invalid";'''
 
-          if not react_match:
-              raise SystemExit("React named import was not found.")
+          helpers = '''type Availability = "idle" | "checking" | "available" | "taken" | "invalid";
 
-          react_members = [
-              item.strip()
-              for item in react_match.group("members").split(",")
-              if item.strip()
-          ]
-
-          if "useMemo" not in react_members:
-              react_members.append("useMemo")
-
-              react_replacement = (
-                  'import { '
-                  + ", ".join(react_members)
-                  + ' } from "react";'
-              )
-
-              source = (
-                  source[:react_match.start()]
-                  + react_replacement
-                  + source[react_match.end():]
-              )
-
-          # ----------------------------------------------------------
-          # Add Select import
-          # ----------------------------------------------------------
-          select_import = '''import {
-            Select,
-            SelectContent,
-            SelectItem,
-            SelectTrigger,
-            SelectValue,
-          } from "@/components/ui/select";'''
-
-          if "@/components/ui/select" not in source:
-              import_matches = list(
-                  re.finditer(
-                      r'^import[\s\S]*?;\s*$',
-                      source,
-                      flags=re.MULTILINE,
-                  )
-              )
-
-              if not import_matches:
-                  raise SystemExit("Import section was not found.")
-
-              insert_at = import_matches[-1].end()
-
-              source = (
-                  source[:insert_at]
-                  + "\n"
-                  + select_import
-                  + source[insert_at:]
-              )
-
-          # ----------------------------------------------------------
-          # Add Paraglide imports
-          # ----------------------------------------------------------
-          missing_imports = []
-
-          if "@/paraglide/messages.js" not in source:
-              missing_imports.append(
-                  'import { m } from "@/paraglide/messages.js";'
-              )
-
-          if "@/paraglide/runtime.js" not in source:
-              missing_imports.append(
-                  'import { getLocale } from "@/paraglide/runtime.js";'
-              )
-
-          if missing_imports:
-              import_matches = list(
-                  re.finditer(
-                      r'^import[\s\S]*?;\s*$',
-                      source,
-                      flags=re.MULTILINE,
-                  )
-              )
-
-              if not import_matches:
-                  raise SystemExit("Import section was not found.")
-
-              insert_at = import_matches[-1].end()
-
-              source = (
-                  source[:insert_at]
-                  + "\n"
-                  + "\n".join(missing_imports)
-                  + source[insert_at:]
-              )
-
-          # ----------------------------------------------------------
-          # Add locale, country and timezone helpers
-          # ----------------------------------------------------------
-          helpers = '''
           const ACTIVE_LOCALES = ["en", "fa", "ar", "zh", "hi"] as const;
 
           type ActiveLocale = (typeof ACTIVE_LOCALES)[number];
@@ -172,77 +71,33 @@ jobs:
             .split(/\\s+/);
 
           function getCurrentLocale(): ActiveLocale {
-            try {
-              const locale = getLocale();
+            const locale = getLocale();
 
-              return ACTIVE_LOCALES.includes(locale as ActiveLocale)
-                ? (locale as ActiveLocale)
-                : "en";
-            } catch {
-              return "en";
-            }
+            return ACTIVE_LOCALES.includes(locale as ActiveLocale)
+              ? (locale as ActiveLocale)
+              : "en";
           }
 
           function getTimezones(): string[] {
             const currentTimezone =
               Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 
-            const intlWithSupportedValues = Intl as typeof Intl & {
+            const intlApi = Intl as typeof Intl & {
               supportedValuesOf?: (key: "timeZone") => string[];
             };
 
-            try {
-              return (
-                intlWithSupportedValues.supportedValuesOf?.("timeZone") ?? [
-                  currentTimezone,
-                ]
-              );
-            } catch {
-              return [currentTimezone];
-            }
-          }
-
-          '''
+            return intlApi.supportedValuesOf?.("timeZone") ?? [currentTimezone];
+          }'''
 
           if "const ACTIVE_LOCALES =" not in source:
-              component_match = re.search(
-                  r'(?:export\s+default\s+)?function\s+ProfileEdit\b',
-                  source,
-              )
+              if availability not in source:
+                  raise SystemExit("Availability type was not found.")
 
-              if not component_match:
-                  raise SystemExit("ProfileEdit component was not found.")
+              source = source.replace(availability, helpers, 1)
 
-              source = (
-                  source[:component_match.start()]
-                  + helpers
-                  + source[component_match.start():]
-              )
+          old_file_ref = '''  const fileRef = useRef<HTMLInputElement>(null);'''
 
-          # ----------------------------------------------------------
-          # Set the default language to the current locale
-          # ----------------------------------------------------------
-          language_state_pattern = re.compile(
-              r'const\s*\[\s*language\s*,\s*setLanguage\s*\]\s*='
-              r'\s*useState(?:<[^>]+>)?\(\s*["\']["\']\s*\)\s*;'
-          )
-
-          source, language_state_count = language_state_pattern.subn(
-              "const [language, setLanguage] = useState(getCurrentLocale());",
-              source,
-              count=1,
-          )
-
-          if (
-              language_state_count == 0
-              and "useState(getCurrentLocale())" not in source
-          ):
-              raise SystemExit("Language state declaration was not found.")
-
-          # ----------------------------------------------------------
-          # Add localized options inside ProfileEdit
-          # ----------------------------------------------------------
-          options_code = '''
+          new_file_ref = '''  const fileRef = useRef<HTMLInputElement>(null);
             const currentLocale = getCurrentLocale();
 
             const regionNames = useMemo(
@@ -271,10 +126,8 @@ jobs:
                 ACTIVE_LOCALES.map((code) => ({
                   value: code,
                   label: languageNames.of(code) ?? code,
-                })).sort((a, b) =>
-                  a.label.localeCompare(b.label, currentLocale),
-                ),
-              [currentLocale, languageNames],
+                })),
+              [languageNames],
             );
 
             const timezoneOptions = useMemo(
@@ -288,292 +141,162 @@ jobs:
                     a.label.localeCompare(b.label, currentLocale),
                   ),
               [currentLocale],
-            );
-
-          '''
+            );'''
 
           if "const countryOptions = useMemo" not in source:
-              file_ref_match = re.search(
-                  r'const\s+fileRef\s*=\s*useRef[\s\S]*?;',
-                  source,
-              )
+              if old_file_ref not in source:
+                  raise SystemExit("fileRef was not found.")
 
-              if not file_ref_match:
-                  raise SystemExit("fileRef declaration was not found.")
+              source = source.replace(old_file_ref, new_file_ref, 1)
 
-              source = (
-                  source[:file_ref_match.end()]
-                  + "\n"
-                  + options_code
-                  + source[file_ref_match.end():]
-              )
-
-          # ----------------------------------------------------------
-          # Validate language loaded from Supabase
-          # ----------------------------------------------------------
-          loaded_language_pattern = re.compile(
-              r'setLanguage\(\s*data\.language\s*\?\?\s*["\']["\']\s*\)\s*;'
+          source = source.replace(
+              '''  const [language, setLanguage] = useState("");''',
+              '''  const [language, setLanguage] = useState<ActiveLocale>(getCurrentLocale());''',
+              1,
           )
 
-          source, loaded_language_count = loaded_language_pattern.subn(
-              '''setLanguage(
-                    ACTIVE_LOCALES.includes(data.language as ActiveLocale)
-                      ? (data.language as ActiveLocale)
-                      : getCurrentLocale(),
-                  );''',
-              source,
-              count=1,
+          source = source.replace(
+              '''        setLanguage(data.language ?? "");''',
+              '''        setLanguage(
+                  ACTIVE_LOCALES.includes(data.language as ActiveLocale)
+                    ? (data.language as ActiveLocale)
+                    : currentLocale,
+                );''',
+              1,
           )
 
-          if (
-              loaded_language_count == 0
-              and "ACTIVE_LOCALES.includes(data.language as ActiveLocale)"
-              not in source
-          ):
-              raise SystemExit("Loaded language assignment was not found.")
+          source = source.replace(
+              '''      } else {
+                setTimezone(tz);
+              }''',
+              '''      } else {
+                setLanguage(currentLocale);
+                setTimezone(tz);
+              }''',
+              1,
+          )
 
-          # ----------------------------------------------------------
-          # New Select fields
-          # ----------------------------------------------------------
-          new_country = '''<Field
-            label={m.profile_edit_country_label()}
-            icon={MapPin}
-          >
-            <Select
-              value={country || undefined}
-              onValueChange={setCountry}
-            >
-              <SelectTrigger
-                aria-label={m.profile_edit_country_label()}
-                className="h-auto w-full rounded-xl border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white shadow-none focus:ring-[#ff8a3d]"
-              >
-                <SelectValue
-                  placeholder={m.profile_edit_country_placeholder()}
-                />
-              </SelectTrigger>
+          source = source.replace(
+              '''  }, [user]);''',
+              '''  }, [currentLocale, user]);''',
+              1,
+          )
 
-              <SelectContent
-                position="popper"
-                className="max-h-72 border-white/10 bg-[#100b0f] text-white"
-              >
-                {countryOptions.map((option) => (
-                  <SelectItem
-                    key={option.value}
-                    value={option.value}
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>'''
+          old_fields = '''              <Field label="Country" icon={MapPin}>
+                        <Input value={country} onChange={setCountry} autoComplete="country-name" />
+                      </Field>
+                      <Field label="Language" icon={Languages}>
+                        <Input value={language} onChange={setLanguage} autoComplete="language" />
+                      </Field>
+                      <Field label="Timezone" icon={Clock}>
+                        <Input value={timezone} onChange={setTimezone} />
+                      </Field>'''
 
-          new_language = '''<Field
-            label={m.language()}
-            icon={Languages}
-          >
-            <Select
-              value={language || undefined}
-              onValueChange={setLanguage}
-            >
-              <SelectTrigger
-                aria-label={m.language()}
-                className="h-auto w-full rounded-xl border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white shadow-none focus:ring-[#ff8a3d]"
-              >
-                <SelectValue
-                  placeholder={m.profile_edit_language_placeholder()}
-                />
-              </SelectTrigger>
+          new_fields = '''              <Field label={m.profile_edit_country_label()} icon={MapPin}>
+                        <select
+                          value={country}
+                          onChange={(event) => setCountry(event.target.value)}
+                          className="w-full rounded-xl border border-white/10 bg-[#100b0f] px-4 py-3 text-sm text-white outline-none transition focus:border-[#ff8a3d]"
+                        >
+                          <option value="">
+                            {m.profile_edit_country_placeholder()}
+                          </option>
+                          {countryOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </Field>
 
-              <SelectContent
-                position="popper"
-                className="max-h-72 border-white/10 bg-[#100b0f] text-white"
-              >
-                {languageOptions.map((option) => (
-                  <SelectItem
-                    key={option.value}
-                    value={option.value}
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>'''
+                      <Field label={m.language()} icon={Languages}>
+                        <select
+                          value={language}
+                          onChange={(event) =>
+                            setLanguage(event.target.value as ActiveLocale)
+                          }
+                          className="w-full rounded-xl border border-white/10 bg-[#100b0f] px-4 py-3 text-sm text-white outline-none transition focus:border-[#ff8a3d]"
+                        >
+                          {languageOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </Field>
 
-          new_timezone = '''<Field
-            label={m.profile_edit_timezone_label()}
-            icon={Clock}
-          >
-            <Select
-              value={timezone || undefined}
-              onValueChange={setTimezone}
-            >
-              <SelectTrigger
-                aria-label={m.profile_edit_timezone_label()}
-                className="h-auto w-full rounded-xl border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white shadow-none focus:ring-[#ff8a3d]"
-              >
-                <SelectValue
-                  placeholder={m.profile_edit_timezone_placeholder()}
-                />
-              </SelectTrigger>
+                      <Field label={m.profile_edit_timezone_label()} icon={Clock}>
+                        <select
+                          value={timezone}
+                          onChange={(event) => setTimezone(event.target.value)}
+                          className="w-full rounded-xl border border-white/10 bg-[#100b0f] px-4 py-3 text-sm text-white outline-none transition focus:border-[#ff8a3d]"
+                        >
+                          <option value="">
+                            {m.profile_edit_timezone_placeholder()}
+                          </option>
+                          {timezoneOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </Field>'''
 
-              <SelectContent
-                position="popper"
-                className="max-h-72 border-white/10 bg-[#100b0f] text-white"
-              >
-                {timezoneOptions.map((option) => (
-                  <SelectItem
-                    key={option.value}
-                    value={option.value}
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>'''
+          if old_fields not in source:
+              raise SystemExit("The three original profile fields were not found.")
 
-          # ----------------------------------------------------------
-          # Replace fields using flexible regex
-          # ----------------------------------------------------------
-          field_replacements = [
-              (
-                  "country",
-                  re.compile(
-                      r'<Field\b[^>]*label=["\']Country["\'][^>]*>'
-                      r'[\s\S]*?<Input\b[\s\S]*?/>'
-                      r'[\s\S]*?</Field>',
-                      re.IGNORECASE,
-                  ),
-                  new_country,
-                  "m.profile_edit_country_label()",
-              ),
-              (
-                  "language",
-                  re.compile(
-                      r'<Field\b[^>]*label=["\']Language["\'][^>]*>'
-                      r'[\s\S]*?<Input\b[\s\S]*?/>'
-                      r'[\s\S]*?</Field>',
-                      re.IGNORECASE,
-                  ),
-                  new_language,
-                  "m.profile_edit_language_placeholder()",
-              ),
-              (
-                  "timezone",
-                  re.compile(
-                      r'<Field\b[^>]*label=["\']Timezone["\'][^>]*>'
-                      r'[\s\S]*?<Input\b[\s\S]*?/>'
-                      r'[\s\S]*?</Field>',
-                      re.IGNORECASE,
-                  ),
-                  new_timezone,
-                  "m.profile_edit_timezone_label()",
-              ),
-          ]
+          source = source.replace(old_fields, new_fields, 1)
+          path.write_text(source, encoding="utf-8")
 
-          for field_name, pattern, replacement, marker in field_replacements:
-              if marker in source:
-                  print(f"{field_name} field is already updated.")
-                  continue
-
-              source, count = pattern.subn(
-                  replacement,
-                  source,
-                  count=1,
-              )
-
-              if count != 1:
-                  raise SystemExit(
-                      f"Could not safely replace the {field_name} field."
-                  )
-
-              print(f"{field_name} field was updated.")
-
-          profile_path.write_text(source, encoding="utf-8")
-
-          # ----------------------------------------------------------
-          # Add translation keys
-          # ----------------------------------------------------------
           translations = {
               "en": {
                   "profile_edit_country_label": "Country",
                   "profile_edit_country_placeholder": "Select a country",
-                  "profile_edit_language_placeholder": "Select a language",
                   "profile_edit_timezone_label": "Timezone",
                   "profile_edit_timezone_placeholder": "Select a timezone",
               },
               "fa": {
                   "profile_edit_country_label": "کشور",
                   "profile_edit_country_placeholder": "یک کشور انتخاب کنید",
-                  "profile_edit_language_placeholder": "یک زبان انتخاب کنید",
                   "profile_edit_timezone_label": "منطقه زمانی",
                   "profile_edit_timezone_placeholder": "یک منطقه زمانی انتخاب کنید",
               },
               "ar": {
                   "profile_edit_country_label": "الدولة",
                   "profile_edit_country_placeholder": "اختر دولة",
-                  "profile_edit_language_placeholder": "اختر لغة",
                   "profile_edit_timezone_label": "المنطقة الزمنية",
                   "profile_edit_timezone_placeholder": "اختر منطقة زمنية",
               },
               "zh": {
                   "profile_edit_country_label": "国家或地区",
                   "profile_edit_country_placeholder": "选择国家或地区",
-                  "profile_edit_language_placeholder": "选择语言",
                   "profile_edit_timezone_label": "时区",
                   "profile_edit_timezone_placeholder": "选择时区",
               },
               "hi": {
                   "profile_edit_country_label": "देश",
                   "profile_edit_country_placeholder": "देश चुनें",
-                  "profile_edit_language_placeholder": "भाषा चुनें",
                   "profile_edit_timezone_label": "समय क्षेत्र",
                   "profile_edit_timezone_placeholder": "समय क्षेत्र चुनें",
               },
           }
 
-          for locale, values in translations.items():
-              path = Path(f"messages/{locale}.json")
+          for locale, messages in translations.items():
+              message_path = Path(f"messages/{locale}.json")
+              data = json.loads(message_path.read_text(encoding="utf-8"))
+              data.update(messages)
 
-              if not path.exists():
-                  raise SystemExit(
-                      f"Translation file was not found: {path}"
-                  )
-
-              data = json.loads(
-                  path.read_text(encoding="utf-8")
-              )
-
-              data.update(values)
-
-              path.write_text(
-                  json.dumps(
-                      data,
-                      ensure_ascii=False,
-                      indent=2,
-                  )
-                  + "\n",
+              message_path.write_text(
+                  json.dumps(data, ensure_ascii=False, indent=2) + "\n",
                   encoding="utf-8",
               )
 
-          print("Profile fields and translations were updated.")
+          print("Localized profile selects added.")
           PY
 
-      - name: Format modified files
+      - name: Format files
         run: |
           npx prettier --write \
-            src/routes/profile-edit.tsx \
-            messages/en.json \
-            messages/fa.json \
-            messages/ar.json \
-            messages/zh.json \
-            messages/hi.json
-
-      - name: Verify formatting
-        run: |
-          npx prettier --check \
             src/routes/profile-edit.tsx \
             messages/en.json \
             messages/fa.json \
@@ -611,5 +334,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git commit -m "fix(profile): add localized profile selects"
+          git commit -m "fix(profile): add multilingual profile selects"
           git push origin HEAD:main

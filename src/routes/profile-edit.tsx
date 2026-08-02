@@ -15,12 +15,35 @@ import {
   Loader2,
   Trash2,
   ShieldAlert,
+  ChevronsUpDown,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { deleteAccount } from "@/lib/account.functions";
 import { toast } from "sonner";
+import { m } from "@/paraglide/messages.js";
+import { getLocale } from "@/paraglide/runtime.js";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import avatarImg from "@/assets/dashboard-avatar.jpg";
 import {
   validateUsernameFormat,
@@ -46,6 +69,295 @@ export const Route = createFileRoute("/profile-edit")({
 
 type Availability = "idle" | "checking" | "available" | "taken" | "invalid";
 
+type LocaleCode = "en" | "fa" | "ar" | "zh" | "hi";
+
+const LANGUAGE_OPTIONS: ReadonlyArray<{
+  value: LocaleCode;
+  label: string;
+}> = [
+  { value: "en", label: "English" },
+  { value: "fa", label: "فارسی" },
+  { value: "ar", label: "العربية" },
+  { value: "zh", label: "中文" },
+  { value: "hi", label: "हिन्दी" },
+];
+
+const COUNTRY_CODES = [
+  "AD",
+  "AE",
+  "AF",
+  "AG",
+  "AI",
+  "AL",
+  "AM",
+  "AO",
+  "AQ",
+  "AR",
+  "AS",
+  "AT",
+  "AU",
+  "AW",
+  "AX",
+  "AZ",
+  "BA",
+  "BB",
+  "BD",
+  "BE",
+  "BF",
+  "BG",
+  "BH",
+  "BI",
+  "BJ",
+  "BL",
+  "BM",
+  "BN",
+  "BO",
+  "BQ",
+  "BR",
+  "BS",
+  "BT",
+  "BV",
+  "BW",
+  "BY",
+  "BZ",
+  "CA",
+  "CC",
+  "CD",
+  "CF",
+  "CG",
+  "CH",
+  "CI",
+  "CK",
+  "CL",
+  "CM",
+  "CN",
+  "CO",
+  "CR",
+  "CU",
+  "CV",
+  "CW",
+  "CX",
+  "CY",
+  "CZ",
+  "DE",
+  "DJ",
+  "DK",
+  "DM",
+  "DO",
+  "DZ",
+  "EC",
+  "EE",
+  "EG",
+  "EH",
+  "ER",
+  "ES",
+  "ET",
+  "FI",
+  "FJ",
+  "FK",
+  "FM",
+  "FO",
+  "FR",
+  "GA",
+  "GB",
+  "GD",
+  "GE",
+  "GF",
+  "GG",
+  "GH",
+  "GI",
+  "GL",
+  "GM",
+  "GN",
+  "GP",
+  "GQ",
+  "GR",
+  "GS",
+  "GT",
+  "GU",
+  "GW",
+  "GY",
+  "HK",
+  "HM",
+  "HN",
+  "HR",
+  "HT",
+  "HU",
+  "ID",
+  "IE",
+  "IL",
+  "IM",
+  "IN",
+  "IO",
+  "IQ",
+  "IR",
+  "IS",
+  "IT",
+  "JE",
+  "JM",
+  "JO",
+  "JP",
+  "KE",
+  "KG",
+  "KH",
+  "KI",
+  "KM",
+  "KN",
+  "KP",
+  "KR",
+  "KW",
+  "KY",
+  "KZ",
+  "LA",
+  "LB",
+  "LC",
+  "LI",
+  "LK",
+  "LR",
+  "LS",
+  "LT",
+  "LU",
+  "LV",
+  "LY",
+  "MA",
+  "MC",
+  "MD",
+  "ME",
+  "MF",
+  "MG",
+  "MH",
+  "MK",
+  "ML",
+  "MM",
+  "MN",
+  "MO",
+  "MP",
+  "MQ",
+  "MR",
+  "MS",
+  "MT",
+  "MU",
+  "MV",
+  "MW",
+  "MX",
+  "MY",
+  "MZ",
+  "NA",
+  "NC",
+  "NE",
+  "NF",
+  "NG",
+  "NI",
+  "NL",
+  "NO",
+  "NP",
+  "NR",
+  "NU",
+  "NZ",
+  "OM",
+  "PA",
+  "PE",
+  "PF",
+  "PG",
+  "PH",
+  "PK",
+  "PL",
+  "PM",
+  "PN",
+  "PR",
+  "PS",
+  "PT",
+  "PW",
+  "PY",
+  "QA",
+  "RE",
+  "RO",
+  "RS",
+  "RU",
+  "RW",
+  "SA",
+  "SB",
+  "SC",
+  "SD",
+  "SE",
+  "SG",
+  "SH",
+  "SI",
+  "SJ",
+  "SK",
+  "SL",
+  "SM",
+  "SN",
+  "SO",
+  "SR",
+  "SS",
+  "ST",
+  "SV",
+  "SX",
+  "SY",
+  "SZ",
+  "TC",
+  "TD",
+  "TF",
+  "TG",
+  "TH",
+  "TJ",
+  "TK",
+  "TL",
+  "TM",
+  "TN",
+  "TO",
+  "TR",
+  "TT",
+  "TV",
+  "TW",
+  "TZ",
+  "UA",
+  "UG",
+  "UM",
+  "US",
+  "UY",
+  "UZ",
+  "VA",
+  "VC",
+  "VE",
+  "VG",
+  "VI",
+  "VN",
+  "VU",
+  "WF",
+  "WS",
+  "YE",
+  "YT",
+  "ZA",
+  "ZM",
+  "ZW",
+] as const;
+
+function currentLocale(): LocaleCode {
+  try {
+    const locale = getLocale();
+
+    return LANGUAGE_OPTIONS.some((option) => option.value === locale)
+      ? (locale as LocaleCode)
+      : "en";
+  } catch {
+    return "en";
+  }
+}
+
+function getTimezones(): string[] {
+  try {
+    const intl = Intl as typeof Intl & {
+      supportedValuesOf?: (key: "timeZone") => string[];
+    };
+
+    return intl.supportedValuesOf?.("timeZone") ?? [];
+  } catch {
+    return [];
+  }
+}
+
 /**
  * Best-effort extraction of the storage path (`<uid>/avatar-...`) from a
  * public URL served by the `avatars` bucket. Returns null when the URL
@@ -54,7 +366,9 @@ type Availability = "idle" | "checking" | "available" | "taken" | "invalid";
 function extractAvatarPath(url: string, uid: string): string | null {
   const marker = `/avatars/${uid}/`;
   const idx = url.indexOf(marker);
+
   if (idx === -1) return null;
+
   return url.slice(idx + "/avatars/".length);
 }
 
@@ -79,26 +393,54 @@ function ProfileEdit() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
-  const [availability, setAvailability] = useState<Availability>("idle");
+  const [availability, setAvailability] =
+    useState<Availability>("idle");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [confirmText, setConfirmText] = useState("");
   const [deleting, setDeleting] = useState(false);
 
+  const locale = currentLocale();
+
+  const countryOptions = useMemo(() => {
+    const displayNames = new Intl.DisplayNames([locale], {
+      type: "region",
+    });
+
+    return COUNTRY_CODES.map((code) => ({
+      value: code,
+      label: displayNames.of(code) ?? code,
+    })).sort((a, b) => a.label.localeCompare(b.label, locale));
+  }, [locale]);
+
+  const timezoneOptions = useMemo(() => getTimezones(), []);
+
   useEffect(() => {
-    if (!loading && !user) navigate({ to: "/auth", search: { next: "/profile-edit" } });
+    if (!loading && !user) {
+      navigate({
+        to: "/auth",
+        search: { next: "/profile-edit" },
+      });
+    }
   }, [loading, user, navigate]);
 
   useEffect(() => {
     let cancelled = false;
+
     if (!user) return;
+
     (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("username, display_name, bio, avatar_url, website, country, timezone, language")
+        .select(
+          "username, display_name, bio, avatar_url, website, country, timezone, language",
+        )
         .eq("id", user.id)
         .maybeSingle();
+
       if (cancelled) return;
+
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
       if (data) {
         setUsername(data.username ?? "");
         setInitialUsername(data.username ?? "");
@@ -108,16 +450,21 @@ function ProfileEdit() {
         setCountry(data.country ?? "");
         setLanguage(data.language ?? "");
         setTimezone(data.timezone ?? tz);
+
         if (data.avatar_url) {
           setAvatar(data.avatar_url);
           setHasAvatar(true);
-          setAvatarPath(extractAvatarPath(data.avatar_url, user.id));
+          setAvatarPath(
+            extractAvatarPath(data.avatar_url, user.id),
+          );
         }
       } else {
         setTimezone(tz);
       }
+
       setProfileLoading(false);
     })();
+
     return () => {
       cancelled = true;
     };
@@ -125,61 +472,96 @@ function ProfileEdit() {
 
   useEffect(() => {
     const norm = normalizeUsername(username);
+
     if (!norm) {
       setAvailability("idle");
       return;
     }
+
     if (validateUsernameFormat(norm)) {
       setAvailability("invalid");
       return;
     }
+
     if (norm === normalizeUsername(initialUsername)) {
       setAvailability("available");
       return;
     }
+
     setAvailability("checking");
+
     const handle = setTimeout(async () => {
-      const { data, error } = await supabase.rpc("username_available", { _username: norm });
+      const { data, error } = await supabase.rpc(
+        "username_available",
+        {
+          _username: norm,
+        },
+      );
+
       if (error) return;
+
       setAvailability(data ? "available" : "taken");
     }, 350);
+
     return () => clearTimeout(handle);
   }, [username, initialUsername]);
 
-  function onFile(e: React.ChangeEvent<HTMLInputElement>) {
+  function onFile(
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) {
     const f = e.target.files?.[0];
+
     if (!f) return;
+
     const err = validateAvatarFile(f);
+
     if (err) {
       toast.error(err);
       e.target.value = "";
       return;
     }
+
     setAvatarFile(f);
     setAvatar(URL.createObjectURL(f));
   }
 
-  async function uploadAvatarIfNeeded(): Promise<string | null> {
+  async function uploadAvatarIfNeeded(): Promise<
+    string | null
+  > {
     if (!avatarFile || !user) return null;
+
     setUploading(true);
+
     try {
-      const ext = avatarFile.name.split(".").pop()?.toLowerCase() || "jpg";
+      const ext =
+        avatarFile.name.split(".").pop()?.toLowerCase() ||
+        "jpg";
+
       const path = `${user.id}/avatar-${Date.now()}.${ext}`;
-      const { error: upErr } = await supabase.storage.from("avatars").upload(path, avatarFile, {
-        cacheControl: "3600",
-        upsert: false,
-        contentType: avatarFile.type,
-      });
+
+      const { error: upErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, avatarFile, {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: avatarFile.type,
+        });
+
       if (upErr) throw upErr;
-      // Best-effort delete of previous avatar so the bucket doesn't accrete.
+
       if (avatarPath && avatarPath !== path) {
         await supabase.storage
           .from("avatars")
           .remove([avatarPath])
           .catch(() => {});
       }
+
       setAvatarPath(path);
-      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+
+      const { data } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(path);
+
       return data.publicUrl;
     } finally {
       setUploading(false);
@@ -188,25 +570,33 @@ function ProfileEdit() {
 
   async function removeAvatar() {
     if (!user) return;
+
     if (avatarPath) {
       await supabase.storage
         .from("avatars")
         .remove([avatarPath])
         .catch(() => {});
     }
+
     const { error } = await supabase
       .from("profiles")
       .update({ avatar_url: null })
       .eq("id", user.id);
+
     if (error) {
       toast.error(error.message);
       return;
     }
+
     setAvatar(avatarImg);
     setAvatarFile(null);
     setAvatarPath(null);
     setHasAvatar(false);
-    await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
+
+    await queryClient.invalidateQueries({
+      queryKey: ["profile", user.id],
+    });
+
     toast.success("Avatar removed");
   }
 
@@ -215,7 +605,9 @@ function ProfileEdit() {
       toast.error("Type DELETE to confirm.");
       return;
     }
+
     setDeleting(true);
+
     try {
       await deleteAccount();
       await supabase.auth.signOut();
@@ -223,15 +615,22 @@ function ProfileEdit() {
       toast.success("Your account has been deleted.");
       navigate({ to: "/" });
     } catch (e) {
-      toast.error((e as Error).message || "Could not delete account.");
+      toast.error(
+        (e as Error).message ||
+          "Could not delete account.",
+      );
+
       setDeleting(false);
     }
   }
 
   const fieldErrors = useMemo(
     () => ({
-      displayName: validateDisplayName(displayName),
-      username: validateUsernameFormat(normalizeUsername(username)),
+      displayName:
+        validateDisplayName(displayName),
+      username: validateUsernameFormat(
+        normalizeUsername(username),
+      ),
       bio: validateBio(bio),
       website: validateWebsite(website.trim()),
     }),
@@ -245,21 +644,33 @@ function ProfileEdit() {
     !fieldErrors.username &&
     !fieldErrors.bio &&
     !fieldErrors.website &&
-    (availability === "available" || availability === "idle");
+    (availability === "available" ||
+      availability === "idle");
 
   async function save() {
     if (!user) return;
+
     if (!canSave) {
-      toast.error("Please fix the highlighted fields.");
+      toast.error(
+        "Please fix the highlighted fields.",
+      );
       return;
     }
+
     setSaving(true);
+
     try {
       let avatarUrl: string | null = null;
+
       try {
-        avatarUrl = await uploadAvatarIfNeeded();
+        avatarUrl =
+          await uploadAvatarIfNeeded();
       } catch (e) {
-        toast.error((e as Error).message || "Could not upload avatar");
+        toast.error(
+          (e as Error).message ||
+            "Could not upload avatar",
+        );
+
         setSaving(false);
         return;
       }
@@ -272,24 +683,44 @@ function ProfileEdit() {
         country: country.trim() || null,
         language: language.trim() || null,
         timezone: timezone.trim() || null,
-        ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
+        ...(avatarUrl
+          ? { avatar_url: avatarUrl }
+          : {}),
       };
 
-      const { error } = await supabase.from("profiles").update(patch).eq("id", user.id);
+      const { error } = await supabase
+        .from("profiles")
+        .update(patch)
+        .eq("id", user.id);
+
       if (error) {
         if (error.code === "23505") {
           setAvailability("taken");
-          toast.error("That username was just taken. Please choose another.");
+
+          toast.error(
+            "That username was just taken. Please choose another.",
+          );
         } else if (error.code === "23514") {
-          toast.error("One of the fields didn't pass validation. Please review and retry.");
+          toast.error(
+            "One of the fields didn't pass validation. Please review and retry.",
+          );
         } else {
-          toast.error(error.message || "Could not save. Please try again.");
+          toast.error(
+            error.message ||
+              "Could not save. Please try again.",
+          );
         }
+
         setSaving(false);
         return;
       }
-      await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
+
+      await queryClient.invalidateQueries({
+        queryKey: ["profile", user.id],
+      });
+
       toast.success("Profile updated");
+
       navigate({ to: "/dashboard" });
     } finally {
       setSaving(false);
@@ -306,17 +737,27 @@ function ProfileEdit() {
     >
       <header
         className="sticky top-0 z-40 backdrop-blur-xl"
-        style={{ background: "rgba(8,6,10,0.55)" }}
+        style={{
+          background: "rgba(8,6,10,0.55)",
+        }}
       >
         <div className="mx-auto flex max-w-[900px] items-center justify-between px-4 py-5 sm:px-6">
           <Link
             to="/dashboard"
             className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white"
           >
-            <ArrowLeft className="h-4 w-4" aria-hidden /> Back to dashboard
+            <ArrowLeft
+              className="h-4 w-4"
+              aria-hidden
+            />
+            Back to dashboard
           </Link>
+
           <span className="text-xl font-bold">
-            Xeom<span style={{ color: "#ff2d87" }}>X</span>
+            Xeom
+            <span style={{ color: "#ff2d87" }}>
+              X
+            </span>
           </span>
         </div>
       </header>
@@ -327,8 +768,13 @@ function ProfileEdit() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <h1 className="text-4xl font-bold tracking-tight">Edit profile</h1>
-          <p className="mt-2 text-white/60">Update how you appear across XeomX.</p>
+          <h1 className="text-4xl font-bold tracking-tight">
+            Edit profile
+          </h1>
+
+          <p className="mt-2 text-white/60">
+            Update how you appear across XeomX.
+          </p>
         </motion.div>
 
         {profileLoading ? (
@@ -337,7 +783,11 @@ function ProfileEdit() {
             role="status"
             aria-live="polite"
           >
-            <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Loading your profile…
+            <Loader2
+              className="h-4 w-4 animate-spin"
+              aria-hidden
+            />
+            Loading your profile…
           </div>
         ) : (
           <div className="mt-8 space-y-6">
@@ -346,31 +796,61 @@ function ProfileEdit() {
                 <div className="relative">
                   <div
                     className="absolute -inset-2 rounded-full opacity-70 blur-xl"
-                    style={{ background: "radial-gradient(circle, #ff5a28, transparent 70%)" }}
+                    style={{
+                      background:
+                        "radial-gradient(circle, #ff5a28, transparent 70%)",
+                    }}
                   />
+
                   <div
                     className="relative h-24 w-24 overflow-hidden rounded-full"
-                    style={{ boxShadow: "0 0 0 2px #ff5a28" }}
+                    style={{
+                      boxShadow:
+                        "0 0 0 2px #ff5a28",
+                    }}
                   >
-                    <img src={avatar} alt="Your avatar" className="h-full w-full object-cover" />
+                    <img
+                      src={avatar}
+                      alt="Your avatar"
+                      className="h-full w-full object-cover"
+                    />
                   </div>
                 </div>
+
                 <div>
-                  <p className="font-semibold">Profile picture</p>
-                  <p className="mt-1 text-sm text-white/50">PNG, JPG or WebP. Max 2 MB.</p>
+                  <p className="font-semibold">
+                    Profile picture
+                  </p>
+
+                  <p className="mt-1 text-sm text-white/50">
+                    PNG, JPG or WebP. Max 2 MB.
+                  </p>
+
                   <button
                     type="button"
-                    onClick={() => fileRef.current?.click()}
+                    onClick={() =>
+                      fileRef.current?.click()
+                    }
                     disabled={uploading}
                     className="mt-3 inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm hover:bg-white/[0.05] disabled:opacity-60"
                   >
                     {uploading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                      <Loader2
+                        className="h-4 w-4 animate-spin"
+                        aria-hidden
+                      />
                     ) : (
-                      <Upload className="h-4 w-4" aria-hidden />
+                      <Upload
+                        className="h-4 w-4"
+                        aria-hidden
+                      />
                     )}
-                    {uploading ? "Uploading…" : "Upload new"}
+
+                    {uploading
+                      ? "Uploading…"
+                      : "Upload new"}
                   </button>
+
                   {hasAvatar && (
                     <button
                       type="button"
@@ -378,9 +858,14 @@ function ProfileEdit() {
                       disabled={uploading}
                       className="ms-2 mt-3 inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-white/70 hover:bg-white/[0.05] disabled:opacity-60"
                     >
-                      <Trash2 className="h-4 w-4" aria-hidden /> Remove
+                      <Trash2
+                        className="h-4 w-4"
+                        aria-hidden
+                      />
+                      Remove
                     </button>
                   )}
+
                   <input
                     ref={fileRef}
                     type="file"
@@ -396,7 +881,13 @@ function ProfileEdit() {
             <Card>
               <Field
                 label="Display name"
-                hint={fieldErrors.displayName ? <ErrText>{fieldErrors.displayName}</ErrText> : null}
+                hint={
+                  fieldErrors.displayName ? (
+                    <ErrText>
+                      {fieldErrors.displayName}
+                    </ErrText>
+                  ) : null
+                }
               >
                 <Input
                   value={displayName}
@@ -405,36 +896,65 @@ function ProfileEdit() {
                   autoComplete="name"
                 />
               </Field>
+
               <Field
                 label="Username"
-                hint={<UsernameHint state={availability} format={fieldErrors.username} />}
+                hint={
+                  <UsernameHint
+                    state={availability}
+                    format={fieldErrors.username}
+                  />
+                }
               >
                 <div className="relative">
                   <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/40">
                     @
                   </span>
+
                   <input
                     value={username}
-                    onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s+/g, ""))}
-                    aria-invalid={availability === "taken" || availability === "invalid"}
+                    onChange={(e) =>
+                      setUsername(
+                        e.target.value
+                          .toLowerCase()
+                          .replace(/\s+/g, ""),
+                      )
+                    }
+                    aria-invalid={
+                      availability === "taken" ||
+                      availability === "invalid"
+                    }
                     autoComplete="off"
                     spellCheck={false}
                     className="w-full rounded-xl border border-white/10 bg-white/[0.03] py-3 pl-9 pr-4 text-sm outline-none focus:border-[#ff8a3d]"
                   />
                 </div>
               </Field>
+
               <Field
                 label="Bio"
-                hint={fieldErrors.bio ? <ErrText>{fieldErrors.bio}</ErrText> : null}
+                hint={
+                  fieldErrors.bio ? (
+                    <ErrText>
+                      {fieldErrors.bio}
+                    </ErrText>
+                  ) : null
+                }
               >
                 <textarea
                   value={bio}
-                  onChange={(e) => setBio(e.target.value)}
+                  onChange={(e) =>
+                    setBio(e.target.value)
+                  }
                   rows={3}
                   maxLength={300}
                   className="w-full resize-none rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm outline-none focus:border-[#ff8a3d]"
                 />
-                <p className="mt-1 text-right text-xs text-white/40" aria-live="polite">
+
+                <p
+                  className="mt-1 text-right text-xs text-white/40"
+                  aria-live="polite"
+                >
                   {bio.length}/300
                 </p>
               </Field>
@@ -444,7 +964,13 @@ function ProfileEdit() {
               <Field
                 label="Website"
                 icon={Globe}
-                hint={fieldErrors.website ? <ErrText>{fieldErrors.website}</ErrText> : null}
+                hint={
+                  fieldErrors.website ? (
+                    <ErrText>
+                      {fieldErrors.website}
+                    </ErrText>
+                  ) : null
+                }
               >
                 <Input
                   value={website}
@@ -453,14 +979,42 @@ function ProfileEdit() {
                   autoComplete="url"
                 />
               </Field>
-              <Field label="Country" icon={MapPin}>
-                <Input value={country} onChange={setCountry} autoComplete="country-name" />
+
+              <Field
+                label={m.profile_region_country()}
+                icon={MapPin}
+              >
+                <ProfileSelect
+                  value={country}
+                  onValueChange={setCountry}
+                  placeholder={m.profile_region_country_placeholder()}
+                  options={countryOptions}
+                  legacyLabel={m.profile_region_current_value()}
+                />
               </Field>
-              <Field label="Language" icon={Languages}>
-                <Input value={language} onChange={setLanguage} autoComplete="language" />
+
+              <Field
+                label={m.profile_region_language()}
+                icon={Languages}
+              >
+                <ProfileSelect
+                  value={language}
+                  onValueChange={setLanguage}
+                  placeholder={m.profile_region_language_placeholder()}
+                  options={LANGUAGE_OPTIONS}
+                  legacyLabel={m.profile_region_current_value()}
+                />
               </Field>
-              <Field label="Timezone" icon={Clock}>
-                <Input value={timezone} onChange={setTimezone} />
+
+              <Field
+                label={m.profile_region_timezone()}
+                icon={Clock}
+              >
+                <TimezoneCombobox
+                  value={timezone}
+                  onValueChange={setTimezone}
+                  options={timezoneOptions}
+                />
               </Field>
             </Card>
 
@@ -471,52 +1025,82 @@ function ProfileEdit() {
               >
                 Cancel
               </Link>
+
               <button
                 type="button"
                 onClick={save}
                 disabled={!canSave}
                 className="inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-semibold text-black disabled:opacity-60"
                 style={{
-                  background: "linear-gradient(90deg,#ff8a3d,#ff2d87)",
-                  boxShadow: "0 8px 24px rgba(255,90,40,0.35)",
+                  background:
+                    "linear-gradient(90deg,#ff8a3d,#ff2d87)",
+                  boxShadow:
+                    "0 8px 24px rgba(255,90,40,0.35)",
                 }}
               >
                 {saving ? (
-                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                  <Loader2
+                    className="h-4 w-4 animate-spin"
+                    aria-hidden
+                  />
                 ) : (
-                  <Sparkles className="h-4 w-4" aria-hidden />
+                  <Sparkles
+                    className="h-4 w-4"
+                    aria-hidden
+                  />
                 )}
-                {saving ? "Saving…" : "Save changes"}
+
+                {saving
+                  ? "Saving…"
+                  : "Save changes"}
               </button>
             </div>
 
-            {/* Danger zone: permanent account deletion */}
             <div
               className="mt-8 rounded-[22px] p-6"
               style={{
-                background: "rgba(255,45,45,0.04)",
-                border: "1px solid rgba(255,80,80,0.25)",
+                background:
+                  "rgba(255,45,45,0.04)",
+                border:
+                  "1px solid rgba(255,80,80,0.25)",
               }}
               role="region"
               aria-labelledby="danger-zone"
             >
               <div className="flex items-start gap-3">
-                <ShieldAlert className="mt-0.5 h-5 w-5 text-rose-400" aria-hidden />
+                <ShieldAlert
+                  className="mt-0.5 h-5 w-5 text-rose-400"
+                  aria-hidden
+                />
+
                 <div className="flex-1">
-                  <h2 id="danger-zone" className="font-semibold text-rose-200">
+                  <h2
+                    id="danger-zone"
+                    className="font-semibold text-rose-200"
+                  >
                     Delete account
                   </h2>
+
                   <p className="mt-1 text-sm text-white/60">
-                    Permanently deletes your account, profile, prompts, collections and avatars.
-                    This action cannot be undone.
+                    Permanently deletes your account,
+                    profile, prompts, collections and
+                    avatars. This action cannot be
+                    undone.
                   </p>
+
                   {!confirmDelete ? (
                     <button
                       type="button"
-                      onClick={() => setConfirmDelete(true)}
+                      onClick={() =>
+                        setConfirmDelete(true)
+                      }
                       className="mt-4 inline-flex items-center gap-2 rounded-full border border-rose-500/40 px-4 py-2 text-sm text-rose-200 hover:bg-rose-500/10"
                     >
-                      <Trash2 className="h-4 w-4" aria-hidden /> Delete my account…
+                      <Trash2
+                        className="h-4 w-4"
+                        aria-hidden
+                      />
+                      Delete my account…
                     </button>
                   ) : (
                     <div className="mt-4 space-y-3">
@@ -524,20 +1108,34 @@ function ProfileEdit() {
                         htmlFor="confirm-del"
                         className="block text-xs uppercase tracking-wider text-white/60"
                       >
-                        Type <span className="font-mono text-rose-300">DELETE</span> to confirm
+                        Type{" "}
+                        <span className="font-mono text-rose-300">
+                          DELETE
+                        </span>{" "}
+                        to confirm
                       </label>
+
                       <input
                         id="confirm-del"
                         value={confirmText}
-                        onChange={(e) => setConfirmText(e.target.value)}
+                        onChange={(e) =>
+                          setConfirmText(
+                            e.target.value,
+                          )
+                        }
                         autoComplete="off"
                         spellCheck={false}
                         aria-describedby="confirm-del-help"
                         className="w-full max-w-xs rounded-xl border border-rose-500/30 bg-white/[0.03] px-4 py-2.5 text-sm outline-none focus:border-rose-400"
                       />
-                      <p id="confirm-del-help" className="text-xs text-white/40">
+
+                      <p
+                        id="confirm-del-help"
+                        className="text-xs text-white/40"
+                      >
                         This is irreversible.
                       </p>
+
                       <div className="flex gap-2">
                         <button
                           type="button"
@@ -549,17 +1147,28 @@ function ProfileEdit() {
                         >
                           Cancel
                         </button>
+
                         <button
                           type="button"
                           onClick={onDeleteAccount}
-                          disabled={deleting || confirmText !== "DELETE"}
+                          disabled={
+                            deleting ||
+                            confirmText !== "DELETE"
+                          }
                           className="inline-flex items-center gap-2 rounded-full bg-rose-500 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-400 disabled:opacity-60"
                         >
                           {deleting ? (
-                            <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                            <Loader2
+                              className="h-4 w-4 animate-spin"
+                              aria-hidden
+                            />
                           ) : (
-                            <Trash2 className="h-4 w-4" aria-hidden />
+                            <Trash2
+                              className="h-4 w-4"
+                              aria-hidden
+                            />
                           )}
+
                           Permanently delete
                         </button>
                       </div>
@@ -575,11 +1184,19 @@ function ProfileEdit() {
   );
 }
 
-function Card({ children }: { children: React.ReactNode }) {
+function Card({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div
       className="space-y-5 rounded-[22px] p-6"
-      style={{ background: "#100b0f", border: "1px solid rgba(255,255,255,0.06)" }}
+      style={{
+        background: "#100b0f",
+        border:
+          "1px solid rgba(255,255,255,0.06)",
+      }}
     >
       {children}
     </div>
@@ -601,10 +1218,21 @@ function Field({
     <div>
       <div className="mb-2 flex items-center justify-between text-xs">
         <label className="inline-flex items-center gap-2 font-medium uppercase tracking-wider text-white/60">
-          {Icon && <Icon className="h-3.5 w-3.5" aria-hidden />} {label}
+          {Icon && (
+            <Icon
+              className="h-3.5 w-3.5"
+              aria-hidden
+            />
+          )}
+
+          {label}
         </label>
-        {hint && <span className="text-xs">{hint}</span>}
+
+        {hint && (
+          <span className="text-xs">{hint}</span>
+        )}
       </div>
+
       {children}
     </div>
   );
@@ -624,7 +1252,9 @@ function Input({
   return (
     <input
       value={value}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) =>
+        onChange(e.target.value)
+      }
       placeholder={placeholder}
       autoComplete={autoComplete}
       className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm outline-none transition focus:border-[#ff8a3d]"
@@ -632,29 +1262,210 @@ function Input({
   );
 }
 
-function ErrText({ children }: { children: React.ReactNode }) {
+function ProfileSelect({
+  value,
+  onValueChange,
+  placeholder,
+  options,
+  legacyLabel,
+}: {
+  value: string;
+  onValueChange: (value: string) => void;
+  placeholder: string;
+  options: ReadonlyArray<{
+    value: string;
+    label: string;
+  }>;
+  legacyLabel: string;
+}) {
+  const knownValue = options.some(
+    (option) => option.value === value,
+  );
+
+  return (
+    <Select
+      value={value || undefined}
+      onValueChange={onValueChange}
+    >
+      <SelectTrigger className="h-auto w-full rounded-xl border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:ring-[#ff8a3d]">
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+
+      <SelectContent className="border-white/10 bg-[#171016] text-white">
+        {value && !knownValue && (
+          <SelectItem value={value}>
+            {legacyLabel}: {value}
+          </SelectItem>
+        )}
+
+        {options.map((option) => (
+          <SelectItem
+            key={option.value}
+            value={option.value}
+          >
+            {option.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
+function TimezoneCombobox({
+  value,
+  onValueChange,
+  options,
+}: {
+  value: string;
+  onValueChange: (value: string) => void;
+  options: string[];
+}) {
+  const [open, setOpen] = useState(false);
+
+  const availableOptions =
+    value && !options.includes(value)
+      ? [value, ...options]
+      : options;
+
+  return (
+    <Popover
+      open={open}
+      onOpenChange={setOpen}
+    >
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          role="combobox"
+          aria-expanded={open}
+          className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm outline-none transition hover:border-white/20 focus:border-[#ff8a3d]"
+        >
+          <span
+            className={
+              value
+                ? "text-white"
+                : "text-white/40"
+            }
+          >
+            {value ||
+              m.profile_region_timezone_placeholder()}
+          </span>
+
+          <ChevronsUpDown
+            className="h-4 w-4 text-white/40"
+            aria-hidden
+          />
+        </button>
+      </PopoverTrigger>
+
+      <PopoverContent
+        align="start"
+        className="w-[var(--radix-popover-trigger-width)] border-white/10 bg-[#171016] p-0 text-white"
+      >
+        <Command className="bg-[#171016] text-white">
+          <CommandInput
+            placeholder={m.profile_region_timezone_search()}
+          />
+
+          <CommandList>
+            <CommandEmpty>
+              {m.profile_region_timezone_empty()}
+            </CommandEmpty>
+
+            <CommandGroup>
+              {availableOptions.map((zone) => (
+                <CommandItem
+                  key={zone}
+                  value={zone}
+                  onSelect={() => {
+                    onValueChange(zone);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={
+                      zone === value
+                        ? "opacity-100"
+                        : "opacity-0"
+                    }
+                    aria-hidden
+                  />
+
+                  <span>{zone}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function ErrText({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <span className="inline-flex items-center gap-1 text-rose-400">
-      <X className="h-3 w-3" aria-hidden /> {children}
+      <X
+        className="h-3 w-3"
+        aria-hidden
+      />
+
+      {children}
     </span>
   );
 }
 
-function UsernameHint({ state, format }: { state: Availability; format: string | null }) {
-  if (format) return <ErrText>{format}</ErrText>;
-  if (state === "checking")
+function UsernameHint({
+  state,
+  format,
+}: {
+  state: Availability;
+  format: string | null;
+}) {
+  if (format) {
+    return <ErrText>{format}</ErrText>;
+  }
+
+  if (state === "checking") {
     return (
       <span className="inline-flex items-center gap-1 text-white/50">
-        <Loader2 className="h-3 w-3 animate-spin" aria-hidden /> Checking…
+        <Loader2
+          className="h-3 w-3 animate-spin"
+          aria-hidden
+        />
+
+        Checking…
       </span>
     );
-  if (state === "available")
+  }
+
+  if (state === "available") {
     return (
       <span className="inline-flex items-center gap-1 text-emerald-400">
-        <Check className="h-3 w-3" aria-hidden /> Available
+        <Check
+          className="h-3 w-3"
+          aria-hidden
+        />
+
+        Available
       </span>
     );
-  if (state === "taken") return <ErrText>Already taken</ErrText>;
-  if (state === "invalid") return <ErrText>Not a valid username</ErrText>;
+  }
+
+  if (state === "taken") {
+    return <ErrText>Already taken</ErrText>;
+  }
+
+  if (state === "invalid") {
+    return (
+      <ErrText>
+        Not a valid username
+      </ErrText>
+    );
+  }
+
   return null;
 }

@@ -1,4 +1,4 @@
-name: Add Profile Selects
+name: Add localized profile selects
 
 on:
   workflow_dispatch:
@@ -6,13 +6,22 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: add-localized-profile-selects
+  cancel-in-progress: false
+
 jobs:
-  add-selects:
+  update-profile:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
-      - name: Checkout repository
+      - name: Checkout main
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -23,115 +32,500 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Convert profile fields to selects
+      - name: Update profile selects and translations
+        shell: bash
         run: |
-          python - <<'PY'
-          from pathlib import Path
+          python3 <<'PY'
+          import json
           import re
+          from pathlib import Path
 
-          path = Path("src/routes/profile-edit.tsx")
-          text = path.read_text()
+          profile_path = Path("src/routes/profile-edit.tsx")
+          source = profile_path.read_text(encoding="utf-8")
 
-          replacements = {
-              "country": [
-                  ("", "انتخاب کشور"),
-                  ("Iran", "ایران"),
-                  ("Netherlands", "هلند"),
-                  ("Germany", "آلمان"),
-                  ("France", "فرانسه"),
-                  ("United Kingdom", "بریتانیا"),
-                  ("United States", "آمریکا"),
-                  ("Canada", "کانادا"),
-                  ("Turkey", "ترکیه"),
-                  ("United Arab Emirates", "امارات"),
-                  ("Azerbaijan", "آذربایجان"),
-              ],
-              "language": [
-                  ("", "انتخاب زبان"),
-                  ("fa", "فارسی"),
-                  ("en", "English"),
-                  ("nl", "Nederlands"),
-                  ("de", "Deutsch"),
-                  ("fr", "Français"),
-                  ("tr", "Türkçe"),
-                  ("ar", "العربية"),
-              ],
-              "timezone": [
-                  ("", "انتخاب منطقه زمانی"),
-                  ("Asia/Tehran", "تهران"),
-                  ("Europe/Amsterdam", "آمستردام"),
-                  ("Europe/Berlin", "برلین"),
-                  ("Europe/Paris", "پاریس"),
-                  ("Europe/London", "لندن"),
-                  ("Asia/Dubai", "دبی"),
-                  ("Asia/Istanbul", "استانبول"),
-                  ("America/New_York", "نیویورک"),
-                  ("America/Los_Angeles", "لس‌آنجلس"),
-              ],
+          # ------------------------------------------------------------
+          # React useMemo import
+          # ------------------------------------------------------------
+          react_import = re.search(
+              r'import\s*\{([^}]+)\}\s*from\s*["\']react["\'];',
+              source,
+          )
+
+          if not react_import:
+              raise SystemExit("React named import was not found.")
+
+          react_members = [
+              item.strip()
+              for item in react_import.group(1).split(",")
+              if item.strip()
+          ]
+
+          if "useMemo" not in react_members:
+              react_members.append("useMemo")
+
+              replacement = (
+                  'import { '
+                  + ", ".join(react_members)
+                  + ' } from "react";'
+              )
+
+              source = (
+                  source[:react_import.start()]
+                  + replacement
+                  + source[react_import.end():]
+              )
+
+          # ------------------------------------------------------------
+          # Required imports
+          # ------------------------------------------------------------
+          select_import = '''import {
+            Select,
+            SelectContent,
+            SelectItem,
+            SelectTrigger,
+            SelectValue,
+          } from "@/components/ui/select";'''
+
+          if '@/components/ui/select' not in source:
+              import_matches = list(
+                  re.finditer(r'^import .+?;\s*$', source, flags=re.MULTILINE)
+              )
+
+              if not import_matches:
+                  raise SystemExit("No import block was found.")
+
+              insert_at = import_matches[-1].end()
+              source = (
+                  source[:insert_at]
+                  + "\n"
+                  + select_import
+                  + source[insert_at:]
+              )
+
+          paraglide_imports = '''import { m } from "@/paraglide/messages.js";
+          import { getLocale } from "@/paraglide/runtime.js";'''
+
+          missing_paraglide = []
+
+          if '@/paraglide/messages.js' not in source:
+              missing_paraglide.append(
+                  'import { m } from "@/paraglide/messages.js";'
+              )
+
+          if '@/paraglide/runtime.js' not in source:
+              missing_paraglide.append(
+                  'import { getLocale } from "@/paraglide/runtime.js";'
+              )
+
+          if missing_paraglide:
+              import_matches = list(
+                  re.finditer(r'^import .+?;\s*$', source, flags=re.MULTILINE)
+              )
+
+              insert_at = import_matches[-1].end()
+
+              source = (
+                  source[:insert_at]
+                  + "\n"
+                  + "\n".join(missing_paraglide)
+                  + source[insert_at:]
+              )
+
+          # ------------------------------------------------------------
+          # Locale, country and timezone helpers
+          # ------------------------------------------------------------
+          helpers = r'''
+          const ACTIVE_LOCALES = ["en", "fa", "ar", "zh", "hi"] as const;
+
+          type ActiveLocale = (typeof ACTIVE_LOCALES)[number];
+
+          const COUNTRY_CODES = `
+          AF AL DZ AD AO AG AR AM AU AT AZ BS BH BD BB BY BE BZ BJ BT BO BA BW BR
+          BN BG BF BI CV KH CM CA CF TD CL CN CO KM CG CD CR CI HR CU CY CZ DK DJ
+          DM DO EC EG SV GQ ER EE SZ ET FJ FI FR GA GM GE DE GH GR GD GT GN GW GY
+          HT HN HU IS IN ID IR IQ IE IL IT JM JP JO KZ KE KI KP KR KW KG LA LV LB
+          LS LR LY LI LT LU MG MW MY MV ML MT MH MR MU MX FM MD MC MN ME MA MZ MM
+          NA NR NP NL NZ NI NE NG MK NO OM PK PW PS PA PG PY PE PH PL PT QA RO RU
+          RW KN LC VC WS SM ST SA SN RS SC SL SG SK SI SB SO ZA SS ES LK SD SR SE
+          CH SY TW TJ TZ TH TL TG TO TT TN TR TM TV UG UA AE GB US UY UZ VU VA VE
+          VN YE ZM ZW
+          `
+            .trim()
+            .split(/\s+/);
+
+          function getCurrentLocale(): ActiveLocale {
+            try {
+              const locale = getLocale();
+
+              return ACTIVE_LOCALES.includes(locale as ActiveLocale)
+                ? (locale as ActiveLocale)
+                : "en";
+            } catch {
+              return "en";
+            }
           }
 
-          for field, options in replacements.items():
-              pattern = re.compile(
-                  rf'<input(?=[^>]*name=["\']{field}["\'])[^>]*/?>',
-                  re.DOTALL,
-              )
-              match = pattern.search(text)
+          function getTimezones(): string[] {
+            const currentTimezone =
+              Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 
-              if not match:
-                  raise SystemExit(f"Input field not found: {field}")
+            const intlWithSupportedValues = Intl as typeof Intl & {
+              supportedValuesOf?: (key: "timeZone") => string[];
+            };
 
-              original = match.group(0)
+            try {
+              return (
+                intlWithSupportedValues.supportedValuesOf?.("timeZone") ?? [
+                  currentTimezone,
+                ]
+              );
+            } catch {
+              return [currentTimezone];
+            }
+          }
 
-              value = re.search(r'value=\{{([^}}]+)\}}', original)
-              change = re.search(r'onChange=\{([^}]+)\}', original)
-              class_name = re.search(r'className=(["\'][^"\']+["\'])', original)
+          '''
 
-              value_expr = value.group(1) if value else f'form.{field}'
-              change_expr = change.group(1) if change else (
-                  f'(event) => setForm((current) => '
-                  f'({{ ...current, {field}: event.target.value }}))'
-              )
-              classes = class_name.group(1) if class_name else (
-                  '"w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3"'
-              )
-
-              option_markup = "\n".join(
-                  f'              <option value="{value}">{label}</option>'
-                  for value, label in options
+          if "const ACTIVE_LOCALES =" not in source:
+              component_match = re.search(
+                  r'export\s+default\s+function\s+ProfileEdit\b',
+                  source,
               )
 
-              select = f'''<select
-                name="{field}"
-                value={{{value_expr}}}
-                onChange={{{change_expr}}}
-                className={classes}
+              if not component_match:
+                  component_match = re.search(
+                      r'function\s+ProfileEdit\b',
+                      source,
+                  )
+
+              if not component_match:
+                  raise SystemExit("ProfileEdit component was not found.")
+
+              source = (
+                  source[:component_match.start()]
+                  + helpers
+                  + source[component_match.start():]
+              )
+
+          # ------------------------------------------------------------
+          # Default language state
+          # ------------------------------------------------------------
+          source, language_state_count = re.subn(
+              r'const \[language,\s*setLanguage\]\s*=\s*useState\(\s*["\']["\']\s*\);',
+              'const [language, setLanguage] = useState(getCurrentLocale());',
+              source,
+              count=1,
+          )
+
+          if language_state_count == 0 and (
+              "useState(getCurrentLocale())" not in source
+          ):
+              raise SystemExit("Language state declaration was not found.")
+
+          # ------------------------------------------------------------
+          # Localized option lists inside ProfileEdit
+          # ------------------------------------------------------------
+          options_code = r'''
+            const currentLocale = getCurrentLocale();
+
+            const regionNames = useMemo(
+              () => new Intl.DisplayNames([currentLocale], { type: "region" }),
+              [currentLocale],
+            );
+
+            const languageNames = useMemo(
+              () => new Intl.DisplayNames([currentLocale], { type: "language" }),
+              [currentLocale],
+            );
+
+            const countryOptions = useMemo(
+              () =>
+                COUNTRY_CODES.map((code) => ({
+                  value: code,
+                  label: regionNames.of(code) ?? code,
+                })).sort((a, b) =>
+                  a.label.localeCompare(b.label, currentLocale),
+                ),
+              [currentLocale, regionNames],
+            );
+
+            const languageOptions = useMemo(
+              () =>
+                ACTIVE_LOCALES.map((code) => ({
+                  value: code,
+                  label: languageNames.of(code) ?? code,
+                })).sort((a, b) =>
+                  a.label.localeCompare(b.label, currentLocale),
+                ),
+              [currentLocale, languageNames],
+            );
+
+            const timezoneOptions = useMemo(
+              () =>
+                getTimezones()
+                  .map((value) => ({
+                    value,
+                    label: value.replaceAll("_", " "),
+                  }))
+                  .sort((a, b) =>
+                    a.label.localeCompare(b.label, currentLocale),
+                  ),
+              [currentLocale],
+            );
+
+          '''
+
+          if "const countryOptions = useMemo" not in source:
+              file_ref_match = re.search(
+                  r'(\s*const\s+fileRef\s*=\s*useRef[^;]*;)',
+                  source,
+              )
+
+              if not file_ref_match:
+                  raise SystemExit("fileRef declaration was not found.")
+
+              source = (
+                  source[:file_ref_match.end()]
+                  + "\n"
+                  + options_code
+                  + source[file_ref_match.end():]
+              )
+
+          # ------------------------------------------------------------
+          # Validate profile language loaded from Supabase
+          # ------------------------------------------------------------
+          source, loaded_language_count = re.subn(
+              r'setLanguage\(\s*data\.language\s*\?\?\s*["\']["\']\s*\);',
+              '''setLanguage(
+                    ACTIVE_LOCALES.includes(data.language as ActiveLocale)
+                      ? (data.language as ActiveLocale)
+                      : currentLocale,
+                  );''',
+              source,
+              count=1,
+          )
+
+          if loaded_language_count == 0 and (
+              "ACTIVE_LOCALES.includes(data.language as ActiveLocale)"
+              not in source
+          ):
+              raise SystemExit("Loaded language assignment was not found.")
+
+          # ------------------------------------------------------------
+          # Replace the three text inputs
+          # ------------------------------------------------------------
+          old_country = '''<Field label="Country" icon={MapPin}>
+            <Input value={country} onChange={setCountry} autoComplete="country-name" />
+          </Field>'''
+
+          new_country = '''<Field label={m.profile_edit_country_label()} icon={MapPin}>
+            <Select value={country || undefined} onValueChange={setCountry}>
+              <SelectTrigger
+                aria-label={m.profile_edit_country_label()}
+                className="h-auto w-full rounded-xl border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white shadow-none focus:ring-[#ff8a3d]"
               >
-{option_markup}
-              </select>'''
+                <SelectValue
+                  placeholder={m.profile_edit_country_placeholder()}
+                />
+              </SelectTrigger>
 
-              text = text[:match.start()] + select + text[match.end():]
+              <SelectContent
+                position="popper"
+                className="max-h-72 border-white/10 bg-[#100b0f] text-white"
+              >
+                {countryOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>'''
 
-          path.write_text(text)
+          old_language = '''<Field label="Language" icon={Languages}>
+            <Input value={language} onChange={setLanguage} autoComplete="language" />
+          </Field>'''
+
+          new_language = '''<Field label={m.language()} icon={Languages}>
+            <Select value={language || undefined} onValueChange={setLanguage}>
+              <SelectTrigger
+                aria-label={m.language()}
+                className="h-auto w-full rounded-xl border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white shadow-none focus:ring-[#ff8a3d]"
+              >
+                <SelectValue
+                  placeholder={m.profile_edit_language_placeholder()}
+                />
+              </SelectTrigger>
+
+              <SelectContent
+                position="popper"
+                className="max-h-72 border-white/10 bg-[#100b0f] text-white"
+              >
+                {languageOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>'''
+
+          old_timezone = '''<Field label="Timezone" icon={Clock}>
+            <Input value={timezone} onChange={setTimezone} />
+          </Field>'''
+
+          new_timezone = '''<Field label={m.profile_edit_timezone_label()} icon={Clock}>
+            <Select value={timezone || undefined} onValueChange={setTimezone}>
+              <SelectTrigger
+                aria-label={m.profile_edit_timezone_label()}
+                className="h-auto w-full rounded-xl border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white shadow-none focus:ring-[#ff8a3d]"
+              >
+                <SelectValue
+                  placeholder={m.profile_edit_timezone_placeholder()}
+                />
+              </SelectTrigger>
+
+              <SelectContent
+                position="popper"
+                className="max-h-72 border-white/10 bg-[#100b0f] text-white"
+              >
+                {timezoneOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>'''
+
+          replacements = [
+              ("country", old_country, new_country),
+              ("language", old_language, new_language),
+              ("timezone", old_timezone, new_timezone),
+          ]
+
+          for name, old, new in replacements:
+              if old in source:
+                  source = source.replace(old, new, 1)
+              elif new not in source:
+                  raise SystemExit(
+                      f"The existing {name} field did not match the expected code."
+                  )
+
+          profile_path.write_text(source, encoding="utf-8")
+
+          # ------------------------------------------------------------
+          # Translation messages
+          # ------------------------------------------------------------
+          translations = {
+              "en": {
+                  "profile_edit_country_label": "Country",
+                  "profile_edit_country_placeholder": "Select a country",
+                  "profile_edit_language_placeholder": "Select a language",
+                  "profile_edit_timezone_label": "Timezone",
+                  "profile_edit_timezone_placeholder": "Select a timezone",
+              },
+              "fa": {
+                  "profile_edit_country_label": "کشور",
+                  "profile_edit_country_placeholder": "یک کشور انتخاب کنید",
+                  "profile_edit_language_placeholder": "یک زبان انتخاب کنید",
+                  "profile_edit_timezone_label": "منطقه زمانی",
+                  "profile_edit_timezone_placeholder": "یک منطقه زمانی انتخاب کنید",
+              },
+              "ar": {
+                  "profile_edit_country_label": "الدولة",
+                  "profile_edit_country_placeholder": "اختر دولة",
+                  "profile_edit_language_placeholder": "اختر لغة",
+                  "profile_edit_timezone_label": "المنطقة الزمنية",
+                  "profile_edit_timezone_placeholder": "اختر منطقة زمنية",
+              },
+              "zh": {
+                  "profile_edit_country_label": "国家或地区",
+                  "profile_edit_country_placeholder": "选择国家或地区",
+                  "profile_edit_language_placeholder": "选择语言",
+                  "profile_edit_timezone_label": "时区",
+                  "profile_edit_timezone_placeholder": "选择时区",
+              },
+              "hi": {
+                  "profile_edit_country_label": "देश",
+                  "profile_edit_country_placeholder": "देश चुनें",
+                  "profile_edit_language_placeholder": "भाषा चुनें",
+                  "profile_edit_timezone_label": "समय क्षेत्र",
+                  "profile_edit_timezone_placeholder": "समय क्षेत्र चुनें",
+              },
+          }
+
+          for locale, values in translations.items():
+              path = Path(f"messages/{locale}.json")
+
+              if not path.exists():
+                  raise SystemExit(f"Translation file not found: {path}")
+
+              data = json.loads(path.read_text(encoding="utf-8"))
+              data.update(values)
+
+              path.write_text(
+                  json.dumps(
+                      data,
+                      ensure_ascii=False,
+                      indent=2,
+                  )
+                  + "\n",
+                  encoding="utf-8",
+              )
+
+          print("Profile selects and translations were updated successfully.")
           PY
 
-      - name: Format and verify
+      - name: Format modified files
         run: |
-          npx prettier --write src/routes/profile-edit.tsx
-          npm run lint
-          npx tsc --noEmit
-          npm run build
+          npx prettier --write \
+            src/routes/profile-edit.tsx \
+            messages/en.json \
+            messages/fa.json \
+            messages/ar.json \
+            messages/zh.json \
+            messages/hi.json
 
-      - name: Commit changes
+      - name: Verify formatting
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          npx prettier --check \
+            src/routes/profile-edit.tsx \
+            messages/en.json \
+            messages/fa.json \
+            messages/ar.json \
+            messages/zh.json \
+            messages/hi.json
 
-          git add src/routes/profile-edit.tsx
+      - name: Run lint
+        run: npm run lint
+
+      - name: Run TypeScript check
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit and push
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git add \
+            src/routes/profile-edit.tsx \
+            messages/en.json \
+            messages/fa.json \
+            messages/ar.json \
+            messages/zh.json \
+            messages/hi.json
 
           if git diff --cached --quiet; then
-            echo "No changes needed."
+            echo "No changes to commit."
             exit 0
           fi
 
-          git commit -m "feat: add profile selection fields"
-          git push
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git commit -m "fix(profile): add localized country language and timezone selects"
+          git push origin HEAD:main

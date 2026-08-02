@@ -39,11 +39,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import avatarImg from "@/assets/dashboard-avatar.jpg";
 import {
   validateUsernameFormat,
@@ -393,8 +389,7 @@ function ProfileEdit() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
-  const [availability, setAvailability] =
-    useState<Availability>("idle");
+  const [availability, setAvailability] = useState<Availability>("idle");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [confirmText, setConfirmText] = useState("");
   const [deleting, setDeleting] = useState(false);
@@ -431,9 +426,7 @@ function ProfileEdit() {
     (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select(
-          "username, display_name, bio, avatar_url, website, country, timezone, language",
-        )
+        .select("username, display_name, bio, avatar_url, website, country, timezone, language")
         .eq("id", user.id)
         .maybeSingle();
 
@@ -454,9 +447,7 @@ function ProfileEdit() {
         if (data.avatar_url) {
           setAvatar(data.avatar_url);
           setHasAvatar(true);
-          setAvatarPath(
-            extractAvatarPath(data.avatar_url, user.id),
-          );
+          setAvatarPath(extractAvatarPath(data.avatar_url, user.id));
         }
       } else {
         setTimezone(tz);
@@ -491,12 +482,9 @@ function ProfileEdit() {
     setAvailability("checking");
 
     const handle = setTimeout(async () => {
-      const { data, error } = await supabase.rpc(
-        "username_available",
-        {
-          _username: norm,
-        },
-      );
+      const { data, error } = await supabase.rpc("username_available", {
+        _username: norm,
+      });
 
       if (error) return;
 
@@ -506,9 +494,7 @@ function ProfileEdit() {
     return () => clearTimeout(handle);
   }, [username, initialUsername]);
 
-  function onFile(
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) {
+  function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
 
     if (!f) return;
@@ -525,27 +511,21 @@ function ProfileEdit() {
     setAvatar(URL.createObjectURL(f));
   }
 
-  async function uploadAvatarIfNeeded(): Promise<
-    string | null
-  > {
+  async function uploadAvatarIfNeeded(): Promise<string | null> {
     if (!avatarFile || !user) return null;
 
     setUploading(true);
 
     try {
-      const ext =
-        avatarFile.name.split(".").pop()?.toLowerCase() ||
-        "jpg";
+      const ext = avatarFile.name.split(".").pop()?.toLowerCase() || "jpg";
 
       const path = `${user.id}/avatar-${Date.now()}.${ext}`;
 
-      const { error: upErr } = await supabase.storage
-        .from("avatars")
-        .upload(path, avatarFile, {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: avatarFile.type,
-        });
+      const { error: upErr } = await supabase.storage.from("avatars").upload(path, avatarFile, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: avatarFile.type,
+      });
 
       if (upErr) throw upErr;
 
@@ -558,9 +538,7 @@ function ProfileEdit() {
 
       setAvatarPath(path);
 
-      const { data } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(path);
+      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
 
       return data.publicUrl;
     } finally {
@@ -615,10 +593,7 @@ function ProfileEdit() {
       toast.success("Your account has been deleted.");
       navigate({ to: "/" });
     } catch (e) {
-      toast.error(
-        (e as Error).message ||
-          "Could not delete account.",
-      );
+      toast.error((e as Error).message || "Could not delete account.");
 
       setDeleting(false);
     }
@@ -626,11 +601,8 @@ function ProfileEdit() {
 
   const fieldErrors = useMemo(
     () => ({
-      displayName:
-        validateDisplayName(displayName),
-      username: validateUsernameFormat(
-        normalizeUsername(username),
-      ),
+      displayName: validateDisplayName(displayName),
+      username: validateUsernameFormat(normalizeUsername(username)),
       bio: validateBio(bio),
       website: validateWebsite(website.trim()),
     }),
@@ -644,16 +616,13 @@ function ProfileEdit() {
     !fieldErrors.username &&
     !fieldErrors.bio &&
     !fieldErrors.website &&
-    (availability === "available" ||
-      availability === "idle");
+    (availability === "available" || availability === "idle");
 
   async function save() {
     if (!user) return;
 
     if (!canSave) {
-      toast.error(
-        "Please fix the highlighted fields.",
-      );
+      toast.error("Please fix the highlighted fields.");
       return;
     }
 
@@ -663,13 +632,9 @@ function ProfileEdit() {
       let avatarUrl: string | null = null;
 
       try {
-        avatarUrl =
-          await uploadAvatarIfNeeded();
+        avatarUrl = await uploadAvatarIfNeeded();
       } catch (e) {
-        toast.error(
-          (e as Error).message ||
-            "Could not upload avatar",
-        );
+        toast.error((e as Error).message || "Could not upload avatar");
 
         setSaving(false);
         return;
@@ -683,32 +648,20 @@ function ProfileEdit() {
         country: country.trim() || null,
         language: language.trim() || null,
         timezone: timezone.trim() || null,
-        ...(avatarUrl
-          ? { avatar_url: avatarUrl }
-          : {}),
+        ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
       };
 
-      const { error } = await supabase
-        .from("profiles")
-        .update(patch)
-        .eq("id", user.id);
+      const { error } = await supabase.from("profiles").update(patch).eq("id", user.id);
 
       if (error) {
         if (error.code === "23505") {
           setAvailability("taken");
 
-          toast.error(
-            "That username was just taken. Please choose another.",
-          );
+          toast.error("That username was just taken. Please choose another.");
         } else if (error.code === "23514") {
-          toast.error(
-            "One of the fields didn't pass validation. Please review and retry.",
-          );
+          toast.error("One of the fields didn't pass validation. Please review and retry.");
         } else {
-          toast.error(
-            error.message ||
-              "Could not save. Please try again.",
-          );
+          toast.error(error.message || "Could not save. Please try again.");
         }
 
         setSaving(false);
@@ -746,18 +699,13 @@ function ProfileEdit() {
             to="/dashboard"
             className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white"
           >
-            <ArrowLeft
-              className="h-4 w-4"
-              aria-hidden
-            />
+            <ArrowLeft className="h-4 w-4" aria-hidden />
             Back to dashboard
           </Link>
 
           <span className="text-xl font-bold">
             Xeom
-            <span style={{ color: "#ff2d87" }}>
-              X
-            </span>
+            <span style={{ color: "#ff2d87" }}>X</span>
           </span>
         </div>
       </header>
@@ -768,13 +716,9 @@ function ProfileEdit() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <h1 className="text-4xl font-bold tracking-tight">
-            Edit profile
-          </h1>
+          <h1 className="text-4xl font-bold tracking-tight">Edit profile</h1>
 
-          <p className="mt-2 text-white/60">
-            Update how you appear across XeomX.
-          </p>
+          <p className="mt-2 text-white/60">Update how you appear across XeomX.</p>
         </motion.div>
 
         {profileLoading ? (
@@ -783,10 +727,7 @@ function ProfileEdit() {
             role="status"
             aria-live="polite"
           >
-            <Loader2
-              className="h-4 w-4 animate-spin"
-              aria-hidden
-            />
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
             Loading your profile…
           </div>
         ) : (
@@ -797,58 +738,38 @@ function ProfileEdit() {
                   <div
                     className="absolute -inset-2 rounded-full opacity-70 blur-xl"
                     style={{
-                      background:
-                        "radial-gradient(circle, #ff5a28, transparent 70%)",
+                      background: "radial-gradient(circle, #ff5a28, transparent 70%)",
                     }}
                   />
 
                   <div
                     className="relative h-24 w-24 overflow-hidden rounded-full"
                     style={{
-                      boxShadow:
-                        "0 0 0 2px #ff5a28",
+                      boxShadow: "0 0 0 2px #ff5a28",
                     }}
                   >
-                    <img
-                      src={avatar}
-                      alt="Your avatar"
-                      className="h-full w-full object-cover"
-                    />
+                    <img src={avatar} alt="Your avatar" className="h-full w-full object-cover" />
                   </div>
                 </div>
 
                 <div>
-                  <p className="font-semibold">
-                    Profile picture
-                  </p>
+                  <p className="font-semibold">Profile picture</p>
 
-                  <p className="mt-1 text-sm text-white/50">
-                    PNG, JPG or WebP. Max 2 MB.
-                  </p>
+                  <p className="mt-1 text-sm text-white/50">PNG, JPG or WebP. Max 2 MB.</p>
 
                   <button
                     type="button"
-                    onClick={() =>
-                      fileRef.current?.click()
-                    }
+                    onClick={() => fileRef.current?.click()}
                     disabled={uploading}
                     className="mt-3 inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm hover:bg-white/[0.05] disabled:opacity-60"
                   >
                     {uploading ? (
-                      <Loader2
-                        className="h-4 w-4 animate-spin"
-                        aria-hidden
-                      />
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
                     ) : (
-                      <Upload
-                        className="h-4 w-4"
-                        aria-hidden
-                      />
+                      <Upload className="h-4 w-4" aria-hidden />
                     )}
 
-                    {uploading
-                      ? "Uploading…"
-                      : "Upload new"}
+                    {uploading ? "Uploading…" : "Upload new"}
                   </button>
 
                   {hasAvatar && (
@@ -858,10 +779,7 @@ function ProfileEdit() {
                       disabled={uploading}
                       className="ms-2 mt-3 inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-white/70 hover:bg-white/[0.05] disabled:opacity-60"
                     >
-                      <Trash2
-                        className="h-4 w-4"
-                        aria-hidden
-                      />
+                      <Trash2 className="h-4 w-4" aria-hidden />
                       Remove
                     </button>
                   )}
@@ -881,13 +799,7 @@ function ProfileEdit() {
             <Card>
               <Field
                 label="Display name"
-                hint={
-                  fieldErrors.displayName ? (
-                    <ErrText>
-                      {fieldErrors.displayName}
-                    </ErrText>
-                  ) : null
-                }
+                hint={fieldErrors.displayName ? <ErrText>{fieldErrors.displayName}</ErrText> : null}
               >
                 <Input
                   value={displayName}
@@ -899,12 +811,7 @@ function ProfileEdit() {
 
               <Field
                 label="Username"
-                hint={
-                  <UsernameHint
-                    state={availability}
-                    format={fieldErrors.username}
-                  />
-                }
+                hint={<UsernameHint state={availability} format={fieldErrors.username} />}
               >
                 <div className="relative">
                   <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/40">
@@ -913,17 +820,8 @@ function ProfileEdit() {
 
                   <input
                     value={username}
-                    onChange={(e) =>
-                      setUsername(
-                        e.target.value
-                          .toLowerCase()
-                          .replace(/\s+/g, ""),
-                      )
-                    }
-                    aria-invalid={
-                      availability === "taken" ||
-                      availability === "invalid"
-                    }
+                    onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s+/g, ""))}
+                    aria-invalid={availability === "taken" || availability === "invalid"}
                     autoComplete="off"
                     spellCheck={false}
                     className="w-full rounded-xl border border-white/10 bg-white/[0.03] py-3 pl-9 pr-4 text-sm outline-none focus:border-[#ff8a3d]"
@@ -933,28 +831,17 @@ function ProfileEdit() {
 
               <Field
                 label="Bio"
-                hint={
-                  fieldErrors.bio ? (
-                    <ErrText>
-                      {fieldErrors.bio}
-                    </ErrText>
-                  ) : null
-                }
+                hint={fieldErrors.bio ? <ErrText>{fieldErrors.bio}</ErrText> : null}
               >
                 <textarea
                   value={bio}
-                  onChange={(e) =>
-                    setBio(e.target.value)
-                  }
+                  onChange={(e) => setBio(e.target.value)}
                   rows={3}
                   maxLength={300}
                   className="w-full resize-none rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm outline-none focus:border-[#ff8a3d]"
                 />
 
-                <p
-                  className="mt-1 text-right text-xs text-white/40"
-                  aria-live="polite"
-                >
+                <p className="mt-1 text-right text-xs text-white/40" aria-live="polite">
                   {bio.length}/300
                 </p>
               </Field>
@@ -964,13 +851,7 @@ function ProfileEdit() {
               <Field
                 label="Website"
                 icon={Globe}
-                hint={
-                  fieldErrors.website ? (
-                    <ErrText>
-                      {fieldErrors.website}
-                    </ErrText>
-                  ) : null
-                }
+                hint={fieldErrors.website ? <ErrText>{fieldErrors.website}</ErrText> : null}
               >
                 <Input
                   value={website}
@@ -980,10 +861,7 @@ function ProfileEdit() {
                 />
               </Field>
 
-              <Field
-                label={m.profile_region_country()}
-                icon={MapPin}
-              >
+              <Field label={m.profile_region_country()} icon={MapPin}>
                 <ProfileSelect
                   value={country}
                   onValueChange={setCountry}
@@ -993,10 +871,7 @@ function ProfileEdit() {
                 />
               </Field>
 
-              <Field
-                label={m.profile_region_language()}
-                icon={Languages}
-              >
+              <Field label={m.profile_region_language()} icon={Languages}>
                 <ProfileSelect
                   value={language}
                   onValueChange={setLanguage}
@@ -1006,10 +881,7 @@ function ProfileEdit() {
                 />
               </Field>
 
-              <Field
-                label={m.profile_region_timezone()}
-                icon={Clock}
-              >
+              <Field label={m.profile_region_timezone()} icon={Clock}>
                 <TimezoneCombobox
                   value={timezone}
                   onValueChange={setTimezone}
@@ -1032,74 +904,49 @@ function ProfileEdit() {
                 disabled={!canSave}
                 className="inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-semibold text-black disabled:opacity-60"
                 style={{
-                  background:
-                    "linear-gradient(90deg,#ff8a3d,#ff2d87)",
-                  boxShadow:
-                    "0 8px 24px rgba(255,90,40,0.35)",
+                  background: "linear-gradient(90deg,#ff8a3d,#ff2d87)",
+                  boxShadow: "0 8px 24px rgba(255,90,40,0.35)",
                 }}
               >
                 {saving ? (
-                  <Loader2
-                    className="h-4 w-4 animate-spin"
-                    aria-hidden
-                  />
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
                 ) : (
-                  <Sparkles
-                    className="h-4 w-4"
-                    aria-hidden
-                  />
+                  <Sparkles className="h-4 w-4" aria-hidden />
                 )}
 
-                {saving
-                  ? "Saving…"
-                  : "Save changes"}
+                {saving ? "Saving…" : "Save changes"}
               </button>
             </div>
 
             <div
               className="mt-8 rounded-[22px] p-6"
               style={{
-                background:
-                  "rgba(255,45,45,0.04)",
-                border:
-                  "1px solid rgba(255,80,80,0.25)",
+                background: "rgba(255,45,45,0.04)",
+                border: "1px solid rgba(255,80,80,0.25)",
               }}
               role="region"
               aria-labelledby="danger-zone"
             >
               <div className="flex items-start gap-3">
-                <ShieldAlert
-                  className="mt-0.5 h-5 w-5 text-rose-400"
-                  aria-hidden
-                />
+                <ShieldAlert className="mt-0.5 h-5 w-5 text-rose-400" aria-hidden />
 
                 <div className="flex-1">
-                  <h2
-                    id="danger-zone"
-                    className="font-semibold text-rose-200"
-                  >
+                  <h2 id="danger-zone" className="font-semibold text-rose-200">
                     Delete account
                   </h2>
 
                   <p className="mt-1 text-sm text-white/60">
-                    Permanently deletes your account,
-                    profile, prompts, collections and
-                    avatars. This action cannot be
-                    undone.
+                    Permanently deletes your account, profile, prompts, collections and avatars.
+                    This action cannot be undone.
                   </p>
 
                   {!confirmDelete ? (
                     <button
                       type="button"
-                      onClick={() =>
-                        setConfirmDelete(true)
-                      }
+                      onClick={() => setConfirmDelete(true)}
                       className="mt-4 inline-flex items-center gap-2 rounded-full border border-rose-500/40 px-4 py-2 text-sm text-rose-200 hover:bg-rose-500/10"
                     >
-                      <Trash2
-                        className="h-4 w-4"
-                        aria-hidden
-                      />
+                      <Trash2 className="h-4 w-4" aria-hidden />
                       Delete my account…
                     </button>
                   ) : (
@@ -1108,31 +955,20 @@ function ProfileEdit() {
                         htmlFor="confirm-del"
                         className="block text-xs uppercase tracking-wider text-white/60"
                       >
-                        Type{" "}
-                        <span className="font-mono text-rose-300">
-                          DELETE
-                        </span>{" "}
-                        to confirm
+                        Type <span className="font-mono text-rose-300">DELETE</span> to confirm
                       </label>
 
                       <input
                         id="confirm-del"
                         value={confirmText}
-                        onChange={(e) =>
-                          setConfirmText(
-                            e.target.value,
-                          )
-                        }
+                        onChange={(e) => setConfirmText(e.target.value)}
                         autoComplete="off"
                         spellCheck={false}
                         aria-describedby="confirm-del-help"
                         className="w-full max-w-xs rounded-xl border border-rose-500/30 bg-white/[0.03] px-4 py-2.5 text-sm outline-none focus:border-rose-400"
                       />
 
-                      <p
-                        id="confirm-del-help"
-                        className="text-xs text-white/40"
-                      >
+                      <p id="confirm-del-help" className="text-xs text-white/40">
                         This is irreversible.
                       </p>
 
@@ -1151,24 +987,14 @@ function ProfileEdit() {
                         <button
                           type="button"
                           onClick={onDeleteAccount}
-                          disabled={
-                            deleting ||
-                            confirmText !== "DELETE"
-                          }
+                          disabled={deleting || confirmText !== "DELETE"}
                           className="inline-flex items-center gap-2 rounded-full bg-rose-500 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-400 disabled:opacity-60"
                         >
                           {deleting ? (
-                            <Loader2
-                              className="h-4 w-4 animate-spin"
-                              aria-hidden
-                            />
+                            <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
                           ) : (
-                            <Trash2
-                              className="h-4 w-4"
-                              aria-hidden
-                            />
+                            <Trash2 className="h-4 w-4" aria-hidden />
                           )}
-
                           Permanently delete
                         </button>
                       </div>
@@ -1184,18 +1010,13 @@ function ProfileEdit() {
   );
 }
 
-function Card({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function Card({ children }: { children: React.ReactNode }) {
   return (
     <div
       className="space-y-5 rounded-[22px] p-6"
       style={{
         background: "#100b0f",
-        border:
-          "1px solid rgba(255,255,255,0.06)",
+        border: "1px solid rgba(255,255,255,0.06)",
       }}
     >
       {children}
@@ -1218,19 +1039,12 @@ function Field({
     <div>
       <div className="mb-2 flex items-center justify-between text-xs">
         <label className="inline-flex items-center gap-2 font-medium uppercase tracking-wider text-white/60">
-          {Icon && (
-            <Icon
-              className="h-3.5 w-3.5"
-              aria-hidden
-            />
-          )}
+          {Icon && <Icon className="h-3.5 w-3.5" aria-hidden />}
 
           {label}
         </label>
 
-        {hint && (
-          <span className="text-xs">{hint}</span>
-        )}
+        {hint && <span className="text-xs">{hint}</span>}
       </div>
 
       {children}
@@ -1252,9 +1066,7 @@ function Input({
   return (
     <input
       value={value}
-      onChange={(e) =>
-        onChange(e.target.value)
-      }
+      onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       autoComplete={autoComplete}
       className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm outline-none transition focus:border-[#ff8a3d]"
@@ -1278,15 +1090,10 @@ function ProfileSelect({
   }>;
   legacyLabel: string;
 }) {
-  const knownValue = options.some(
-    (option) => option.value === value,
-  );
+  const knownValue = options.some((option) => option.value === value);
 
   return (
-    <Select
-      value={value || undefined}
-      onValueChange={onValueChange}
-    >
+    <Select value={value || undefined} onValueChange={onValueChange}>
       <SelectTrigger className="h-auto w-full rounded-xl border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:ring-[#ff8a3d]">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
@@ -1299,10 +1106,7 @@ function ProfileSelect({
         )}
 
         {options.map((option) => (
-          <SelectItem
-            key={option.value}
-            value={option.value}
-          >
+          <SelectItem key={option.value} value={option.value}>
             {option.label}
           </SelectItem>
         ))}
@@ -1322,16 +1126,10 @@ function TimezoneCombobox({
 }) {
   const [open, setOpen] = useState(false);
 
-  const availableOptions =
-    value && !options.includes(value)
-      ? [value, ...options]
-      : options;
+  const availableOptions = value && !options.includes(value) ? [value, ...options] : options;
 
   return (
-    <Popover
-      open={open}
-      onOpenChange={setOpen}
-    >
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
           type="button"
@@ -1339,21 +1137,11 @@ function TimezoneCombobox({
           aria-expanded={open}
           className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm outline-none transition hover:border-white/20 focus:border-[#ff8a3d]"
         >
-          <span
-            className={
-              value
-                ? "text-white"
-                : "text-white/40"
-            }
-          >
-            {value ||
-              m.profile_region_timezone_placeholder()}
+          <span className={value ? "text-white" : "text-white/40"}>
+            {value || m.profile_region_timezone_placeholder()}
           </span>
 
-          <ChevronsUpDown
-            className="h-4 w-4 text-white/40"
-            aria-hidden
-          />
+          <ChevronsUpDown className="h-4 w-4 text-white/40" aria-hidden />
         </button>
       </PopoverTrigger>
 
@@ -1362,14 +1150,10 @@ function TimezoneCombobox({
         className="w-[var(--radix-popover-trigger-width)] border-white/10 bg-[#171016] p-0 text-white"
       >
         <Command className="bg-[#171016] text-white">
-          <CommandInput
-            placeholder={m.profile_region_timezone_search()}
-          />
+          <CommandInput placeholder={m.profile_region_timezone_search()} />
 
           <CommandList>
-            <CommandEmpty>
-              {m.profile_region_timezone_empty()}
-            </CommandEmpty>
+            <CommandEmpty>{m.profile_region_timezone_empty()}</CommandEmpty>
 
             <CommandGroup>
               {availableOptions.map((zone) => (
@@ -1381,14 +1165,7 @@ function TimezoneCombobox({
                     setOpen(false);
                   }}
                 >
-                  <Check
-                    className={
-                      zone === value
-                        ? "opacity-100"
-                        : "opacity-0"
-                    }
-                    aria-hidden
-                  />
+                  <Check className={zone === value ? "opacity-100" : "opacity-0"} aria-hidden />
 
                   <span>{zone}</span>
                 </CommandItem>
@@ -1401,30 +1178,17 @@ function TimezoneCombobox({
   );
 }
 
-function ErrText({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function ErrText({ children }: { children: React.ReactNode }) {
   return (
     <span className="inline-flex items-center gap-1 text-rose-400">
-      <X
-        className="h-3 w-3"
-        aria-hidden
-      />
+      <X className="h-3 w-3" aria-hidden />
 
       {children}
     </span>
   );
 }
 
-function UsernameHint({
-  state,
-  format,
-}: {
-  state: Availability;
-  format: string | null;
-}) {
+function UsernameHint({ state, format }: { state: Availability; format: string | null }) {
   if (format) {
     return <ErrText>{format}</ErrText>;
   }
@@ -1432,11 +1196,7 @@ function UsernameHint({
   if (state === "checking") {
     return (
       <span className="inline-flex items-center gap-1 text-white/50">
-        <Loader2
-          className="h-3 w-3 animate-spin"
-          aria-hidden
-        />
-
+        <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
         Checking…
       </span>
     );
@@ -1445,11 +1205,7 @@ function UsernameHint({
   if (state === "available") {
     return (
       <span className="inline-flex items-center gap-1 text-emerald-400">
-        <Check
-          className="h-3 w-3"
-          aria-hidden
-        />
-
+        <Check className="h-3 w-3" aria-hidden />
         Available
       </span>
     );
@@ -1460,11 +1216,7 @@ function UsernameHint({
   }
 
   if (state === "invalid") {
-    return (
-      <ErrText>
-        Not a valid username
-      </ErrText>
-    );
+    return <ErrText>Not a valid username</ErrText>;
   }
 
   return null;

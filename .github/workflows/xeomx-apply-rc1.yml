@@ -4,20 +4,23 @@ on:
   push:
     branches:
       - release/xeomx-superapp-rc1-final
-    paths:
-      - '.xeomx/**'
-      - '.github/workflows/xeomx-apply-rc1.yml'
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
 
 jobs:
   apply-release-candidate:
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout release branch
         uses: actions/checkout@v4
         with:
+          ref: release/xeomx-superapp-rc1-final
           fetch-depth: 0
 
       - name: Reconstruct and verify audited patch

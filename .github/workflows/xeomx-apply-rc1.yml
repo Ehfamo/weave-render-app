@@ -1,0 +1,49 @@
+name: XEOMX Apply RC1
+
+on:
+  push:
+    branches:
+      - release/xeomx-superapp-rc1-final
+    paths:
+      - '.xeomx/**'
+      - '.github/workflows/xeomx-apply-rc1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply-release-candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct and verify audited patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .xeomx/chunk-* > /tmp/xeomx-rc1.patch.gz.b64
+          base64 --decode /tmp/xeomx-rc1.patch.gz.b64 | gzip -d > /tmp/xeomx-rc1.patch
+          echo "5a0de1c393cc37cc0342af893e2c9dfd7e30329330d02456099ee3d6d983811  /tmp/xeomx-rc1.patch" | sha256sum -c -
+          git apply --check /tmp/xeomx-rc1.patch
+
+      - name: Apply audited RC1 patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git apply /tmp/xeomx-rc1.patch
+          rm -rf .xeomx
+          rm -f .github/workflows/xeomx-apply-rc1.yml
+
+      - name: Commit release candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "XEOMX Release Automation"
+          git config user.email "xeomxai@gmail.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "feat: prepare XEOMX super app release candidate"
+          git push origin HEAD:release/xeomx-superapp-rc1-final

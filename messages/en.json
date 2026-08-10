@@ -478,5 +478,14 @@
   "beta_notice_body": "This section is functional but still being refined. Expect rapid changes.",
   "auth_continue_discord": "Continue with Discord",
   "pricing_preview_notice": "Plans shown on this page are previews and may change before launch. No payment is currently being collected.",
-  "common_close": "Close"
+  "common_close": "Close",
+  "profile_region_country": "Country",
+  "profile_region_country_placeholder": "Select your country",
+  "profile_region_language": "Language",
+  "profile_region_language_placeholder": "Select your language",
+  "profile_region_timezone": "Timezone",
+  "profile_region_timezone_placeholder": "Select your timezone",
+  "profile_region_timezone_search": "Search timezones…",
+  "profile_region_timezone_empty": "No timezone found.",
+  "profile_region_current_value": "Current value"
 }

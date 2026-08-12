@@ -16,22 +16,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Tail Worker and reproduce auth SSR failure
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Prepare Wrangler
+        run: npx --yes wrangler@4.106.0 --version
+      - name: Tail Worker and reproduce localized auth SSR failure
         shell: bash
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          TARGET_URL: https://xeomx-request7-staging.ehfamo7830.workers.dev/auth?next=%2Fprojects
+          BASE_URL: https://xeomx-request7-staging.ehfamo7830.workers.dev
         run: |
           set -uo pipefail
           : > /tmp/xeomx-tail.log
-          timeout 25s npx --yes wrangler@4.106.0 tail xeomx-request7-staging --format=json > /tmp/xeomx-tail.log 2>&1 &
+          : > /tmp/xeomx-headers.txt
+          : > /tmp/xeomx-body.txt
+          timeout 30s npx --yes wrangler@4.106.0 tail xeomx-request7-staging --format=json > /tmp/xeomx-tail.log 2>&1 &
           TAIL_PID=$!
-          sleep 6
-          curl --silent --show-error --location --max-time 20 \
-            --dump-header /tmp/xeomx-headers.txt \
-            --output /tmp/xeomx-body.txt \
-            "${TARGET_URL}" || true
+          sleep 5
+          for PATHNAME in '/en/auth?next=%2Fprojects' '/en/' '/auth?next=%2Fprojects'; do
+            echo "===== ${PATHNAME} =====" >> /tmp/xeomx-headers.txt
+            curl --silent --show-error --max-time 20 \
+              --dump-header - \
+              --output /tmp/xeomx-one-body.txt \
+              "${BASE_URL}${PATHNAME}" >> /tmp/xeomx-headers.txt || true
+            echo "===== ${PATHNAME} =====" >> /tmp/xeomx-body.txt
+            cat /tmp/xeomx-one-body.txt >> /tmp/xeomx-body.txt || true
+            echo >> /tmp/xeomx-body.txt
+            sleep 2
+          done
           sleep 6
           kill "${TAIL_PID}" 2>/dev/null || true
           wait "${TAIL_PID}" 2>/dev/null || true

@@ -64,7 +64,7 @@ Deno.serve(async (req: Request) => {
 
   if (body.action === "create") {
     const stamp = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
-    const email = `xeomx.browser.e2e.${stamp}@example.invalid`;
+    const email = `xeomx.browser.e2e.${stamp}@gmail.com`;
     const password = `X7!${crypto.randomUUID()}z9A`;
     const created = await admin.auth.admin.createUser({
       email,

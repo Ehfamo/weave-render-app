@@ -40,11 +40,21 @@ jobs:
       - name: Smoke test deploy package
         run: npm run test:smoke
       - name: Deploy isolated Staging Worker
-        run: >-
-          npx --yes wrangler@4.106.0 deploy
-          --name xeomx-request7-staging
-          --var SUPABASE_URL:${SUPABASE_URL}
-          --var SUPABASE_PUBLISHABLE_KEY:${SUPABASE_PUBLISHABLE_KEY}
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@4.106.0 deploy \
+            --name xeomx-request7-staging \
+            --var SUPABASE_URL:${SUPABASE_URL} \
+            --var SUPABASE_PUBLISHABLE_KEY:${SUPABASE_PUBLISHABLE_KEY} \
+            2>&1 | tee wrangler-deploy.log
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Preserve staging deploy evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: xeomx-request7-staging-deploy
+          path: wrangler-deploy.log
+          if-no-files-found: error
+          retention-days: 7

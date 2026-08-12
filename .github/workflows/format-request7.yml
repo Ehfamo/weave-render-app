@@ -8,6 +8,7 @@ on:
       - src/components/xeomx/product/ProjectWorkspace.tsx
       - src/routes/_authenticated/projects.tsx
       - src/lib/backend/**
+      - src/integrations/supabase/types.ts
       - src/server.ts
       - .github/workflows/format-request7.yml
 
@@ -31,14 +32,14 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Format Request7 source
-        run: npx prettier --write src/components/xeomx/product/ProjectWorkspace.tsx src/routes/_authenticated/projects.tsx src/lib/backend/vertical-slice.ts src/lib/backend/vertical-slice.database.ts src/lib/backend/vertical-slice.functions.ts src/lib/backend/vertical-slice.server.ts src/server.ts
+        run: npx prettier --write src/components/xeomx/product/ProjectWorkspace.tsx src/routes/_authenticated/projects.tsx src/lib/backend/vertical-slice.ts src/lib/backend/vertical-slice.database.ts src/lib/backend/vertical-slice.functions.ts src/lib/backend/vertical-slice.server.ts src/integrations/supabase/types.ts src/server.ts
       - name: Commit formatting
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/components/xeomx/product/ProjectWorkspace.tsx src/routes/_authenticated/projects.tsx src/lib/backend src/server.ts
+          git add src/components/xeomx/product/ProjectWorkspace.tsx src/routes/_authenticated/projects.tsx src/lib/backend src/integrations/supabase/types.ts src/server.ts
           if git diff --cached --quiet; then
             echo "Already formatted."
             exit 0

@@ -19,8 +19,6 @@ async function getServerEntry(): Promise<ServerEntry> {
   return serverEntryPromise;
 }
 
-// h3 swallows in-handler throws into a normal 500 Response with body
-// {"unhandled":true,"message":"HTTPError"} — try/catch alone never fires for those.
 async function normalizeCatastrophicSsrResponse(response: Response): Promise<Response> {
   if (response.status < 500) return response;
   const contentType = response.headers.get("content-type") ?? "";
@@ -38,32 +36,32 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
   });
 }
 
-// Enterprise security headers. Applied to every response.
-// - HSTS: force HTTPS for 2y incl. subdomains, preload eligible
-// - CSP: report-only initially to avoid breaking SSR/hydration/3rd-party assets
-// - COOP/CORP/OAC: cross-origin isolation baseline (no COEP — would break avatars)
-// - Permissions-Policy: deny powerful features by default
-// - Cache-Control: keep HTML uncached so signed-in state never leaks between users
-const SUPABASE_ORIGIN = "https://ovqhdzppfbdvnzuglukf.supabase.co";
-const CSP_REPORT_ONLY = [
-  "default-src 'self'",
-  "base-uri 'self'",
-  "form-action 'self'",
-  "frame-ancestors 'none'",
-  "object-src 'none'",
-  // TanStack Start injects inline hydration scripts/state.
-  `script-src 'self' 'unsafe-inline' https:`,
-  `style-src 'self' 'unsafe-inline' https:`,
-  `img-src 'self' data: blob: https:`,
-  `font-src 'self' data: https:`,
-  `connect-src 'self' https: wss: ${SUPABASE_ORIGIN} wss://ovqhdzppfbdvnzuglukf.supabase.co`,
-  `media-src 'self' https: blob:`,
-  `worker-src 'self' blob:`,
-  `manifest-src 'self'`,
-  "upgrade-insecure-requests",
-].join("; ");
+type RuntimeEnv = Record<string, string | undefined>;
 
-function applySecurityHeaders(response: Response, request: Request): Response {
+function buildCspReportOnly(env: RuntimeEnv) {
+  const supabaseOrigin = env.SUPABASE_URL?.replace(/\/$/, "");
+  const supabaseWsOrigin = supabaseOrigin?.replace(/^https:/, "wss:").replace(/^http:/, "ws:");
+  return [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+    "object-src 'none'",
+    `script-src 'self' 'unsafe-inline' https:`,
+    `style-src 'self' 'unsafe-inline' https:`,
+    `img-src 'self' data: blob: https:`,
+    `font-src 'self' data: https:`,
+    ["connect-src 'self' https: wss:", supabaseOrigin, supabaseWsOrigin]
+      .filter(Boolean)
+      .join(" "),
+    `media-src 'self' https: blob:`,
+    `worker-src 'self' blob:`,
+    `manifest-src 'self'`,
+    "upgrade-insecure-requests",
+  ].join("; ");
+}
+
+function applySecurityHeaders(response: Response, request: Request, env: RuntimeEnv): Response {
   const h = new Headers(response.headers);
   h.delete("x-powered-by");
   h.delete("server");
@@ -76,8 +74,7 @@ function applySecurityHeaders(response: Response, request: Request): Response {
   if (!h.has("referrer-policy")) h.set("referrer-policy", "strict-origin-when-cross-origin");
   if (!h.has("x-dns-prefetch-control")) h.set("x-dns-prefetch-control", "on");
   if (!h.has("origin-agent-cluster")) h.set("origin-agent-cluster", "?1");
-  if (!h.has("cross-origin-opener-policy"))
-    h.set("cross-origin-opener-policy", "same-origin-allow-popups");
+  if (!h.has("cross-origin-opener-policy")) h.set("cross-origin-opener-policy", "same-origin-allow-popups");
   if (!h.has("cross-origin-resource-policy")) h.set("cross-origin-resource-policy", "same-site");
   if (!h.has("permissions-policy")) {
     h.set(
@@ -107,25 +104,16 @@ function applySecurityHeaders(response: Response, request: Request): Response {
     );
   }
 
-  // Ship CSP in Report-Only mode so we get telemetry without breaking hydration.
-  // Flip to Content-Security-Policy after a clean reporting window.
   const contentType = h.get("content-type") ?? "";
   const isHtml = contentType.includes("text/html");
-  if (
-    isHtml &&
-    !h.has("content-security-policy-report-only") &&
-    !h.has("content-security-policy")
-  ) {
-    h.set("content-security-policy-report-only", CSP_REPORT_ONLY);
+  if (isHtml && !h.has("content-security-policy-report-only") && !h.has("content-security-policy")) {
+    h.set("content-security-policy-report-only", buildCspReportOnly(env));
   }
 
-  // Never cache authenticated HTML documents at intermediary caches.
   if (isHtml && !h.has("cache-control")) {
     h.set("cache-control", "private, no-store");
   }
 
-  // Long-lived immutable cache for CDN assets, fonts, images, JS/CSS bundles.
-  // These paths are content-hashed or asset-id addressed, so they are safe to cache aggressively.
   if (!isHtml && !h.has("cache-control")) {
     const p = new URL(request.url).pathname;
     const isImmutable =
@@ -137,7 +125,6 @@ function applySecurityHeaders(response: Response, request: Request): Response {
     }
   }
 
-  // Belt & braces: block clickjacking for HTML on custom domains too.
   void request;
   return new Response(response.body, {
     status: response.status,
@@ -147,8 +134,7 @@ function applySecurityHeaders(response: Response, request: Request): Response {
 }
 
 export default {
-  async fetch(request: Request, env: unknown, ctx: unknown) {
-    // Force HTTPS at the edge. Cloudflare terminates TLS; x-forwarded-proto tells us the client scheme.
+  async fetch(request: Request, env: RuntimeEnv, ctx: unknown) {
     const proto = request.headers.get("x-forwarded-proto");
     const url = new URL(request.url);
     if (
@@ -167,10 +153,6 @@ export default {
     }
     try {
       const handler = await getServerEntry();
-      // Static asset requests must never carry a locale prefix. Some crawlers /
-      // preload hints rewrite absolute /__l5e/... paths as /en/__l5e/... when a
-      // page is served under a locale prefix, producing hard 404s. Strip the
-      // locale segment before delegating so the asset resolves normally.
       const assetUrl = new URL(request.url);
       const localeAsset = assetUrl.pathname.match(/^\/(en|fa|ar|zh|hi)(\/(?:__l5e|assets)\/.*)$/);
       if (localeAsset) {
@@ -181,7 +163,7 @@ export default {
         return handler.fetch(request, env, ctx);
       });
       const normalized = await normalizeCatastrophicSsrResponse(response);
-      return applySecurityHeaders(normalized, request);
+      return applySecurityHeaders(normalized, request, env);
     } catch (error) {
       console.error(error);
       return applySecurityHeaders(
@@ -190,6 +172,7 @@ export default {
           headers: { "content-type": "text/html; charset=utf-8" },
         }),
         request,
+        env,
       );
     }
   },

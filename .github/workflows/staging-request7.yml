@@ -15,12 +15,15 @@ env:
   SUPABASE_PUBLISHABLE_KEY: sb_publishable_PUISWn93BXooGndzl06Ovw_locHt1Gz
   VITE_SUPABASE_URL: https://bzoikmppvwiidyjdaqgv.supabase.co
   VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_PUISWn93BXooGndzl06Ovw_locHt1Gz
+  E2E_BASE_URL: https://xeomx-request7-staging.ehfamo7830.workers.dev
+  E2E_BOOTSTRAP_URL: https://bzoikmppvwiidyjdaqgv.supabase.co/functions/v1/xeomx-github-e2e-bootstrap
 
 jobs:
   quality-and-staging-deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -58,3 +61,59 @@ jobs:
           path: wrangler-deploy.log
           if-no-files-found: error
           retention-days: 7
+      - name: Create short-lived browser E2E user through GitHub OIDC
+        shell: bash
+        run: |
+          set -euo pipefail
+          OIDC_TOKEN="$(curl --fail-with-body --silent --show-error \
+            -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=xeomx-staging-e2e" | jq -r '.value')"
+          RESPONSE="$(curl --fail-with-body --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer ${OIDC_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data '{"action":"create"}' \
+            "${E2E_BOOTSTRAP_URL}")"
+          echo "${RESPONSE}" | jq -e '.ok == true' >/dev/null
+          USER_ID="$(echo "${RESPONSE}" | jq -r '.user_id')"
+          EMAIL="$(echo "${RESPONSE}" | jq -r '.email')"
+          PASSWORD="$(echo "${RESPONSE}" | jq -r '.password')"
+          echo "::add-mask::${USER_ID}"
+          echo "::add-mask::${EMAIL}"
+          echo "::add-mask::${PASSWORD}"
+          echo "E2E_USER_ID=${USER_ID}" >> "${GITHUB_ENV}"
+          echo "E2E_EMAIL=${EMAIL}" >> "${GITHUB_ENV}"
+          echo "E2E_PASSWORD=${PASSWORD}" >> "${GITHUB_ENV}"
+      - name: Install Chromium E2E runtime
+        run: |
+          npm install --no-save --package-lock=false @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Browser E2E — real Auth → Project → Cloudflare AI → Reload
+        run: npx playwright test tests/browser-e2e.spec.mjs --project=chromium --reporter=list
+      - name: Preserve browser E2E evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xeomx-request7-browser-e2e
+          path: test-results
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Cleanup short-lived browser E2E user
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${E2E_USER_ID:-}" ]; then
+            echo "No E2E user was created."
+            exit 0
+          fi
+          OIDC_TOKEN="$(curl --fail-with-body --silent --show-error \
+            -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=xeomx-staging-e2e" | jq -r '.value')"
+          RESPONSE="$(curl --fail-with-body --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer ${OIDC_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data "{\"action\":\"cleanup\",\"user_id\":\"${E2E_USER_ID}\"}" \
+            "${E2E_BOOTSTRAP_URL}")"
+          echo "${RESPONSE}" | jq -e '.ok == true' >/dev/null

@@ -12,10 +12,7 @@ export const Route = createFileRoute("/_authenticated/projects")({
   component: ProjectsRoute,
   ssr: false,
   head: () => ({
-    meta: [
-      { title: "Projects — XEOMX" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Projects — XEOMX" }, { name: "robots", content: "noindex" }],
   }),
 });
 

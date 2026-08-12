@@ -79,16 +79,28 @@ function messageSummary(row: Request7MessageRow): ProjectMessage {
 }
 
 const VERTICAL_ERROR_SET = new Set<string>([
-  "UNAUTHENTICATED", "FORBIDDEN", "PROJECT_NOT_FOUND", "CONVERSATION_NOT_FOUND",
-  "JOB_NOT_FOUND", "INSUFFICIENT_CREDITS", "PROVIDER_UNAVAILABLE", "MODEL_UNAVAILABLE",
-  "PROVIDER_TIMEOUT", "GENERATION_FAILED", "STORAGE_FAILED", "DATABASE_FAILED",
-  "IDEMPOTENCY_CONFLICT", "VALIDATION_FAILED",
+  "UNAUTHENTICATED",
+  "FORBIDDEN",
+  "PROJECT_NOT_FOUND",
+  "CONVERSATION_NOT_FOUND",
+  "JOB_NOT_FOUND",
+  "INSUFFICIENT_CREDITS",
+  "PROVIDER_UNAVAILABLE",
+  "MODEL_UNAVAILABLE",
+  "PROVIDER_TIMEOUT",
+  "GENERATION_FAILED",
+  "STORAGE_FAILED",
+  "DATABASE_FAILED",
+  "IDEMPOTENCY_CONFLICT",
+  "VALIDATION_FAILED",
 ]);
 
 function jobErrorCode(value: string | null): VerticalSliceErrorCode | null {
   return value && VERTICAL_ERROR_SET.has(value)
     ? (value as VerticalSliceErrorCode)
-    : value ? "GENERATION_FAILED" : null;
+    : value
+      ? "GENERATION_FAILED"
+      : null;
 }
 
 function jobSummary(row: Request7GenerationJobRow): GenerationJobSummary {
@@ -168,7 +180,9 @@ function firstRow<T>(value: T[] | null, error: { message: string } | null): T {
 export async function listProjects(client: unknown): Promise<ProjectSummary[]> {
   const { data, error } = await request7Client(client)
     .from("projects")
-    .select("id,owner_id,name,description,status,default_routing_mode,default_model,created_at,updated_at")
+    .select(
+      "id,owner_id,name,description,status,default_routing_mode,default_model,created_at,updated_at",
+    )
     .order("updated_at", { ascending: false })
     .limit(100);
   if (error) throwDatabaseError(error);
@@ -205,7 +219,9 @@ export async function updateProject(
       default_model: input.defaultModel || null,
     })
     .eq("id", input.projectId)
-    .select("id,owner_id,name,description,status,default_routing_mode,default_model,created_at,updated_at")
+    .select(
+      "id,owner_id,name,description,status,default_routing_mode,default_model,created_at,updated_at",
+    )
     .single();
   if (error || !data) throwDatabaseError(error);
   return projectSummary(data);
@@ -219,38 +235,87 @@ export async function cancelGenerationJob(client: unknown, jobId: string): Promi
   return Boolean(data);
 }
 
-export async function loadProjectSnapshot(client: unknown, projectId: string): Promise<ProjectSnapshot> {
+export async function loadProjectSnapshot(
+  client: unknown,
+  projectId: string,
+): Promise<ProjectSnapshot> {
   const db = request7Client(client);
-  const projectRequest = db.from("projects")
-    .select("id,owner_id,name,description,status,default_routing_mode,default_model,created_at,updated_at")
-    .eq("id", projectId).maybeSingle();
-  const conversationsRequest = db.from("conversations")
-    .select("id,project_id,created_by,title,routing_mode,selected_provider,selected_model,created_at,updated_at")
-    .eq("project_id", projectId).order("updated_at", { ascending: false }).limit(100);
-  const messagesRequest = db.from("messages")
-    .select("id,project_id,conversation_id,author_id,role,content,provider,model,metadata,generation_job_id,created_at")
-    .eq("project_id", projectId).order("created_at", { ascending: true }).limit(500);
-  const jobsRequest = db.from("generation_jobs")
-    .select("id,user_id,project_id,conversation_id,input_message_id,capability,routing_mode,requested_provider,requested_model,selected_provider,selected_model,status,idempotency_key,request_hash,reserved_credit_units,attempt_count,max_attempts,error_category,error_message,request_metadata,queued_at,started_at,completed_at,created_at,updated_at")
-    .eq("project_id", projectId).order("created_at", { ascending: false }).limit(100);
-  const assetsRequest = db.from("assets")
-    .select("id,owner_id,project_id,generation_job_id,kind,origin,mime_type,status,storage_bucket,storage_path,version,parent_asset_id,metadata,created_at,updated_at")
-    .eq("project_id", projectId).order("created_at", { ascending: false }).limit(100);
-  const usageRequest = db.from("usage_events")
-    .select("id,user_id,project_id,job_id,provider_request_id,provider,model,input_units,output_units,estimated_cost_microunits,actual_cost_microunits,currency,usage_unavailable,created_at")
-    .eq("project_id", projectId).order("created_at", { ascending: false }).limit(100);
-  const creditRequest = db.from("credit_ledger")
-    .select("id,user_id,project_id,job_id,usage_event_id,delta,reason,idempotency_key,metadata,created_at")
-    .eq("project_id", projectId).order("created_at", { ascending: false }).limit(100);
-  const auditRequest = db.from("audit_events")
-    .select("id,actor_id,project_id,job_id,event_type,target_type,target_id,result,error_category,policy_context,metadata,created_at")
-    .eq("project_id", projectId).order("created_at", { ascending: false }).limit(100);
+  const projectRequest = db
+    .from("projects")
+    .select(
+      "id,owner_id,name,description,status,default_routing_mode,default_model,created_at,updated_at",
+    )
+    .eq("id", projectId)
+    .maybeSingle();
+  const conversationsRequest = db
+    .from("conversations")
+    .select(
+      "id,project_id,created_by,title,routing_mode,selected_provider,selected_model,created_at,updated_at",
+    )
+    .eq("project_id", projectId)
+    .order("updated_at", { ascending: false })
+    .limit(100);
+  const messagesRequest = db
+    .from("messages")
+    .select(
+      "id,project_id,conversation_id,author_id,role,content,provider,model,metadata,generation_job_id,created_at",
+    )
+    .eq("project_id", projectId)
+    .order("created_at", { ascending: true })
+    .limit(500);
+  const jobsRequest = db
+    .from("generation_jobs")
+    .select(
+      "id,user_id,project_id,conversation_id,input_message_id,capability,routing_mode,requested_provider,requested_model,selected_provider,selected_model,status,idempotency_key,request_hash,reserved_credit_units,attempt_count,max_attempts,error_category,error_message,request_metadata,queued_at,started_at,completed_at,created_at,updated_at",
+    )
+    .eq("project_id", projectId)
+    .order("created_at", { ascending: false })
+    .limit(100);
+  const assetsRequest = db
+    .from("assets")
+    .select(
+      "id,owner_id,project_id,generation_job_id,kind,origin,mime_type,status,storage_bucket,storage_path,version,parent_asset_id,metadata,created_at,updated_at",
+    )
+    .eq("project_id", projectId)
+    .order("created_at", { ascending: false })
+    .limit(100);
+  const usageRequest = db
+    .from("usage_events")
+    .select(
+      "id,user_id,project_id,job_id,provider_request_id,provider,model,input_units,output_units,estimated_cost_microunits,actual_cost_microunits,currency,usage_unavailable,created_at",
+    )
+    .eq("project_id", projectId)
+    .order("created_at", { ascending: false })
+    .limit(100);
+  const creditRequest = db
+    .from("credit_ledger")
+    .select(
+      "id,user_id,project_id,job_id,usage_event_id,delta,reason,idempotency_key,metadata,created_at",
+    )
+    .eq("project_id", projectId)
+    .order("created_at", { ascending: false })
+    .limit(100);
+  const auditRequest = db
+    .from("audit_events")
+    .select(
+      "id,actor_id,project_id,job_id,event_type,target_type,target_id,result,error_category,policy_context,metadata,created_at",
+    )
+    .eq("project_id", projectId)
+    .order("created_at", { ascending: false })
+    .limit(100);
   const balanceRequest = db.rpc("xeomx_credit_balance", {});
 
   const [project, conversations, messages, jobs, assets, usage, credit, audit, balance] =
     await Promise.all([
-      projectRequest, conversationsRequest, messagesRequest, jobsRequest, assetsRequest,
-      usageRequest, creditRequest, auditRequest, balanceRequest,
+      projectRequest,
+      conversationsRequest,
+      messagesRequest,
+      jobsRequest,
+      assetsRequest,
+      usageRequest,
+      creditRequest,
+      auditRequest,
+      balanceRequest,
     ]);
 
   if (project.error) throwDatabaseError(project.error);
@@ -282,15 +347,17 @@ function generationRequestHash(input: {
   requestedModel?: string;
 }): string {
   return createHash("sha256")
-    .update(JSON.stringify({
-      actorId: input.actorId,
-      projectId: input.projectId,
-      conversationId: input.conversationId ?? null,
-      prompt: input.prompt,
-      routingMode: input.routingMode,
-      requestedProvider: input.requestedProvider ?? null,
-      requestedModel: input.requestedModel ?? null,
-    }))
+    .update(
+      JSON.stringify({
+        actorId: input.actorId,
+        projectId: input.projectId,
+        conversationId: input.conversationId ?? null,
+        prompt: input.prompt,
+        routingMode: input.routingMode,
+        requestedProvider: input.requestedProvider ?? null,
+        requestedModel: input.requestedModel ?? null,
+      }),
+    )
     .digest("hex");
 }
 

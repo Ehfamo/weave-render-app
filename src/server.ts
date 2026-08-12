@@ -51,9 +51,7 @@ function buildCspReportOnly(env: RuntimeEnv) {
     `style-src 'self' 'unsafe-inline' https:`,
     `img-src 'self' data: blob: https:`,
     `font-src 'self' data: https:`,
-    ["connect-src 'self' https: wss:", supabaseOrigin, supabaseWsOrigin]
-      .filter(Boolean)
-      .join(" "),
+    ["connect-src 'self' https: wss:", supabaseOrigin, supabaseWsOrigin].filter(Boolean).join(" "),
     `media-src 'self' https: blob:`,
     `worker-src 'self' blob:`,
     `manifest-src 'self'`,
@@ -74,7 +72,8 @@ function applySecurityHeaders(response: Response, request: Request, env: Runtime
   if (!h.has("referrer-policy")) h.set("referrer-policy", "strict-origin-when-cross-origin");
   if (!h.has("x-dns-prefetch-control")) h.set("x-dns-prefetch-control", "on");
   if (!h.has("origin-agent-cluster")) h.set("origin-agent-cluster", "?1");
-  if (!h.has("cross-origin-opener-policy")) h.set("cross-origin-opener-policy", "same-origin-allow-popups");
+  if (!h.has("cross-origin-opener-policy"))
+    h.set("cross-origin-opener-policy", "same-origin-allow-popups");
   if (!h.has("cross-origin-resource-policy")) h.set("cross-origin-resource-policy", "same-site");
   if (!h.has("permissions-policy")) {
     h.set(
@@ -106,7 +105,11 @@ function applySecurityHeaders(response: Response, request: Request, env: Runtime
 
   const contentType = h.get("content-type") ?? "";
   const isHtml = contentType.includes("text/html");
-  if (isHtml && !h.has("content-security-policy-report-only") && !h.has("content-security-policy")) {
+  if (
+    isHtml &&
+    !h.has("content-security-policy-report-only") &&
+    !h.has("content-security-policy")
+  ) {
     h.set("content-security-policy-report-only", buildCspReportOnly(env));
   }
 

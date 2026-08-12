@@ -89,7 +89,7 @@ jobs:
           npm install --no-save --package-lock=false @playwright/test@1.55.0
           npx playwright install --with-deps chromium
       - name: Browser E2E — real Auth → Project → Cloudflare AI → Reload
-        run: npx playwright test tests/browser-e2e.spec.mjs --project=chromium --reporter=list
+        run: npx playwright test tests/browser-e2e.spec.mjs --reporter=list
       - name: Preserve browser E2E evidence
         if: always()
         uses: actions/upload-artifact@v4

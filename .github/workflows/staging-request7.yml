@@ -29,14 +29,14 @@ jobs:
           cache: npm
       - name: Install locked dependencies
         run: npm ci
+      - name: Build against isolated Staging (also regenerates route tree)
+        run: npm run build
       - name: Typecheck
         run: npm run typecheck
       - name: Lint
         run: npm run lint
       - name: Tests
         run: npm run test
-      - name: Build against isolated Staging
-        run: npm run build
       - name: Smoke test deploy package
         run: npm run test:smoke
       - name: Deploy isolated Staging Worker

@@ -38,8 +38,8 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 
 type RuntimeEnv = Record<string, string | undefined>;
 
-function buildCspReportOnly(env: RuntimeEnv) {
-  const supabaseOrigin = env.SUPABASE_URL?.replace(/\/$/, "");
+function buildCspReportOnly(env?: RuntimeEnv) {
+  const supabaseOrigin = env?.SUPABASE_URL?.replace(/\/$/, "");
   const supabaseWsOrigin = supabaseOrigin?.replace(/^https:/, "wss:").replace(/^http:/, "ws:");
   return [
     "default-src 'self'",
@@ -59,7 +59,7 @@ function buildCspReportOnly(env: RuntimeEnv) {
   ].join("; ");
 }
 
-function applySecurityHeaders(response: Response, request: Request, env: RuntimeEnv): Response {
+function applySecurityHeaders(response: Response, request: Request, env?: RuntimeEnv): Response {
   const h = new Headers(response.headers);
   h.delete("x-powered-by");
   h.delete("server");
@@ -128,7 +128,6 @@ function applySecurityHeaders(response: Response, request: Request, env: Runtime
     }
   }
 
-  void request;
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
@@ -137,7 +136,7 @@ function applySecurityHeaders(response: Response, request: Request, env: Runtime
 }
 
 export default {
-  async fetch(request: Request, env: RuntimeEnv, ctx: unknown) {
+  async fetch(request: Request, env: RuntimeEnv | undefined, ctx: unknown) {
     const proto = request.headers.get("x-forwarded-proto");
     const url = new URL(request.url);
     if (

@@ -1,0 +1,46 @@
+name: Bootstrap Request7 Browser Core
+
+on:
+  push:
+    branches:
+      - staging/xeomx-request7-cloudflare-live
+    paths:
+      - .staging-overlay/**
+      - .github/workflows/bootstrap-request7.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: xeomx-request7-bootstrap
+  cancel-in-progress: true
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify and unpack Request7 browser core
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .staging-overlay/request7-browser-core.b64 > /tmp/request7-browser-core.tar.gz
+          echo "ed7d4e8d4727b72d7efac1d4ea3756d1aae0d520104b7b7c965b8bd59af284fb  /tmp/request7-browser-core.tar.gz" | sha256sum -c -
+          tar -xzf /tmp/request7-browser-core.tar.gz -C .
+          rm -rf .staging-overlay
+          rm -f .github/workflows/bootstrap-request7.yml
+      - name: Commit staged Request7 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No source changes to commit."
+            exit 0
+          fi
+          git commit -m "feat: wire Request7 browser core to Cloudflare staging"
+          git push origin HEAD:staging/xeomx-request7-cloudflare-live

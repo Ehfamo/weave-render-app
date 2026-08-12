@@ -1,0 +1,55 @@
+name: Debug XEOMX Staging Runtime
+
+on:
+  push:
+    branches:
+      - staging/xeomx-request7-cloudflare-live
+    paths:
+      - .github/workflows/debug-staging-runtime.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tail Worker and reproduce auth SSR failure
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          TARGET_URL: https://xeomx-request7-staging.ehfamo7830.workers.dev/auth?next=%2Fprojects
+        run: |
+          set -uo pipefail
+          : > /tmp/xeomx-tail.log
+          timeout 25s npx --yes wrangler@4.106.0 tail xeomx-request7-staging --format=json > /tmp/xeomx-tail.log 2>&1 &
+          TAIL_PID=$!
+          sleep 6
+          curl --silent --show-error --location --max-time 20 \
+            --dump-header /tmp/xeomx-headers.txt \
+            --output /tmp/xeomx-body.txt \
+            "${TARGET_URL}" || true
+          sleep 6
+          kill "${TAIL_PID}" 2>/dev/null || true
+          wait "${TAIL_PID}" 2>/dev/null || true
+          echo '=== RESPONSE HEADERS ==='
+          cat /tmp/xeomx-headers.txt || true
+          echo '=== RESPONSE BODY ==='
+          cat /tmp/xeomx-body.txt || true
+          echo
+          echo '=== WRANGLER TAIL ==='
+          cat /tmp/xeomx-tail.log || true
+      - name: Upload runtime debug evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xeomx-staging-runtime-debug
+          path: |
+            /tmp/xeomx-tail.log
+            /tmp/xeomx-headers.txt
+            /tmp/xeomx-body.txt
+          if-no-files-found: warn
+          retention-days: 2

@@ -1,0 +1,50 @@
+name: XEOMX Request7 Staging
+
+on:
+  push:
+    branches:
+      - staging/xeomx-request7-cloudflare-live
+  workflow_dispatch:
+
+concurrency:
+  group: xeomx-request7-staging
+  cancel-in-progress: true
+
+env:
+  SUPABASE_URL: https://bzoikmppvwiidyjdaqgv.supabase.co
+  SUPABASE_PUBLISHABLE_KEY: sb_publishable_PUISWn93BXooGndzl06Ovw_locHt1Gz
+  VITE_SUPABASE_URL: https://bzoikmppvwiidyjdaqgv.supabase.co
+  VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_PUISWn93BXooGndzl06Ovw_locHt1Gz
+
+jobs:
+  quality-and-staging-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Tests
+        run: npm run test
+      - name: Build against isolated Staging
+        run: npm run build
+      - name: Smoke test deploy package
+        run: npm run test:smoke
+      - name: Deploy isolated Staging Worker
+        run: >-
+          npx --yes wrangler@4.106.0 deploy
+          --name xeomx-request7-staging
+          --var SUPABASE_URL:${SUPABASE_URL}
+          --var SUPABASE_PUBLISHABLE_KEY:${SUPABASE_PUBLISHABLE_KEY}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

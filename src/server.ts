@@ -208,9 +208,10 @@ async function browserSearchProbe(): Promise<Response> {
         visibleLinksOnly: true,
         gotoOptions: { waitUntil: "domcontentloaded", timeout: 12_000 },
       });
-      const body = (await upstream.json().catch(() => null)) as
-        | { result?: unknown; success?: boolean }
-        | null;
+      const body = (await upstream.json().catch(() => null)) as {
+        result?: unknown;
+        success?: boolean;
+      } | null;
       results[name] = {
         ok: upstream.ok && body?.success !== false,
         status: upstream.status,

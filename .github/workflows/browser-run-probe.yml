@@ -1,5 +1,5 @@
 name: XEOMX Browser Run Probe
-# search-discovery-probe
+# research-extraction-probe
 
 on:
   push:
@@ -16,17 +16,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Probe Staging search discovery
+      - name: Probe Staging research extraction
         shell: bash
         run: |
           set -euo pipefail
-          body="$(curl -fsS https://xeomx-request7-staging.ehfamo7830.workers.dev/__xeomx/search-probe)"
+          body="$(curl -fsS https://xeomx-request7-staging.ehfamo7830.workers.dev/__xeomx/research-extract-probe)"
           printf '%s\n' "$body"
           BODY="$body" node - <<'NODE'
           const body = JSON.parse(process.env.BODY || '{}');
-          if (!body.ok) {
-            console.error('SEARCH_DISCOVERY_PROBE_FAILED', body);
+          if (!body.ok || !Array.isArray(body.diagnostics)) {
+            console.error('RESEARCH_EXTRACTION_PROBE_FAILED', body);
             process.exit(1);
           }
-          console.log('SEARCH_DISCOVERY_PROBE_PASS');
+          console.log('RESEARCH_EXTRACTION_PROBE_PASS');
           NODE

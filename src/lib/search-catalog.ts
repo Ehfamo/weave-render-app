@@ -63,7 +63,10 @@ function toCollection(row: CollectionRow): Collection {
   };
 }
 
-export async function searchCatalog(query: string, category?: string): Promise<SearchCatalogResults> {
+export async function searchCatalog(
+  query: string,
+  category?: string,
+): Promise<SearchCatalogResults> {
   const term = cleanTerm(query);
   if (term.length < 2) return { prompts: [], creators: [], collections: [] };
   const pattern = `%${term}%`;
@@ -120,7 +123,11 @@ export async function searchCatalog(query: string, category?: string): Promise<S
           .limit(12),
       ];
 
-  const responses = await Promise.all([...promptRequests, ...creatorRequests, ...collectionRequests]);
+  const responses = await Promise.all([
+    ...promptRequests,
+    ...creatorRequests,
+    ...collectionRequests,
+  ]);
   const error = responses.find((response) => response.error)?.error;
   if (error) throw error;
 

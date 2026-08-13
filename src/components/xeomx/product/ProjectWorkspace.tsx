@@ -57,6 +57,7 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
   const cancelGeneration = useServerFn(cancelGenerationJobFn);
 
   const [selectedProjectId, setSelectedProjectId] = useState(initialProjectId ?? "");
+  const [pendingJobId, setPendingJobId] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [prompt, setPrompt] = useState("");
@@ -79,10 +80,22 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
     queryFn: async () => unwrap(await loadProject({ data: { projectId: selectedProjectId } })),
     refetchInterval: (query) => {
       const snapshot = query.state.data as ProjectSnapshot | undefined;
+      const submittedJob = pendingJobId
+        ? snapshot?.jobs.find((job) => job.id === pendingJobId)
+        : undefined;
+
+      if (
+        pendingJobId &&
+        (!submittedJob || submittedJob.status === "queued" || submittedJob.status === "running")
+      ) {
+        return POLL_MS;
+      }
+
       return snapshot?.jobs.some((job) => job.status === "queued" || job.status === "running")
         ? POLL_MS
         : false;
     },
+    refetchIntervalInBackground: true,
   });
 
   useEffect(() => {
@@ -92,7 +105,17 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
     setDescription(project.description ?? "");
   }, [snapshotQuery.data?.project]);
 
+  useEffect(() => {
+    if (!pendingJobId) return;
+    const submittedJob = snapshotQuery.data?.jobs.find((job) => job.id === pendingJobId);
+    if (!submittedJob) return;
+    if (submittedJob.status !== "queued" && submittedJob.status !== "running") {
+      setPendingJobId("");
+    }
+  }, [pendingJobId, snapshotQuery.data?.jobs]);
+
   const selectProject = (id: string) => {
+    setPendingJobId("");
     setSelectedProjectId(id);
     onProjectChange?.(id);
   };
@@ -154,7 +177,8 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
         }),
       );
     },
-    onSuccess: async () => {
+    onSuccess: async (result) => {
+      setPendingJobId(result.jobId);
       setPrompt("");
       await queryClient.invalidateQueries({ queryKey: ["request7", "project", selectedProjectId] });
     },
@@ -163,13 +187,15 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
   const cancelMutation = useMutation({
     mutationFn: async (jobId: string) => unwrap(await cancelGeneration({ data: { jobId } })),
     onSuccess: async () => {
+      setPendingJobId("");
       await queryClient.invalidateQueries({ queryKey: ["request7", "project", selectedProjectId] });
     },
   });
 
   const latestJob = snapshotQuery.data?.jobs[0];
   const messages = snapshotQuery.data?.messages ?? [];
-  const running = latestJob?.status === "queued" || latestJob?.status === "running";
+  const running =
+    Boolean(pendingJobId) || latestJob?.status === "queued" || latestJob?.status === "running";
   const assistantMessages = useMemo(
     () => messages.filter((message) => message.role === "assistant"),
     [messages],

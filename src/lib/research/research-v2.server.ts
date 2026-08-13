@@ -415,13 +415,15 @@ async function extractSourceHttp(url: URL): Promise<ExtractedSource | null> {
 
   const raw = await readLimitedText(fetched.response);
   if (!raw || looksLikeChallenge(raw)) return null;
-  const excerpt = contentType.includes("html") || raw.includes("<html") ? htmlToText(raw) : raw.trim();
+  const excerpt =
+    contentType.includes("html") || raw.includes("<html") ? htmlToText(raw) : raw.trim();
   if (excerpt.length < 120) return null;
 
   return {
-    title: contentType.includes("html") || raw.includes("<html")
-      ? htmlTitle(raw, fetched.url)
-      : fetched.url.hostname,
+    title:
+      contentType.includes("html") || raw.includes("<html")
+        ? htmlTitle(raw, fetched.url)
+        : fetched.url.hostname,
     url: fetched.url.toString(),
     domain: fetched.url.hostname.toLowerCase().slice(0, 253),
     excerpt: excerpt.slice(0, MAX_EXCERPT_CHARS),

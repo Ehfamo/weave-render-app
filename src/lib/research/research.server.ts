@@ -50,7 +50,10 @@ function browserBinding(): BrowserRunBinding {
 
 function isPrivateIpv4(hostname: string): boolean {
   const octets = hostname.split(".").map((part) => Number(part));
-  if (octets.length !== 4 || octets.some((value) => !Number.isInteger(value) || value < 0 || value > 255)) {
+  if (
+    octets.length !== 4 ||
+    octets.some((value) => !Number.isInteger(value) || value < 0 || value > 255)
+  ) {
     return false;
   }
   const [a, b] = octets;
@@ -135,7 +138,10 @@ function sourceTitle(markdown: string, url: URL): string {
   return (heading || url.hostname).slice(0, 300);
 }
 
-async function quickAction(action: string, options: Record<string, unknown>): Promise<BrowserResponse> {
+async function quickAction(
+  action: string,
+  options: Record<string, unknown>,
+): Promise<BrowserResponse> {
   const response = await browserBinding().quickAction(action, options);
   const body = (await response.json().catch(() => null)) as BrowserResponse | null;
   if (!response.ok || body?.success === false || !body) {

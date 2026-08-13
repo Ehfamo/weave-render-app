@@ -43,6 +43,8 @@ jobs:
       - name: Smoke test deploy package
         run: npm run test:smoke
       - name: Deploy isolated Staging Worker
+        id: deploy_staging
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
@@ -55,12 +57,23 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       - name: Preserve staging deploy evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: xeomx-request7-staging-deploy
           path: wrangler-deploy.log
           if-no-files-found: error
           retention-days: 7
+      - name: Report staging deploy failure
+        if: steps.deploy_staging.outcome == 'failure'
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "=== sanitized wrangler failure tail ==="
+          tail -n 80 wrangler-deploy.log \
+            | sed -E 's/(authorization:[[:space:]]*bearer)[[:space:]]+[^[:space:]]+/\1 [REDACTED]/Ig' \
+            | sed -E 's/(api[_-]?token[=:][[:space:]]*)[^[:space:]]+/\1[REDACTED]/Ig'
+          exit 1
       - name: Create short-lived browser E2E user through GitHub OIDC
         shell: bash
         run: |

@@ -1,7 +1,7 @@
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, Plus, RefreshCw, Send, Square } from "lucide-react";
+import { ExternalLink, Loader2, Plus, RefreshCw, Search, Send, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,6 +18,10 @@ import {
   type ProjectSnapshot,
   type ProjectSummary,
 } from "@/lib/backend/vertical-slice";
+import {
+  listProjectResearchSourcesFn,
+  submitWebResearchFn,
+} from "@/lib/research/research.functions";
 
 const POLL_MS = 2500;
 
@@ -26,8 +30,8 @@ type Props = {
   onProjectChange?: (projectId: string) => void;
 };
 
-function newIdempotencyKey() {
-  return `browser:${Date.now()}:${crypto.randomUUID()}`;
+function newIdempotencyKey(prefix = "browser") {
+  return `${prefix}:${Date.now()}:${crypto.randomUUID()}`;
 }
 
 function unwrap<T>(result: { ok: true; data: T } | { ok: false; error: { message: string } }): T {
@@ -55,6 +59,8 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
   const loadProject = useServerFn(loadProjectFn);
   const submitGeneration = useServerFn(submitTextGenerationFn);
   const cancelGeneration = useServerFn(cancelGenerationJobFn);
+  const submitResearch = useServerFn(submitWebResearchFn);
+  const listResearchSources = useServerFn(listProjectResearchSourcesFn);
 
   const [selectedProjectId, setSelectedProjectId] = useState(initialProjectId ?? "");
   const [pendingJobId, setPendingJobId] = useState("");
@@ -96,6 +102,13 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
         : false;
     },
     refetchIntervalInBackground: true,
+  });
+
+  const researchSourcesQuery = useQuery({
+    queryKey: ["request7", "research-sources", selectedProjectId],
+    enabled: Boolean(selectedProjectId),
+    queryFn: async () =>
+      unwrap(await listResearchSources({ data: { projectId: selectedProjectId } })),
   });
 
   useEffect(() => {
@@ -182,6 +195,33 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
     },
   });
 
+  const researchMutation = useMutation({
+    mutationFn: async () => {
+      if (!selectedProjectId) throw new Error("Select a project first.");
+      const question = prompt.trim();
+      if (!question) throw new Error("Enter a research question.");
+      return unwrap(
+        await submitResearch({
+          data: {
+            projectId: selectedProjectId,
+            question,
+            idempotencyKey: newIdempotencyKey("research"),
+          },
+        }),
+      );
+    },
+    onSuccess: async (result) => {
+      setPendingJobId(result.jobId);
+      setPrompt("");
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["request7", "project", selectedProjectId] }),
+        queryClient.invalidateQueries({
+          queryKey: ["request7", "research-sources", selectedProjectId],
+        }),
+      ]);
+    },
+  });
+
   const cancelMutation = useMutation({
     mutationFn: async (jobId: string) => unwrap(await cancelGeneration({ data: { jobId } })),
     onSuccess: async () => {
@@ -194,10 +234,8 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
   const messages = snapshotQuery.data?.messages ?? [];
   const running =
     Boolean(pendingJobId) || latestJob?.status === "queued" || latestJob?.status === "running";
-  const assistantMessages = useMemo(
-    () => messages.filter((message) => message.role === "assistant"),
-    [messages],
-  );
+  const assistantMessageCount = messages.filter((message) => message.role === "assistant").length;
+  const submitting = generateMutation.isPending || researchMutation.isPending;
 
   const onCreate = (event: FormEvent) => {
     event.preventDefault();
@@ -222,8 +260,8 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
           </span>
         </div>
         <p className="text-sm text-muted-foreground">
-          Authenticated project → durable zero-cost AI router → persisted output, asset, usage,
-          credit and audit.
+          Authenticated project → durable AI job → grounded web research or generation → persisted
+          output, sources, credit and audit.
         </p>
       </header>
 
@@ -300,17 +338,19 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
                   <div>
                     <h2 className="font-medium">Project settings</h2>
                     <p className="text-xs text-muted-foreground">
-                      Auto route: Cloudflare → Gemini → Groq
+                      Auto route · Cloudflare primary · durable jobs
                     </p>
                   </div>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => void snapshotQuery.refetch()}
-                    disabled={snapshotQuery.isFetching}
+                    onClick={() =>
+                      void Promise.all([snapshotQuery.refetch(), researchSourcesQuery.refetch()])
+                    }
+                    disabled={snapshotQuery.isFetching || researchSourcesQuery.isFetching}
                   >
                     <RefreshCw
-                      className={`size-4 ${snapshotQuery.isFetching ? "animate-spin" : ""}`}
+                      className={`size-4 ${snapshotQuery.isFetching || researchSourcesQuery.isFetching ? "animate-spin" : ""}`}
                     />{" "}
                     Reload
                   </Button>
@@ -345,9 +385,9 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
               <section className="rounded-xl border border-border bg-surface/20 p-4 sm:p-5">
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <h2 className="font-medium">Generate</h2>
+                    <h2 className="font-medium">Ask XEOMX</h2>
                     <p className="text-xs text-muted-foreground">
-                      Jobs are queued and processed by the independent cron worker.
+                      Send normally, or research the live web and answer with durable citations.
                     </p>
                   </div>
                   {latestJob ? (
@@ -365,16 +405,27 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
                     maxLength={50000}
                   />
                   <div className="flex flex-wrap gap-2">
-                    <Button
-                      type="submit"
-                      disabled={!prompt.trim() || generateMutation.isPending || running}
-                    >
+                    <Button type="submit" disabled={!prompt.trim() || submitting || running}>
                       {generateMutation.isPending || running ? (
                         <Loader2 className="size-4 animate-spin" />
                       ) : (
                         <Send className="size-4" />
                       )}{" "}
                       Send
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      data-testid="research-web-button"
+                      onClick={() => researchMutation.mutate()}
+                      disabled={!prompt.trim() || submitting || running}
+                    >
+                      {researchMutation.isPending ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <Search className="size-4" />
+                      )}{" "}
+                      Research web
                     </Button>
                     {running && latestJob ? (
                       <Button
@@ -388,7 +439,14 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
                     ) : null}
                   </div>
                 </form>
-                <ErrorBox error={generateMutation.error ?? cancelMutation.error} />
+                <ErrorBox
+                  error={
+                    generateMutation.error ??
+                    researchMutation.error ??
+                    cancelMutation.error ??
+                    researchSourcesQuery.error
+                  }
+                />
               </section>
 
               <section className="rounded-xl border border-border bg-surface/20 p-4 sm:p-5">
@@ -400,18 +458,52 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
                 </div>
                 <div className="space-y-3">
                   {messages.length ? (
-                    messages.map((message) => (
-                      <article
-                        key={message.id}
-                        className={`rounded-lg border p-3 ${message.role === "assistant" ? "border-foreground/20 bg-background" : "border-border"}`}
-                      >
-                        <div className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">
-                          {message.role}
-                          {message.provider ? ` · ${message.provider}` : ""}
-                        </div>
-                        <p className="whitespace-pre-wrap text-sm leading-6">{message.content}</p>
-                      </article>
-                    ))
+                    messages.map((message) => {
+                      const sources = message.generationJobId
+                        ? researchSourcesQuery.data?.[message.generationJobId]
+                        : undefined;
+                      return (
+                        <article
+                          key={message.id}
+                          className={`rounded-lg border p-3 ${message.role === "assistant" ? "border-foreground/20 bg-background" : "border-border"}`}
+                        >
+                          <div className="mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">
+                            {message.role}
+                            {message.provider ? ` · ${message.provider}` : ""}
+                          </div>
+                          <p className="whitespace-pre-wrap text-sm leading-6">{message.content}</p>
+                          {sources?.length ? (
+                            <div
+                              className="mt-4 border-t border-border pt-3"
+                              data-testid="research-sources"
+                            >
+                              <div className="mb-2 text-xs font-medium">Sources</div>
+                              <div className="space-y-2">
+                                {sources.map((source) => (
+                                  <a
+                                    key={`${message.id}:${source.id}`}
+                                    href={source.url}
+                                    target="_blank"
+                                    rel="noreferrer noopener"
+                                    className="flex items-start justify-between gap-3 rounded-lg border border-border p-2 text-xs transition hover:bg-surface"
+                                  >
+                                    <span className="min-w-0">
+                                      <span className="block truncate font-medium">
+                                        [{source.id}] {source.title}
+                                      </span>
+                                      <span className="block truncate text-muted-foreground">
+                                        {source.domain}
+                                      </span>
+                                    </span>
+                                    <ExternalLink className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
+                                  </a>
+                                ))}
+                              </div>
+                            </div>
+                          ) : null}
+                        </article>
+                      );
+                    })
                   ) : (
                     <p className="text-sm text-muted-foreground">No messages yet.</p>
                   )}
@@ -420,7 +512,7 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
 
               <section className="grid gap-3 sm:grid-cols-4">
                 <Metric label="Jobs" value={snapshotQuery.data?.jobs.length ?? 0} />
-                <Metric label="Outputs" value={assistantMessages.length} />
+                <Metric label="Outputs" value={assistantMessageCount} />
                 <Metric label="Assets" value={snapshotQuery.data?.assets.length ?? 0} />
                 <Metric label="Audit" value={snapshotQuery.data?.auditEvents.length ?? 0} />
               </section>

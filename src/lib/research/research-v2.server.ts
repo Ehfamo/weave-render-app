@@ -11,13 +11,17 @@ type BrowserRunBinding = {
 type RuntimeEnv = { BROWSER?: BrowserRunBinding };
 type BrowserResponse = { success?: boolean; result?: unknown };
 type ExtractedSource = Omit<ResearchSource, "id">;
+type SafeFetchResult = { response: Response; url: URL };
 
 const MAX_SOURCES = 3;
 const MAX_CANDIDATES = 8;
 const BATCH_SIZE = 4;
-const SEARCH_TIMEOUT_MS = 10_000;
+const SEARCH_TIMEOUT_MS = 8_000;
 const SOURCE_TIMEOUT_MS = 8_000;
 const MAX_EXCERPT_CHARS = 4_500;
+const MAX_HTTP_BODY_BYTES = 600_000;
+const HTTP_USER_AGENT =
+  "Mozilla/5.0 (compatible; XEOMXResearch/1.0; +https://xeomx-request7-staging.ehfamo7830.workers.dev)";
 const SEARCH_HOSTS = new Set([
   "duckduckgo.com",
   "lite.duckduckgo.com",
@@ -170,6 +174,17 @@ function markdownLinks(markdown: string): string[] {
   return links;
 }
 
+function htmlLinks(html: string): string[] {
+  const links: string[] = [];
+  const pattern = /<a\b[^>]*?\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi;
+  for (const match of html.matchAll(pattern)) {
+    const value = (match[1] || match[2] || match[3] || "").replace(/&amp;/gi, "&");
+    if (value) links.push(value);
+    if (links.length >= 80) break;
+  }
+  return links;
+}
+
 function cleanMarkdown(value: string): string {
   return value
     .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
@@ -179,8 +194,124 @@ function cleanMarkdown(value: string): string {
     .trim();
 }
 
+function decodeHtmlEntities(value: string): string {
+  const named: Record<string, string> = {
+    amp: "&",
+    apos: "'",
+    gt: ">",
+    hellip: "…",
+    lt: "<",
+    nbsp: " ",
+    quot: '"',
+  };
+  return value.replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (match, entity: string) => {
+    if (entity.startsWith("#x") || entity.startsWith("#X")) {
+      const code = Number.parseInt(entity.slice(2), 16);
+      return Number.isFinite(code) ? String.fromCodePoint(code) : match;
+    }
+    if (entity.startsWith("#")) {
+      const code = Number.parseInt(entity.slice(1), 10);
+      return Number.isFinite(code) ? String.fromCodePoint(code) : match;
+    }
+    return named[entity.toLowerCase()] ?? match;
+  });
+}
+
+function htmlToText(html: string): string {
+  return decodeHtmlEntities(
+    html
+      .replace(/<!--[\s\S]*?-->/g, " ")
+      .replace(/<(script|style|noscript|svg|template)\b[\s\S]*?<\/\1>/gi, " ")
+      .replace(/<(br|\/p|\/div|\/li|\/section|\/article|\/h[1-6]|\/tr)>/gi, "\n")
+      .replace(/<[^>]+>/g, " "),
+  )
+    .replace(/[ \t\f\v]+/g, " ")
+    .replace(/ *\n */g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function htmlTitle(html: string, url: URL): string {
+  const raw = html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i)?.[1];
+  const title = raw ? htmlToText(raw) : "";
+  return (title || url.hostname).slice(0, 300);
+}
+
 function titleFor(markdown: string, url: URL): string {
   return (markdown.match(/^#{1,2}\s+(.+)$/m)?.[1]?.trim() || url.hostname).slice(0, 300);
+}
+
+function looksLikeChallenge(value: string): boolean {
+  const lower = value.toLowerCase();
+  return (
+    lower.includes("cf-chl-") ||
+    lower.includes("challenge-platform") ||
+    lower.includes("just a moment...") ||
+    lower.includes("verify you are human")
+  );
+}
+
+async function readLimitedText(response: Response): Promise<string> {
+  if (!response.body) return "";
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let output = "";
+  let total = 0;
+
+  while (total < MAX_HTTP_BODY_BYTES) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (!value) continue;
+    const remaining = MAX_HTTP_BODY_BYTES - total;
+    const chunk = value.byteLength > remaining ? value.slice(0, remaining) : value;
+    total += chunk.byteLength;
+    output += decoder.decode(chunk, { stream: true });
+    if (chunk.byteLength < value.byteLength) {
+      await reader.cancel().catch(() => undefined);
+      break;
+    }
+  }
+  output += decoder.decode();
+  return output;
+}
+
+async function safeHttpFetch(initial: URL, timeoutMs: number): Promise<SafeFetchResult | null> {
+  let current = safeExternalUrl(initial.toString());
+  if (!current) return null;
+
+  for (let redirectCount = 0; redirectCount <= 3; redirectCount += 1) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(current, {
+        method: "GET",
+        redirect: "manual",
+        signal: controller.signal,
+        headers: {
+          accept: "text/html,application/xhtml+xml,text/plain,text/markdown;q=0.9,*/*;q=0.1",
+          "accept-language": "en-US,en;q=0.8",
+          "user-agent": HTTP_USER_AGENT,
+        },
+      });
+
+      if ([301, 302, 303, 307, 308].includes(response.status)) {
+        const location = response.headers.get("location");
+        if (!location || redirectCount === 3) return null;
+        const next = safeExternalUrl(new URL(location, current).toString());
+        if (!next) return null;
+        current = next;
+        continue;
+      }
+
+      return { response, url: current };
+    } catch {
+      return null;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  return null;
 }
 
 async function quickAction(
@@ -215,7 +346,25 @@ function sourceOptions(url: string) {
   };
 }
 
-async function discoverUrls(question: string): Promise<URL[]> {
+async function discoverUrlsHttp(question: string): Promise<URL[]> {
+  const searchUrls = [
+    new URL(`https://lite.duckduckgo.com/lite/?q=${encodeURIComponent(question)}`),
+    new URL(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(question)}`),
+  ];
+
+  for (const searchUrl of searchUrls) {
+    const fetched = await safeHttpFetch(searchUrl, SEARCH_TIMEOUT_MS);
+    if (!fetched || !fetched.response.ok) continue;
+    const html = await readLimitedText(fetched.response);
+    if (!html || looksLikeChallenge(html)) continue;
+    const candidates = normalizeSearchLinks(htmlLinks(html), fetched.url.toString());
+    if (candidates.length) return candidates;
+  }
+
+  return [];
+}
+
+async function discoverUrlsBrowser(question: string): Promise<URL[]> {
   const searchUrls = [
     `https://lite.duckduckgo.com/lite/?q=${encodeURIComponent(question)}`,
     `https://html.duckduckgo.com/html/?q=${encodeURIComponent(question)}`,
@@ -237,11 +386,46 @@ async function discoverUrls(question: string): Promise<URL[]> {
         if (fromMarkdown.length) return fromMarkdown;
       }
     } catch {
-      // Try the next zero-cost DuckDuckGo HTML surface.
+      // Try the next zero-cost DuckDuckGo surface.
     }
   }
 
   return [];
+}
+
+async function discoverUrls(question: string): Promise<URL[]> {
+  const http = await discoverUrlsHttp(question);
+  return http.length ? http : discoverUrlsBrowser(question);
+}
+
+async function extractSourceHttp(url: URL): Promise<ExtractedSource | null> {
+  const fetched = await safeHttpFetch(url, SOURCE_TIMEOUT_MS);
+  if (!fetched || !fetched.response.ok) return null;
+
+  const contentType = (fetched.response.headers.get("content-type") ?? "").toLowerCase();
+  if (
+    contentType &&
+    !contentType.includes("text/html") &&
+    !contentType.includes("application/xhtml+xml") &&
+    !contentType.includes("text/plain") &&
+    !contentType.includes("text/markdown")
+  ) {
+    return null;
+  }
+
+  const raw = await readLimitedText(fetched.response);
+  if (!raw || looksLikeChallenge(raw)) return null;
+  const excerpt = contentType.includes("html") || raw.includes("<html") ? htmlToText(raw) : raw.trim();
+  if (excerpt.length < 120) return null;
+
+  return {
+    title: contentType.includes("html") || raw.includes("<html")
+      ? htmlTitle(raw, fetched.url)
+      : fetched.url.hostname,
+    url: fetched.url.toString(),
+    domain: fetched.url.hostname.toLowerCase().slice(0, 253),
+    excerpt: excerpt.slice(0, MAX_EXCERPT_CHARS),
+  };
 }
 
 async function sourceMarkdown(url: URL): Promise<string | null> {
@@ -268,7 +452,7 @@ async function sourceMarkdown(url: URL): Promise<string | null> {
   }
 }
 
-async function extractSource(url: URL): Promise<ExtractedSource | null> {
+async function extractSourceBrowser(url: URL): Promise<ExtractedSource | null> {
   const markdown = await sourceMarkdown(url);
   if (!markdown) return null;
   return {
@@ -277,6 +461,10 @@ async function extractSource(url: URL): Promise<ExtractedSource | null> {
     domain: url.hostname.toLowerCase().slice(0, 253),
     excerpt: markdown.slice(0, MAX_EXCERPT_CHARS),
   };
+}
+
+async function extractSource(url: URL): Promise<ExtractedSource | null> {
+  return (await extractSourceHttp(url)) ?? extractSourceBrowser(url);
 }
 
 function uniqueDomains(urls: readonly URL[]): URL[] {
@@ -308,6 +496,7 @@ async function collectSources(question: string): Promise<ResearchSource[]> {
     const extracted = await Promise.all(batch.map(extractSource));
     for (const source of extracted) {
       if (!source || sources.length >= MAX_SOURCES) continue;
+      if (sources.some((existing) => existing.domain === source.domain)) continue;
       sources.push({ id: sources.length + 1, ...source });
     }
   }

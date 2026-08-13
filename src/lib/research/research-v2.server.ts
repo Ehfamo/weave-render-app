@@ -207,6 +207,14 @@ function searchOptions(url: string) {
   };
 }
 
+function sourceOptions(url: string) {
+  return {
+    url,
+    rejectResourceTypes: ["image", "media", "font"],
+    gotoOptions: { waitUntil: "domcontentloaded", timeout: SOURCE_TIMEOUT_MS },
+  };
+}
+
 async function discoverUrls(question: string): Promise<URL[]> {
   const searchUrls = [
     `https://lite.duckduckgo.com/lite/?q=${encodeURIComponent(question)}`,
@@ -236,25 +244,39 @@ async function discoverUrls(question: string): Promise<URL[]> {
   return [];
 }
 
-async function extractSource(url: URL): Promise<ExtractedSource | null> {
+async function sourceMarkdown(url: URL): Promise<string | null> {
   try {
-    const body = await quickAction("markdown", {
-      url: url.toString(),
-      rejectResourceTypes: ["image", "media", "font"],
-      gotoOptions: { waitUntil: "domcontentloaded", timeout: SOURCE_TIMEOUT_MS },
-    });
-    if (typeof body.result !== "string") return null;
-    const markdown = cleanMarkdown(body.result);
-    if (markdown.length < 120) return null;
-    return {
-      title: titleFor(markdown, url),
-      url: url.toString(),
-      domain: url.hostname.toLowerCase().slice(0, 253),
-      excerpt: markdown.slice(0, MAX_EXCERPT_CHARS),
-    };
+    const direct = await quickAction("markdown", sourceOptions(url.toString()));
+    if (typeof direct.result === "string") {
+      const markdown = cleanMarkdown(direct.result);
+      if (markdown.length >= 120) return markdown;
+    }
+  } catch {
+    // Fall through to rendered HTML extraction.
+  }
+
+  try {
+    const content = await quickAction("content", sourceOptions(url.toString()));
+    if (typeof content.result !== "string" || content.result.length < 120) return null;
+
+    const converted = await quickAction("markdown", { html: content.result });
+    if (typeof converted.result !== "string") return null;
+    const markdown = cleanMarkdown(converted.result);
+    return markdown.length >= 120 ? markdown : null;
   } catch {
     return null;
   }
+}
+
+async function extractSource(url: URL): Promise<ExtractedSource | null> {
+  const markdown = await sourceMarkdown(url);
+  if (!markdown) return null;
+  return {
+    title: titleFor(markdown, url),
+    url: url.toString(),
+    domain: url.hostname.toLowerCase().slice(0, 253),
+    excerpt: markdown.slice(0, MAX_EXCERPT_CHARS),
+  };
 }
 
 function uniqueDomains(urls: readonly URL[]): URL[] {

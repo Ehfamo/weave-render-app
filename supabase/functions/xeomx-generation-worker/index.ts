@@ -2,10 +2,22 @@ import { createClient } from 'npm:@supabase/supabase-js@2.95.0'
 
 const CF_DEFAULT_MODEL = '@cf/meta/llama-3.1-8b-instruct-fast'
 
-async function processOne() {
+function createAdmin() {
   const url = Deno.env.get('SUPABASE_URL')!
   const secrets = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
-  const admin = createClient(url, secrets['default'], { auth: { persistSession: false, autoRefreshToken: false } })
+  return createClient(url, secrets['default'], { auth: { persistSession: false, autoRefreshToken: false } })
+}
+
+async function authorized(req: Request) {
+  const token = req.headers.get('x-xeomx-worker-token')
+  if (!token) return false
+  const admin = createAdmin()
+  const result = await admin.rpc('xeomx_validate_worker_token', { p_token: token })
+  return !result.error && result.data === true
+}
+
+async function processOne() {
+  const admin = createAdmin()
   const cfToken = Deno.env.get('CLOUDFLARE_API_TOKEN')
   const cfAccount = Deno.env.get('CLOUDFLARE_ACCOUNT_ID')
   if (!cfToken || !cfAccount) throw new Error('CLOUDFLARE_CONFIG_MISSING')
@@ -79,8 +91,11 @@ async function processOne() {
   }
 }
 
-Deno.serve(async()=>{
+Deno.serve(async(req)=>{
+  if (!(await authorized(req))) {
+    return Response.json({accepted:false,error:'unauthorized'},{status:401,headers:{'Cache-Control':'no-store'}})
+  }
   // @ts-ignore Supabase Edge Runtime global.
   EdgeRuntime.waitUntil(processOne().catch(()=>{}))
-  return Response.json({accepted:true},{status:202})
+  return Response.json({accepted:true},{status:202,headers:{'Cache-Control':'no-store'}})
 })

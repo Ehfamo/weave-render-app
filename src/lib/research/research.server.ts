@@ -27,6 +27,7 @@ const MAX_EXCERPT_CHARS = 4_500;
 const SEARCH_HOSTS = new Set([
   "duckduckgo.com",
   "html.duckduckgo.com",
+  "lite.duckduckgo.com",
   "www.google.com",
   "google.com",
   "www.bing.com",
@@ -73,8 +74,9 @@ function safeExternalUrl(value: string): URL | null {
     const url = new URL(value);
     const hostname = url.hostname.toLowerCase().replace(/\.$/, "");
     if (url.protocol !== "https:") return null;
+    if (url.port && url.port !== "443") return null;
     if (!hostname || hostname === "localhost" || hostname.endsWith(".local")) return null;
-    if (hostname === "::1" || hostname.startsWith("[")) return null;
+    if (hostname === "::1" || hostname.startsWith("[") || hostname.includes(":")) return null;
     if (isPrivateIpv4(hostname)) return null;
     return url;
   } catch {
@@ -154,10 +156,11 @@ async function quickAction(
 }
 
 async function discoverSourceUrls(question: string): Promise<URL[]> {
-  const searchUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(question)}`;
+  const searchUrl = `https://lite.duckduckgo.com/lite/?q=${encodeURIComponent(question)}`;
   const body = await quickAction("links", {
     url: searchUrl,
-    visibleLinksOnly: true,
+    visibleLinksOnly: false,
+    rejectResourceTypes: ["image", "media", "font"],
     gotoOptions: { waitUntil: "domcontentloaded", timeout: 12_000 },
   });
   return normalizeSearchLinks(body.result, searchUrl);
@@ -167,6 +170,7 @@ async function extractSource(url: URL, id: number): Promise<ResearchSource | nul
   try {
     const body = await quickAction("markdown", {
       url: url.toString(),
+      rejectResourceTypes: ["image", "media", "font"],
       gotoOptions: { waitUntil: "domcontentloaded", timeout: 12_000 },
     });
     if (typeof body.result !== "string") return null;

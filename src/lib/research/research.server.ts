@@ -21,8 +21,13 @@ type BrowserResponse = {
   result?: unknown;
 };
 
+type ExtractedResearchSource = Omit<ResearchSource, "id">;
+
 const MAX_SOURCES = 3;
-const MAX_SOURCE_CANDIDATES = 10;
+const MAX_SOURCE_CANDIDATES = 6;
+const SOURCE_BATCH_SIZE = 3;
+const SOURCE_TIMEOUT_MS = 8_000;
+const SEARCH_TIMEOUT_MS = 10_000;
 const MAX_EXCERPT_CHARS = 4_500;
 const SEARCH_HOSTS = new Set([
   "duckduckgo.com",
@@ -161,23 +166,22 @@ async function discoverSourceUrls(question: string): Promise<URL[]> {
     url: searchUrl,
     visibleLinksOnly: false,
     rejectResourceTypes: ["image", "media", "font"],
-    gotoOptions: { waitUntil: "domcontentloaded", timeout: 12_000 },
+    gotoOptions: { waitUntil: "domcontentloaded", timeout: SEARCH_TIMEOUT_MS },
   });
   return normalizeSearchLinks(body.result, searchUrl);
 }
 
-async function extractSource(url: URL, id: number): Promise<ResearchSource | null> {
+async function extractSource(url: URL): Promise<ExtractedResearchSource | null> {
   try {
     const body = await quickAction("markdown", {
       url: url.toString(),
       rejectResourceTypes: ["image", "media", "font"],
-      gotoOptions: { waitUntil: "domcontentloaded", timeout: 12_000 },
+      gotoOptions: { waitUntil: "domcontentloaded", timeout: SOURCE_TIMEOUT_MS },
     });
     if (typeof body.result !== "string") return null;
     const markdown = cleanMarkdown(body.result);
     if (markdown.length < 120) return null;
     return {
-      id,
       title: sourceTitle(markdown, url),
       url: url.toString(),
       domain: url.hostname.toLowerCase().slice(0, 253),
@@ -188,19 +192,37 @@ async function extractSource(url: URL, id: number): Promise<ResearchSource | nul
   }
 }
 
-async function collectSources(question: string): Promise<ResearchSource[]> {
-  const candidates = await discoverSourceUrls(question);
-  const sources: ResearchSource[] = [];
-  const usedDomains = new Set<string>();
+function uniqueDomainCandidates(candidates: readonly URL[]): URL[] {
+  const domains = new Set<string>();
+  const unique: URL[] = [];
 
   for (const candidate of candidates) {
-    if (sources.length >= MAX_SOURCES) break;
     const domain = candidate.hostname.toLowerCase();
-    if (usedDomains.has(domain)) continue;
-    const source = await extractSource(candidate, sources.length + 1);
-    if (!source) continue;
-    sources.push(source);
-    usedDomains.add(domain);
+    if (domains.has(domain)) continue;
+    domains.add(domain);
+    unique.push(candidate);
+    if (unique.length >= MAX_SOURCE_CANDIDATES) break;
+  }
+
+  return unique;
+}
+
+async function collectSources(question: string): Promise<ResearchSource[]> {
+  const candidates = uniqueDomainCandidates(await discoverSourceUrls(question));
+  const sources: ResearchSource[] = [];
+
+  for (
+    let index = 0;
+    index < candidates.length && sources.length < MAX_SOURCES;
+    index += SOURCE_BATCH_SIZE
+  ) {
+    const batch = candidates.slice(index, index + SOURCE_BATCH_SIZE);
+    const extracted = await Promise.all(batch.map((candidate) => extractSource(candidate)));
+
+    for (const source of extracted) {
+      if (!source || sources.length >= MAX_SOURCES) continue;
+      sources.push({ id: sources.length + 1, ...source });
+    }
   }
 
   if (!sources.length) {

@@ -8,6 +8,17 @@ type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };
 
+type BrowserRunBinding = {
+  quickAction: (action: string, options: Record<string, unknown>) => Promise<Response>;
+};
+
+type RuntimeEnv = {
+  SUPABASE_URL?: string;
+  SUPABASE_PUBLISHABLE_KEY?: string;
+  BROWSER?: BrowserRunBinding;
+  [key: string]: unknown;
+};
+
 let serverEntryPromise: Promise<ServerEntry> | undefined;
 
 async function getServerEntry(): Promise<ServerEntry> {
@@ -36,10 +47,9 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
   });
 }
 
-type RuntimeEnv = Record<string, string | undefined>;
-
 function buildCspReportOnly(env?: RuntimeEnv) {
-  const supabaseOrigin = env?.SUPABASE_URL?.replace(/\/$/, "");
+  const supabaseOrigin =
+    typeof env?.SUPABASE_URL === "string" ? env.SUPABASE_URL.replace(/\/$/, "") : undefined;
   const supabaseWsOrigin = supabaseOrigin?.replace(/^https:/, "wss:").replace(/^http:/, "ws:");
   return [
     "default-src 'self'",
@@ -134,6 +144,27 @@ function applySecurityHeaders(response: Response, request: Request, env?: Runtim
   });
 }
 
+async function browserBindingProbe(env?: RuntimeEnv): Promise<Response> {
+  if (!env?.BROWSER) {
+    return Response.json({ ok: false, reason: "browser_binding_missing" }, { status: 503 });
+  }
+
+  try {
+    const upstream = await env.BROWSER.quickAction("markdown", { url: "https://example.com" });
+    const body = (await upstream.json().catch(() => null)) as { result?: unknown } | null;
+    return Response.json(
+      {
+        ok: upstream.ok,
+        upstream_status: upstream.status,
+        markdown_present: typeof body?.result === "string" && body.result.length > 0,
+      },
+      { status: upstream.ok ? 200 : 502 },
+    );
+  } catch {
+    return Response.json({ ok: false, reason: "browser_binding_failure" }, { status: 502 });
+  }
+}
+
 export default {
   async fetch(request: Request, env: RuntimeEnv | undefined, ctx: unknown) {
     const proto = request.headers.get("x-forwarded-proto");
@@ -152,6 +183,11 @@ export default {
         },
       });
     }
+
+    if (url.pathname === "/__xeomx/browser-probe") {
+      return applySecurityHeaders(await browserBindingProbe(env), request, env);
+    }
+
     try {
       const handler = await getServerEntry();
       const assetUrl = new URL(request.url);

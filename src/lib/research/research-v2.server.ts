@@ -277,7 +277,11 @@ async function collectSources(question: string): Promise<ResearchSource[]> {
   }
 
   const sources: ResearchSource[] = [];
-  for (let index = 0; index < candidates.length && sources.length < MAX_SOURCES; index += BATCH_SIZE) {
+  for (
+    let index = 0;
+    index < candidates.length && sources.length < MAX_SOURCES;
+    index += BATCH_SIZE
+  ) {
     const batch = candidates.slice(index, index + BATCH_SIZE);
     const extracted = await Promise.all(batch.map(extractSource));
     for (const source of extracted) {
@@ -326,7 +330,11 @@ export async function submitWebResearchV2(
   },
 ): Promise<ResearchSubmission> {
   const clientDb = db(client);
-  const project = await clientDb.from("projects").select("id").eq("id", input.projectId).maybeSingle();
+  const project = await clientDb
+    .from("projects")
+    .select("id")
+    .eq("id", input.projectId)
+    .maybeSingle();
   if (project.error) throw safeVerticalSliceError(project.error);
   if (!project.data) throw new VerticalSliceError("PROJECT_NOT_FOUND");
 

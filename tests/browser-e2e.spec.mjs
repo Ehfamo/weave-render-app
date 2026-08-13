@@ -152,9 +152,7 @@ test("real browser completes generation, grounded research, and live search with
     timeout: 20_000,
   });
   await expect(page.getByTestId("search-creators")).toContainText(`Creator ${searchTerm}`);
-  await expect(page.getByTestId("search-collections")).toContainText(
-    `Collection ${searchTerm}`,
-  );
+  await expect(page.getByTestId("search-collections")).toContainText(`Collection ${searchTerm}`);
 
   await page.getByRole("tab", { name: "Writing" }).click();
   await expect(page).toHaveURL(/category=Writing/);

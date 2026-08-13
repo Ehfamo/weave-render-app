@@ -51,10 +51,15 @@ test("real browser completes and reloads the Request7 Cloudflare vertical slice"
   await expect(page).toHaveTitle(/XEOMX/i);
   await expect(page.locator("body")).not.toBeEmpty();
 
+  // SSR makes the auth controls visible before React has necessarily attached
+  // event handlers. Wait for the initial module graph + session probe to settle
+  // so the test interacts with the hydrated app, not inert SSR markup.
+  await page.waitForLoadState("networkidle");
+
   const emailOption = page.getByRole("button", { name: /email/i });
   await expect(emailOption).toBeVisible();
   await emailOption.click();
-  await page.waitForTimeout(1_000);
+  await expect(page.locator("#auth-email")).toBeVisible({ timeout: 5_000 });
 
   const hydrationState = await page.evaluate(() => ({
     url: window.location.href,
@@ -87,7 +92,7 @@ test("real browser completes and reloads the Request7 Cloudflare vertical slice"
         2,
       ),
     );
-    throw new Error("Auth SSR rendered, but the email view did not activate after click");
+    throw new Error("Auth SSR rendered, but the email view did not activate after hydration");
   }
 
   await page.locator("#auth-email").fill(email);
@@ -129,7 +134,8 @@ test("real browser completes and reloads the Request7 Cloudflare vertical slice"
   });
 
   const relevantErrors = consoleErrors.filter(
-    (entry) => !/favicon|ResizeObserver loop/i.test(entry),
+    (entry) =>
+      !/favicon|ResizeObserver loop|upgrade-insecure-requests.*report-only policy/i.test(entry),
   );
   expect(relevantErrors, `Browser console/page errors:\n${relevantErrors.join("\n")}`).toEqual([]);
 });

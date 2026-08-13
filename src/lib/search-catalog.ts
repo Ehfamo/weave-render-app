@@ -73,11 +73,8 @@ export async function searchCatalog(
   const categoryScoped = !!category && category !== "All";
 
   const promptBase = () => {
-    let request = supabase
-      .from("prompts")
-      .select(PROMPT_SELECT)
-      .eq("is_published", true)
-      .limit(24);
+    const base = supabase.from("prompts").select(PROMPT_SELECT);
+    let request = base.eq("is_published", true).limit(24);
     if (categoryScoped) request = request.eq("category", category!);
     return request;
   };

@@ -1,0 +1,31 @@
+name: XEOMX Browser Run Probe
+
+on:
+  push:
+    branches:
+      - staging/xeomx-request7-cloudflare-live
+    paths:
+      - .github/workflows/browser-run-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Probe Staging Browser Run
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="$(curl -fsS https://bzoikmppvwiidyjdaqgv.supabase.co/functions/v1/xeomx-browser-run-probe)"
+          printf '%s\n' "$body"
+          BODY="$body" node - <<'NODE'
+          const body = JSON.parse(process.env.BODY || '{}');
+          if (!body.ok || body.upstream_status !== 200 || !body.markdown_present) {
+            console.error('BROWSER_RUN_PROBE_FAILED', body);
+            process.exit(1);
+          }
+          console.log('BROWSER_RUN_PROBE_PASS');
+          NODE

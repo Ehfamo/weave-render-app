@@ -1,5 +1,6 @@
 import "./lib/error-capture";
 
+import { env as cloudflareEnv } from "cloudflare:workers";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 import { paraglideMiddleware } from "./paraglide/server.js";
@@ -144,13 +145,14 @@ function applySecurityHeaders(response: Response, request: Request, env?: Runtim
   });
 }
 
-async function browserBindingProbe(env?: RuntimeEnv): Promise<Response> {
-  if (!env?.BROWSER) {
+async function browserBindingProbe(): Promise<Response> {
+  const browser = (cloudflareEnv as unknown as RuntimeEnv).BROWSER;
+  if (!browser) {
     return Response.json({ ok: false, reason: "browser_binding_missing" }, { status: 503 });
   }
 
   try {
-    const upstream = await env.BROWSER.quickAction("markdown", { url: "https://example.com" });
+    const upstream = await browser.quickAction("markdown", { url: "https://example.com" });
     const body = (await upstream.json().catch(() => null)) as { result?: unknown } | null;
     return Response.json(
       {
@@ -185,7 +187,7 @@ export default {
     }
 
     if (url.pathname === "/__xeomx/browser-probe") {
-      return applySecurityHeaders(await browserBindingProbe(env), request, env);
+      return applySecurityHeaders(await browserBindingProbe(), request, env);
     }
 
     try {

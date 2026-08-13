@@ -4,9 +4,10 @@ import { expect, test } from "@playwright/test";
 const baseURL = process.env.E2E_BASE_URL;
 const email = process.env.E2E_EMAIL;
 const password = process.env.E2E_PASSWORD;
+const searchTerm = process.env.E2E_SEARCH_TERM;
 
-if (!baseURL || !email || !password) {
-  throw new Error("E2E_BASE_URL, E2E_EMAIL and E2E_PASSWORD are required");
+if (!baseURL || !email || !password || !searchTerm) {
+  throw new Error("E2E_BASE_URL, E2E_EMAIL, E2E_PASSWORD and E2E_SEARCH_TERM are required");
 }
 
 test.use({
@@ -145,8 +146,7 @@ test("real browser completes generation, grounded research, and live search with
   await expect(page.locator("article p").last()).toContainText(/\[[1-3]\]/);
   await expect(page.getByText(/Credits:\s*23/)).toBeVisible();
 
-  const searchTerm = "xeomxsearchlivev1";
-  await page.goto(`/search?q=${searchTerm}`, { waitUntil: "domcontentloaded" });
+  await page.goto(`/search?q=${encodeURIComponent(searchTerm)}`, { waitUntil: "domcontentloaded" });
   await expect(page.getByTestId("search-input")).toHaveValue(searchTerm);
   await expect(page.getByTestId("search-prompts")).toContainText(`Live Search ${searchTerm}`, {
     timeout: 20_000,

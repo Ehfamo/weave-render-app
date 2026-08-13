@@ -145,8 +145,12 @@ function applySecurityHeaders(response: Response, request: Request, env?: Runtim
   });
 }
 
+function browserBinding(): BrowserRunBinding | undefined {
+  return (cloudflareEnv as unknown as RuntimeEnv).BROWSER;
+}
+
 async function browserBindingProbe(): Promise<Response> {
-  const browser = (cloudflareEnv as unknown as RuntimeEnv).BROWSER;
+  const browser = browserBinding();
   if (!browser) {
     return Response.json({ ok: false, reason: "browser_binding_missing" }, { status: 503 });
   }
@@ -165,6 +169,59 @@ async function browserBindingProbe(): Promise<Response> {
   } catch {
     return Response.json({ ok: false, reason: "browser_binding_failure" }, { status: 502 });
   }
+}
+
+function summarizeLinks(result: unknown) {
+  if (!Array.isArray(result)) return { count: 0, sample_hosts: [] as string[] };
+  const hosts: string[] = [];
+  for (const value of result) {
+    if (typeof value !== "string") continue;
+    try {
+      const host = new URL(value, "https://example.com").hostname.toLowerCase();
+      if (host && !hosts.includes(host)) hosts.push(host);
+    } catch {
+      // Ignore malformed diagnostic values.
+    }
+    if (hosts.length >= 8) break;
+  }
+  return { count: result.filter((value) => typeof value === "string").length, sample_hosts: hosts };
+}
+
+async function browserSearchProbe(): Promise<Response> {
+  const browser = browserBinding();
+  if (!browser) {
+    return Response.json({ ok: false, reason: "browser_binding_missing" }, { status: 503 });
+  }
+
+  const query = encodeURIComponent("Cloudflare Browser Rendering Workers Binding");
+  const targets = {
+    duckduckgo: `https://html.duckduckgo.com/html/?q=${query}`,
+    bing: `https://www.bing.com/search?q=${query}`,
+    google: `https://www.google.com/search?q=${query}`,
+  };
+  const results: Record<string, unknown> = {};
+
+  for (const [name, target] of Object.entries(targets)) {
+    try {
+      const upstream = await browser.quickAction("links", {
+        url: target,
+        visibleLinksOnly: true,
+        gotoOptions: { waitUntil: "domcontentloaded", timeout: 12_000 },
+      });
+      const body = (await upstream.json().catch(() => null)) as
+        | { result?: unknown; success?: boolean }
+        | null;
+      results[name] = {
+        ok: upstream.ok && body?.success !== false,
+        status: upstream.status,
+        ...summarizeLinks(body?.result),
+      };
+    } catch {
+      results[name] = { ok: false, status: 0, count: 0, sample_hosts: [] };
+    }
+  }
+
+  return Response.json({ ok: true, results });
 }
 
 export default {
@@ -188,6 +245,9 @@ export default {
 
     if (url.pathname === "/__xeomx/browser-probe") {
       return applySecurityHeaders(await browserBindingProbe(), request, env);
+    }
+    if (url.pathname === "/__xeomx/search-probe") {
+      return applySecurityHeaders(await browserSearchProbe(), request, env);
     }
 
     try {

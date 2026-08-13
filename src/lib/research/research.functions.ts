@@ -2,10 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Request7Result } from "@/lib/backend/vertical-slice.functions";
 import { safeVerticalSliceError } from "@/lib/backend/vertical-slice";
-import type {
-  ResearchSourcesByJob,
-  ResearchSubmission,
-} from "@/lib/research/research";
+import type { ResearchSourcesByJob, ResearchSubmission } from "@/lib/research/research";
 
 type ResearchInput = {
   projectId: string;

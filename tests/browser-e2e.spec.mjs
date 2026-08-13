@@ -124,9 +124,11 @@ test("real browser completes generation and grounded research with reload persis
   });
   await expect(page.getByText(/Credits:\s*24/)).toBeVisible();
 
-  await page.getByPlaceholder("Ask XEOMX…").fill(
-    "What does Cloudflare Browser Rendering Workers Binding allow a Worker to do? Answer briefly.",
-  );
+  await page
+    .getByPlaceholder("Ask XEOMX…")
+    .fill(
+      "What does Cloudflare Browser Rendering Workers Binding allow a Worker to do? Answer briefly.",
+    );
   await page.getByTestId("research-web-button").click();
 
   const researchSources = page.getByTestId("research-sources").last();

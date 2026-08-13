@@ -196,9 +196,9 @@ async function browserSearchProbe(): Promise<Response> {
 
   const query = encodeURIComponent("Cloudflare Browser Rendering Workers Binding");
   const targets = {
-    duckduckgo: `https://html.duckduckgo.com/html/?q=${query}`,
-    bing: `https://www.bing.com/search?q=${query}`,
-    google: `https://www.google.com/search?q=${query}`,
+    duckduckgo_lite: `https://lite.duckduckgo.com/lite/?q=${query}`,
+    brave: `https://search.brave.com/search?q=${query}&source=web`,
+    mojeek: `https://www.mojeek.com/search?q=${query}`,
   };
   const results: Record<string, unknown> = {};
 
@@ -206,7 +206,8 @@ async function browserSearchProbe(): Promise<Response> {
     try {
       const upstream = await browser.quickAction("links", {
         url: target,
-        visibleLinksOnly: true,
+        visibleLinksOnly: false,
+        rejectResourceTypes: ["image", "media", "font"],
         gotoOptions: { waitUntil: "domcontentloaded", timeout: 12_000 },
       });
       const body = (await upstream.json().catch(() => null)) as {

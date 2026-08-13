@@ -91,12 +91,15 @@ jobs:
           USER_ID="$(echo "${RESPONSE}" | jq -r '.user_id')"
           EMAIL="$(echo "${RESPONSE}" | jq -r '.email')"
           PASSWORD="$(echo "${RESPONSE}" | jq -r '.password')"
+          SEARCH_TERM="$(echo "${RESPONSE}" | jq -r '.search_term')"
+          test -n "${SEARCH_TERM}" && test "${SEARCH_TERM}" != "null"
           echo "::add-mask::${USER_ID}"
           echo "::add-mask::${EMAIL}"
           echo "::add-mask::${PASSWORD}"
           echo "E2E_USER_ID=${USER_ID}" >> "${GITHUB_ENV}"
           echo "E2E_EMAIL=${EMAIL}" >> "${GITHUB_ENV}"
           echo "E2E_PASSWORD=${PASSWORD}" >> "${GITHUB_ENV}"
+          echo "E2E_SEARCH_TERM=${SEARCH_TERM}" >> "${GITHUB_ENV}"
       - name: Install Chromium E2E runtime
         run: |
           npm install --no-save --package-lock=false @playwright/test@1.55.0

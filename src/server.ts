@@ -227,6 +227,94 @@ async function browserSearchProbe(): Promise<Response> {
   return Response.json({ ok: true, results });
 }
 
+function externalDuckDuckGoTarget(value: string, base: string): URL | null {
+  try {
+    const link = new URL(value, base);
+    const host = link.hostname.toLowerCase();
+    if (!host.endsWith("duckduckgo.com")) return link.protocol === "https:" ? link : null;
+    const target = link.searchParams.get("uddg");
+    if (!target) return null;
+    const decoded = new URL(decodeURIComponent(target));
+    return decoded.protocol === "https:" ? decoded : null;
+  } catch {
+    return null;
+  }
+}
+
+async function actionDiagnostic(
+  browser: BrowserRunBinding,
+  action: string,
+  options: Record<string, unknown>,
+) {
+  try {
+    const response = await browser.quickAction(action, options);
+    const body = (await response.json().catch(() => null)) as {
+      result?: unknown;
+      success?: boolean;
+    } | null;
+    return {
+      status: response.status,
+      success: response.ok && body?.success !== false,
+      length: typeof body?.result === "string" ? body.result.length : 0,
+    };
+  } catch {
+    return { status: 0, success: false, length: 0 };
+  }
+}
+
+// Temporary staging-only diagnostic. Never returns full source URLs or page contents.
+async function researchExtractionProbe(): Promise<Response> {
+  const browser = browserBinding();
+  if (!browser) {
+    return Response.json({ ok: false, reason: "browser_binding_missing" }, { status: 503 });
+  }
+
+  const searchUrl =
+    "https://lite.duckduckgo.com/lite/?q=Cloudflare%20Browser%20Rendering%20Workers%20Binding";
+  try {
+    const upstream = await browser.quickAction("links", {
+      url: searchUrl,
+      visibleLinksOnly: false,
+      rejectResourceTypes: ["image", "media", "font"],
+      gotoOptions: { waitUntil: "domcontentloaded", timeout: 12_000 },
+    });
+    const body = (await upstream.json().catch(() => null)) as { result?: unknown } | null;
+    const raw = Array.isArray(body?.result) ? body.result : [];
+    const seen = new Set<string>();
+    const candidates: URL[] = [];
+    for (const value of raw) {
+      if (typeof value !== "string") continue;
+      const target = externalDuckDuckGoTarget(value, searchUrl);
+      if (!target) continue;
+      const domain = target.hostname.toLowerCase();
+      if (!domain || domain.endsWith("duckduckgo.com") || seen.has(domain)) continue;
+      seen.add(domain);
+      candidates.push(target);
+      if (candidates.length >= 3) break;
+    }
+
+    const diagnostics = await Promise.all(
+      candidates.map(async (target) => ({
+        domain: target.hostname.toLowerCase(),
+        markdown: await actionDiagnostic(browser, "markdown", {
+          url: target.toString(),
+          rejectResourceTypes: ["image", "media", "font"],
+          gotoOptions: { waitUntil: "domcontentloaded", timeout: 8_000 },
+        }),
+        content: await actionDiagnostic(browser, "content", {
+          url: target.toString(),
+          rejectResourceTypes: ["image", "media", "font"],
+          gotoOptions: { waitUntil: "domcontentloaded", timeout: 8_000 },
+        }),
+      })),
+    );
+
+    return Response.json({ ok: true, candidate_count: candidates.length, diagnostics });
+  } catch {
+    return Response.json({ ok: false, reason: "research_extract_probe_failed" }, { status: 502 });
+  }
+}
+
 export default {
   async fetch(request: Request, env: RuntimeEnv | undefined, ctx: unknown) {
     const proto = request.headers.get("x-forwarded-proto");
@@ -251,6 +339,9 @@ export default {
     }
     if (url.pathname === "/__xeomx/search-probe") {
       return applySecurityHeaders(await browserSearchProbe(), request, env);
+    }
+    if (url.pathname === "/__xeomx/research-extract-probe") {
+      return applySecurityHeaders(await researchExtractionProbe(), request, env);
     }
 
     try {

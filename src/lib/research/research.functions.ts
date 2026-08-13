@@ -72,8 +72,8 @@ export const submitWebResearchFn = createServerFn({ method: "POST" })
   .handler(async ({ context, data }): Promise<Request7Result<ResearchSubmission>> =>
     safely(async () => {
       const input = validateResearch(data);
-      const { submitWebResearch } = await import("@/lib/research/research.server");
-      return submitWebResearch(context.supabase, { actorId: context.userId, ...input });
+      const { submitWebResearchV2 } = await import("@/lib/research/research-v2.server");
+      return submitWebResearchV2(context.supabase, { actorId: context.userId, ...input });
     }),
   );
 

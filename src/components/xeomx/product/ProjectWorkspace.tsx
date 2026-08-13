@@ -145,7 +145,7 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
             projectId: selectedProjectId,
             name: name.trim(),
             description: description.trim() || undefined,
-            routingMode: "manual",
+            routingMode: "auto",
             defaultModel: REQUEST_7_LIVE_TEXT_PROVIDER.model,
           },
         }),
@@ -169,9 +169,7 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
           data: {
             projectId: selectedProjectId,
             prompt: text,
-            routingMode: "manual",
-            requestedProvider: REQUEST_7_LIVE_TEXT_PROVIDER.id,
-            requestedModel: REQUEST_7_LIVE_TEXT_PROVIDER.model,
+            routingMode: "auto",
             idempotencyKey: newIdempotencyKey(),
           },
         }),
@@ -224,8 +222,8 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
           </span>
         </div>
         <p className="text-sm text-muted-foreground">
-          Authenticated project → durable Cloudflare Workers AI job → persisted output, asset,
-          usage, credit and audit.
+          Authenticated project → durable zero-cost AI router → persisted output, asset, usage,
+          credit and audit.
         </p>
       </header>
 
@@ -302,7 +300,7 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
                   <div>
                     <h2 className="font-medium">Project settings</h2>
                     <p className="text-xs text-muted-foreground">
-                      Provider: Cloudflare · Model: {REQUEST_7_LIVE_TEXT_PROVIDER.model}
+                      Auto route: Cloudflare → Gemini → Groq
                     </p>
                   </div>
                   <Button
@@ -324,7 +322,7 @@ export function ProjectWorkspace({ initialProjectId, onProjectChange }: Props) {
                     placeholder="Project name"
                     maxLength={120}
                   />
-                  <Input value={REQUEST_7_LIVE_TEXT_PROVIDER.id} readOnly aria-label="Provider" />
+                  <Input value="auto" readOnly aria-label="Provider" />
                   <Textarea
                     className="sm:col-span-2"
                     value={description}

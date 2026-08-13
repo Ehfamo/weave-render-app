@@ -113,19 +113,18 @@ function applySecurityHeaders(response: Response, request: Request, env?: Runtim
     h.set("content-security-policy-report-only", buildCspReportOnly(env));
   }
 
-  if (isHtml && !h.has("cache-control")) {
-    h.set("cache-control", "private, no-store");
-  }
-
-  if (!isHtml && !h.has("cache-control")) {
-    const p = new URL(request.url).pathname;
-    const isImmutable =
-      p.startsWith("/__l5e/") ||
+  const p = new URL(request.url).pathname;
+  const isImmutable =
+    !isHtml &&
+    (p.startsWith("/__l5e/") ||
       p.startsWith("/assets/") ||
-      /\.(?:js|css|woff2?|ttf|otf|eot|webp|avif|jpe?g|png|gif|svg|ico|mp4|webm|wasm)$/i.test(p);
-    if (isImmutable) {
-      h.set("cache-control", "public, max-age=31536000, immutable");
-    }
+      /\.(?:js|css|woff2?|ttf|otf|eot|webp|avif|jpe?g|png|gif|svg|ico|mp4|webm|wasm)$/i.test(p));
+
+  if (!h.has("cache-control")) {
+    h.set(
+      "cache-control",
+      isImmutable ? "public, max-age=31536000, immutable" : "private, no-store",
+    );
   }
 
   return new Response(response.body, {

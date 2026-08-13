@@ -15,7 +15,7 @@ test.use({
   ignoreHTTPSErrors: false,
 });
 
-test("real browser completes generation and grounded research with reload persistence", async ({
+test("real browser completes generation, grounded research, and live search with reload persistence", async ({
   page,
 }) => {
   test.setTimeout(360_000);
@@ -144,6 +144,30 @@ test("real browser completes generation and grounded research with reload persis
   await expect(page.getByTestId("research-sources").last()).toBeVisible({ timeout: 30_000 });
   await expect(page.locator("article p").last()).toContainText(/\[[1-3]\]/);
   await expect(page.getByText(/Credits:\s*23/)).toBeVisible();
+
+  const searchTerm = "xeomxsearchlivev1";
+  await page.goto(`/search?q=${searchTerm}`, { waitUntil: "domcontentloaded" });
+  await expect(page.getByTestId("search-input")).toHaveValue(searchTerm);
+  await expect(page.getByTestId("search-prompts")).toContainText(`Live Search ${searchTerm}`, {
+    timeout: 20_000,
+  });
+  await expect(page.getByTestId("search-creators")).toContainText(`Creator ${searchTerm}`);
+  await expect(page.getByTestId("search-collections")).toContainText(
+    `Collection ${searchTerm}`,
+  );
+
+  await page.getByRole("tab", { name: "Writing" }).click();
+  await expect(page).toHaveURL(/category=Writing/);
+  await expect(page.getByTestId("search-prompts")).toContainText(`Live Search ${searchTerm}`);
+  await expect(page.getByTestId("search-creators")).toHaveCount(0);
+  await expect(page.getByTestId("search-collections")).toHaveCount(0);
+
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await expect(page).toHaveURL(/category=Writing/);
+  await expect(page.getByTestId("search-input")).toHaveValue(searchTerm);
+  await expect(page.getByTestId("search-prompts")).toContainText(`Live Search ${searchTerm}`, {
+    timeout: 20_000,
+  });
 
   await page.screenshot({
     path: "test-results/xeomx-request7-live.png",

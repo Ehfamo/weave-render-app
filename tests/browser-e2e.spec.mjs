@@ -15,10 +15,10 @@ test.use({
   ignoreHTTPSErrors: false,
 });
 
-test("real browser completes and reloads the Request7 Cloudflare vertical slice", async ({
+test("real browser completes generation and grounded research with reload persistence", async ({
   page,
 }) => {
-  test.setTimeout(180_000);
+  test.setTimeout(360_000);
 
   const consoleErrors = [];
   const consoleMessages = [];
@@ -50,10 +50,6 @@ test("real browser completes and reloads the Request7 Cloudflare vertical slice"
   await page.goto("/auth?next=%2Fprojects", { waitUntil: "domcontentloaded" });
   await expect(page).toHaveTitle(/XEOMX/i);
   await expect(page.locator("body")).not.toBeEmpty();
-
-  // SSR makes the auth controls visible before React has necessarily attached
-  // event handlers. Wait for the initial module graph + session probe to settle
-  // so the test interacts with the hydrated app, not inert SSR markup.
   await page.waitForLoadState("networkidle");
 
   const emailOption = page.getByRole("button", { name: /email/i });
@@ -127,6 +123,25 @@ test("real browser completes and reloads the Request7 Cloudflare vertical slice"
     timeout: 20_000,
   });
   await expect(page.getByText(/Credits:\s*24/)).toBeVisible();
+
+  await page
+    .getByPlaceholder("Ask XEOMX…")
+    .fill("What does Cloudflare Browser Rendering Workers Binding allow a Worker to do? Answer briefly.");
+  await page.getByTestId("research-web-button").click();
+
+  const researchSources = page.getByTestId("research-sources").last();
+  await expect(researchSources).toBeVisible({ timeout: 150_000 });
+  await expect(researchSources.locator("a").first()).toHaveAttribute("href", /^https:\/\//);
+
+  const researchAnswer = page.locator("article p").last();
+  await expect(researchAnswer).toContainText(/\[[1-3]\]/, { timeout: 20_000 });
+  await expect(page.getByText(/Credits:\s*23/)).toBeVisible({ timeout: 20_000 });
+
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await expect(page.getByRole("heading", { name: "XEOMX Project Workspace" })).toBeVisible();
+  await expect(page.getByTestId("research-sources").last()).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator("article p").last()).toContainText(/\[[1-3]\]/);
+  await expect(page.getByText(/Credits:\s*23/)).toBeVisible();
 
   await page.screenshot({
     path: "test-results/xeomx-request7-live.png",

@@ -3,11 +3,14 @@ import test from "node:test";
 import { validateResearchCitations } from "../supabase/functions/xeomx-generation-worker/citation-validation.mjs";
 
 test("research citations accept only provided source ids", () => {
-  assert.deepEqual(validateResearchCitations("Bindings expose resources [1] and services [2].", [1, 2, 3]), {
-    ok: true,
-    reason: null,
-    citedIds: [1, 2],
-  });
+  assert.deepEqual(
+    validateResearchCitations("Bindings expose resources [1] and services [2].", [1, 2, 3]),
+    {
+      ok: true,
+      reason: null,
+      citedIds: [1, 2],
+    },
+  );
 });
 
 test("research citations require at least one citation", () => {

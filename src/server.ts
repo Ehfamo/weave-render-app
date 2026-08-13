@@ -187,6 +187,7 @@ function summarizeLinks(result: unknown) {
   return { count: result.filter((value) => typeof value === "string").length, sample_hosts: hosts };
 }
 
+// Temporary staging-only diagnostic; removed after choosing the live discovery provider.
 async function browserSearchProbe(): Promise<Response> {
   const browser = browserBinding();
   if (!browser) {

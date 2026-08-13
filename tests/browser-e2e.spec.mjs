@@ -1,3 +1,4 @@
+import { mkdirSync, writeFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 
 const baseURL = process.env.E2E_BASE_URL;
@@ -17,11 +18,34 @@ test.use({
 test("real browser completes and reloads the Request7 Cloudflare vertical slice", async ({
   page,
 }) => {
+  test.setTimeout(180_000);
+
   const consoleErrors = [];
+  const consoleMessages = [];
+  const pageErrors = [];
+  const requestFailures = [];
+  const badResponses = [];
+
   page.on("console", (message) => {
+    consoleMessages.push({ type: message.type(), text: message.text() });
     if (message.type() === "error") consoleErrors.push(message.text());
   });
-  page.on("pageerror", (error) => consoleErrors.push(error.message));
+  page.on("pageerror", (error) => {
+    pageErrors.push(error.message);
+    consoleErrors.push(error.message);
+  });
+  page.on("requestfailed", (request) => {
+    requestFailures.push({
+      url: request.url(),
+      method: request.method(),
+      failure: request.failure()?.errorText ?? "unknown",
+    });
+  });
+  page.on("response", (response) => {
+    if (response.status() >= 400) {
+      badResponses.push({ url: response.url(), status: response.status() });
+    }
+  });
 
   await page.goto("/auth?next=%2Fprojects", { waitUntil: "domcontentloaded" });
   await expect(page).toHaveTitle(/XEOMX/i);
@@ -30,6 +54,41 @@ test("real browser completes and reloads the Request7 Cloudflare vertical slice"
   const emailOption = page.getByRole("button", { name: /email/i });
   await expect(emailOption).toBeVisible();
   await emailOption.click();
+  await page.waitForTimeout(1_000);
+
+  const hydrationState = await page.evaluate(() => ({
+    url: window.location.href,
+    emailPresent: Boolean(document.querySelector("#auth-email")),
+    scripts: Array.from(document.scripts).map((script) => ({
+      src: script.src,
+      type: script.type,
+      async: script.async,
+      defer: script.defer,
+    })),
+    resources: performance
+      .getEntriesByType("resource")
+      .filter((entry) => /\.(?:js|mjs)(?:\?|$)/i.test(entry.name))
+      .map((entry) => ({ name: entry.name, duration: entry.duration })),
+  }));
+
+  if (!hydrationState.emailPresent) {
+    mkdirSync("test-results", { recursive: true });
+    writeFileSync(
+      "test-results/hydration-diagnostics.json",
+      JSON.stringify(
+        {
+          hydrationState,
+          consoleMessages,
+          pageErrors,
+          requestFailures,
+          badResponses,
+        },
+        null,
+        2,
+      ),
+    );
+    throw new Error("Auth SSR rendered, but the email view did not activate after click");
+  }
 
   await page.locator("#auth-email").fill(email);
   await page.locator("#auth-password").fill(password);

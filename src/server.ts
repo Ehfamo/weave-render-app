@@ -1,6 +1,5 @@
 import "./lib/error-capture";
 
-import { env as cloudflareEnv } from "cloudflare:workers";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 import { paraglideMiddleware } from "./paraglide/server.js";
@@ -9,14 +8,9 @@ type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };
 
-type BrowserRunBinding = {
-  quickAction: (action: string, options: Record<string, unknown>) => Promise<Response>;
-};
-
 type RuntimeEnv = {
   SUPABASE_URL?: string;
   SUPABASE_PUBLISHABLE_KEY?: string;
-  BROWSER?: BrowserRunBinding;
   [key: string]: unknown;
 };
 
@@ -83,8 +77,9 @@ function applySecurityHeaders(response: Response, request: Request, env?: Runtim
   if (!h.has("referrer-policy")) h.set("referrer-policy", "strict-origin-when-cross-origin");
   if (!h.has("x-dns-prefetch-control")) h.set("x-dns-prefetch-control", "on");
   if (!h.has("origin-agent-cluster")) h.set("origin-agent-cluster", "?1");
-  if (!h.has("cross-origin-opener-policy"))
+  if (!h.has("cross-origin-opener-policy")) {
     h.set("cross-origin-opener-policy", "same-origin-allow-popups");
+  }
   if (!h.has("cross-origin-resource-policy")) h.set("cross-origin-resource-policy", "same-site");
   if (!h.has("permissions-policy")) {
     h.set(
@@ -145,176 +140,6 @@ function applySecurityHeaders(response: Response, request: Request, env?: Runtim
   });
 }
 
-function browserBinding(): BrowserRunBinding | undefined {
-  return (cloudflareEnv as unknown as RuntimeEnv).BROWSER;
-}
-
-async function browserBindingProbe(): Promise<Response> {
-  const browser = browserBinding();
-  if (!browser) {
-    return Response.json({ ok: false, reason: "browser_binding_missing" }, { status: 503 });
-  }
-
-  try {
-    const upstream = await browser.quickAction("markdown", { url: "https://example.com" });
-    const body = (await upstream.json().catch(() => null)) as { result?: unknown } | null;
-    return Response.json(
-      {
-        ok: upstream.ok,
-        upstream_status: upstream.status,
-        markdown_present: typeof body?.result === "string" && body.result.length > 0,
-      },
-      { status: upstream.ok ? 200 : 502 },
-    );
-  } catch {
-    return Response.json({ ok: false, reason: "browser_binding_failure" }, { status: 502 });
-  }
-}
-
-function summarizeLinks(result: unknown) {
-  if (!Array.isArray(result)) return { count: 0, sample_hosts: [] as string[] };
-  const hosts: string[] = [];
-  for (const value of result) {
-    if (typeof value !== "string") continue;
-    try {
-      const host = new URL(value, "https://example.com").hostname.toLowerCase();
-      if (host && !hosts.includes(host)) hosts.push(host);
-    } catch {
-      // Ignore malformed diagnostic values.
-    }
-    if (hosts.length >= 8) break;
-  }
-  return { count: result.filter((value) => typeof value === "string").length, sample_hosts: hosts };
-}
-
-// Temporary staging-only diagnostic; removed after choosing the live discovery provider.
-async function browserSearchProbe(): Promise<Response> {
-  const browser = browserBinding();
-  if (!browser) {
-    return Response.json({ ok: false, reason: "browser_binding_missing" }, { status: 503 });
-  }
-
-  const query = encodeURIComponent("Cloudflare Browser Rendering Workers Binding");
-  const targets = {
-    duckduckgo_lite: `https://lite.duckduckgo.com/lite/?q=${query}`,
-    brave: `https://search.brave.com/search?q=${query}&source=web`,
-    mojeek: `https://www.mojeek.com/search?q=${query}`,
-  };
-  const results: Record<string, unknown> = {};
-
-  for (const [name, target] of Object.entries(targets)) {
-    try {
-      const upstream = await browser.quickAction("links", {
-        url: target,
-        visibleLinksOnly: false,
-        rejectResourceTypes: ["image", "media", "font"],
-        gotoOptions: { waitUntil: "domcontentloaded", timeout: 12_000 },
-      });
-      const body = (await upstream.json().catch(() => null)) as {
-        result?: unknown;
-        success?: boolean;
-      } | null;
-      results[name] = {
-        ok: upstream.ok && body?.success !== false,
-        status: upstream.status,
-        ...summarizeLinks(body?.result),
-      };
-    } catch {
-      results[name] = { ok: false, status: 0, count: 0, sample_hosts: [] };
-    }
-  }
-
-  return Response.json({ ok: true, results });
-}
-
-function externalDuckDuckGoTarget(value: string, base: string): URL | null {
-  try {
-    const link = new URL(value, base);
-    const host = link.hostname.toLowerCase();
-    if (!host.endsWith("duckduckgo.com")) return link.protocol === "https:" ? link : null;
-    const target = link.searchParams.get("uddg");
-    if (!target) return null;
-    const decoded = new URL(decodeURIComponent(target));
-    return decoded.protocol === "https:" ? decoded : null;
-  } catch {
-    return null;
-  }
-}
-
-async function actionDiagnostic(
-  browser: BrowserRunBinding,
-  action: string,
-  options: Record<string, unknown>,
-) {
-  try {
-    const response = await browser.quickAction(action, options);
-    const body = (await response.json().catch(() => null)) as {
-      result?: unknown;
-      success?: boolean;
-    } | null;
-    return {
-      status: response.status,
-      success: response.ok && body?.success !== false,
-      length: typeof body?.result === "string" ? body.result.length : 0,
-    };
-  } catch {
-    return { status: 0, success: false, length: 0 };
-  }
-}
-
-// Temporary staging-only diagnostic. Never returns full source URLs or page contents.
-async function researchExtractionProbe(): Promise<Response> {
-  const browser = browserBinding();
-  if (!browser) {
-    return Response.json({ ok: false, reason: "browser_binding_missing" }, { status: 503 });
-  }
-
-  const searchUrl =
-    "https://lite.duckduckgo.com/lite/?q=Cloudflare%20Browser%20Rendering%20Workers%20Binding";
-  try {
-    const upstream = await browser.quickAction("links", {
-      url: searchUrl,
-      visibleLinksOnly: false,
-      rejectResourceTypes: ["image", "media", "font"],
-      gotoOptions: { waitUntil: "domcontentloaded", timeout: 12_000 },
-    });
-    const body = (await upstream.json().catch(() => null)) as { result?: unknown } | null;
-    const raw = Array.isArray(body?.result) ? body.result : [];
-    const seen = new Set<string>();
-    const candidates: URL[] = [];
-    for (const value of raw) {
-      if (typeof value !== "string") continue;
-      const target = externalDuckDuckGoTarget(value, searchUrl);
-      if (!target) continue;
-      const domain = target.hostname.toLowerCase();
-      if (!domain || domain.endsWith("duckduckgo.com") || seen.has(domain)) continue;
-      seen.add(domain);
-      candidates.push(target);
-      if (candidates.length >= 3) break;
-    }
-
-    const diagnostics = await Promise.all(
-      candidates.map(async (target) => ({
-        domain: target.hostname.toLowerCase(),
-        markdown: await actionDiagnostic(browser, "markdown", {
-          url: target.toString(),
-          rejectResourceTypes: ["image", "media", "font"],
-          gotoOptions: { waitUntil: "domcontentloaded", timeout: 8_000 },
-        }),
-        content: await actionDiagnostic(browser, "content", {
-          url: target.toString(),
-          rejectResourceTypes: ["image", "media", "font"],
-          gotoOptions: { waitUntil: "domcontentloaded", timeout: 8_000 },
-        }),
-      })),
-    );
-
-    return Response.json({ ok: true, candidate_count: candidates.length, diagnostics });
-  } catch {
-    return Response.json({ ok: false, reason: "research_extract_probe_failed" }, { status: 502 });
-  }
-}
-
 export default {
   async fetch(request: Request, env: RuntimeEnv | undefined, ctx: unknown) {
     const proto = request.headers.get("x-forwarded-proto");
@@ -332,16 +157,6 @@ export default {
           "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
         },
       });
-    }
-
-    if (url.pathname === "/__xeomx/browser-probe") {
-      return applySecurityHeaders(await browserBindingProbe(), request, env);
-    }
-    if (url.pathname === "/__xeomx/search-probe") {
-      return applySecurityHeaders(await browserSearchProbe(), request, env);
-    }
-    if (url.pathname === "/__xeomx/research-extract-probe") {
-      return applySecurityHeaders(await researchExtractionProbe(), request, env);
     }
 
     try {

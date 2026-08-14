@@ -1,0 +1,129 @@
+name: XEOMX Step4 Isolated Golden Quality Gates
+
+on:
+  push:
+    branches:
+      - verify/step4-exact-lock-20260814
+
+permissions:
+  contents: read
+
+env:
+  BASE_URL: https://xeomx-golden-step4-20260814.ehfamo7830.workers.dev
+
+jobs:
+  quality-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install isolated quality tooling
+        run: |
+          npm init -y >/dev/null 2>&1 || true
+          npm install --no-save lighthouse@12 @playwright/test@1.55.0 @axe-core/playwright@4.10.2 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+          mkdir -p step4-quality-evidence/lighthouse step4-quality-evidence/axe step4-quality-evidence/headers
+
+      - name: Security header inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          for path in / /xeomx-ai /research /search /enterprise /security; do
+            slug="$(printf '%s' "$path" | sed 's#^/##; s#/#-#g')"; [ -n "$slug" ] || slug=root
+            curl --retry 4 --max-time 30 -sS -D "step4-quality-evidence/headers/${slug}.txt" -o /dev/null "$BASE_URL$path"
+          done
+          python - <<'PY'
+          from pathlib import Path
+          import json,re
+          wanted=['content-security-policy','strict-transport-security','x-content-type-options','x-frame-options','referrer-policy','permissions-policy','cross-origin-opener-policy','cross-origin-resource-policy']
+          out={}
+          for p in Path('step4-quality-evidence/headers').glob('*.txt'):
+              txt=p.read_text(errors='ignore')
+              headers={}
+              for line in txt.splitlines():
+                  if ':' in line:
+                      k,v=line.split(':',1); headers[k.strip().lower()]=v.strip()
+              out[p.stem]={k:headers.get(k) for k in wanted}
+          Path('step4-quality-evidence/security-header-summary.json').write_text(json.dumps(out,indent=2))
+          PY
+
+      - name: Accessibility scan with axe
+        shell: bash
+        run: |
+          cat > /tmp/axe-scan.mjs <<'NODE'
+          import { chromium } from '@playwright/test'
+          import AxeBuilder from '@axe-core/playwright'
+          import fs from 'node:fs'
+          const base=process.env.BASE_URL
+          const paths=['/','/xeomx-ai','/research','/search','/enterprise','/security']
+          const browser=await chromium.launch({headless:true})
+          const page=await browser.newPage({viewport:{width:1440,height:1000}})
+          const summary=[]
+          for(const path of paths){
+            const resp=await page.goto(base+path,{waitUntil:'networkidle',timeout:45000})
+            const result=await new AxeBuilder({page}).analyze()
+            const counts={critical:0,serious:0,moderate:0,minor:0,unknown:0}
+            for(const v of result.violations) counts[v.impact||'unknown']=(counts[v.impact||'unknown']||0)+1
+            summary.push({path,httpStatus:resp?.status()||0,violations:result.violations.length,counts})
+            fs.writeFileSync(`step4-quality-evidence/axe/${path==='/'?'root':path.slice(1).replaceAll('/','-')}.json`,JSON.stringify(result,null,2))
+          }
+          fs.writeFileSync('step4-quality-evidence/axe-summary.json',JSON.stringify(summary,null,2))
+          await browser.close()
+          NODE
+          NODE_PATH="$PWD/node_modules" node /tmp/axe-scan.mjs 2>&1 | tee step4-quality-evidence/axe-scan.log
+
+      - name: Lighthouse audits
+        shell: bash
+        run: |
+          set -euo pipefail
+          for path in / /xeomx-ai /research /search /enterprise /security; do
+            slug="$(printf '%s' "$path" | sed 's#^/##; s#/#-#g')"; [ -n "$slug" ] || slug=root
+            npx lighthouse "$BASE_URL$path" --quiet --chrome-flags='--headless --no-sandbox' --output=json --output-path="step4-quality-evidence/lighthouse/${slug}.json" || true
+          done
+          node - <<'NODE'
+          const fs=require('fs'), path=require('path')
+          const dir='step4-quality-evidence/lighthouse'
+          const out=[]
+          for(const file of fs.readdirSync(dir).filter(x=>x.endsWith('.json'))){
+            const j=JSON.parse(fs.readFileSync(path.join(dir,file),'utf8'))
+            const c=j.categories||{}
+            const a=j.audits||{}
+            out.push({page:file.replace('.json',''),url:j.finalDisplayedUrl||j.finalUrl,
+              performance:c.performance?.score??null,accessibility:c.accessibility?.score??null,
+              bestPractices:c['best-practices']?.score??null,seo:c.seo?.score??null,
+              fcp:a['first-contentful-paint']?.numericValue??null,lcp:a['largest-contentful-paint']?.numericValue??null,
+              cls:a['cumulative-layout-shift']?.numericValue??null,tbt:a['total-blocking-time']?.numericValue??null,
+              speedIndex:a['speed-index']?.numericValue??null})
+          }
+          fs.writeFileSync('step4-quality-evidence/lighthouse-summary.json',JSON.stringify(out,null,2))
+          NODE
+
+      - name: Summarize release quality gate without hiding findings
+        shell: bash
+        run: |
+          node - <<'NODE' | tee step4-quality-evidence/quality-gate-summary.txt
+          const fs=require('fs')
+          const axe=JSON.parse(fs.readFileSync('step4-quality-evidence/axe-summary.json','utf8'))
+          const lh=JSON.parse(fs.readFileSync('step4-quality-evidence/lighthouse-summary.json','utf8'))
+          const critical=axe.reduce((n,x)=>n+(x.counts.critical||0),0)
+          const serious=axe.reduce((n,x)=>n+(x.counts.serious||0),0)
+          const avg=k=>lh.length?lh.reduce((n,x)=>n+(x[k]??0),0)/lh.length:null
+          console.log(`axe critical=${critical} serious=${serious}`)
+          console.log(`lighthouse pages=${lh.length} avg-performance=${avg('performance')} avg-accessibility=${avg('accessibility')} avg-best-practices=${avg('bestPractices')} avg-seo=${avg('seo')}`)
+          console.log('This workflow records evidence; release readiness is decided from the recorded findings, not by suppressing warnings.')
+          NODE
+          sha256sum step4-quality-evidence/* step4-quality-evidence/axe/* step4-quality-evidence/lighthouse/* step4-quality-evidence/headers/* 2>/dev/null > step4-quality-evidence/EVIDENCE_SHA256.txt || true
+
+      - name: Upload quality evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xeomx-step4-quality-gates-evidence
+          path: step4-quality-evidence/
+          if-no-files-found: error
+          retention-days: 14

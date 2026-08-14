@@ -1,0 +1,155 @@
+name: XEOMX Step4 Isolated Golden J01-J12 E2E
+
+on:
+  push:
+    branches:
+      - staging/xeomx-request7-cloudflare-live
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  BASE_URL: https://xeomx-golden-step4-20260814.ehfamo7830.workers.dev
+  SUPABASE_URL: https://bzoikmppvwiidyjdaqgv.supabase.co
+  SUPABASE_PUBLISHABLE_KEY: sb_publishable_PUISWn93BXooGndzl06Ovw_locHt1Gz
+
+jobs:
+  journey-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Create evidence directory
+        run: mkdir -p step4-e2e-evidence
+
+      - name: Obtain short-lived staging E2E identity via GitHub OIDC
+        shell: bash
+        run: |
+          set -euo pipefail
+          OIDC_JSON="$(curl --fail-with-body -sS -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=xeomx-staging-e2e")"
+          OIDC="$(printf '%s' "$OIDC_JSON" | jq -r '.value')"
+          test -n "$OIDC" -a "$OIDC" != "null"
+          ENDPOINT="$SUPABASE_URL/functions/v1/xeomx-e2e-bootstrap"
+          RESP=''
+          for body in '{"action":"bootstrap"}' '{"action":"issue"}' '{}'; do
+            set +e
+            candidate="$(curl -sS -X POST "$ENDPOINT" \
+              -H "Authorization: Bearer $OIDC" \
+              -H "X-GitHub-OIDC-Token: $OIDC" \
+              -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+              -H 'Content-Type: application/json' \
+              -d "$body")"
+            rc=$?
+            set -e
+            if [ "$rc" -eq 0 ] && printf '%s' "$candidate" | jq -e . >/dev/null 2>&1; then
+              if printf '%s' "$candidate" | jq -e '.. | objects | select(has("email") and has("password"))' >/dev/null 2>&1; then
+                RESP="$candidate"; break
+              fi
+            fi
+          done
+          test -n "$RESP"
+          EMAIL="$(printf '%s' "$RESP" | jq -r '.. | objects | select(has("email") and has("password")) | .email' | head -1)"
+          PASSWORD="$(printf '%s' "$RESP" | jq -r '.. | objects | select(has("email") and has("password")) | .password' | head -1)"
+          test -n "$EMAIL" -a "$EMAIL" != "null"
+          test -n "$PASSWORD" -a "$PASSWORD" != "null"
+          AUTH="$(curl --fail-with-body -sS -X POST "$SUPABASE_URL/auth/v1/token?grant_type=password" \
+            -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+            -H 'Content-Type: application/json' \
+            -d "$(jq -nc --arg e "$EMAIL" --arg p "$PASSWORD" '{email:$e,password:$p}')")"
+          printf '%s' "$AUTH" | jq -e '.access_token and .refresh_token and .user.id' >/dev/null
+          printf '%s' "$AUTH" > /tmp/supabase-session.json
+          jq '{bootstrap:"PASS",user_id:.user.id,expires_in,token_type}' /tmp/supabase-session.json > step4-e2e-evidence/auth-bootstrap-sanitized.json
+
+      - name: Install Playwright Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1 || true
+          npm install --no-save @playwright/test@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Run J01-J12 exact Golden browser route E2E
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/step4-e2e.mjs <<'NODE'
+          import { chromium } from '@playwright/test'
+          import fs from 'node:fs'
+
+          const base = process.env.BASE_URL
+          const session = JSON.parse(fs.readFileSync('/tmp/supabase-session.json','utf8'))
+          const key = 'sb-bzoikmppvwiidyjdaqgv-auth-token'
+          const journeys = [
+            ['J01','/xeomx-ai'],
+            ['J02','/projects'],
+            ['J03','/models'],
+            ['J04','/research'],
+            ['J05','/studio'],
+            ['J06','/build'],
+            ['J07','/agents'],
+            ['J08','/workflows'],
+            ['J09','/marketplace'],
+            ['J10','/academy'],
+            ['J11','/enterprise'],
+            ['J12','/security'],
+          ]
+          const browser = await chromium.launch({headless:true})
+          const context = await browser.newContext({ viewport:{width:1440,height:1000} })
+          await context.addInitScript(({key,session}) => {
+            localStorage.setItem(key, JSON.stringify(session))
+          }, {key,session})
+          const page = await context.newPage()
+          const results=[]
+          const consoleErrors=[]
+          page.on('console', m => { if (m.type()==='error') consoleErrors.push(m.text()) })
+          page.on('pageerror', e => consoleErrors.push(String(e)))
+
+          for (const [id,path] of journeys) {
+            const response = await page.goto(base+path,{waitUntil:'domcontentloaded',timeout:45000})
+            await page.waitForTimeout(800)
+            const status=response?.status() ?? 0
+            const title=await page.title()
+            const body=(await page.locator('body').innerText()).slice(0,2000)
+            const finalUrl=page.url()
+            const fatal=/Internal Server Error|Application error|Unhandled Runtime Error/i.test(body)
+            const ok=status>=200 && status<400 && !fatal && !/\/login(?:\?|$)/.test(new URL(finalUrl).pathname)
+            results.push({id,path,status,finalUrl,title,ok,bodySample:body.slice(0,260)})
+            await page.screenshot({path:`step4-e2e-evidence/${id}.png`,fullPage:false})
+            if(!ok) throw new Error(`${id} failed: status=${status} final=${finalUrl}`)
+          }
+          fs.writeFileSync('step4-e2e-evidence/journey-results.json',JSON.stringify(results,null,2))
+          fs.writeFileSync('step4-e2e-evidence/console-errors.json',JSON.stringify(consoleErrors,null,2))
+          await browser.close()
+          NODE
+          NODE_PATH="$PWD/node_modules" node /tmp/step4-e2e.mjs 2>&1 | tee step4-e2e-evidence/browser-e2e.log
+          node -e "const r=require('./step4-e2e-evidence/journey-results.json'); if(r.length!==12||r.some(x=>!x.ok))process.exit(1); console.log('J01-J12: 12/12 PASS')" | tee step4-e2e-evidence/journey-summary.txt
+
+      - name: Authenticated Supabase session smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          TOKEN="$(jq -r .access_token /tmp/supabase-session.json)"
+          code="$(curl --fail-with-body -sS -o /tmp/user.json -w '%{http_code}' "$SUPABASE_URL/auth/v1/user" -H "apikey: $SUPABASE_PUBLISHABLE_KEY" -H "Authorization: Bearer $TOKEN")"
+          echo "$code auth/v1/user" | tee step4-e2e-evidence/authenticated-http-smoke.txt
+          test "$code" = "200"
+          jq '{id:.id,aud:.aud,role:.role}' /tmp/user.json > step4-e2e-evidence/auth-user-sanitized.json
+
+      - name: Evidence hashes
+        shell: bash
+        run: |
+          rm -f /tmp/supabase-session.json
+          sha256sum step4-e2e-evidence/* > step4-e2e-evidence/EVIDENCE_SHA256.txt
+
+      - name: Upload J01-J12 E2E evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: xeomx-step4-j01-j12-e2e-evidence
+          path: step4-e2e-evidence/
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,144 @@
+name: XEOMX Step4 Golden Exact Verify Deploy
+
+on:
+  push:
+    branches:
+      - verify/step4-exact-lock-20260814
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  SUPABASE_URL: https://bzoikmppvwiidyjdaqgv.supabase.co
+  SUPABASE_PUBLISHABLE_KEY: sb_publishable_PUISWn93BXooGndzl06Ovw_locHt1Gz
+  VITE_SUPABASE_URL: https://bzoikmppvwiidyjdaqgv.supabase.co
+  VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_PUISWn93BXooGndzl06Ovw_locHt1Gz
+
+jobs:
+  exact-verify-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout temporary verification branch
+        uses: actions/checkout@v4
+
+      - name: Reconstruct exact Stage3 Golden source
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p step4-evidence
+          cat .step4/patch.part*.b64 | base64 --decode | xz --decompress > /tmp/golden.patch
+          echo "c287263b8ae393e5893f5b5eb68bc95814729c46f2548eaa5feaddeba47ad8bb  /tmp/golden.patch" | sha256sum -c - | tee step4-evidence/patch-sha256.txt
+          git apply --binary /tmp/golden.patch
+          ACTUAL_LOCK="$(sha256sum package-lock.json | awk '{print $1}')"
+          echo "$ACTUAL_LOCK  package-lock.json" | tee step4-evidence/package-lock-sha256.txt
+          test "$ACTUAL_LOCK" = "96bdd756c80a12cb2b48b31328784378d6f7fed72ad8010e6dd48e5c80303c10"
+          node - <<'NODE' | tee step4-evidence/locked-dependency.txt
+          const lock = require('./package-lock.json')
+          const v = lock.packages?.['node_modules/@lovable.dev/vite-tanstack-config']?.version
+          console.log('@lovable.dev/vite-tanstack-config locked=' + v)
+          if (v !== '2.8.5') process.exit(1)
+          NODE
+          git status --short > step4-evidence/reconstructed-git-status.txt
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Exact npm ci
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --version | tee step4-evidence/node-version.txt
+          npm --version | tee step4-evidence/npm-version.txt
+          npm ci 2>&1 | tee step4-evidence/npm-ci.log
+          npm ls @lovable.dev/vite-tanstack-config --depth=0 2>&1 | tee step4-evidence/npm-ls-exact.log
+          node - <<'NODE' | tee step4-evidence/installed-dependency.txt
+          const p = require('./node_modules/@lovable.dev/vite-tanstack-config/package.json')
+          console.log('@lovable.dev/vite-tanstack-config installed=' + p.version)
+          if (p.version !== '2.8.5') process.exit(1)
+          NODE
+
+      - name: Build
+        run: npm run build 2>&1 | tee step4-evidence/build.log
+
+      - name: Typecheck
+        run: npm run typecheck 2>&1 | tee step4-evidence/typecheck.log
+
+      - name: Lint
+        run: npm run lint 2>&1 | tee step4-evidence/lint.log
+
+      - name: Unit and contract tests
+        run: npm test 2>&1 | tee step4-evidence/test.log
+
+      - name: Optional verification scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE' > /tmp/scripts.txt
+          const p=require('./package.json'); for (const k of Object.keys(p.scripts||{})) console.log(k)
+          NODE
+          run_if_present() {
+            local name="$1"
+            if grep -Fxq "$name" /tmp/scripts.txt; then
+              npm run "$name" 2>&1 | tee "step4-evidence/${name//:/-}.log"
+            else
+              echo "SCRIPT_NOT_PRESENT: $name" | tee "step4-evidence/${name//:/-}.log"
+            fi
+          }
+          run_if_present test:integration
+          run_if_present test:migrations
+          run_if_present test:migration
+          run_if_present test:smoke
+          run_if_present test:readiness
+
+      - name: Deploy isolated exact Golden worker
+        id: deploy
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_API_TOKEN:-}"
+          test -n "${CLOUDFLARE_ACCOUNT_ID:-}"
+          npx wrangler deploy \
+            --name xeomx-golden-step4-20260814 \
+            --var SUPABASE_URL:"$SUPABASE_URL" \
+            --var SUPABASE_PUBLISHABLE_KEY:"$SUPABASE_PUBLISHABLE_KEY" \
+            2>&1 | tee step4-evidence/wrangler-deploy.log
+          URL="$(grep -Eo 'https://[^ ]+\.workers\.dev' step4-evidence/wrangler-deploy.log | tail -1 || true)"
+          if [ -z "$URL" ]; then
+            URL="https://xeomx-golden-step4-20260814.ehfamo7830.workers.dev"
+          fi
+          echo "$URL" | tee step4-evidence/isolated-worker-url.txt
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Isolated deployment HTTP smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL="${{ steps.deploy.outputs.url }}"
+          for path in / /journeys /search /os/ai/chat; do
+            code="$(curl --retry 5 --retry-delay 2 --max-time 30 -sS -o /tmp/body -w '%{http_code}' "$URL$path")"
+            printf '%s %s\n' "$code" "$path" | tee -a step4-evidence/http-smoke.txt
+            test "$code" -ge 200 -a "$code" -lt 400
+          done
+
+      - name: Record exact source commit and evidence manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD | tee step4-evidence/temp-verification-commit.txt
+          sha256sum step4-evidence/* > step4-evidence/EVIDENCE_SHA256.txt
+
+      - name: Upload Stage4 exact verification evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: xeomx-step4-exact-golden-evidence
+          path: step4-evidence/
+          if-no-files-found: error
+          retention-days: 14

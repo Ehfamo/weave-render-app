@@ -1,0 +1,314 @@
+name: XEOMX Stage5.4 Final Evidence Gate
+
+on:
+  push:
+    branches:
+      - verify/stage5-4-exact-golden-20260815
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      STAGING_BRANCH: staging/xeomx-request7-cloudflare-live
+      PAYLOAD_BRANCH: payload/stage54-core-v2-20260815
+      CORE_ARCHIVE_SHA256: e5e99cfea3ccdbe206e5e19104ff4890837ecf7d4dadc15cc3f140eaf5c1689f
+      ISOLATED_WORKER_NAME: xeomx-stage54-exact-golden-20260815
+      TARGET_BRANCH: verify/stage5-4-exact-golden-20260815
+    steps:
+      - id: checkout
+        name: Checkout verification branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - id: reconstruct
+        name: Reconstruct checksum-verified overlay
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "$PAYLOAD_BRANCH"
+          for n in 00 01 02 03 04 05 06 07; do git show "FETCH_HEAD:.xeomx-stage54-core-v2/core.$n" > "/tmp/core.$n"; done
+          cat > /tmp/core-v2.sha256 <<'EOF'
+          02515ae3d3d40640df39bcd54261b1048e6ba90ae9d46dfee5df988bc945eb32  /tmp/core.00
+          37c231c2aef38b7925bc95bf4fffdf9024a1a093ba2c174509b8311e3cc5b9bc  /tmp/core.01
+          85a737b8e47823eeb27eefa0d790f28c0dc9b880cfcf8eefac95b82873bb20e4  /tmp/core.02
+          632d7c49d68da6cc624426bd38d3c27c386b79b563c55e39bacabd0dda0f46bc  /tmp/core.03
+          33437cc634b3574b819ece7c1f8efa164679084ef42e8f9f708c26ee40f9e179  /tmp/core.04
+          1a05a12bfbdbf1b8b066af63055da23fdbe5b4db4c076a6a21b41a4e14dee141  /tmp/core.05
+          a4ea7a4331cb509ca4e7d61ab68eb7f521ae4f46e693a47fe3453b29c13f67c2  /tmp/core.06
+          b738c10a8617bc1ae53fdc1799695f80d2def47f385b7eb1333ee36db82ac32d  /tmp/core.07
+          EOF
+          sha256sum -c /tmp/core-v2.sha256
+          cat /tmp/core.0{0,1,2,3,4,5,6,7} > /tmp/stage54-core.b64
+          base64 -d /tmp/stage54-core.b64 > /tmp/stage54-core.tar.xz
+          echo "$CORE_ARCHIVE_SHA256  /tmp/stage54-core.tar.xz" | sha256sum -c -
+          xz -t /tmp/stage54-core.tar.xz
+          tar -tJf /tmp/stage54-core.tar.xz > /tmp/stage54-core.list
+          grep -qx 'package.json' /tmp/stage54-core.list
+          grep -qx 'package-lock.json' /tmp/stage54-core.list
+
+      - id: staging_checkout
+        name: Checkout real staging source detached
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "$STAGING_BRANCH"
+          git checkout --detach FETCH_HEAD
+          echo "BASE_SHA=$(git rev-parse HEAD)"
+          test "$(git branch --show-current)" = ""
+
+      - id: materialize
+        name: Materialize Stage5.4 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -xJf /tmp/stage54-core.tar.xz -C .
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('src/lib/backend/vertical-slice.ts'); s=p.read_text()
+          old='''export const REQUEST_7_LIVE_TEXT_PROVIDER = {
+            id: "cloudflare",
+            model: "@cf/meta/llama-3.1-8b-instruct-fast",
+            reservedCreditUnits: 5,
+          } as const;'''
+          new='''export const REQUEST_7_TEXT_PROVIDER_ROUTES = [
+            {
+              id: "cloudflare",
+              model: "@cf/meta/llama-3.1-8b-instruct-fast",
+              reservedCreditUnits: 5,
+            },
+            { id: "gemini", model: "gemini-3.5-flash", reservedCreditUnits: 5 },
+            { id: "groq", model: "llama-3.1-8b-instant", reservedCreditUnits: 5 },
+          ] as const;
+
+          export const REQUEST_7_LIVE_TEXT_PROVIDER = REQUEST_7_TEXT_PROVIDER_ROUTES[0];'''
+          if s.count(old)!=1: raise SystemExit(f'vertical-slice block count={s.count(old)}')
+          p.write_text(s.replace(old,new))
+          p=Path('src/lib/backend/vertical-slice.server.ts'); s=p.read_text()
+          if s.count('  REQUEST_7_LIVE_TEXT_PROVIDER,\n')!=1: raise SystemExit('server import mismatch')
+          s=s.replace('  REQUEST_7_LIVE_TEXT_PROVIDER,\n','  REQUEST_7_TEXT_PROVIDER_ROUTES,\n')
+          old='''  const route = REQUEST_7_LIVE_TEXT_PROVIDER;
+            if (input.routingMode === "manual") {
+              if (input.requestedProvider !== route.id) throw new VerticalSliceError("PROVIDER_UNAVAILABLE");
+              if (input.requestedModel !== route.model) throw new VerticalSliceError("MODEL_UNAVAILABLE");
+            }'''
+          new='''  if (input.routingMode === "manual") {
+            const providerRoutes = REQUEST_7_TEXT_PROVIDER_ROUTES.filter(
+              (route) => route.id === input.requestedProvider,
+            );
+            if (!providerRoutes.length) throw new VerticalSliceError("PROVIDER_UNAVAILABLE");
+            if (!providerRoutes.some((route) => route.model === input.requestedModel)) {
+              throw new VerticalSliceError("MODEL_UNAVAILABLE");
+            }
+          }'''
+          if s.count(old)!=1: raise SystemExit(f'server routing block count={s.count(old)}')
+          p.write_text(s.replace(old,new))
+          PY
+          grep -q '"@lovable.dev/vite-tanstack-config": "2.8.5"' package.json
+          grep -q '"@lovable.dev/vite-tanstack-config": "2.8.5"' package-lock.json
+          git diff --check
+
+      - id: node
+        name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - id: install
+        name: Fresh exact npm install
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts=false
+          actual="$(node -p "require('./node_modules/@lovable.dev/vite-tanstack-config/package.json').version")"
+          echo "INSTALLED_VITE_TANSTACK_CONFIG=$actual"
+          test "$actual" = '2.8.5'
+
+      - id: build
+        name: Production build and route generation
+        run: npm run build
+
+      - id: typecheck
+        name: Typecheck
+        run: npm run typecheck
+
+      - id: autofix
+        name: Scoped ESLint autofix diagnostic
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npx eslint src/lib/backend/vertical-slice.ts src/lib/backend/vertical-slice.server.ts src/routeTree.gen.ts --fix 2>&1 | tee /tmp/stage54-autofix.log
+          status=${PIPESTATUS[0]}
+          git diff --check
+          git diff -- src/lib/backend/vertical-slice.ts src/lib/backend/vertical-slice.server.ts src/routeTree.gen.ts > /tmp/stage54-lint-fix.patch
+          exit "$status"
+
+      - id: lint
+        name: Full lint
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run lint 2>&1 | tee /tmp/stage54-lint.log
+          exit ${PIPESTATUS[0]}
+
+      - id: tests
+        name: Full tests
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee /tmp/stage54-tests.log
+          exit ${PIPESTATUS[0]}
+
+      - id: integration
+        name: Integration tests
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run test:integration 2>&1 | tee /tmp/stage54-integration.log
+          exit ${PIPESTATUS[0]}
+
+      - id: migrations
+        name: Migration tests
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run test:migrations 2>&1 | tee /tmp/stage54-migrations.log
+          exit ${PIPESTATUS[0]}
+
+      - id: smoke
+        name: Build smoke
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run test:smoke 2>&1 | tee /tmp/stage54-smoke.log
+          exit ${PIPESTATUS[0]}
+
+      - id: secrets
+        name: Secret pattern gate
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -RInE --exclude-dir=node_modules --exclude-dir=.git --exclude='package-lock.json' --exclude='*.md' '(sk_live_|AIza[0-9A-Za-z_-]{20,}|gsk_[0-9A-Za-z_-]{20,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----)' src supabase tests package.json 2>/dev/null | tee /tmp/stage54-secret-findings.log; then
+            echo 'SECRET_PATTERN_GATE=FAIL' >> /tmp/stage54-secret-findings.log
+            exit 1
+          fi
+          echo 'SECRET_PATTERN_GATE=PASS' | tee /tmp/stage54-secret-findings.log
+
+      - id: deploy
+        name: Deploy only isolated Cloudflare Worker
+        if: >-
+          steps.lint.outcome == 'success' &&
+          steps.tests.outcome == 'success' &&
+          steps.integration.outcome == 'success' &&
+          steps.migrations.outcome == 'success' &&
+          steps.smoke.outcome == 'success' &&
+          steps.secrets.outcome == 'success'
+        continue-on-error: true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          set -o pipefail
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          npx wrangler deploy --name "$ISOLATED_WORKER_NAME" 2>&1 | tee /tmp/stage54-deploy.log
+          exit ${PIPESTATUS[0]}
+
+      - id: publish
+        name: Persist complete gate evidence to verification branch only
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          S_CHECKOUT: ${{ steps.checkout.outcome }}
+          S_RECONSTRUCT: ${{ steps.reconstruct.outcome }}
+          S_STAGING_CHECKOUT: ${{ steps.staging_checkout.outcome }}
+          S_MATERIALIZE: ${{ steps.materialize.outcome }}
+          S_NODE: ${{ steps.node.outcome }}
+          S_INSTALL: ${{ steps.install.outcome }}
+          S_BUILD: ${{ steps.build.outcome }}
+          S_TYPECHECK: ${{ steps.typecheck.outcome }}
+          S_AUTOFIX: ${{ steps.autofix.outcome }}
+          S_LINT: ${{ steps.lint.outcome }}
+          S_TESTS: ${{ steps.tests.outcome }}
+          S_INTEGRATION: ${{ steps.integration.outcome }}
+          S_MIGRATIONS: ${{ steps.migrations.outcome }}
+          S_SMOKE: ${{ steps.smoke.outcome }}
+          S_SECRETS: ${{ steps.secrets.outcome }}
+          S_DEPLOY: ${{ steps.deploy.outcome }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/stage54-evidence
+          cat > /tmp/stage54-evidence/result.txt <<EOF
+          XEOMX_STAGE5_4_FINAL_EVIDENCE_GATE_2026-08-15
+          workflow_run_id=$GITHUB_RUN_ID
+          workflow_sha=$GITHUB_SHA
+          base_staging_branch=$STAGING_BRANCH
+          payload_branch=$PAYLOAD_BRANCH
+          core_archive_sha256=$CORE_ARCHIVE_SHA256
+          isolated_worker=$ISOLATED_WORKER_NAME
+          checkout=$S_CHECKOUT
+          reconstruct=$S_RECONSTRUCT
+          staging_checkout=$S_STAGING_CHECKOUT
+          materialize=$S_MATERIALIZE
+          node=$S_NODE
+          fresh_npm_ci=$S_INSTALL
+          build=$S_BUILD
+          typecheck=$S_TYPECHECK
+          scoped_autofix=$S_AUTOFIX
+          lint=$S_LINT
+          full_tests=$S_TESTS
+          integration=$S_INTEGRATION
+          migrations=$S_MIGRATIONS
+          smoke=$S_SMOKE
+          secret_gate=$S_SECRETS
+          isolated_deploy=$S_DEPLOY
+          no_merge=true
+          no_main_write=true
+          no_production_dns=true
+          no_production_supabase_write=true
+          stage6_started=false
+          EOF
+          for src in /tmp/stage54-autofix.log /tmp/stage54-lint-fix.patch /tmp/stage54-lint.log /tmp/stage54-tests.log /tmp/stage54-integration.log /tmp/stage54-migrations.log /tmp/stage54-smoke.log /tmp/stage54-secret-findings.log /tmp/stage54-deploy.log; do
+            [ -f "$src" ] && cp "$src" /tmp/stage54-evidence/ || true
+          done
+          publish() {
+            local src="$1" path="$2" msg="$3"
+            local content api sha
+            content="$(base64 -w0 "$src")"
+            api="repos/${GITHUB_REPOSITORY}/contents/$path"
+            sha="$(gh api "$api?ref=$TARGET_BRANCH" --jq '.sha' 2>/dev/null || true)"
+            args=(--method PUT "$api" -f message="[skip ci] $msg" -f content="$content" -f branch="$TARGET_BRANCH")
+            if [ -n "$sha" ]; then args+=(-f sha="$sha"); fi
+            gh api "${args[@]}" >/dev/null
+          }
+          for src in /tmp/stage54-evidence/*; do
+            name="$(basename "$src")"
+            publish "$src" ".xeomx-diagnostics/final-gate/$name" "stage5.4: persist final gate evidence $name"
+          done
+
+      - name: Enforce complete local gate
+        if: >-
+          steps.lint.outcome != 'success' ||
+          steps.tests.outcome != 'success' ||
+          steps.integration.outcome != 'success' ||
+          steps.migrations.outcome != 'success' ||
+          steps.smoke.outcome != 'success' ||
+          steps.secrets.outcome != 'success' ||
+          steps.deploy.outcome == 'failure'
+        run: exit 1

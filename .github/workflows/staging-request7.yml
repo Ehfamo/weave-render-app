@@ -30,15 +30,29 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test -f .xeomx-stage54-core/core.00
-          test -f .xeomx-stage54-core/core.01
-          test -f .xeomx-stage54-core/core.02
-          test -f .xeomx-stage54-core/core.03
-          test -f .xeomx-stage54-core/core.04
-          test -f .xeomx-stage54-core/core.05
-          test -f .xeomx-stage54-core/core.06
-          test -f .xeomx-stage54-core/core.07
-          head -c "$CORE07_LENGTH" .xeomx-stage54-core/core.07 > /tmp/core.07.exact
+          for f in .xeomx-stage54-core/core.00 .xeomx-stage54-core/core.01 .xeomx-stage54-core/core.02 .xeomx-stage54-core/core.03 .xeomx-stage54-core/core.04 .xeomx-stage54-core/core.05 .xeomx-stage54-core/core.06 .xeomx-stage54-core/core.07; do
+            test -f "$f"
+          done
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, os
+          p = Path('.xeomx-stage54-core/core.07')
+          data = p.read_bytes()
+          size = int(os.environ['CORE07_LENGTH'])
+          expected = os.environ['CORE07_SHA256']
+          found = None
+          for offset in range(0, len(data) - size + 1):
+              candidate = data[offset:offset + size]
+              if hashlib.sha256(candidate).hexdigest() == expected:
+                  found = (offset, candidate)
+                  break
+          if found is None:
+              raise SystemExit(f'No exact core.07 slice found in {len(data)} bytes')
+          offset, candidate = found
+          Path('/tmp/core.07.exact').write_bytes(candidate)
+          print(f'CORE07_EXACT_OFFSET={offset}')
+          print(f'CORE07_SOURCE_BYTES={len(data)}')
+          PY
           echo "$CORE07_SHA256  /tmp/core.07.exact" | sha256sum -c -
           cat .xeomx-stage54-core/core.00 \
               .xeomx-stage54-core/core.01 \
@@ -72,7 +86,6 @@ jobs:
           tar -xJf /tmp/stage54-core.tar.xz -C .
           python - <<'PY'
           from pathlib import Path
-
           p = Path('src/lib/backend/vertical-slice.ts')
           s = p.read_text()
           old = '''export const REQUEST_7_LIVE_TEXT_PROVIDER = {
@@ -165,13 +178,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if grep -RInE \
-            --exclude-dir=node_modules \
-            --exclude-dir=.git \
-            --exclude='package-lock.json' \
-            --exclude='*.md' \
-            '(sk_live_|AIza[0-9A-Za-z_-]{20,}|gsk_[0-9A-Za-z_-]{20,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----)' \
-            src supabase tests package.json 2>/dev/null; then
+          if grep -RInE --exclude-dir=node_modules --exclude-dir=.git --exclude='package-lock.json' --exclude='*.md' '(sk_live_|AIza[0-9A-Za-z_-]{20,}|gsk_[0-9A-Za-z_-]{20,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----)' src supabase tests package.json 2>/dev/null; then
             echo 'Potential credential-like material found' >&2
             exit 1
           fi

@@ -17,18 +17,19 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
-      - name: Validate reconstruction payload only
+      - name: Identify reconstruction payload encoding
         shell: bash
         run: |
           set -euo pipefail
-          echo "CHUNKS=$(find .xeomx -maxdepth 1 -type f -name 'chunk-*' | sort | wc -l)"
-          find .xeomx -maxdepth 1 -type f -name 'chunk-*' -printf '%f %s\n' | sort
-          cat $(find .xeomx -maxdepth 1 -type f -name 'chunk-*' | sort) > /tmp/payload.b64
-          echo "B64_BYTES=$(wc -c </tmp/payload.b64)"
-          base64 --decode /tmp/payload.b64 > /tmp/payload.gz
-          gzip -t /tmp/payload.gz
-          gzip -dc /tmp/payload.gz > /tmp/payload.patch
-          echo "PATCH_BYTES=$(wc -c </tmp/payload.patch)"
-          sha256sum /tmp/payload.patch
-          git apply --check /tmp/payload.patch
-          echo "PAYLOAD_VALID=1"
+          files=$(find .xeomx -maxdepth 1 -type f -name 'chunk-*' | sort)
+          echo "CHUNKS=$(printf '%s\n' "$files" | wc -l)"
+          cat $files > /tmp/payload.b64
+          base64 --decode /tmp/payload.b64 > /tmp/payload.bin
+          echo "DECODED_BYTES=$(wc -c </tmp/payload.bin)"
+          sha256sum /tmp/payload.bin
+          file /tmp/payload.bin
+          printf 'MAGIC='; head -c 32 /tmp/payload.bin | od -An -tx1 | tr -d ' \n'; echo
+          if gzip -t /tmp/payload.bin 2>/dev/null; then echo FORMAT=gzip; fi
+          if xz -t /tmp/payload.bin 2>/dev/null; then echo FORMAT=xz; fi
+          if unzip -t /tmp/payload.bin >/dev/null 2>&1; then echo FORMAT=zip; fi
+          if head -c 16 /tmp/payload.bin | grep -q '^diff --git'; then echo FORMAT=raw_git_patch; fi

@@ -136,7 +136,10 @@ jobs:
           echo "INSTALLED_VITE_TANSTACK_CONFIG=$actual"
           test "$actual" = '2.8.5'
 
-      - name: Typecheck
+      - name: Production build and route generation
+        run: npm run build
+
+      - name: Typecheck after generated routes
         run: npm run typecheck
 
       - name: Lint
@@ -150,9 +153,6 @@ jobs:
 
       - name: Migration tests
         run: npm run test:migrations
-
-      - name: Production build
-        run: npm run build
 
       - name: Build smoke
         run: npm run test:smoke

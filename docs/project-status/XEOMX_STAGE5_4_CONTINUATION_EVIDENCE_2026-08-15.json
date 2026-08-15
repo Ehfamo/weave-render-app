@@ -1,0 +1,39 @@
+{
+  "timestamp": "2026-08-15",
+  "stage": "5.4 continuation",
+  "golden_zip": "XEOMX_GOLDEN_STAGE5_4_FINAL_PREPROD_GATE_2026-08-14.zip",
+  "golden_sha256": "55e1c1f1413eba140a489decce1381ddd3056437978156326049a533b8bd0790",
+  "golden_zip_bytes": 7513825,
+  "source_integrity_discrepancy": {
+    "missing_from_current_golden_zip": [
+      "src/lib/product-architecture.ts",
+      "src/lib/core-workflows.ts",
+      "src/lib/platform-contracts.ts",
+      "src/components/xeomx/product/ProductWorkspacePreview.tsx"
+    ],
+    "expected_sha256": {
+      "src/lib/product-architecture.ts": "4fed3a9cac34ab1c400f545438406802ee8c2dd2e8deac244cbd9dcba9b09ab3",
+      "src/lib/core-workflows.ts": "fce4fb9d01bafd808f45dcd241323ab5c99ada8057f757a10f11afaf93b023f1",
+      "src/lib/platform-contracts.ts": "840e9e012c244652492021223bbd55ae562bf702f06b65d03a67d81c50d5c4f2",
+      "src/components/xeomx/product/ProductWorkspacePreview.tsx": "5504a029910f04541f61b7876fe2df60ab18e2d18f188a2e89d823302f948a11"
+    }
+  },
+  "github_runs": [31875194979, 31875240733, 31875274056],
+  "supabase": {
+    "project_ref": "bzoikmppvwiidyjdaqgv",
+    "security_warn_count": 7,
+    "security_definer_authenticated_execute": 6,
+    "leaked_password_protection": "OPEN",
+    "performance": "INFO-only unused-index advisories",
+    "latest_migration": "20260814161806_stage5_4_stale_generation_lease_recovery",
+    "generation_worker": "ACTIVE v13",
+    "browser_run_probe": "ACTIVE v3"
+  },
+  "safety": {
+    "production_untouched": true,
+    "production_supabase_untouched": true,
+    "dns_untouched": true,
+    "merge": false,
+    "stage6_started": false
+  }
+}

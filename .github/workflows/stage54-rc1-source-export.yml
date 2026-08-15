@@ -1,0 +1,47 @@
+name: XEOMX Stage5.4 RC1 Source Export
+
+on:
+  push:
+    branches:
+      - verify/stage54-from-rc1-tempcheck-20260815
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Build secret-safe tracked source export
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/xeomx-export
+          git ls-files | while IFS= read -r p; do
+            b="$(basename "$p" | tr '[:upper:]' '[:lower:]')"
+            case "$b" in
+              .env|.env.*|*.pem|*.key|*credential*|*secret*) continue ;;
+            esac
+            [ -f "$p" ] || continue
+            mkdir -p "/tmp/xeomx-export/$(dirname "$p")"
+            cp -p "$p" "/tmp/xeomx-export/$p"
+          done
+          rm -f /tmp/xeomx-export/.github/workflows/stage54-rc1-source-export.yml
+          tar -C /tmp/xeomx-export -czf /tmp/xeomx-rc1-source.tar.gz .
+          sha256sum /tmp/xeomx-rc1-source.tar.gz | tee /tmp/xeomx-rc1-source.sha256
+          find /tmp/xeomx-export -type f | sed 's#^/tmp/xeomx-export/##' | sort > /tmp/xeomx-rc1-files.txt
+          echo "FILES=$(wc -l </tmp/xeomx-rc1-files.txt)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xeomx-stage54-rc1-source
+          path: |
+            /tmp/xeomx-rc1-source.tar.gz
+            /tmp/xeomx-rc1-source.sha256
+            /tmp/xeomx-rc1-files.txt
+          if-no-files-found: error
+          retention-days: 2

@@ -1,0 +1,116 @@
+name: XEOMX Stage 5.4 Exact Golden Reconstruction
+
+on:
+  push:
+    branches:
+      - verify/stage5-4-exact-golden-20260815
+  workflow_dispatch:
+
+jobs:
+  reconstruct-and-verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout verification branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Fetch sealed Golden payload refs
+        run: |
+          git fetch --no-tags --depth=1 origin \
+            refs/heads/release/xeomx-superapp-rc1-verified:refs/remotes/origin/release/xeomx-superapp-rc1-verified \
+            refs/heads/payload/stage54-core-v2-20260815:refs/remotes/origin/payload/stage54-core-v2-20260815
+
+      - name: Reconstruct sealed Golden source
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf exact-golden reconstruct
+          mkdir -p reconstruct exact-golden
+          : > reconstruct/golden.b64
+          for n in 00 01 02 03 04 05 06; do
+            git show "refs/remotes/origin/release/xeomx-superapp-rc1-verified:.xeomx/chunk-${n}" >> reconstruct/golden.b64
+          done
+          tr -d '\n\r' < reconstruct/golden.b64 > reconstruct/golden.normalized.b64
+          base64 -d -i reconstruct/golden.normalized.b64 > reconstruct/golden.xz
+          xz -t reconstruct/golden.xz
+          xz -dc reconstruct/golden.xz > reconstruct/golden.tar
+          tar -tf reconstruct/golden.tar >/dev/null
+          tar -xf reconstruct/golden.tar -C exact-golden
+          test -f exact-golden/package.json
+          test -f exact-golden/package-lock.json
+          test -f exact-golden/src/lib/product-architecture.ts
+          test -f exact-golden/src/lib/core-workflows.ts
+          test -f exact-golden/src/lib/platform-contracts.ts
+          test -f exact-golden/src/components/xeomx/product/ProductWorkspacePreview.tsx
+
+      - name: Overlay Stage 5.4 backend and verification tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          git archive --format=tar refs/remotes/origin/payload/stage54-core-v2-20260815 | tar -x -C exact-golden
+          test -f exact-golden/supabase/functions/xeomx-generation-worker/index.ts
+          test -f exact-golden/tests/stage54-targeted-hardening.test.mjs
+          test -f exact-golden/tests/core-workflows.test.mjs
+
+      - name: Remove credentials from verification workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f exact-golden/.env exact-golden/.env.*
+          if grep -RInE '(sk-[A-Za-z0-9_-]{20,}|AIza[0-9A-Za-z_-]{20,}|gsk_[A-Za-z0-9_-]{20,}|CF_API_TOKEN=.+|SUPABASE_SERVICE_ROLE_KEY=.+)' exact-golden --exclude-dir=node_modules --exclude='*.lock' >/tmp/secret-scan.txt; then
+            echo 'Potential credential material found:'
+            cat /tmp/secret-scan.txt
+            exit 1
+          fi
+
+      - name: Exact dependency install
+        working-directory: exact-golden
+        run: npm ci
+
+      - name: Exact dependency assertion
+        working-directory: exact-golden
+        run: node -e "const p=require('./package-lock.json'); const v=p.packages?.['node_modules/@lovable.dev/vite-tanstack-config']?.version; if(v!=='2.8.5'){throw new Error('Expected @lovable.dev/vite-tanstack-config 2.8.5, got '+v)}; console.log('exact dependency',v)"
+
+      - name: Build
+        working-directory: exact-golden
+        run: npm run build
+
+      - name: Typecheck
+        working-directory: exact-golden
+        run: npm run typecheck
+
+      - name: Lint
+        working-directory: exact-golden
+        run: npm run lint
+
+      - name: Full regression
+        working-directory: exact-golden
+        run: npm test
+
+      - name: Collect deterministic evidence
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          mkdir -p evidence
+          printf 'commit=%s\n' "$GITHUB_SHA" > evidence/reconstruction.txt
+          printf 'release_ref=%s\n' 'release/xeomx-superapp-rc1-verified' >> evidence/reconstruction.txt
+          printf 'overlay_ref=%s\n' 'payload/stage54-core-v2-20260815' >> evidence/reconstruction.txt
+          sha256sum reconstruct/golden.normalized.b64 reconstruct/golden.xz reconstruct/golden.tar >> evidence/reconstruction.txt 2>/dev/null || true
+          find exact-golden/src/lib exact-golden/src/components/xeomx/product -type f 2>/dev/null | wc -l > evidence/source-count.txt
+
+      - name: Upload verification artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xeomx-stage54-exact-golden-reconstruction-${{ github.run_id }}
+          path: |
+            evidence/
+            reconstruct/golden.normalized.b64
+            reconstruct/golden.xz
+          if-no-files-found: warn
+          retention-days: 14

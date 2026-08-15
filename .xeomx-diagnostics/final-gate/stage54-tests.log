@@ -21,7 +21,7 @@ TAP version 13
 # Subtest: tests/all-target-surfaces.test.mjs
 not ok 1 - tests/all-target-surfaces.test.mjs
   ---
-  duration_ms: 45.611086
+  duration_ms: 51.223456
   type: 'test'
   location: '/home/runner/work/weave-render-app/weave-render-app/tests/all-target-surfaces.test.mjs:1:1'
   failureType: 'testCodeFailure'
@@ -33,7 +33,7 @@ not ok 1 - tests/all-target-surfaces.test.mjs
 # Subtest: the Cloudflare build emits a deployable Worker package
 ok 2 - the Cloudflare build emits a deployable Worker package
   ---
-  duration_ms: 7.497851
+  duration_ms: 10.363338
   type: 'test'
   ...
 # node:internal/modules/esm/resolve:275
@@ -54,7 +54,7 @@ ok 2 - the Cloudflare build emits a deployable Worker package
 # Subtest: tests/core-workflows.test.mjs
 not ok 3 - tests/core-workflows.test.mjs
   ---
-  duration_ms: 42.360466
+  duration_ms: 50.006276
   type: 'test'
   location: '/home/runner/work/weave-render-app/weave-render-app/tests/core-workflows.test.mjs:1:1'
   failureType: 'testCodeFailure'
@@ -81,7 +81,7 @@ not ok 3 - tests/core-workflows.test.mjs
 # Subtest: tests/p0-target-surfaces.test.mjs
 not ok 4 - tests/p0-target-surfaces.test.mjs
   ---
-  duration_ms: 38.965753
+  duration_ms: 47.72505
   type: 'test'
   location: '/home/runner/work/weave-render-app/weave-render-app/tests/p0-target-surfaces.test.mjs:1:1'
   failureType: 'testCodeFailure'
@@ -108,7 +108,7 @@ not ok 4 - tests/p0-target-surfaces.test.mjs
 # Subtest: tests/platform-contracts.test.mjs
 not ok 5 - tests/platform-contracts.test.mjs
   ---
-  duration_ms: 31.083623
+  duration_ms: 48.338814
   type: 'test'
   location: '/home/runner/work/weave-render-app/weave-render-app/tests/platform-contracts.test.mjs:1:1'
   failureType: 'testCodeFailure'
@@ -120,7 +120,7 @@ not ok 5 - tests/platform-contracts.test.mjs
 # Subtest: the 25-environment product contract is complete and internally unique after the full target-surface closure wave
 not ok 6 - the 25-environment product contract is complete and internally unique after the full target-surface closure wave
   ---
-  duration_ms: 5.327457
+  duration_ms: 7.009511
   type: 'test'
   location: '/home/runner/work/weave-render-app/weave-render-app/tests/product-readiness.test.mjs:101:1'
   failureType: 'testCodeFailure'
@@ -137,7 +137,7 @@ not ok 6 - the 25-environment product contract is complete and internally unique
 # Subtest: all twelve critical journeys point to real product views
 not ok 7 - all twelve critical journeys point to real product views
   ---
-  duration_ms: 2.293346
+  duration_ms: 2.982031
   type: 'test'
   location: '/home/runner/work/weave-render-app/weave-render-app/tests/product-readiness.test.mjs:120:1'
   failureType: 'testCodeFailure'
@@ -154,7 +154,7 @@ not ok 7 - all twelve critical journeys point to real product views
 # Subtest: locale contracts stay in exact parity
 not ok 8 - locale contracts stay in exact parity
   ---
-  duration_ms: 12.309506
+  duration_ms: 14.539424
   type: 'test'
   location: '/home/runner/work/weave-render-app/weave-render-app/tests/product-readiness.test.mjs:159:1'
   failureType: 'testCodeFailure'
@@ -176,7 +176,7 @@ not ok 8 - locale contracts stay in exact parity
 # Subtest: release truth and safety controls are explicit in product previews
 not ok 9 - release truth and safety controls are explicit in product previews
   ---
-  duration_ms: 2.113741
+  duration_ms: 3.702118
   type: 'test'
   location: '/home/runner/work/weave-render-app/weave-render-app/tests/product-readiness.test.mjs:175:1'
   failureType: 'testCodeFailure'
@@ -192,7 +192,7 @@ not ok 9 - release truth and safety controls are explicit in product previews
 # Subtest: legacy simulations, fake metrics, and soft product 404s stay removed
 not ok 10 - legacy simulations, fake metrics, and soft product 404s stay removed
   ---
-  duration_ms: 4.672339
+  duration_ms: 2.241232
   type: 'test'
   location: '/home/runner/work/weave-render-app/weave-render-app/tests/product-readiness.test.mjs:219:1'
   failureType: 'testCodeFailure'
@@ -214,7 +214,7 @@ not ok 10 - legacy simulations, fake metrics, and soft product 404s stay removed
 # Subtest: public listing, auth, SEO, and runtime warning boundaries remain safe
 not ok 11 - public listing, auth, SEO, and runtime warning boundaries remain safe
   ---
-  duration_ms: 1.263987
+  duration_ms: 2.975772
   type: 'test'
   location: '/home/runner/work/weave-render-app/weave-render-app/tests/product-readiness.test.mjs:256:1'
   failureType: 'testCodeFailure'
@@ -232,13 +232,13 @@ not ok 11 - public listing, auth, SEO, and runtime warning boundaries remain saf
 # Subtest: release dependency surface excludes proven unused direct packages
 ok 12 - release dependency surface excludes proven unused direct packages
   ---
-  duration_ms: 1.739618
+  duration_ms: 1.784626
   type: 'test'
   ...
 # Subtest: secondary global tools stay outside the initial client path
 not ok 13 - secondary global tools stay outside the initial client path
   ---
-  duration_ms: 1.064842
+  duration_ms: 1.406685
   type: 'test'
   location: '/home/runner/work/weave-render-app/weave-render-app/tests/product-readiness.test.mjs:300:1'
   failureType: 'testCodeFailure'
@@ -260,7 +260,7 @@ not ok 13 - secondary global tools stay outside the initial client path
 # Subtest: request 4 hardening stays centralized, fail-closed, and context preserving
 not ok 14 - request 4 hardening stays centralized, fail-closed, and context preserving
   ---
-  duration_ms: 1.737907
+  duration_ms: 2.044601
   type: 'test'
   location: '/home/runner/work/weave-render-app/weave-render-app/tests/product-readiness.test.mjs:317:1'
   failureType: 'testCodeFailure'
@@ -282,139 +282,139 @@ not ok 14 - request 4 hardening stays centralized, fail-closed, and context pres
 # Subtest: Request 7 migration is additive, indexed and RLS protected
 ok 15 - Request 7 migration is additive, indexed and RLS protected
   ---
-  duration_ms: 5.282461
+  duration_ms: 11.37649
   type: 'test'
   ...
 # Subtest: Request 7 migration keeps sensitive writes server-only and storage private
 ok 16 - Request 7 migration keeps sensitive writes server-only and storage private
   ---
-  duration_ms: 6.822654
+  duration_ms: 3.752383
   type: 'test'
   ...
 # Subtest: Request 7 workflow maturity is connected but never falsely live-verified
 ok 17 - Request 7 workflow maturity is connected but never falsely live-verified
   ---
-  duration_ms: 1.499734
+  duration_ms: 2.119712
   type: 'test'
   ...
 # Subtest: authentication is required before the generation path
 ok 18 - authentication is required before the generation path
   ---
-  duration_ms: 0.713874
+  duration_ms: 1.008525
   type: 'test'
   ...
 # Subtest: project ownership is enforced before unavailable requests are persisted
 ok 19 - project ownership is enforced before unavailable requests are persisted
   ---
-  duration_ms: 0.445187
+  duration_ms: 0.6882
   type: 'test'
   ...
 # Subtest: provider unavailable is persisted honestly without a credit charge
 ok 20 - provider unavailable is persisted honestly without a credit charge
   ---
-  duration_ms: 0.410726
+  duration_ms: 0.583005
   type: 'test'
   ...
 # Subtest: successful CI provider execution persists output, asset, usage, ledger and audit
 ok 21 - successful CI provider execution persists output, asset, usage, ledger and audit
   ---
-  duration_ms: 0.945396
+  duration_ms: 1.197565
   type: 'test'
   ...
 # Subtest: failed provider execution releases the full reservation and records failure
 ok 22 - failed provider execution releases the full reservation and records failure
   ---
-  duration_ms: 0.423456
+  duration_ms: 0.519641
   type: 'test'
   ...
 # Subtest: cancelling a queued job is authorized, idempotent and releases its reservation once
 ok 23 - cancelling a queued job is authorized, idempotent and releases its reservation once
   ---
-  duration_ms: 0.425969
+  duration_ms: 0.472771
   type: 'test'
   ...
 # Subtest: insufficient credits creates no job, message, usage or charge
 ok 24 - insufficient credits creates no job, message, usage or charge
   ---
-  duration_ms: 0.302207
+  duration_ms: 0.376589
   type: 'test'
   ...
 # Subtest: an idempotent retry does not execute the provider or charge twice
 ok 25 - an idempotent retry does not execute the provider or charge twice
   ---
-  duration_ms: 0.583171
+  duration_ms: 0.804022
   type: 'test'
   ...
 # Subtest: reusing an idempotency key for different input is rejected
 ok 26 - reusing an idempotency key for different input is rejected
   ---
-  duration_ms: 2.41087
+  duration_ms: 2.579454
   type: 'test'
   ...
 # Subtest: manual routing requires the exact verified provider and model
 ok 27 - manual routing requires the exact verified provider and model
   ---
-  duration_ms: 0.273424
+  duration_ms: 0.360374
   type: 'test'
   ...
 # Subtest: full CI vertical slice survives project reload
 ok 28 - full CI vertical slice survives project reload
   ---
-  duration_ms: 0.323598
+  duration_ms: 0.386393
   type: 'test'
   ...
 # Subtest: research citations accept only provided source ids
 ok 29 - research citations accept only provided source ids
   ---
-  duration_ms: 1.586643
+  duration_ms: 2.301972
   type: 'test'
   ...
 # Subtest: research citations require at least one citation
 ok 30 - research citations require at least one citation
   ---
-  duration_ms: 0.156822
+  duration_ms: 0.264973
   type: 'test'
   ...
 # Subtest: research citations reject unknown source ids
 ok 31 - research citations reject unknown source ids
   ---
-  duration_ms: 0.201317
+  duration_ms: 0.273866
   type: 'test'
   ...
 # Subtest: research citations reject malformed numeric citation groups
 ok 32 - research citations reject malformed numeric citation groups
   ---
-  duration_ms: 0.15565
+  duration_ms: 0.180117
   type: 'test'
   ...
 # Subtest: Stage 5 migration adds the three missing foreign-key indexes
 ok 33 - Stage 5 migration adds the three missing foreign-key indexes
   ---
-  duration_ms: 4.174134
+  duration_ms: 8.782379
   type: 'test'
   ...
 # Subtest: Stage 5 migration preserves RLS and narrows policy roles
 ok 34 - Stage 5 migration preserves RLS and narrows policy roles
   ---
-  duration_ms: 1.501117
+  duration_ms: 3.617853
   type: 'test'
   ...
 # Subtest: Stage 5 migration is transactional and non-destructive to data
 ok 35 - Stage 5 migration is transactional and non-destructive to data
   ---
-  duration_ms: 1.003952
+  duration_ms: 1.406515
   type: 'test'
   ...
 # Subtest: compensating agent JSON guard normalizes and recursively rejects common secret keys
 ok 36 - compensating agent JSON guard normalizes and recursively rejects common secret keys
   ---
-  duration_ms: 7.371795
+  duration_ms: 12.576198
   type: 'test'
   ...
 # Subtest: hardened guard remains fixed-path and private to trusted execution
 ok 37 - hardened guard remains fixed-path and private to trusted execution
   ---
-  duration_ms: 2.612788
+  duration_ms: 2.254201
   type: 'test'
   ...
 # node:internal/modules/esm/resolve:275
@@ -435,7 +435,7 @@ ok 37 - hardened guard remains fixed-path and private to trusted execution
 # Subtest: tests/stage53-agent-workflow-control-plane.test.mjs
 not ok 12 - tests/stage53-agent-workflow-control-plane.test.mjs
   ---
-  duration_ms: 41.846151
+  duration_ms: 58.722923
   type: 'test'
   location: '/home/runner/work/weave-render-app/weave-render-app/tests/stage53-agent-workflow-control-plane.test.mjs:1:1'
   failureType: 'testCodeFailure'
@@ -447,43 +447,43 @@ not ok 12 - tests/stage53-agent-workflow-control-plane.test.mjs
 # Subtest: Stage 5.3 creates six durable RLS-protected control-plane tables
 ok 39 - Stage 5.3 creates six durable RLS-protected control-plane tables
   ---
-  duration_ms: 7.243236
+  duration_ms: 8.994544
   type: 'test'
   ...
 # Subtest: risk and state constraints encode R0/R1 allowlists, R2 approval and R3 denial
 ok 40 - risk and state constraints encode R0/R1 allowlists, R2 approval and R3 denial
   ---
-  duration_ms: 1.892785
+  duration_ms: 3.00848
   type: 'test'
   ...
 # Subtest: R2 cannot queue before an exact project-owner approval
 ok 41 - R2 cannot queue before an exact project-owner approval
   ---
-  duration_ms: 2.928014
+  duration_ms: 3.310328
   type: 'test'
   ...
 # Subtest: idempotency, opaque references, secret rejection and audits are durable
 ok 42 - idempotency, opaque references, secret rejection and audits are durable
   ---
-  duration_ms: 0.935211
+  duration_ms: 1.599311
   type: 'test'
   ...
 # Subtest: all foreign keys have intentional covering indexes
 ok 43 - all foreign keys have intentional covering indexes
   ---
-  duration_ms: 1.081968
+  duration_ms: 1.172658
   type: 'test'
   ...
 # Subtest: private trigger helpers are never executable by authenticated clients
 ok 44 - private trigger helpers are never executable by authenticated clients
   ---
-  duration_ms: 1.934236
+  duration_ms: 2.168745
   type: 'test'
   ...
 # Subtest: authenticated mutations remain narrow and RLS ownership-bound
 ok 45 - authenticated mutations remain narrow and RLS ownership-bound
   ---
-  duration_ms: 1.776303
+  duration_ms: 2.035557
   type: 'test'
   ...
 # node:internal/modules/esm/resolve:275
@@ -504,7 +504,7 @@ ok 45 - authenticated mutations remain narrow and RLS ownership-bound
 # Subtest: tests/stage53-billing-boundary.test.mjs
 not ok 14 - tests/stage53-billing-boundary.test.mjs
   ---
-  duration_ms: 69.108943
+  duration_ms: 47.196927
   type: 'test'
   location: '/home/runner/work/weave-render-app/weave-render-app/tests/stage53-billing-boundary.test.mjs:1:1'
   failureType: 'testCodeFailure'
@@ -516,115 +516,115 @@ not ok 14 - tests/stage53-billing-boundary.test.mjs
 # Subtest: Stage 5.3 billing migration is additive and lets apply_migration own the transaction
 ok 47 - Stage 5.3 billing migration is additive and lets apply_migration own the transaction
   ---
-  duration_ms: 5.81692
+  duration_ms: 7.512898
   type: 'test'
   ...
 # Subtest: authenticated clients can read only their own billing rows
 ok 48 - authenticated clients can read only their own billing rows
   ---
-  duration_ms: 2.140381
+  duration_ms: 3.009722
   type: 'test'
   ...
 # Subtest: foreign keys have covering indexes and payment events are idempotent
 ok 49 - foreign keys have covering indexes and payment events are idempotent
   ---
-  duration_ms: 0.924646
+  duration_ms: 1.255882
   type: 'test'
   ...
 # Subtest: aggregate advisory locks make create/event/entitlement idempotency race-safe
 ok 50 - aggregate advisory locks make create/event/entitlement idempotency race-safe
   ---
-  duration_ms: 0.889473
+  duration_ms: 1.158948
   type: 'test'
   ...
 # Subtest: checkout and subscription lifecycle transitions fail closed
 ok 51 - checkout and subscription lifecycle transitions fail closed
   ---
-  duration_ms: 0.854232
+  duration_ms: 1.20077
   type: 'test'
   ...
 # Subtest: service-only helpers revoke public and client execution
 ok 52 - service-only helpers revoke public and client execution
   ---
-  duration_ms: 1.840598
+  duration_ms: 2.464233
   type: 'test'
   ...
 # Subtest: entitlement activation locks and validates a confirmed payment event
 ok 53 - entitlement activation locks and validates a confirmed payment event
   ---
-  duration_ms: 1.269755
+  duration_ms: 2.578813
   type: 'test'
   ...
 # Subtest: migration remains provider-neutral and contains no credentials
 ok 54 - migration remains provider-neutral and contains no credentials
   ---
-  duration_ms: 1.072474
+  duration_ms: 1.407536
   type: 'test'
   ...
 # Subtest: metadata is recursively filtered and raw webhook payloads are never persisted
 ok 55 - metadata is recursively filtered and raw webhook payloads are never persisted
   ---
-  duration_ms: 1.213582
+  duration_ms: 1.605369
   type: 'test'
   ...
 # Subtest: Stage 5.3 covers both composite Dataset/Evals foreign keys
 ok 56 - Stage 5.3 covers both composite Dataset/Evals foreign keys
   ---
-  duration_ms: 4.852285
+  duration_ms: 6.087584
   type: 'test'
   ...
 # Subtest: Stage 5.3 evidence migration is apply_migration-owned and additive
 ok 57 - Stage 5.3 evidence migration is apply_migration-owned and additive
   ---
-  duration_ms: 8.22826
+  duration_ms: 9.845195
   type: 'test'
   ...
 # Subtest: all browser-visible writes have explicit RLS checks and no anonymous grants
 ok 58 - all browser-visible writes have explicit RLS checks and no anonymous grants
   ---
-  duration_ms: 2.497038
+  duration_ms: 3.08294
   type: 'test'
   ...
 # Subtest: trigger helpers are fixed-path, service-only SECURITY DEFINER functions
 ok 59 - trigger helpers are fixed-path, service-only SECURITY DEFINER functions
   ---
-  duration_ms: 6.001712
+  duration_ms: 5.008645
   type: 'test'
   ...
 # Subtest: version, result, link and provenance immutability fail closed
 ok 60 - version, result, link and provenance immutability fail closed
   ---
-  duration_ms: 1.163218
+  duration_ms: 1.39658
   type: 'test'
   ...
 # Subtest: recursive SQL boundary rejects secret-like JSON keys on every JSON surface
 ok 61 - recursive SQL boundary rejects secret-like JSON keys on every JSON surface
   ---
-  duration_ms: 1.553885
+  duration_ms: 1.746729
   type: 'test'
   ...
 # Subtest: provider compute is disconnected until verified and FK paths are indexed
 ok 62 - provider compute is disconnected until verified and FK paths are indexed
   ---
-  duration_ms: 2.466883
+  duration_ms: 3.437325
   type: 'test'
   ...
 # Subtest: eval run constraints have non-colliding explicit names
 ok 63 - eval run constraints have non-colliding explicit names
   ---
-  duration_ms: 1.839316
+  duration_ms: 2.076658
   type: 'test'
   ...
 # Subtest: dataset item admission locks the version against concurrent finalization
 ok 64 - dataset item admission locks the version against concurrent finalization
   ---
-  duration_ms: 0.788254
+  duration_ms: 1.569107
   type: 'test'
   ...
 # Subtest: migration contains no credential values or broad authenticated result writes
 ok 65 - migration contains no credential values or broad authenticated result writes
   ---
-  duration_ms: 1.334421
+  duration_ms: 2.051721
   type: 'test'
   ...
 # node:internal/modules/esm/resolve:275
@@ -645,7 +645,7 @@ ok 65 - migration contains no credential values or broad authenticated result wr
 # Subtest: tests/stage53-evidence.test.mjs
 not ok 18 - tests/stage53-evidence.test.mjs
   ---
-  duration_ms: 35.89554
+  duration_ms: 46.266477
   type: 'test'
   location: '/home/runner/work/weave-render-app/weave-render-app/tests/stage53-evidence.test.mjs:1:1'
   failureType: 'testCodeFailure'
@@ -657,7 +657,7 @@ not ok 18 - tests/stage53-evidence.test.mjs
 # Subtest: authenticated membership mutation privileges are removed while RLS read remains
 ok 67 - authenticated membership mutation privileges are removed while RLS read remains
   ---
-  duration_ms: 4.779908
+  duration_ms: 5.856141
   type: 'test'
   ...
 # node:internal/modules/esm/resolve:275
@@ -678,7 +678,7 @@ ok 67 - authenticated membership mutation privileges are removed while RLS read 
 # Subtest: tests/stage53-project-search.test.mjs
 not ok 20 - tests/stage53-project-search.test.mjs
   ---
-  duration_ms: 35.534416
+  duration_ms: 45.621071
   type: 'test'
   location: '/home/runner/work/weave-render-app/weave-render-app/tests/stage53-project-search.test.mjs:1:1'
   failureType: 'testCodeFailure'
@@ -690,67 +690,67 @@ not ok 20 - tests/stage53-project-search.test.mjs
 # Subtest: stale running generation jobs have a partial-indexed lease recovery path
 ok 69 - stale running generation jobs have a partial-indexed lease recovery path
   ---
-  duration_ms: 0.986777
+  duration_ms: 1.172298
   type: 'test'
   ...
 # Subtest: lease recovery fails stale work closed through the canonical failure RPC
 ok 70 - lease recovery fails stale work closed through the canonical failure RPC
   ---
-  duration_ms: 0.33194
+  duration_ms: 0.274597
   type: 'test'
   ...
 # Subtest: lease recovery is fixed-path and service-role only
 ok 71 - lease recovery is fixed-path and service-role only
   ---
-  duration_ms: 0.779992
+  duration_ms: 0.717204
   type: 'test'
   ...
 # Subtest: lease recovery validates bounded timeout and batch size
 ok 72 - lease recovery validates bounded timeout and batch size
   ---
-  duration_ms: 0.277079
+  duration_ms: 0.258363
   type: 'test'
   ...
 # Subtest: generation worker performs stale-lease cleanup before claiming queued work
 ok 73 - generation worker performs stale-lease cleanup before claiming queued work
   ---
-  duration_ms: 0.326752
+  duration_ms: 0.278723
   type: 'test'
   ...
 # Subtest: Stage 5.4 app routing registers the exact Cloudflare, Gemini, and Groq models
 ok 74 - Stage 5.4 app routing registers the exact Cloudflare, Gemini, and Groq models
   ---
-  duration_ms: 1.729333
+  duration_ms: 1.435709
   type: 'test'
   ...
 # Subtest: the verified Cloudflare route remains the default live route
 ok 75 - the verified Cloudflare route remains the default live route
   ---
-  duration_ms: 0.221076
+  duration_ms: 0.16214
   type: 'test'
   ...
 # Subtest: server-side manual submission validates against the exact provider registry
 ok 76 - server-side manual submission validates against the exact provider registry
   ---
-  duration_ms: 15.687334
+  duration_ms: 7.997827
   type: 'test'
   ...
 # Subtest: provider success followed by persistence failure fails closed without cross-provider fallback
 ok 77 - provider success followed by persistence failure fails closed without cross-provider fallback
   ---
-  duration_ms: 1.152081
+  duration_ms: 1.246017
   type: 'test'
   ...
 # Subtest: credit ledger Stage 5.4 migration restores authenticated read-only ACL
 ok 78 - credit ledger Stage 5.4 migration restores authenticated read-only ACL
   ---
-  duration_ms: 1.161575
+  duration_ms: 1.205427
   type: 'test'
   ...
 # Subtest: pending entitlement audit trigger is provider-neutral and privilege-contained
 ok 79 - pending entitlement audit trigger is provider-neutral and privilege-contained
   ---
-  duration_ms: 1.108778
+  duration_ms: 0.958171
   type: 'test'
   ...
 1..79
@@ -761,4 +761,4 @@ ok 79 - pending entitlement audit trigger is provider-neutral and privilege-cont
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 643.181339
+# duration_ms 779.312324

@@ -15,88 +15,43 @@ jobs:
     timeout-minutes: 40
     env:
       STAGING_BRANCH: staging/xeomx-request7-cloudflare-live
-      CORE_ARCHIVE_SHA256: 7818fe34e43dde126ae2e165f567a4a9a64c506ab685921c9edf55c4dbfcee03
-      CORE07_LENGTH: 19724
-      CORE07_SHA256: 5b20adbd2ff1e2135f578a6877dc96e862088c650c7935e53b948c870d7cf6f2
+      PAYLOAD_BRANCH: payload/stage54-core-v2-20260815
+      CORE_ARCHIVE_SHA256: e5e99cfea3ccdbe206e5e19104ff4890837ecf7d4dadc15cc3f140eaf5c1689f
       ISOLATED_WORKER_NAME: xeomx-stage54-exact-golden-20260815
     steps:
-      - name: Checkout verification payload branch
+      - name: Checkout verification branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Reconstruct and verify Stage5.4 core overlay
+      - name: Reconstruct and verify Stage5.4 core v2 overlay
         shell: bash
         run: |
           set -euo pipefail
-          for f in .xeomx-stage54-core/core.00 .xeomx-stage54-core/core.01 .xeomx-stage54-core/core.02 .xeomx-stage54-core/core.03 .xeomx-stage54-core/core.04 .xeomx-stage54-core/core.05 .xeomx-stage54-core/core.06 .xeomx-stage54-core/core.07; do
-            test -f "$f"
+          git fetch origin "$PAYLOAD_BRANCH"
+          for n in 00 01 02 03 04 05 06 07; do
+            git show "FETCH_HEAD:.xeomx-stage54-core-v2/core.$n" > "/tmp/core.$n"
           done
-          python - <<'PY'
-          from pathlib import Path
-          import hashlib, os
-
-          p = Path('.xeomx-stage54-core/core.07')
-          data = p.read_bytes()
-          size = int(os.environ['CORE07_LENGTH'])
-          expected = os.environ['CORE07_SHA256']
-
-          def ok(candidate: bytes) -> bool:
-              return len(candidate) == size and hashlib.sha256(candidate).hexdigest() == expected
-
-          found = None
-          mode = None
-
-          if ok(data):
-              found = data
-              mode = 'exact-file'
-
-          if found is None and len(data) >= size:
-              for offset in range(0, len(data) - size + 1):
-                  candidate = data[offset:offset + size]
-                  if ok(candidate):
-                      found = candidate
-                      mode = f'exact-slice@{offset}'
-                      break
-
-          if found is None and len(data) > size:
-              extra = len(data) - size
-              for cut in range(0, size + 1):
-                  candidate = data[:cut] + data[cut + extra:]
-                  if ok(candidate):
-                      found = candidate
-                      mode = f'remove-single-extra-block@{cut}+{extra}'
-                      break
-
-          if found is None:
-              raise SystemExit(
-                  f'Unable to recover checksum-exact core.07 from {len(data)} bytes; '
-                  f'expected_len={size} expected_sha={expected}'
-              )
-
-          Path('/tmp/core.07.exact').write_bytes(found)
-          print(f'CORE07_RECOVERY_MODE={mode}')
-          print(f'CORE07_SOURCE_BYTES={len(data)}')
-          print(f'CORE07_EXACT_BYTES={len(found)}')
-          print(f'CORE07_EXACT_SHA256={hashlib.sha256(found).hexdigest()}')
-          PY
-          echo "$CORE07_SHA256  /tmp/core.07.exact" | sha256sum -c -
-          cat .xeomx-stage54-core/core.00 \
-              .xeomx-stage54-core/core.01 \
-              .xeomx-stage54-core/core.02 \
-              .xeomx-stage54-core/core.03 \
-              .xeomx-stage54-core/core.04 \
-              .xeomx-stage54-core/core.05 \
-              .xeomx-stage54-core/core.06 \
-              /tmp/core.07.exact > /tmp/stage54-core.b64
+          cat > /tmp/core-v2.sha256 <<'EOF'
+          02515ae3d3d40640df39bcd54261b1048e6ba90ae9d46dfee5df988bc945eb32  /tmp/core.00
+          37c231c2aef38b7925bc95bf4fffdf9024a1a093ba2c174509b8311e3cc5b9bc  /tmp/core.01
+          85a737b8e47823eeb27eefa0d790f28c0dc9b880cfcf8eefac95b82873bb20e4  /tmp/core.02
+          632d7c49d68da6cc624426bd38d3c27c386b79b563c55e39bacabd0dda0f46bc  /tmp/core.03
+          33437cc634b3574b819ece7c1f8efa164679084ef42e8f9f708c26ee40f9e179  /tmp/core.04
+          1a05a12bfbdbf1b8b066af63055da23fdbe5b4db4c076a6a21b41a4e14dee141  /tmp/core.05
+          a4ea7a4331cb509ca4e7d61ab68eb7f521ae4f46e693a47fe3453b29c13f67c2  /tmp/core.06
+          b738c10a8617bc1ae53fdc1799695f80d2def47f385b7eb1333ee36db82ac32d  /tmp/core.07
+          EOF
+          sha256sum -c /tmp/core-v2.sha256
+          cat /tmp/core.00 /tmp/core.01 /tmp/core.02 /tmp/core.03 /tmp/core.04 /tmp/core.05 /tmp/core.06 /tmp/core.07 > /tmp/stage54-core.b64
           base64 -d /tmp/stage54-core.b64 > /tmp/stage54-core.tar.xz
           echo "$CORE_ARCHIVE_SHA256  /tmp/stage54-core.tar.xz" | sha256sum -c -
           xz -t /tmp/stage54-core.tar.xz
-          tar -tJf /tmp/stage54-core.tar.xz >/tmp/stage54-core.list
-          grep -qx './package.json' /tmp/stage54-core.list
-          grep -qx './package-lock.json' /tmp/stage54-core.list
-          echo 'CORE_OVERLAY=VERIFIED'
+          tar -tJf /tmp/stage54-core.tar.xz > /tmp/stage54-core.list
+          grep -qx 'package.json' /tmp/stage54-core.list
+          grep -qx 'package-lock.json' /tmp/stage54-core.list
+          echo 'CORE_V2_OVERLAY=VERIFIED'
 
       - name: Checkout real staging source without modifying staging branch
         shell: bash
@@ -230,6 +185,7 @@ jobs:
           {
             echo '## XEOMX Stage 5.4 exact isolated gate'
             echo "- Base staging branch: $STAGING_BRANCH"
+            echo "- Payload branch: $PAYLOAD_BRANCH"
             echo "- Isolated worker target: $ISOLATED_WORKER_NAME"
             echo "- Core overlay SHA256: $CORE_ARCHIVE_SHA256"
             echo '- No merge performed.'

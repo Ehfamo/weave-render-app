@@ -1,4 +1,4 @@
-name: XEOMX Stage5.4 Exact Golden Gate
+name: XEOMX Stage5.4 Payload Recovery
 
 on:
   push:
@@ -10,99 +10,57 @@ permissions:
   contents: read
 
 jobs:
-  exact-golden-gate:
+  recover:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
-    env:
-      GOLDEN_ZIP_URL: https://drive.usercontent.google.com/download?id=1V6jPoCp5R6AyVynnOOunZUTVUZtNm1aI&export=download&confirm=t
-      GOLDEN_ZIP_SHA256: 55e1c1f1413eba140a489decce1381ddd3056437978156326049a533b8bd0790
-      ISOLATED_WORKER_NAME: xeomx-stage54-exact-golden-20260815
+    timeout-minutes: 10
     steps:
-      - name: Checkout isolated verification branch
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
           persist-credentials: false
 
-      - name: Download and verify immutable Golden ZIP
+      - name: Inspect staged Golden reconstruction payloads
         shell: bash
         run: |
-          set -euo pipefail
-          curl -L --fail --silent --show-error "$GOLDEN_ZIP_URL" -o /tmp/stage54-golden.zip
-          actual="$(sha256sum /tmp/stage54-golden.zip | awk '{print $1}')"
-          echo "GOLDEN_ZIP_BYTES=$(wc -c </tmp/stage54-golden.zip)"
-          echo "GOLDEN_ZIP_SHA256=$actual"
-          test "$actual" = "$GOLDEN_ZIP_SHA256"
-          unzip -q /tmp/stage54-golden.zip -d /tmp/stage54-golden
-          test -f /tmp/stage54-golden/source/package.json
-          test -f /tmp/stage54-golden/source/package-lock.json
+          set -u
+          echo '=== TREE ==='
+          find .xeomx-stage54 .xeomx-stage54-small -maxdepth 1 -type f -printf '%p %s bytes\n' 2>/dev/null | sort
 
-      - name: Materialize exact Golden source tree
-        shell: bash
-        run: |
-          set -euo pipefail
-          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
-          cp -a /tmp/stage54-golden/source/. .
-          grep -q '"@lovable.dev/vite-tanstack-config": "2.8.5"' package-lock.json
-          grep -q '"@lovable.dev/vite-tanstack-config": "2.8.5"' package.json
-          git diff --no-index --check /dev/null /tmp/stage54-golden/source >/dev/null || true
-          echo "EXACT_GOLDEN_SOURCE_MATERIALIZED=1"
+          inspect_set() {
+            label="$1"; shift
+            out="/tmp/${label}.xz"
+            : > "$out.b64"
+            for f in "$@"; do
+              [ -f "$f" ] || continue
+              tr -d '\r\n ' < "$f" >> "$out.b64"
+            done
+            echo "=== $label ==="
+            echo "B64_BYTES=$(wc -c < "$out.b64")"
+            if base64 -d "$out.b64" > "$out" 2>/tmp/${label}.b64.err; then
+              echo "BASE64=PASS"
+              echo "XZ_BYTES=$(wc -c < "$out")"
+              sha256sum "$out"
+              if xz -t "$out" 2>/tmp/${label}.xz.err; then
+                echo "XZ=PASS"
+                xz -dc "$out" > "/tmp/${label}.decoded"
+                echo "DECODED_BYTES=$(wc -c < /tmp/${label}.decoded)"
+                file "/tmp/${label}.decoded" || true
+                if tar -tf "/tmp/${label}.decoded" >/tmp/${label}.tar.list 2>/tmp/${label}.tar.err; then
+                  echo "TAR=PASS"
+                  sed -n '1,80p' /tmp/${label}.tar.list
+                else
+                  echo "TAR=NO"
+                  head -c 200 "/tmp/${label}.decoded" | xxd || true
+                fi
+              else
+                echo "XZ=INCOMPLETE_OR_INVALID"
+                cat /tmp/${label}.xz.err || true
+              fi
+            else
+              echo "BASE64=FAIL"
+              cat /tmp/${label}.b64.err || true
+            fi
+          }
 
-      - name: Setup Node 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Exact dependency install
-        run: npm ci --ignore-scripts=false
-
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Full tests
-        run: npm test
-
-      - name: Integration tests
-        run: npm run test:integration
-
-      - name: Migration tests
-        run: npm run test:migrations
-
-      - name: Production build
-        run: npm run build
-
-      - name: Build smoke
-        run: npm run test:smoke
-
-      - name: Secret-pattern gate
-        shell: bash
-        run: |
-          set -euo pipefail
-          if grep -RInE --exclude-dir=node_modules --exclude-dir=.git --exclude='package-lock.json' '(sk_live_|sk_test_|AIza[0-9A-Za-z_-]{20,}|gsk_[0-9A-Za-z_-]{20,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----)' . ; then
-            echo 'Potential credential-like material found in Golden source' >&2
-            exit 1
-          fi
-          echo 'SECRET_PATTERN_GATE=PASS'
-
-      - name: Deploy exact Golden to isolated Cloudflare Worker
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -n "$CLOUDFLARE_API_TOKEN"
-          test -n "$CLOUDFLARE_ACCOUNT_ID"
-          npx wrangler deploy --name "$ISOLATED_WORKER_NAME"
-
-      - name: Record isolated deployment
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo "ISOLATED_WORKER_NAME=$ISOLATED_WORKER_NAME" >> "$GITHUB_STEP_SUMMARY"
-          echo "Golden ZIP SHA256=$GOLDEN_ZIP_SHA256" >> "$GITHUB_STEP_SUMMARY"
-          echo "Production/DNS/main were not targeted by this workflow." >> "$GITHUB_STEP_SUMMARY"
+          inspect_set small .xeomx-stage54-small/payload.*
+          inspect_set small_with_rest .xeomx-stage54-small/payload.* .xeomx-stage54-small/rest.*
+          inspect_set primary .xeomx-stage54/payload.*

@@ -10,11 +10,95 @@ permissions:
   contents: read
 
 jobs:
-  registration-probe:
+  exact-golden-gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 30
+    env:
+      GOLDEN_PATCH_URL: https://drive.usercontent.google.com/download?id=1RQ4C40djhRayMYa0Cc94W1JX1pmiVMay&export=download&confirm=t
+      GOLDEN_PATCH_XZ_SHA256: 5f73774ada3a2121fc365cfea4d1144d5fa2077dbbfa0ae53fbf1b8bc86c8cbb
+      ISOLATED_WORKER_NAME: xeomx-stage54-exact-golden-20260815
     steps:
-      - name: Confirm isolated workflow trigger
+      - name: Checkout isolated verification branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Download and verify exact Golden patch
+        shell: bash
         run: |
-          echo "STAGE54_WORKFLOW_REGISTERED=1"
-          echo "HEAD=${GITHUB_SHA}"
+          set -euo pipefail
+          curl -L --fail --silent --show-error "$GOLDEN_PATCH_URL" -o /tmp/stage54.patch.xz
+          echo "$GOLDEN_PATCH_XZ_SHA256  /tmp/stage54.patch.xz" | sha256sum -c -
+          xz -dc /tmp/stage54.patch.xz > /tmp/stage54.patch
+          test -s /tmp/stage54.patch
+          echo "PATCH_BYTES=$(wc -c </tmp/stage54.patch)"
+
+      - name: Apply exact Golden source patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git apply --check /tmp/stage54.patch
+          git apply /tmp/stage54.patch
+          git diff --check
+          grep -q '"@lovable.dev/vite-tanstack-config": "2.8.5"' package-lock.json
+          grep -q '"@lovable.dev/vite-tanstack-config": "2.8.5"' package.json
+          echo "EXACT_GOLDEN_PATCH_APPLIED=1"
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Exact dependency install
+        run: npm ci --ignore-scripts=false
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Full tests
+        run: npm test
+
+      - name: Integration tests
+        run: npm run test:integration
+
+      - name: Migration tests
+        run: npm run test:migrations
+
+      - name: Production build
+        run: npm run build
+
+      - name: Build smoke
+        run: npm run test:smoke
+
+      - name: Secret-pattern gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git grep -nEI '(sk_live_|sk_test_|AIza[0-9A-Za-z_-]{20,}|gsk_[0-9A-Za-z_-]{20,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----)' -- ':!package-lock.json' ':!*.md' ':!*.json' ; then
+            echo 'Potential credential-like material found in tracked source' >&2
+            exit 1
+          fi
+          echo 'SECRET_PATTERN_GATE=PASS'
+
+      - name: Deploy exact Golden to isolated Cloudflare Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          npx wrangler deploy --name "$ISOLATED_WORKER_NAME"
+
+      - name: Record isolated deployment URL
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "ISOLATED_WORKER_NAME=$ISOLATED_WORKER_NAME" >> "$GITHUB_STEP_SUMMARY"
+          echo "Production/DNS/main were not targeted by this workflow." >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,48 @@
+
+> lint
+> eslint .
+
+
+/home/runner/work/weave-render-app/weave-render-app/src/components/ui/badge.tsx
+  32:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/weave-render-app/weave-render-app/src/components/ui/button.tsx
+  49:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/weave-render-app/weave-render-app/src/components/ui/form.tsx
+  163:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/weave-render-app/weave-render-app/src/components/ui/navigation-menu.tsx
+  111:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/weave-render-app/weave-render-app/src/components/ui/sidebar.tsx
+  743:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/weave-render-app/weave-render-app/src/components/ui/toggle.tsx
+  42:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/weave-render-app/weave-render-app/src/components/xeomx/HeroBackground.tsx
+  48:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/weave-render-app/weave-render-app/src/lib/backend/vertical-slice.server.ts
+  380:3  error  Insert `··`  prettier/prettier
+  381:5  error  Insert `··`  prettier/prettier
+  382:3  error  Insert `··`  prettier/prettier
+  383:1  error  Insert `··`  prettier/prettier
+  384:3  error  Insert `··`  prettier/prettier
+  385:5  error  Insert `··`  prettier/prettier
+  386:3  error  Insert `··`  prettier/prettier
+  387:1  error  Insert `··`  prettier/prettier
+
+/home/runner/work/weave-render-app/weave-render-app/src/routes/__root.tsx
+  264:7  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+  266:7  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+  268:7  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+  270:7  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+
+/home/runner/work/weave-render-app/weave-render-app/src/routes/magazine.tsx
+  56:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+✖ 20 problems (8 errors, 12 warnings)
+  8 errors and 4 warnings potentially fixable with the `--fix` option.
+

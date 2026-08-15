@@ -1,0 +1,172 @@
+diff --git a/src/lib/backend/vertical-slice.server.ts b/src/lib/backend/vertical-slice.server.ts
+index 49cbd74..81ffc68 100644
+--- a/src/lib/backend/vertical-slice.server.ts
++++ b/src/lib/backend/vertical-slice.server.ts
+@@ -16,7 +16,7 @@ import type {
+   VerticalSliceRoutingMode,
+ } from "@/lib/backend/vertical-slice";
+ import {
+-  REQUEST_7_LIVE_TEXT_PROVIDER,
++  REQUEST_7_TEXT_PROVIDER_ROUTES,
+   VerticalSliceError,
+   safeVerticalSliceError,
+ } from "@/lib/backend/vertical-slice";
+@@ -376,10 +376,14 @@ export async function submitTextGeneration(
+ ): Promise<GenerationExecutionResult> {
+   if (!input.actorId) throw new VerticalSliceError("UNAUTHENTICATED");
+ 
+-  const route = REQUEST_7_LIVE_TEXT_PROVIDER;
+   if (input.routingMode === "manual") {
+-    if (input.requestedProvider !== route.id) throw new VerticalSliceError("PROVIDER_UNAVAILABLE");
+-    if (input.requestedModel !== route.model) throw new VerticalSliceError("MODEL_UNAVAILABLE");
++    const providerRoutes = REQUEST_7_TEXT_PROVIDER_ROUTES.filter(
++      (route) => route.id === input.requestedProvider,
++    );
++    if (!providerRoutes.length) throw new VerticalSliceError("PROVIDER_UNAVAILABLE");
++    if (!providerRoutes.some((route) => route.model === input.requestedModel)) {
++      throw new VerticalSliceError("MODEL_UNAVAILABLE");
++    }
+   }
+ 
+   const request: GenerationSubmissionInput = {
+diff --git a/src/lib/backend/vertical-slice.ts b/src/lib/backend/vertical-slice.ts
+index 49662ee..9faa893 100644
+--- a/src/lib/backend/vertical-slice.ts
++++ b/src/lib/backend/vertical-slice.ts
+@@ -82,11 +82,17 @@ export function safeVerticalSliceError(error: unknown): VerticalSliceError {
+ 
+ export type VerticalSliceRoutingMode = "auto" | "manual";
+ 
+-export const REQUEST_7_LIVE_TEXT_PROVIDER = {
+-  id: "cloudflare",
+-  model: "@cf/meta/llama-3.1-8b-instruct-fast",
+-  reservedCreditUnits: 5,
+-} as const;
++export const REQUEST_7_TEXT_PROVIDER_ROUTES = [
++  {
++    id: "cloudflare",
++    model: "@cf/meta/llama-3.1-8b-instruct-fast",
++    reservedCreditUnits: 5,
++  },
++  { id: "gemini", model: "gemini-3.5-flash", reservedCreditUnits: 5 },
++  { id: "groq", model: "llama-3.1-8b-instant", reservedCreditUnits: 5 },
++] as const;
++
++export const REQUEST_7_LIVE_TEXT_PROVIDER = REQUEST_7_TEXT_PROVIDER_ROUTES[0];
+ export type PersistedJobState = "queued" | "running" | "succeeded" | "failed" | "cancelled";
+ 
+ export type ProjectSummary = {
+diff --git a/src/routeTree.gen.ts b/src/routeTree.gen.ts
+index 9115b10..39a53e9 100644
+--- a/src/routeTree.gen.ts
++++ b/src/routeTree.gen.ts
+@@ -37,6 +37,7 @@ import { Route as ExploreSlugRouteImport } from './routes/explore_.$slug'
+ import { Route as CreatorsHandleRouteImport } from './routes/creators.$handle'
+ import { Route as CollectionsIdRouteImport } from './routes/collections.$id'
+ import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
++import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
+ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+ 
+ const XeomxAiRoute = XeomxAiRouteImport.update({
+@@ -178,6 +179,11 @@ const AuthenticatedSavedRoute = AuthenticatedSavedRouteImport.update({
+   path: '/saved',
+   getParentRoute: () => AuthenticatedRouteRoute,
+ } as any)
++const AuthenticatedProjectsRoute = AuthenticatedProjectsRouteImport.update({
++  id: '/projects',
++  path: '/projects',
++  getParentRoute: () => AuthenticatedRouteRoute,
++} as any)
+ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+   id: '/dashboard',
+   path: '/dashboard',
+@@ -207,6 +213,7 @@ export interface FileRoutesByFullPath {
+   '/terms': typeof TermsRoute
+   '/xeomx-ai': typeof XeomxAiRoute
+   '/dashboard': typeof AuthenticatedDashboardRoute
++  '/projects': typeof AuthenticatedProjectsRoute
+   '/saved': typeof AuthenticatedSavedRoute
+   '/collections/$id': typeof CollectionsIdRoute
+   '/creators/$handle': typeof CreatorsHandleRoute
+@@ -237,6 +244,7 @@ export interface FileRoutesByTo {
+   '/terms': typeof TermsRoute
+   '/xeomx-ai': typeof XeomxAiRoute
+   '/dashboard': typeof AuthenticatedDashboardRoute
++  '/projects': typeof AuthenticatedProjectsRoute
+   '/saved': typeof AuthenticatedSavedRoute
+   '/collections/$id': typeof CollectionsIdRoute
+   '/creators/$handle': typeof CreatorsHandleRoute
+@@ -269,6 +277,7 @@ export interface FileRoutesById {
+   '/terms': typeof TermsRoute
+   '/xeomx-ai': typeof XeomxAiRoute
+   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
++  '/_authenticated/projects': typeof AuthenticatedProjectsRoute
+   '/_authenticated/saved': typeof AuthenticatedSavedRoute
+   '/collections/$id': typeof CollectionsIdRoute
+   '/creators/$handle': typeof CreatorsHandleRoute
+@@ -301,6 +310,7 @@ export interface FileRouteTypes {
+     | '/terms'
+     | '/xeomx-ai'
+     | '/dashboard'
++    | '/projects'
+     | '/saved'
+     | '/collections/$id'
+     | '/creators/$handle'
+@@ -331,6 +341,7 @@ export interface FileRouteTypes {
+     | '/terms'
+     | '/xeomx-ai'
+     | '/dashboard'
++    | '/projects'
+     | '/saved'
+     | '/collections/$id'
+     | '/creators/$handle'
+@@ -362,6 +373,7 @@ export interface FileRouteTypes {
+     | '/terms'
+     | '/xeomx-ai'
+     | '/_authenticated/dashboard'
++    | '/_authenticated/projects'
+     | '/_authenticated/saved'
+     | '/collections/$id'
+     | '/creators/$handle'
+@@ -595,6 +607,13 @@ declare module '@tanstack/react-router' {
+       preLoaderRoute: typeof AuthenticatedSavedRouteImport
+       parentRoute: typeof AuthenticatedRouteRoute
+     }
++    '/_authenticated/projects': {
++      id: '/_authenticated/projects'
++      path: '/projects'
++      fullPath: '/projects'
++      preLoaderRoute: typeof AuthenticatedProjectsRouteImport
++      parentRoute: typeof AuthenticatedRouteRoute
++    }
+     '/_authenticated/dashboard': {
+       id: '/_authenticated/dashboard'
+       path: '/dashboard'
+@@ -607,11 +626,13 @@ declare module '@tanstack/react-router' {
+ 
+ interface AuthenticatedRouteRouteChildren {
+   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
++  AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRoute
+   AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
+ }
+ 
+ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
++  AuthenticatedProjectsRoute: AuthenticatedProjectsRoute,
+   AuthenticatedSavedRoute: AuthenticatedSavedRoute,
+ }
+ 
+@@ -683,3 +704,13 @@ const rootRouteChildren: RootRouteChildren = {
+ export const routeTree = rootRouteImport
+   ._addFileChildren(rootRouteChildren)
+   ._addFileTypes<FileRouteTypes>()
++
++import type { getRouter } from './router.tsx'
++import type { startInstance } from './start.ts'
++declare module '@tanstack/react-start' {
++  interface Register {
++    ssr: true
++    router: Awaited<ReturnType<typeof getRouter>>
++    config: Awaited<ReturnType<typeof startInstance.getOptions>>
++  }
++}

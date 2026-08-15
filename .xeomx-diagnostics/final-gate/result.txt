@@ -1,6 +1,6 @@
 XEOMX_STAGE5_4_FINAL_EVIDENCE_GATE_2026-08-15
-workflow_run_id=31875240701
-workflow_sha=f09c9606e75473720f473ca37f52d19aac70b277
+workflow_run_id=31875274079
+workflow_sha=fc193539493cd3127388b265d413eb2a1946ef12
 base_staging_branch=staging/xeomx-request7-cloudflare-live
 payload_branch=payload/stage54-core-v2-20260815
 core_archive_sha256=e5e99cfea3ccdbe206e5e19104ff4890837ecf7d4dadc15cc3f140eaf5c1689f

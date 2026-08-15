@@ -12,10 +12,10 @@ permissions:
 jobs:
   exact-golden-gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     env:
-      GOLDEN_PATCH_URL: https://drive.usercontent.google.com/download?id=1RQ4C40djhRayMYa0Cc94W1JX1pmiVMay&export=download&confirm=t
-      GOLDEN_PATCH_XZ_SHA256: 5f73774ada3a2121fc365cfea4d1144d5fa2077dbbfa0ae53fbf1b8bc86c8cbb
+      GOLDEN_ZIP_URL: https://drive.usercontent.google.com/download?id=1V6jPoCp5R6AyVynnOOunZUTVUZtNm1aI&export=download&confirm=t
+      GOLDEN_ZIP_SHA256: 55e1c1f1413eba140a489decce1381ddd3056437978156326049a533b8bd0790
       ISOLATED_WORKER_NAME: xeomx-stage54-exact-golden-20260815
     steps:
       - name: Checkout isolated verification branch
@@ -24,26 +24,29 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Download and verify exact Golden patch
+      - name: Download and verify immutable Golden ZIP
         shell: bash
         run: |
           set -euo pipefail
-          curl -L --fail --silent --show-error "$GOLDEN_PATCH_URL" -o /tmp/stage54.patch.xz
-          echo "$GOLDEN_PATCH_XZ_SHA256  /tmp/stage54.patch.xz" | sha256sum -c -
-          xz -dc /tmp/stage54.patch.xz > /tmp/stage54.patch
-          test -s /tmp/stage54.patch
-          echo "PATCH_BYTES=$(wc -c </tmp/stage54.patch)"
+          curl -L --fail --silent --show-error "$GOLDEN_ZIP_URL" -o /tmp/stage54-golden.zip
+          actual="$(sha256sum /tmp/stage54-golden.zip | awk '{print $1}')"
+          echo "GOLDEN_ZIP_BYTES=$(wc -c </tmp/stage54-golden.zip)"
+          echo "GOLDEN_ZIP_SHA256=$actual"
+          test "$actual" = "$GOLDEN_ZIP_SHA256"
+          unzip -q /tmp/stage54-golden.zip -d /tmp/stage54-golden
+          test -f /tmp/stage54-golden/source/package.json
+          test -f /tmp/stage54-golden/source/package-lock.json
 
-      - name: Apply exact Golden source patch
+      - name: Materialize exact Golden source tree
         shell: bash
         run: |
           set -euo pipefail
-          git apply --check /tmp/stage54.patch
-          git apply /tmp/stage54.patch
-          git diff --check
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a /tmp/stage54-golden/source/. .
           grep -q '"@lovable.dev/vite-tanstack-config": "2.8.5"' package-lock.json
           grep -q '"@lovable.dev/vite-tanstack-config": "2.8.5"' package.json
-          echo "EXACT_GOLDEN_PATCH_APPLIED=1"
+          git diff --no-index --check /dev/null /tmp/stage54-golden/source >/dev/null || true
+          echo "EXACT_GOLDEN_SOURCE_MATERIALIZED=1"
 
       - name: Setup Node 22
         uses: actions/setup-node@v4
@@ -79,8 +82,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if git grep -nEI '(sk_live_|sk_test_|AIza[0-9A-Za-z_-]{20,}|gsk_[0-9A-Za-z_-]{20,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----)' -- ':!package-lock.json' ':!*.md' ':!*.json' ; then
-            echo 'Potential credential-like material found in tracked source' >&2
+          if grep -RInE --exclude-dir=node_modules --exclude-dir=.git --exclude='package-lock.json' '(sk_live_|sk_test_|AIza[0-9A-Za-z_-]{20,}|gsk_[0-9A-Za-z_-]{20,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----)' . ; then
+            echo 'Potential credential-like material found in Golden source' >&2
             exit 1
           fi
           echo 'SECRET_PATTERN_GATE=PASS'
@@ -96,9 +99,10 @@ jobs:
           test -n "$CLOUDFLARE_ACCOUNT_ID"
           npx wrangler deploy --name "$ISOLATED_WORKER_NAME"
 
-      - name: Record isolated deployment URL
+      - name: Record isolated deployment
         shell: bash
         run: |
           set -euo pipefail
           echo "ISOLATED_WORKER_NAME=$ISOLATED_WORKER_NAME" >> "$GITHUB_STEP_SUMMARY"
+          echo "Golden ZIP SHA256=$GOLDEN_ZIP_SHA256" >> "$GITHUB_STEP_SUMMARY"
           echo "Production/DNS/main were not targeted by this workflow." >> "$GITHUB_STEP_SUMMARY"

@@ -6,217 +6,217 @@ TAP version 13
 # Subtest: Request 7 migration is additive, indexed and RLS protected
 ok 1 - Request 7 migration is additive, indexed and RLS protected
   ---
-  duration_ms: 5.712005
+  duration_ms: 7.451366
   type: 'test'
   ...
 # Subtest: Request 7 migration keeps sensitive writes server-only and storage private
 ok 2 - Request 7 migration keeps sensitive writes server-only and storage private
   ---
-  duration_ms: 4.233281
+  duration_ms: 4.106157
   type: 'test'
   ...
 # Subtest: Stage 5 migration adds the three missing foreign-key indexes
 ok 3 - Stage 5 migration adds the three missing foreign-key indexes
   ---
-  duration_ms: 6.226124
+  duration_ms: 5.685348
   type: 'test'
   ...
 # Subtest: Stage 5 migration preserves RLS and narrows policy roles
 ok 4 - Stage 5 migration preserves RLS and narrows policy roles
   ---
-  duration_ms: 2.125869
+  duration_ms: 2.281102
   type: 'test'
   ...
 # Subtest: Stage 5 migration is transactional and non-destructive to data
 ok 5 - Stage 5 migration is transactional and non-destructive to data
   ---
-  duration_ms: 1.200132
+  duration_ms: 1.366606
   type: 'test'
   ...
 # Subtest: Stage 5.3 creates six durable RLS-protected control-plane tables
 ok 6 - Stage 5.3 creates six durable RLS-protected control-plane tables
   ---
-  duration_ms: 6.133958
+  duration_ms: 8.520401
   type: 'test'
   ...
 # Subtest: risk and state constraints encode R0/R1 allowlists, R2 approval and R3 denial
 ok 7 - risk and state constraints encode R0/R1 allowlists, R2 approval and R3 denial
   ---
-  duration_ms: 1.366888
+  duration_ms: 1.879717
   type: 'test'
   ...
 # Subtest: R2 cannot queue before an exact project-owner approval
 ok 8 - R2 cannot queue before an exact project-owner approval
   ---
-  duration_ms: 2.028967
+  duration_ms: 2.881451
   type: 'test'
   ...
 # Subtest: idempotency, opaque references, secret rejection and audits are durable
 ok 9 - idempotency, opaque references, secret rejection and audits are durable
   ---
-  duration_ms: 0.971174
+  duration_ms: 1.208641
   type: 'test'
   ...
 # Subtest: all foreign keys have intentional covering indexes
 ok 10 - all foreign keys have intentional covering indexes
   ---
-  duration_ms: 1.272899
+  duration_ms: 1.129925
   type: 'test'
   ...
 # Subtest: private trigger helpers are never executable by authenticated clients
 ok 11 - private trigger helpers are never executable by authenticated clients
   ---
-  duration_ms: 1.2664
+  duration_ms: 2.165189
   type: 'test'
   ...
 # Subtest: authenticated mutations remain narrow and RLS ownership-bound
 ok 12 - authenticated mutations remain narrow and RLS ownership-bound
   ---
-  duration_ms: 1.995557
+  duration_ms: 2.312117
   type: 'test'
   ...
 # Subtest: Stage 5.3 billing migration is additive and lets apply_migration own the transaction
 ok 13 - Stage 5.3 billing migration is additive and lets apply_migration own the transaction
   ---
-  duration_ms: 9.680579
+  duration_ms: 10.457413
   type: 'test'
   ...
 # Subtest: authenticated clients can read only their own billing rows
 ok 14 - authenticated clients can read only their own billing rows
   ---
-  duration_ms: 3.496257
+  duration_ms: 4.172666
   type: 'test'
   ...
 # Subtest: foreign keys have covering indexes and payment events are idempotent
 ok 15 - foreign keys have covering indexes and payment events are idempotent
   ---
-  duration_ms: 1.079073
+  duration_ms: 1.756644
   type: 'test'
   ...
 # Subtest: aggregate advisory locks make create/event/entitlement idempotency race-safe
 ok 16 - aggregate advisory locks make create/event/entitlement idempotency race-safe
   ---
-  duration_ms: 1.582346
+  duration_ms: 1.39625
   type: 'test'
   ...
 # Subtest: checkout and subscription lifecycle transitions fail closed
 ok 17 - checkout and subscription lifecycle transitions fail closed
   ---
-  duration_ms: 1.764245
+  duration_ms: 1.314028
   type: 'test'
   ...
 # Subtest: service-only helpers revoke public and client execution
 ok 18 - service-only helpers revoke public and client execution
   ---
-  duration_ms: 2.151848
+  duration_ms: 3.277088
   type: 'test'
   ...
 # Subtest: entitlement activation locks and validates a confirmed payment event
 ok 19 - entitlement activation locks and validates a confirmed payment event
   ---
-  duration_ms: 2.603404
+  duration_ms: 2.917204
   type: 'test'
   ...
 # Subtest: migration remains provider-neutral and contains no credentials
 ok 20 - migration remains provider-neutral and contains no credentials
   ---
-  duration_ms: 1.38856
+  duration_ms: 2.400699
   type: 'test'
   ...
 # Subtest: metadata is recursively filtered and raw webhook payloads are never persisted
 ok 21 - metadata is recursively filtered and raw webhook payloads are never persisted
   ---
-  duration_ms: 1.562226
+  duration_ms: 1.793098
   type: 'test'
   ...
 # Subtest: Stage 5.3 evidence migration is apply_migration-owned and additive
 ok 22 - Stage 5.3 evidence migration is apply_migration-owned and additive
   ---
-  duration_ms: 6.224853
+  duration_ms: 12.003985
   type: 'test'
   ...
 # Subtest: all browser-visible writes have explicit RLS checks and no anonymous grants
 ok 23 - all browser-visible writes have explicit RLS checks and no anonymous grants
   ---
-  duration_ms: 1.748122
+  duration_ms: 4.583835
   type: 'test'
   ...
 # Subtest: trigger helpers are fixed-path, service-only SECURITY DEFINER functions
 ok 24 - trigger helpers are fixed-path, service-only SECURITY DEFINER functions
   ---
-  duration_ms: 7.258058
+  duration_ms: 8.927834
   type: 'test'
   ...
 # Subtest: version, result, link and provenance immutability fail closed
 ok 25 - version, result, link and provenance immutability fail closed
   ---
-  duration_ms: 1.39483
+  duration_ms: 1.746209
   type: 'test'
   ...
 # Subtest: recursive SQL boundary rejects secret-like JSON keys on every JSON surface
 ok 26 - recursive SQL boundary rejects secret-like JSON keys on every JSON surface
   ---
-  duration_ms: 1.876932
+  duration_ms: 2.571863
   type: 'test'
   ...
 # Subtest: provider compute is disconnected until verified and FK paths are indexed
 ok 27 - provider compute is disconnected until verified and FK paths are indexed
   ---
-  duration_ms: 1.989708
+  duration_ms: 1.981217
   type: 'test'
   ...
 # Subtest: eval run constraints have non-colliding explicit names
 ok 28 - eval run constraints have non-colliding explicit names
   ---
-  duration_ms: 2.914664
+  duration_ms: 2.284626
   type: 'test'
   ...
 # Subtest: dataset item admission locks the version against concurrent finalization
 ok 29 - dataset item admission locks the version against concurrent finalization
   ---
-  duration_ms: 0.906448
+  duration_ms: 0.987594
   type: 'test'
   ...
 # Subtest: migration contains no credential values or broad authenticated result writes
 ok 30 - migration contains no credential values or broad authenticated result writes
   ---
-  duration_ms: 1.298138
+  duration_ms: 1.82151
   type: 'test'
   ...
 # Subtest: authenticated membership mutation privileges are removed while RLS read remains
 ok 31 - authenticated membership mutation privileges are removed while RLS read remains
   ---
-  duration_ms: 4.755563
+  duration_ms: 5.866236
   type: 'test'
   ...
 # Subtest: stale running generation jobs have a partial-indexed lease recovery path
 ok 32 - stale running generation jobs have a partial-indexed lease recovery path
   ---
-  duration_ms: 0.713294
+  duration_ms: 0.891852
   type: 'test'
   ...
 # Subtest: lease recovery fails stale work closed through the canonical failure RPC
 ok 33 - lease recovery fails stale work closed through the canonical failure RPC
   ---
-  duration_ms: 0.272302
+  duration_ms: 0.268728
   type: 'test'
   ...
 # Subtest: lease recovery is fixed-path and service-role only
 ok 34 - lease recovery is fixed-path and service-role only
   ---
-  duration_ms: 0.605605
+  duration_ms: 0.662322
   type: 'test'
   ...
 # Subtest: lease recovery validates bounded timeout and batch size
 ok 35 - lease recovery validates bounded timeout and batch size
   ---
-  duration_ms: 0.221527
+  duration_ms: 0.281617
   type: 'test'
   ...
 # Subtest: generation worker performs stale-lease cleanup before claiming queued work
 ok 36 - generation worker performs stale-lease cleanup before claiming queued work
   ---
-  duration_ms: 0.211522
+  duration_ms: 0.267607
   type: 'test'
   ...
 1..36
@@ -227,4 +227,4 @@ ok 36 - generation worker performs stale-lease cleanup before claiming queued wo
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 177.668985
+# duration_ms 219.690358

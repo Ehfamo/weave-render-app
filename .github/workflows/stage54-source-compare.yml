@@ -1,0 +1,57 @@
+name: XEOMX Stage5.4 Source Compare
+
+on:
+  push:
+    branches:
+      - verify/stage5-4-source-compare-20260815
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout isolated comparison branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Create safe tracked-source snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+
+          tracked = subprocess.check_output(['git', 'ls-files'], text=True).splitlines()
+          excluded = []
+          kept = []
+          for p in tracked:
+              name = Path(p).name.lower()
+              if name == '.env' or name.startswith('.env.') or 'credential' in name or name.endswith('.pem') or name.endswith('.key'):
+                  excluded.append(p)
+              else:
+                  kept.append(p)
+          Path('/tmp/xeomx-tracked-files.txt').write_text('\n'.join(kept) + '\n')
+          Path('/tmp/xeomx-excluded-files.txt').write_text('\n'.join(excluded) + ('\n' if excluded else ''))
+          PY
+          tar -czf /tmp/xeomx-main-tracked-source.tar.gz -T /tmp/xeomx-tracked-files.txt
+          sha256sum /tmp/xeomx-main-tracked-source.tar.gz | tee /tmp/xeomx-main-tracked-source.sha256
+          git rev-parse HEAD | tee /tmp/source-head.txt
+          wc -l /tmp/xeomx-tracked-files.txt | tee /tmp/tracked-count.txt
+
+      - name: Upload source comparison snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: xeomx-stage54-source-compare
+          path: |
+            /tmp/xeomx-main-tracked-source.tar.gz
+            /tmp/xeomx-main-tracked-source.sha256
+            /tmp/source-head.txt
+            /tmp/tracked-count.txt
+            /tmp/xeomx-excluded-files.txt
+          if-no-files-found: error
+          retention-days: 2

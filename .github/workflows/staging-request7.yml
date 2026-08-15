@@ -36,22 +36,50 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import hashlib, os
+
           p = Path('.xeomx-stage54-core/core.07')
           data = p.read_bytes()
           size = int(os.environ['CORE07_LENGTH'])
           expected = os.environ['CORE07_SHA256']
+
+          def ok(candidate: bytes) -> bool:
+              return len(candidate) == size and hashlib.sha256(candidate).hexdigest() == expected
+
           found = None
-          for offset in range(0, len(data) - size + 1):
-              candidate = data[offset:offset + size]
-              if hashlib.sha256(candidate).hexdigest() == expected:
-                  found = (offset, candidate)
-                  break
+          mode = None
+
+          if ok(data):
+              found = data
+              mode = 'exact-file'
+
+          if found is None and len(data) >= size:
+              for offset in range(0, len(data) - size + 1):
+                  candidate = data[offset:offset + size]
+                  if ok(candidate):
+                      found = candidate
+                      mode = f'exact-slice@{offset}'
+                      break
+
+          if found is None and len(data) > size:
+              extra = len(data) - size
+              for cut in range(0, size + 1):
+                  candidate = data[:cut] + data[cut + extra:]
+                  if ok(candidate):
+                      found = candidate
+                      mode = f'remove-single-extra-block@{cut}+{extra}'
+                      break
+
           if found is None:
-              raise SystemExit(f'No exact core.07 slice found in {len(data)} bytes')
-          offset, candidate = found
-          Path('/tmp/core.07.exact').write_bytes(candidate)
-          print(f'CORE07_EXACT_OFFSET={offset}')
+              raise SystemExit(
+                  f'Unable to recover checksum-exact core.07 from {len(data)} bytes; '
+                  f'expected_len={size} expected_sha={expected}'
+              )
+
+          Path('/tmp/core.07.exact').write_bytes(found)
+          print(f'CORE07_RECOVERY_MODE={mode}')
           print(f'CORE07_SOURCE_BYTES={len(data)}')
+          print(f'CORE07_EXACT_BYTES={len(found)}')
+          print(f'CORE07_EXACT_SHA256={hashlib.sha256(found).hexdigest()}')
           PY
           echo "$CORE07_SHA256  /tmp/core.07.exact" | sha256sum -c -
           cat .xeomx-stage54-core/core.00 \

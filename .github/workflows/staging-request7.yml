@@ -1,4 +1,4 @@
-name: XEOMX Request7 Staging
+name: XEOMX Stage5.4 Exact Patch Probe
 
 on:
   push:
@@ -6,135 +6,21 @@ on:
       - staging/xeomx-request7-cloudflare-live
   workflow_dispatch:
 
-concurrency:
-  group: xeomx-request7-staging
-  cancel-in-progress: true
-
-env:
-  SUPABASE_URL: https://bzoikmppvwiidyjdaqgv.supabase.co
-  SUPABASE_PUBLISHABLE_KEY: sb_publishable_PUISWn93BXooGndzl06Ovw_locHt1Gz
-  VITE_SUPABASE_URL: https://bzoikmppvwiidyjdaqgv.supabase.co
-  VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_PUISWn93BXooGndzl06Ovw_locHt1Gz
-  E2E_BASE_URL: https://xeomx-request7-staging.ehfamo7830.workers.dev
-  E2E_BOOTSTRAP_URL: https://bzoikmppvwiidyjdaqgv.supabase.co/functions/v1/xeomx-github-e2e-bootstrap
+permissions:
+  contents: read
 
 jobs:
-  quality-and-staging-deploy:
+  probe:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - name: Install locked dependencies
-        run: npm ci
-      - name: Build against isolated Staging (also regenerates route tree)
-        run: npm run build
-      - name: Typecheck
-        run: npm run typecheck
-      - name: Lint
-        run: npm run lint
-      - name: Tests
-        run: npm run test
-      - name: Smoke test deploy package
-        run: npm run test:smoke
-      - name: Deploy isolated Staging Worker
-        id: deploy_staging
-        continue-on-error: true
+      - name: Download exact Stage5.4 patch from Golden Drive handoff
         shell: bash
         run: |
           set -euo pipefail
-          npx --yes wrangler@4.106.0 deploy \
-            --name xeomx-request7-staging \
-            --var SUPABASE_URL:${SUPABASE_URL} \
-            --var SUPABASE_PUBLISHABLE_KEY:${SUPABASE_PUBLISHABLE_KEY} \
-            2>&1 | tee wrangler-deploy.log
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      - name: Preserve staging deploy evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: xeomx-request7-staging-deploy
-          path: wrangler-deploy.log
-          if-no-files-found: error
-          retention-days: 7
-      - name: Report staging deploy failure
-        if: steps.deploy_staging.outcome == 'failure'
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo "=== sanitized wrangler failure tail ==="
-          tail -n 80 wrangler-deploy.log \
-            | sed -E 's/(authorization:[[:space:]]*bearer)[[:space:]]+[^[:space:]]+/\1 [REDACTED]/Ig' \
-            | sed -E 's/(api[_-]?token[=:][[:space:]]*)[^[:space:]]+/\1[REDACTED]/Ig'
-          exit 1
-      - name: Create short-lived browser E2E user through GitHub OIDC
-        shell: bash
-        run: |
-          set -euo pipefail
-          OIDC_TOKEN="$(curl --fail-with-body --silent --show-error \
-            -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
-            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=xeomx-staging-e2e" | jq -r '.value')"
-          RESPONSE="$(curl --fail-with-body --silent --show-error \
-            -X POST \
-            -H "Authorization: Bearer ${OIDC_TOKEN}" \
-            -H "Content-Type: application/json" \
-            --data '{"action":"create"}' \
-            "${E2E_BOOTSTRAP_URL}")"
-          echo "${RESPONSE}" | jq -e '.ok == true' >/dev/null
-          USER_ID="$(echo "${RESPONSE}" | jq -r '.user_id')"
-          EMAIL="$(echo "${RESPONSE}" | jq -r '.email')"
-          PASSWORD="$(echo "${RESPONSE}" | jq -r '.password')"
-          SEARCH_TERM="$(echo "${RESPONSE}" | jq -r '.search_term')"
-          test -n "${SEARCH_TERM}" && test "${SEARCH_TERM}" != "null"
-          echo "::add-mask::${USER_ID}"
-          echo "::add-mask::${EMAIL}"
-          echo "::add-mask::${PASSWORD}"
-          echo "E2E_USER_ID=${USER_ID}" >> "${GITHUB_ENV}"
-          echo "E2E_EMAIL=${EMAIL}" >> "${GITHUB_ENV}"
-          echo "E2E_PASSWORD=${PASSWORD}" >> "${GITHUB_ENV}"
-          echo "E2E_SEARCH_TERM=${SEARCH_TERM}" >> "${GITHUB_ENV}"
-      - name: Install Chromium E2E runtime
-        run: |
-          npm install --no-save --package-lock=false @playwright/test@1.55.0
-          npx playwright install --with-deps chromium
-      - name: Browser E2E — real Auth → Project → Cloudflare AI → Reload
-        shell: bash
-        run: |
-          set -o pipefail
-          npx playwright test tests/browser-e2e.spec.mjs --reporter=list 2>&1 | tee playwright-e2e.log
-      - name: Preserve browser E2E evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: xeomx-request7-browser-e2e
-          path: |
-            test-results
-            playwright-e2e.log
-          if-no-files-found: warn
-          retention-days: 7
-      - name: Cleanup short-lived browser E2E user
-        if: always()
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ -z "${E2E_USER_ID:-}" ]; then
-            echo "No E2E user was created."
-            exit 0
-          fi
-          OIDC_TOKEN="$(curl --fail-with-body --silent --show-error \
-            -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
-            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=xeomx-staging-e2e" | jq -r '.value')"
-          RESPONSE="$(curl --fail-with-body --silent --show-error \
-            -X POST \
-            -H "Authorization: Bearer ${OIDC_TOKEN}" \
-            -H "Content-Type: application/json" \
-            --data "{\"action\":\"cleanup\",\"user_id\":\"${E2E_USER_ID}\"}" \
-            "${E2E_BOOTSTRAP_URL}")"
-          echo "${RESPONSE}" | jq -e '.ok == true' >/dev/null
+          url='https://drive.usercontent.google.com/download?id=1RQ4C40djhRayMYa0Cc94W1JX1pmiVMay&export=download&confirm=t'
+          code="$(curl -L --silent --show-error --output /tmp/stage54.patch.xz --write-out '%{http_code}' "$url" || true)"
+          echo "HTTP_STATUS=$code"
+          echo "BYTES=$(wc -c </tmp/stage54.patch.xz 2>/dev/null || echo 0)"
+          test "$code" = "200"
+          echo '1073f45550da69eea94f9dc9fbc385910225ed43295de01bbf4a3c35a8366113  /tmp/stage54.patch.xz' | sha256sum -c -

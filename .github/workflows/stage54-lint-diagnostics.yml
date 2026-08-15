@@ -1,0 +1,158 @@
+name: XEOMX Stage5.4 Lint Diagnostics
+
+on:
+  push:
+    branches:
+      - verify/stage5-4-exact-golden-20260815
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint-diagnostics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      STAGING_BRANCH: staging/xeomx-request7-cloudflare-live
+      PAYLOAD_BRANCH: payload/stage54-core-v2-20260815
+      CORE_ARCHIVE_SHA256: e5e99cfea3ccdbe206e5e19104ff4890837ecf7d4dadc15cc3f140eaf5c1689f
+    steps:
+      - name: Checkout verification branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Reconstruct checksum-verified overlay
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "$PAYLOAD_BRANCH"
+          for n in 00 01 02 03 04 05 06 07; do
+            git show "FETCH_HEAD:.xeomx-stage54-core-v2/core.$n" > "/tmp/core.$n"
+          done
+          cat > /tmp/core-v2.sha256 <<'EOF'
+          02515ae3d3d40640df39bcd54261b1048e6ba90ae9d46dfee5df988bc945eb32  /tmp/core.00
+          37c231c2aef38b7925bc95bf4fffdf9024a1a093ba2c174509b8311e3cc5b9bc  /tmp/core.01
+          85a737b8e47823eeb27eefa0d790f28c0dc9b880cfcf8eefac95b82873bb20e4  /tmp/core.02
+          632d7c49d68da6cc624426bd38d3c27c386b79b563c55e39bacabd0dda0f46bc  /tmp/core.03
+          33437cc634b3574b819ece7c1f8efa164679084ef42e8f9f708c26ee40f9e179  /tmp/core.04
+          1a05a12bfbdbf1b8b066af63055da23fdbe5b4db4c076a6a21b41a4e14dee141  /tmp/core.05
+          a4ea7a4331cb509ca4e7d61ab68eb7f521ae4f46e693a47fe3453b29c13f67c2  /tmp/core.06
+          b738c10a8617bc1ae53fdc1799695f80d2def47f385b7eb1333ee36db82ac32d  /tmp/core.07
+          EOF
+          sha256sum -c /tmp/core-v2.sha256
+          cat /tmp/core.00 /tmp/core.01 /tmp/core.02 /tmp/core.03 /tmp/core.04 /tmp/core.05 /tmp/core.06 /tmp/core.07 > /tmp/stage54-core.b64
+          base64 -d /tmp/stage54-core.b64 > /tmp/stage54-core.tar.xz
+          echo "$CORE_ARCHIVE_SHA256  /tmp/stage54-core.tar.xz" | sha256sum -c -
+          xz -t /tmp/stage54-core.tar.xz
+
+      - name: Checkout real staging source detached
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "$STAGING_BRANCH"
+          git checkout --detach FETCH_HEAD
+          test "$(git branch --show-current)" = ""
+
+      - name: Materialize Stage5.4 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -xJf /tmp/stage54-core.tar.xz -C .
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('src/lib/backend/vertical-slice.ts')
+          s = p.read_text()
+          old = '''export const REQUEST_7_LIVE_TEXT_PROVIDER = {
+            id: "cloudflare",
+            model: "@cf/meta/llama-3.1-8b-instruct-fast",
+            reservedCreditUnits: 5,
+          } as const;'''
+          new = '''export const REQUEST_7_TEXT_PROVIDER_ROUTES = [
+            {
+              id: "cloudflare",
+              model: "@cf/meta/llama-3.1-8b-instruct-fast",
+              reservedCreditUnits: 5,
+            },
+            { id: "gemini", model: "gemini-3.5-flash", reservedCreditUnits: 5 },
+            { id: "groq", model: "llama-3.1-8b-instant", reservedCreditUnits: 5 },
+          ] as const;
+
+          export const REQUEST_7_LIVE_TEXT_PROVIDER = REQUEST_7_TEXT_PROVIDER_ROUTES[0];'''
+          if s.count(old) != 1:
+              raise SystemExit(f'vertical-slice.ts expected block count=1, got {s.count(old)}')
+          p.write_text(s.replace(old, new))
+
+          p = Path('src/lib/backend/vertical-slice.server.ts')
+          s = p.read_text()
+          old_import = '  REQUEST_7_LIVE_TEXT_PROVIDER,\n'
+          new_import = '  REQUEST_7_TEXT_PROVIDER_ROUTES,\n'
+          if s.count(old_import) != 1:
+              raise SystemExit(f'server import count expected=1, got {s.count(old_import)}')
+          s = s.replace(old_import, new_import)
+          old_block = '''  const route = REQUEST_7_LIVE_TEXT_PROVIDER;
+            if (input.routingMode === "manual") {
+              if (input.requestedProvider !== route.id) throw new VerticalSliceError("PROVIDER_UNAVAILABLE");
+              if (input.requestedModel !== route.model) throw new VerticalSliceError("MODEL_UNAVAILABLE");
+            }'''
+          new_block = '''  if (input.routingMode === "manual") {
+            const providerRoutes = REQUEST_7_TEXT_PROVIDER_ROUTES.filter(
+              (route) => route.id === input.requestedProvider,
+            );
+            if (!providerRoutes.length) throw new VerticalSliceError("PROVIDER_UNAVAILABLE");
+            if (!providerRoutes.some((route) => route.model === input.requestedModel)) {
+              throw new VerticalSliceError("MODEL_UNAVAILABLE");
+            }
+          }'''
+          if s.count(old_block) != 1:
+              raise SystemExit(f'server routing block expected=1, got {s.count(old_block)}')
+          p.write_text(s.replace(old_block, new_block))
+          PY
+          git diff --check
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Fresh npm install
+        run: npm ci --ignore-scripts=false
+
+      - name: Generate routes with production build
+        run: npm run build
+
+      - name: Confirm typecheck
+        run: npm run typecheck
+
+      - name: Capture lint diagnostics
+        id: lint
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run lint 2>&1 | tee /tmp/stage54-lint.log
+          status=${PIPESTATUS[0]}
+          {
+            echo '## Stage5.4 lint diagnostic tail'
+            echo '```text'
+            tail -n 120 /tmp/stage54-lint.log
+            echo '```'
+            echo "lint_exit=$status"
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
+
+      - name: Upload lint diagnostics artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage54-lint-diagnostics
+          path: /tmp/stage54-lint.log
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce lint gate
+        if: steps.lint.outcome != 'success'
+        run: exit 1

@@ -17,19 +17,29 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
-      - name: Identify reconstruction payload encoding
+      - name: Validate XZ reconstruction payload
         shell: bash
         run: |
           set -euo pipefail
           files=$(find .xeomx -maxdepth 1 -type f -name 'chunk-*' | sort)
-          echo "CHUNKS=$(printf '%s\n' "$files" | wc -l)"
           cat $files > /tmp/payload.b64
-          base64 --decode /tmp/payload.b64 > /tmp/payload.bin
-          echo "DECODED_BYTES=$(wc -c </tmp/payload.bin)"
-          sha256sum /tmp/payload.bin
-          file /tmp/payload.bin
-          printf 'MAGIC='; head -c 32 /tmp/payload.bin | od -An -tx1 | tr -d ' \n'; echo
-          if gzip -t /tmp/payload.bin 2>/dev/null; then echo FORMAT=gzip; fi
-          if xz -t /tmp/payload.bin 2>/dev/null; then echo FORMAT=xz; fi
-          if unzip -t /tmp/payload.bin >/dev/null 2>&1; then echo FORMAT=zip; fi
-          if head -c 16 /tmp/payload.bin | grep -q '^diff --git'; then echo FORMAT=raw_git_patch; fi
+          base64 --decode /tmp/payload.b64 > /tmp/payload.xz
+          echo '6a1f05fa28330519728f7baf55872160831f6942d20b7736a002627d67b6504f  /tmp/payload.xz' | sha256sum -c -
+          xz -t /tmp/payload.xz
+          xz -dc /tmp/payload.xz > /tmp/payload.out
+          echo "OUT_BYTES=$(wc -c </tmp/payload.out)"
+          sha256sum /tmp/payload.out
+          file /tmp/payload.out
+          printf 'OUT_MAGIC='; head -c 32 /tmp/payload.out | od -An -tx1 | tr -d ' \n'; echo
+          if head -c 16 /tmp/payload.out | grep -q '^diff --git'; then
+            echo FORMAT=raw_git_patch
+            git apply --check /tmp/payload.out
+            echo PATCH_APPLY_CHECK=PASS
+          elif tar -tf /tmp/payload.out >/tmp/tar-list.txt 2>/dev/null; then
+            echo FORMAT=tar
+            echo "TAR_FILES=$(wc -l </tmp/tar-list.txt)"
+            head -20 /tmp/tar-list.txt
+          else
+            echo FORMAT=unknown
+            exit 2
+          fi

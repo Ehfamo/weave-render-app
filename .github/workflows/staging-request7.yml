@@ -1,4 +1,4 @@
-name: XEOMX Stage5.4 Payload Recovery
+name: XEOMX Stage5.4 Exact Isolated Gate
 
 on:
   push:
@@ -10,57 +10,194 @@ permissions:
   contents: read
 
 jobs:
-  recover:
+  gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 40
+    env:
+      STAGING_BRANCH: staging/xeomx-request7-cloudflare-live
+      CORE_ARCHIVE_SHA256: 7818fe34e43dde126ae2e165f567a4a9a64c506ab685921c9edf55c4dbfcee03
+      CORE07_LENGTH: 19724
+      CORE07_SHA256: 5b20adbd2ff1e2135f578a6877dc96e862088c650c7935e53b948c870d7cf6f2
+      ISOLATED_WORKER_NAME: xeomx-stage54-exact-golden-20260815
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout verification payload branch
+        uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           persist-credentials: false
 
-      - name: Inspect staged Golden reconstruction payloads
+      - name: Reconstruct and verify Stage5.4 core overlay
         shell: bash
         run: |
-          set -u
-          echo '=== TREE ==='
-          find .xeomx-stage54 .xeomx-stage54-small -maxdepth 1 -type f -printf '%p %s bytes\n' 2>/dev/null | sort
+          set -euo pipefail
+          test -f .xeomx-stage54-core/core.00
+          test -f .xeomx-stage54-core/core.01
+          test -f .xeomx-stage54-core/core.02
+          test -f .xeomx-stage54-core/core.03
+          test -f .xeomx-stage54-core/core.04
+          test -f .xeomx-stage54-core/core.05
+          test -f .xeomx-stage54-core/core.06
+          test -f .xeomx-stage54-core/core.07
+          head -c "$CORE07_LENGTH" .xeomx-stage54-core/core.07 > /tmp/core.07.exact
+          echo "$CORE07_SHA256  /tmp/core.07.exact" | sha256sum -c -
+          cat .xeomx-stage54-core/core.00 \
+              .xeomx-stage54-core/core.01 \
+              .xeomx-stage54-core/core.02 \
+              .xeomx-stage54-core/core.03 \
+              .xeomx-stage54-core/core.04 \
+              .xeomx-stage54-core/core.05 \
+              .xeomx-stage54-core/core.06 \
+              /tmp/core.07.exact > /tmp/stage54-core.b64
+          base64 -d /tmp/stage54-core.b64 > /tmp/stage54-core.tar.xz
+          echo "$CORE_ARCHIVE_SHA256  /tmp/stage54-core.tar.xz" | sha256sum -c -
+          xz -t /tmp/stage54-core.tar.xz
+          tar -tJf /tmp/stage54-core.tar.xz >/tmp/stage54-core.list
+          grep -qx './package.json' /tmp/stage54-core.list
+          grep -qx './package-lock.json' /tmp/stage54-core.list
+          echo 'CORE_OVERLAY=VERIFIED'
 
-          inspect_set() {
-            label="$1"; shift
-            out="/tmp/${label}.xz"
-            : > "$out.b64"
-            for f in "$@"; do
-              [ -f "$f" ] || continue
-              tr -d '\r\n ' < "$f" >> "$out.b64"
-            done
-            echo "=== $label ==="
-            echo "B64_BYTES=$(wc -c < "$out.b64")"
-            if base64 -d "$out.b64" > "$out" 2>/tmp/${label}.b64.err; then
-              echo "BASE64=PASS"
-              echo "XZ_BYTES=$(wc -c < "$out")"
-              sha256sum "$out"
-              if xz -t "$out" 2>/tmp/${label}.xz.err; then
-                echo "XZ=PASS"
-                xz -dc "$out" > "/tmp/${label}.decoded"
-                echo "DECODED_BYTES=$(wc -c < /tmp/${label}.decoded)"
-                file "/tmp/${label}.decoded" || true
-                if tar -tf "/tmp/${label}.decoded" >/tmp/${label}.tar.list 2>/tmp/${label}.tar.err; then
-                  echo "TAR=PASS"
-                  sed -n '1,80p' /tmp/${label}.tar.list
-                else
-                  echo "TAR=NO"
-                  head -c 200 "/tmp/${label}.decoded" | xxd || true
-                fi
-              else
-                echo "XZ=INCOMPLETE_OR_INVALID"
-                cat /tmp/${label}.xz.err || true
-              fi
-            else
-              echo "BASE64=FAIL"
-              cat /tmp/${label}.b64.err || true
-            fi
-          }
+      - name: Checkout real staging source without modifying staging branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "$STAGING_BRANCH"
+          git checkout --detach FETCH_HEAD
+          echo "BASE_SHA=$(git rev-parse HEAD)"
+          test "$(git branch --show-current)" = ""
 
-          inspect_set small .xeomx-stage54-small/payload.*
-          inspect_set small_with_rest .xeomx-stage54-small/payload.* .xeomx-stage54-small/rest.*
-          inspect_set primary .xeomx-stage54/payload.*
+      - name: Materialize exact Stage5.4 overlay
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -xJf /tmp/stage54-core.tar.xz -C .
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('src/lib/backend/vertical-slice.ts')
+          s = p.read_text()
+          old = '''export const REQUEST_7_LIVE_TEXT_PROVIDER = {
+            id: "cloudflare",
+            model: "@cf/meta/llama-3.1-8b-instruct-fast",
+            reservedCreditUnits: 5,
+          } as const;'''
+          new = '''export const REQUEST_7_TEXT_PROVIDER_ROUTES = [
+            {
+              id: "cloudflare",
+              model: "@cf/meta/llama-3.1-8b-instruct-fast",
+              reservedCreditUnits: 5,
+            },
+            { id: "gemini", model: "gemini-3.5-flash", reservedCreditUnits: 5 },
+            { id: "groq", model: "llama-3.1-8b-instant", reservedCreditUnits: 5 },
+          ] as const;
+
+          export const REQUEST_7_LIVE_TEXT_PROVIDER = REQUEST_7_TEXT_PROVIDER_ROUTES[0];'''
+          if s.count(old) != 1:
+              raise SystemExit(f'vertical-slice.ts expected block count=1, got {s.count(old)}')
+          p.write_text(s.replace(old, new))
+
+          p = Path('src/lib/backend/vertical-slice.server.ts')
+          s = p.read_text()
+          old_import = '  REQUEST_7_LIVE_TEXT_PROVIDER,\n'
+          new_import = '  REQUEST_7_TEXT_PROVIDER_ROUTES,\n'
+          if s.count(old_import) != 1:
+              raise SystemExit(f'server import count expected=1, got {s.count(old_import)}')
+          s = s.replace(old_import, new_import)
+          old_block = '''  const route = REQUEST_7_LIVE_TEXT_PROVIDER;
+            if (input.routingMode === "manual") {
+              if (input.requestedProvider !== route.id) throw new VerticalSliceError("PROVIDER_UNAVAILABLE");
+              if (input.requestedModel !== route.model) throw new VerticalSliceError("MODEL_UNAVAILABLE");
+            }'''
+          new_block = '''  if (input.routingMode === "manual") {
+            const providerRoutes = REQUEST_7_TEXT_PROVIDER_ROUTES.filter(
+              (route) => route.id === input.requestedProvider,
+            );
+            if (!providerRoutes.length) throw new VerticalSliceError("PROVIDER_UNAVAILABLE");
+            if (!providerRoutes.some((route) => route.model === input.requestedModel)) {
+              throw new VerticalSliceError("MODEL_UNAVAILABLE");
+            }
+          }'''
+          if s.count(old_block) != 1:
+              raise SystemExit(f'server routing block expected=1, got {s.count(old_block)}')
+          p.write_text(s.replace(old_block, new_block))
+          PY
+          grep -q '"@lovable.dev/vite-tanstack-config": "2.8.5"' package.json
+          grep -q '"@lovable.dev/vite-tanstack-config": "2.8.5"' package-lock.json
+          git diff --check
+          echo 'STAGE54_SOURCE=RECONSTRUCTED'
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Fresh exact npm install
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts=false
+          actual="$(node -p "require('./node_modules/@lovable.dev/vite-tanstack-config/package.json').version")"
+          echo "INSTALLED_VITE_TANSTACK_CONFIG=$actual"
+          test "$actual" = '2.8.5'
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Full tests
+        run: npm test
+
+      - name: Integration tests
+        run: npm run test:integration
+
+      - name: Migration tests
+        run: npm run test:migrations
+
+      - name: Production build
+        run: npm run build
+
+      - name: Build smoke
+        run: npm run test:smoke
+
+      - name: Secret pattern gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -RInE \
+            --exclude-dir=node_modules \
+            --exclude-dir=.git \
+            --exclude='package-lock.json' \
+            --exclude='*.md' \
+            '(sk_live_|AIza[0-9A-Za-z_-]{20,}|gsk_[0-9A-Za-z_-]{20,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----)' \
+            src supabase tests package.json 2>/dev/null; then
+            echo 'Potential credential-like material found' >&2
+            exit 1
+          fi
+          echo 'SECRET_PATTERN_GATE=PASS'
+
+      - name: Deploy only isolated Cloudflare Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          npx wrangler deploy --name "$ISOLATED_WORKER_NAME" 2>&1 | tee /tmp/wrangler-deploy.log
+
+      - name: Record verification scope
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo '## XEOMX Stage 5.4 exact isolated gate'
+            echo "- Base staging branch: $STAGING_BRANCH"
+            echo "- Isolated worker target: $ISOLATED_WORKER_NAME"
+            echo "- Core overlay SHA256: $CORE_ARCHIVE_SHA256"
+            echo '- No merge performed.'
+            echo '- No main branch write performed.'
+            echo '- No production DNS route configured by this workflow.'
+          } >> "$GITHUB_STEP_SUMMARY"

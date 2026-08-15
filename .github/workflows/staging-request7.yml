@@ -14,13 +14,34 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Download exact Stage5.4 patch from Golden Drive handoff
+      - name: Resolve binary-safe exact patch handoff
         shell: bash
         run: |
           set -euo pipefail
-          url='https://drive.usercontent.google.com/download?id=1RQ4C40djhRayMYa0Cc94W1JX1pmiVMay&export=download&confirm=t'
-          code="$(curl -L --silent --show-error --output /tmp/stage54.patch.xz --write-out '%{http_code}' "$url" || true)"
-          echo "HTTP_STATUS=$code"
-          echo "BYTES=$(wc -c </tmp/stage54.patch.xz 2>/dev/null || echo 0)"
-          test "$code" = "200"
-          echo '1073f45550da69eea94f9dc9fbc385910225ed43295de01bbf4a3c35a8366113  /tmp/stage54.patch.xz' | sha256sum -c -
+          id='1RQ4C40djhRayMYa0Cc94W1JX1pmiVMay'
+          urls=(
+            "https://drive.usercontent.google.com/download?id=${id}&export=download&confirm=t"
+            "https://drive.google.com/uc?export=download&id=${id}&confirm=t"
+            "https://drive.google.com/uc?id=${id}&export=download"
+            "https://drive.usercontent.google.com/u/0/uc?id=${id}&export=download&confirm=t"
+          )
+          expected='1073f45550da69eea94f9dc9fbc385910225ed43295de01bbf4a3c35a8366113'
+          ok=0
+          i=0
+          for url in "${urls[@]}"; do
+            out="/tmp/candidate-${i}"
+            hdr="/tmp/headers-${i}"
+            code="$(curl -L --silent --show-error -D "$hdr" -o "$out" -w '%{http_code}' "$url" || true)"
+            size="$(wc -c <"$out" 2>/dev/null || echo 0)"
+            sha="$(sha256sum "$out" 2>/dev/null | awk '{print $1}' || true)"
+            ctype="$(grep -i '^content-type:' "$hdr" | tail -1 | tr -d '\r' || true)"
+            magic="$(head -c 12 "$out" 2>/dev/null | od -An -tx1 | tr -d ' \n' || true)"
+            echo "CANDIDATE=${i} HTTP=${code} SIZE=${size} SHA256=${sha} ${ctype} MAGIC=${magic}"
+            if [ "$sha" = "$expected" ]; then
+              echo "RAW_MATCH_INDEX=${i}"
+              ok=1
+              break
+            fi
+            i=$((i+1))
+          done
+          test "$ok" = "1"

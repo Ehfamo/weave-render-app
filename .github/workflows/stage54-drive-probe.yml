@@ -1,0 +1,26 @@
+name: XEOMX Stage5.4 Drive Patch Probe
+
+on:
+  push:
+    branches:
+      - verify/stage5-4-exact-golden-20260815
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Probe exact patch artifact without credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          url='https://drive.usercontent.google.com/download?id=1RQ4C40djhRayMYa0Cc94W1JX1pmiVMay&export=download&confirm=t'
+          code="$(curl -L --silent --show-error --output /tmp/stage54.patch.xz --write-out '%{http_code}' "$url" || true)"
+          echo "HTTP_STATUS=$code"
+          echo "BYTES=$(wc -c </tmp/stage54.patch.xz 2>/dev/null || echo 0)"
+          if [ "$code" = "200" ]; then
+            sha256sum /tmp/stage54.patch.xz
+          fi

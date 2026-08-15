@@ -6,73 +6,73 @@ TAP version 13
 # Subtest: Request 7 workflow maturity is connected but never falsely live-verified
 ok 1 - Request 7 workflow maturity is connected but never falsely live-verified
   ---
-  duration_ms: 1.885689
+  duration_ms: 1.557315
   type: 'test'
   ...
 # Subtest: authentication is required before the generation path
 ok 2 - authentication is required before the generation path
   ---
-  duration_ms: 0.823654
+  duration_ms: 0.706438
   type: 'test'
   ...
 # Subtest: project ownership is enforced before unavailable requests are persisted
 ok 3 - project ownership is enforced before unavailable requests are persisted
   ---
-  duration_ms: 0.53622
+  duration_ms: 0.427266
   type: 'test'
   ...
 # Subtest: provider unavailable is persisted honestly without a credit charge
 ok 4 - provider unavailable is persisted honestly without a credit charge
   ---
-  duration_ms: 0.480869
+  duration_ms: 0.45633
   type: 'test'
   ...
 # Subtest: successful CI provider execution persists output, asset, usage, ledger and audit
 ok 5 - successful CI provider execution persists output, asset, usage, ledger and audit
   ---
-  duration_ms: 1.075605
+  duration_ms: 0.883006
   type: 'test'
   ...
 # Subtest: failed provider execution releases the full reservation and records failure
 ok 6 - failed provider execution releases the full reservation and records failure
   ---
-  duration_ms: 0.444826
+  duration_ms: 0.372494
   type: 'test'
   ...
 # Subtest: cancelling a queued job is authorized, idempotent and releases its reservation once
 ok 7 - cancelling a queued job is authorized, idempotent and releases its reservation once
   ---
-  duration_ms: 0.432948
+  duration_ms: 0.353925
   type: 'test'
   ...
 # Subtest: insufficient credits creates no job, message, usage or charge
 ok 8 - insufficient credits creates no job, message, usage or charge
   ---
-  duration_ms: 0.338028
+  duration_ms: 0.280635
   type: 'test'
   ...
 # Subtest: an idempotent retry does not execute the provider or charge twice
 ok 9 - an idempotent retry does not execute the provider or charge twice
   ---
-  duration_ms: 1.752533
+  duration_ms: 0.617504
   type: 'test'
   ...
 # Subtest: reusing an idempotency key for different input is rejected
 ok 10 - reusing an idempotency key for different input is rejected
   ---
-  duration_ms: 0.866147
+  duration_ms: 1.720432
   type: 'test'
   ...
 # Subtest: manual routing requires the exact verified provider and model
 ok 11 - manual routing requires the exact verified provider and model
   ---
-  duration_ms: 0.323877
+  duration_ms: 0.293584
   type: 'test'
   ...
 # Subtest: full CI vertical slice survives project reload
 ok 12 - full CI vertical slice survives project reload
   ---
-  duration_ms: 0.401862
+  duration_ms: 0.344861
   type: 'test'
   ...
 1..12
@@ -83,4 +83,4 @@ ok 12 - full CI vertical slice survives project reload
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 124.013599
+# duration_ms 134.62058

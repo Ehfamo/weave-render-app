@@ -1,0 +1,65 @@
+name: XEOMX P0 Canonical Base Candidate Audit
+
+on:
+  push:
+    branches:
+      - plan/xeomx-platform-expansion-20260909
+    paths:
+      - .github/workflows/p0-base-candidate-audit.yml
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: plan/xeomx-platform-expansion-20260909
+          fetch-depth: 0
+      - name: Compare candidate source bases
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --all --tags --force --prune
+          refs=(
+            origin/main
+            origin/reconcile/source-export-20260813
+            origin/verify/stage54-from-step4-20260815
+            origin/verify/stage5-4-source-compare-20260815
+            origin/payload/stage54-core-v2-20260815
+          )
+          for r in "${refs[@]}"; do
+            echo "===== $r $(git rev-parse "$r") ====="
+            echo "files=$(git ls-tree -r --name-only "$r" | wc -l)"
+            echo "src_files=$(git ls-tree -r --name-only "$r" src | wc -l)"
+            echo "route_tsx=$(git ls-tree -r --name-only "$r" src/routes | grep -E '\.tsx$' | wc -l)"
+            for p in \
+              src/lib/xeomx-os.ts \
+              src/lib/product-architecture.ts \
+              src/lib/core-workflows.ts \
+              src/lib/platform-contracts.ts \
+              src/components/xeomx/product/ProductWorkspacePreview.tsx \
+              src/components/xeomx/product/ProductEnvironmentPage.tsx \
+              tests/product-architecture.test.ts \
+              supabase/migrations/20260814161806_stage5_4_stale_generation_lease_recovery.sql; do
+              if git cat-file -e "$r:$p" 2>/dev/null; then echo "PRESENT $p"; else echo "MISSING $p"; fi
+            done
+            if git cat-file -e "$r:package.json" 2>/dev/null; then
+              echo 'PACKAGE_SCRIPTS:'
+              git show "$r:package.json" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const p=JSON.parse(s); console.log(JSON.stringify(p.scripts||{}));})'
+            fi
+          done
+
+          echo '===== STAGE54 CORE V2 TAR MEMBERS ====='
+          REF=origin/payload/stage54-core-v2-20260815
+          mapfile -t parts < <(git ls-tree -r --name-only "$REF" .xeomx-stage54-core-v2 | grep '/core\.' | sort -V)
+          : >/tmp/core.b64
+          for f in "${parts[@]}"; do git show "$REF:$f" >>/tmp/core.b64; done
+          base64 -d /tmp/core.b64 >/tmp/core.tar.xz
+          xz -t /tmp/core.tar.xz
+          xz -dc /tmp/core.tar.xz >/tmp/core.tar
+          tar -tf /tmp/core.tar | tee /tmp/core-list.txt
+          echo "core_entries=$(wc -l </tmp/core-list.txt)"

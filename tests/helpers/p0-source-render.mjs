@@ -50,3 +50,19 @@ for (const feature of Object.values(FEATURES)) {
 console.log(
   "PASS: status accessibility, truthful job absence, permission denial, release labels and planned action gating",
 );
+
+const { PRODUCT_ENVIRONMENTS } = await import("../../src/lib/product-architecture.ts");
+const { ProductWorkspacePreview } =
+  await import("../../src/components/xeomx/product/ProductWorkspacePreview.tsx");
+let renderedViews = 0;
+for (const environment of PRODUCT_ENVIRONMENTS) {
+  for (const subpage of environment.subpages) {
+    const html = render(ProductWorkspacePreview, { environment, subpage, mode: "advanced" });
+    assert.ok(html.length > 0, `${environment.id}/${subpage.key} did not render`);
+    renderedViews += 1;
+  }
+}
+assert.equal(renderedViews, 295);
+console.log(
+  `PASS: ${renderedViews} canonical product previews render without undefined modules or messages`,
+);

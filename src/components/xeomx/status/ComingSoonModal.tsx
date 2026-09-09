@@ -30,7 +30,8 @@ export function ComingSoonModal({
 
   if (!open) return null;
   const cfg = FEATURES[featureKey];
-  const status = cfg.status === "coming_soon" ? "coming_soon" : "preview";
+  const status =
+    cfg.status === "planned" || cfg.status === "coming_soon" ? "coming_soon" : "preview";
   const heading =
     title ?? (status === "coming_soon" ? m.coming_soon_notice_title() : m.preview_notice_title());
   const body =

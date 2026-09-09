@@ -2,7 +2,10 @@
 // Every UI surface must classify its feature via this registry — no scattered
 // status flags in components. See `.lovable/plan.md`.
 
-export type FeatureStatus = "live" | "beta" | "preview" | "coming_soon";
+import type { CapabilityReleaseState } from "./platform-contracts";
+
+/** coming_soon remains an input alias for legacy notices, never canonical registry data. */
+export type FeatureStatus = CapabilityReleaseState | "coming_soon";
 
 export interface FeatureConfig {
   key: string;
@@ -133,7 +136,7 @@ export const FEATURES = {
   // ── COMING SOON (no functionality yet) ────────────────────────────────
   pricing: {
     key: "pricing",
-    status: "coming_soon",
+    status: "planned",
     route: "/pricing",
     allowPrimaryAction: false,
     waitlistEnabled: true,
@@ -141,91 +144,91 @@ export const FEATURES = {
   } as FeatureConfig,
   marketplace: {
     key: "marketplace",
-    status: "coming_soon",
+    status: "planned",
     route: "",
     allowPrimaryAction: false,
     waitlistEnabled: true,
   } as FeatureConfig,
   subscriptions: {
     key: "subscriptions",
-    status: "coming_soon",
+    status: "planned",
     route: "/pricing",
     allowPrimaryAction: false,
     waitlistEnabled: true,
   } as FeatureConfig,
   creatorEarnings: {
     key: "creatorEarnings",
-    status: "coming_soon",
+    status: "planned",
     route: "",
     allowPrimaryAction: false,
     waitlistEnabled: true,
   } as FeatureConfig,
   payouts: {
     key: "payouts",
-    status: "coming_soon",
+    status: "planned",
     route: "",
     allowPrimaryAction: false,
     waitlistEnabled: true,
   } as FeatureConfig,
   follow: {
     key: "follow",
-    status: "coming_soon",
+    status: "planned",
     route: "",
     allowPrimaryAction: false,
     waitlistEnabled: true,
   } as FeatureConfig,
   founders: {
     key: "founders",
-    status: "coming_soon",
+    status: "planned",
     route: "",
     allowPrimaryAction: false,
     waitlistEnabled: true,
   } as FeatureConfig,
   academy: {
     key: "academy",
-    status: "coming_soon",
+    status: "planned",
     route: "",
     allowPrimaryAction: false,
     waitlistEnabled: true,
   } as FeatureConfig,
   agentStore: {
     key: "agentStore",
-    status: "coming_soon",
+    status: "planned",
     route: "",
     allowPrimaryAction: false,
     waitlistEnabled: true,
   } as FeatureConfig,
   aiCompare: {
     key: "aiCompare",
-    status: "coming_soon",
+    status: "planned",
     route: "",
     allowPrimaryAction: false,
     waitlistEnabled: true,
   } as FeatureConfig,
   pwa: {
     key: "pwa",
-    status: "coming_soon",
+    status: "planned",
     route: "",
     allowPrimaryAction: false,
     waitlistEnabled: true,
   } as FeatureConfig,
   android: {
     key: "android",
-    status: "coming_soon",
+    status: "planned",
     route: "",
     allowPrimaryAction: false,
     waitlistEnabled: true,
   } as FeatureConfig,
   telegramBot: {
     key: "telegramBot",
-    status: "coming_soon",
+    status: "planned",
     route: "",
     allowPrimaryAction: false,
     waitlistEnabled: true,
   } as FeatureConfig,
   socialPublishing: {
     key: "socialPublishing",
-    status: "coming_soon",
+    status: "planned",
     route: "",
     allowPrimaryAction: false,
     waitlistEnabled: false,

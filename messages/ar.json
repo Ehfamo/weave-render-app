@@ -478,5 +478,8 @@
   "beta_notice_body": "هذا القسم يعمل لكنه لا يزال قيد التحسين. توقع تغييرات سريعة.",
   "auth_continue_discord": "المتابعة عبر Discord",
   "pricing_preview_notice": "الخطط الموضحة هي معاينة وقد تتغير قبل الإطلاق. لا يتم تحصيل أي مدفوعات حاليًا.",
-  "common_close": "إغلاق"
+  "common_close": "إغلاق",
+  "feature_status_mock": "نموذج",
+  "feature_status_planned": "مخطط له",
+  "feature_status_unavailable": "غير متاح"
 }

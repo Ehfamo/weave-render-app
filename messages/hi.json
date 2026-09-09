@@ -478,5 +478,8 @@
   "beta_notice_body": "यह भाग काम कर रहा है पर अभी विकसित हो रहा है। तेज़ बदलाव संभव हैं।",
   "auth_continue_discord": "Discord से जारी रखें",
   "pricing_preview_notice": "इस पेज पर दिखाई गई योजनाएँ प्रीव्यू हैं और लॉन्च से पहले बदल सकती हैं। फ़िलहाल कोई भुगतान नहीं लिया जा रहा।",
-  "common_close": "बंद करें"
+  "common_close": "बंद करें",
+  "feature_status_mock": "नमूना",
+  "feature_status_planned": "नियोजित",
+  "feature_status_unavailable": "अनुपलब्ध"
 }

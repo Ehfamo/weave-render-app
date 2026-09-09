@@ -478,5 +478,8 @@
   "beta_notice_body": "This section is functional but still being refined. Expect rapid changes.",
   "auth_continue_discord": "Continue with Discord",
   "pricing_preview_notice": "Plans shown on this page are previews and may change before launch. No payment is currently being collected.",
-  "common_close": "Close"
+  "common_close": "Close",
+  "feature_status_mock": "Sample",
+  "feature_status_planned": "Planned",
+  "feature_status_unavailable": "Unavailable"
 }

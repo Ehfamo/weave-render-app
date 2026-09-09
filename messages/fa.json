@@ -478,5 +478,8 @@
   "beta_notice_body": "این بخش کار می‌کند اما هنوز در حال بهبود است. تغییرات سریع در راه است.",
   "auth_continue_discord": "ادامه با Discord",
   "pricing_preview_notice": "پلن‌های نمایش‌داده‌شده صرفاً پیش‌نمایش هستند و ممکن است تغییر کنند. در حال حاضر هیچ پرداختی دریافت نمی‌شود.",
-  "common_close": "بستن"
+  "common_close": "بستن",
+  "feature_status_mock": "نمونه",
+  "feature_status_planned": "برنامه‌ریزی‌شده",
+  "feature_status_unavailable": "در دسترس نیست"
 }

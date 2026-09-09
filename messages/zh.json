@@ -478,5 +478,8 @@
   "beta_notice_body": "此部分可用,但仍在完善中。可能会有快速变动。",
   "auth_continue_discord": "使用 Discord 继续",
   "pricing_preview_notice": "此页显示的方案为预览,可能在发布前调整。目前不收取任何费用。",
-  "common_close": "关闭"
+  "common_close": "关闭",
+  "feature_status_mock": "示例",
+  "feature_status_planned": "计划中",
+  "feature_status_unavailable": "不可用"
 }

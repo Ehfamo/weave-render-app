@@ -1,6 +1,7 @@
 {
   "name": "tanstack_start_ts",
   "private": true,
+  "packageManager": "npm@10.9.3",
   "sideEffects": false,
   "type": "module",
   "scripts": {
@@ -8,14 +9,19 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test": "node --experimental-strip-types --test tests/*.test.mjs",
+    "test:integration": "node --experimental-strip-types --test tests/request-7-vertical-slice.test.mjs",
+    "test:migrations": "node --test tests/*migration*.test.mjs",
+    "test:smoke": "node --test tests/build.smoke.test.mjs",
+    "deploy": "wrangler deploy"
   },
   "dependencies": {
     "@fontsource-variable/fraunces": "^5.2.9",
     "@fontsource-variable/inter": "^5.2.8",
     "@fontsource-variable/vazirmatn": "^5.2.8",
-    "@hookform/resolvers": "^5.2.2",
     "@inlang/paraglide-js": "^2.20.2",
     "@lovable.dev/cloud-auth-js": "^1.1.2",
     "@radix-ui/react-accordion": "^1.2.12",
@@ -53,7 +59,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
-    "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.575.0",
@@ -69,8 +74,7 @@
     "tailwindcss": "^4.2.1",
     "tw-animate-css": "^1.3.4",
     "vaul": "^1.1.2",
-    "vite-tsconfig-paths": "^6.0.2",
-    "zod": "^3.24.2"
+    "vite-tsconfig-paths": "^6.0.2"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.42.3",
@@ -90,6 +94,7 @@
     "prettier": "^3.7.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
-    "vite": "^8.0.16"
+    "vite": "^8.0.16",
+    "wrangler": "4.123.0"
   }
 }

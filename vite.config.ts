@@ -1,10 +1,14 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
-import { cloudflare } from "@cloudflare/vite-plugin";
+import { nitro } from "nitro/vite";
 import { paraglideVitePlugin } from "@inlang/paraglide-js";
 
 export default defineConfig({
+  // Register the same Nitro adapter for build and preview. The wrapper only
+  // auto-registers Nitro for build; mixing its output with Cloudflare preview
+  // misreads deploy/config.json (Nitro does not emit auxiliaryWorkers).
+  nitro: false,
   plugins: [
-    cloudflare({ viteEnvironment: { name: "ssr" } }),
+    nitro({ preset: "cloudflare-module" }),
     paraglideVitePlugin({
       project: "./project.inlang",
       outdir: "./src/paraglide",

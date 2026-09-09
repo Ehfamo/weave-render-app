@@ -6,6 +6,12 @@ on:
       - plan/xeomx-platform-expansion-20260909
     paths:
       - .github/workflows/p0-full-validation.yml
+      - src/**
+      - tests/**
+      - scripts/**
+      - messages/**
+      - supabase/**
+      - vite.config.ts
 
 permissions:
   contents: read
@@ -13,11 +19,21 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    env:
+      # Isolated runtime wiring, not a live backend or credential substitute.
+      VITE_SUPABASE_URL: http://127.0.0.1:54321
+      VITE_SUPABASE_PUBLISHABLE_KEY: p0-isolated-public-test-value
+      SUPABASE_URL: http://127.0.0.1:54321
+      SUPABASE_PUBLISHABLE_KEY: p0-isolated-public-test-value
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
+
+      - name: Isolate local validation from repository environment files
+        shell: bash
+        run: rm -f .env .env.local .env.production .env.production.local .env.preview
 
       - uses: actions/setup-node@v4
         with:
@@ -191,7 +207,7 @@ jobs:
           set -euo pipefail
           npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/xeomx-preview.log 2>&1 &
           PID=$!
-          trap 'kill $PID 2>/dev/null || true' EXIT
+          trap 'result=$?; cat /tmp/xeomx-preview.log; kill $PID 2>/dev/null || true; exit $result' EXIT
           ok=0
           for i in $(seq 1 30); do
             if curl -fsS http://127.0.0.1:4173/ >/tmp/home.html; then ok=1; break; fi

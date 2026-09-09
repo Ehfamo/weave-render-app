@@ -1,0 +1,11 @@
+{
+  "missing": [],
+  "cycles": [],
+  "identityCounts": {
+    "core-workflows.ts": 1,
+    "platform-contracts.ts": 1,
+    "product-architecture.ts": 1,
+    "ProductWorkspacePreview.tsx": 1
+  },
+  "routeTreePresent": true
+}

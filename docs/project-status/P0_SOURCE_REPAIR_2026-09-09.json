@@ -1,0 +1,239 @@
+{
+  "repository": "Ehfamo/weave-render-app",
+  "branch": "plan/xeomx-platform-expansion-20260909",
+  "starting_head": "3827d1225323d627efbdfcaffbdcb3ee28a3f2a5",
+  "validated_source_head": "90b400baf8b0fe6b91f370ece8b89a97132281eb",
+  "timestamp": "2026-09-09T22:01:49.703704+00:00",
+  "node": "v24.19.0",
+  "npm": "11.9.0",
+  "verification_tool": "Python hashlib.sha256(path.read_bytes()); len(path.read_bytes())",
+  "canonical": [
+    {
+      "path": "src/lib/core-workflows.ts",
+      "sha256": "fce4fb9d01bafd808f45dcd241323ab5c99ada8057f757a10f11afaf93b023f1",
+      "bytes": 18262
+    },
+    {
+      "path": "src/lib/platform-contracts.ts",
+      "sha256": "840e9e012c244652492021223bbd55ae562bf702f06b65d03a67d81c50d5c4f2",
+      "bytes": 21587
+    },
+    {
+      "path": "src/components/xeomx/product/ProductWorkspacePreview.tsx",
+      "sha256": "5504a029910f04541f61b7876fe2df60ab18e2d18f188a2e89d823302f948a11",
+      "bytes": 31144
+    },
+    {
+      "path": "src/lib/product-architecture.ts",
+      "sha256": "4fed3a9cac34ab1c400f545438406802ee8c2dd2e8deac244cbd9dcba9b09ab3",
+      "bytes": 55566
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "c5340cf78e852c4ba0ac5ad3afe34a706323dfd37de46a2cf4f43f5dfa9d3b8d",
+      "bytes": 348592
+    }
+  ],
+  "local_checks": {
+    "clean_install": {
+      "command": "npm ci",
+      "exit_code": 0,
+      "log_sha256": "dec49805a54b086344625389b1485258e4c4aa9cb45ffca48793617ec77d07ee",
+      "execution": "FRESHLY_RERUN"
+    },
+    "build": {
+      "command": "npm run build",
+      "exit_code": 0,
+      "log_sha256": "d86856bb7b0747c8ad40c2d4fb83f38bf24e148293c4a9c2b5782cd0817ad767",
+      "execution": "FRESHLY_RERUN"
+    },
+    "typecheck": {
+      "command": "npm run typecheck",
+      "exit_code": 0,
+      "log_sha256": "ae791f9f57ffbb3c0a592b6a34e25250c1f7f6f13fde4d05f77a0d4e7681f89a",
+      "execution": "FRESHLY_RERUN"
+    },
+    "lint": {
+      "command": "npm run lint",
+      "exit_code": 0,
+      "log_sha256": "c9176a1945ff90dde6b05bfcf926c3eeacc67661e79e99cf8cd9eb35f0de8c2c",
+      "execution": "FRESHLY_RERUN"
+    },
+    "unit": {
+      "command": "npm test",
+      "exit_code": 1,
+      "log_sha256": "c42cd0c13a81ab5e14b9e2f50a782178a9dac174ab0cb4802f3bc2a5d41b8e63",
+      "execution": "FRESHLY_RERUN"
+    },
+    "integration": {
+      "command": "npm run test:integration",
+      "exit_code": 0,
+      "log_sha256": "942e602e7426c76729656465f0c8098c44e2063dce79c47e390c359e25aea1dc",
+      "execution": "FRESHLY_RERUN"
+    },
+    "migrations": {
+      "command": "npm run test:migrations",
+      "exit_code": 0,
+      "log_sha256": "7b68b2bd987fc127503319fcc975cf4109892d74afe1805292adbc910bd92028",
+      "execution": "FRESHLY_RERUN"
+    },
+    "smoke": {
+      "command": "npm run test:smoke",
+      "exit_code": 0,
+      "log_sha256": "0d2a31f327c74ae39fb6c0c9e4ff4c5e4327fb8d2dd78ce74fc9bd0d923ec8d2",
+      "execution": "FRESHLY_RERUN"
+    },
+    "imports": {
+      "command": "node scripts/p0-source-audit.mjs",
+      "exit_code": 0,
+      "log_sha256": "aba6518519b63f0ff2f29a874505971085194bf9a967cc5fe4a342dde9033fe3",
+      "execution": "FRESHLY_RERUN"
+    },
+    "secret_scan": {
+      "command": "workflow Secret and credential scan Python script",
+      "exit_code": 0,
+      "log_sha256": "aee8bf206e8f91c01d505d647431f546ad21e321e0639639436956de867d9978",
+      "execution": "FRESHLY_RERUN"
+    },
+    "i18n_rtl": {
+      "command": "workflow i18n/RTL Python script",
+      "exit_code": 0,
+      "log_sha256": "b9c16a25d0597eb64c2bd147d42cad86fd8b6fe0cc96b1375b14337d27d1a76a",
+      "execution": "FRESHLY_RERUN"
+    }
+  },
+  "unit": {
+    "total": 101,
+    "pass": 88,
+    "fail": 13,
+    "failed_tests": [
+      "all 21 former non-P0 gaps have exact direct routes",
+      "home defers marketplace discovery and its heavy prompt-card dependency",
+      "all 17 P0 target routes exist with exact route declarations",
+      "P0 partial targets receive distinct target-specific surfaces",
+      "all twelve critical journeys point to real product views",
+      "locale contracts stay in exact parity",
+      "legacy simulations, fake metrics, and soft product 404s stay removed",
+      "public listing, auth, SEO, and runtime warning boundaries remain safe",
+      "secondary global tools stay outside the initial client path",
+      "request 4 hardening stays centralized, fail-closed, and context preserving",
+      "tests/stage53-agent-workflow-control-plane.test.mjs",
+      "tests/stage53-billing-boundary.test.mjs",
+      "tests/stage53-evidence.test.mjs"
+    ]
+  },
+  "changed_paths": [
+    ".github/workflows/p0-full-validation.yml",
+    "messages/ar.json",
+    "messages/en.json",
+    "messages/fa.json",
+    "messages/hi.json",
+    "messages/zh.json",
+    "src/components/xeomx/os/SystemState.tsx",
+    "src/components/xeomx/product/CapabilityStatusPanel.tsx",
+    "src/components/xeomx/product/JobStatusPanel.tsx",
+    "src/components/xeomx/product/ModelIntelligenceWorkspace.tsx",
+    "src/components/xeomx/product/PaymentSafetyPanel.tsx",
+    "src/components/xeomx/product/PermissionPreviewPanel.tsx",
+    "src/components/xeomx/product/PersonalOSOverview.tsx",
+    "src/components/xeomx/product/SecurityIncidentPanel.tsx",
+    "src/components/xeomx/status/ComingSoonModal.tsx",
+    "src/components/xeomx/status/FeatureStatusBadge.tsx",
+    "src/hooks/use-product-complexity-mode.ts",
+    "src/integrations/supabase/types.ts",
+    "src/lib/backend/vertical-slice.database.ts",
+    "src/lib/backend/vertical-slice.functions.ts",
+    "src/lib/backend/vertical-slice.server.ts",
+    "src/lib/backend/vertical-slice.ts",
+    "src/lib/feature-status.ts",
+    "src/lib/marketplace.ts",
+    "src/lib/project-context.ts",
+    "src/lib/search-contract.ts",
+    "src/lib/xeomx-os.ts",
+    "supabase/functions/xeomx-generation-worker/citation-validation.mjs",
+    "supabase/functions/xeomx-generation-worker/index.ts",
+    "tests/helpers/p0-source-loader.mjs",
+    "tests/helpers/p0-source-render.mjs",
+    "tests/p0-source-repair.test.mjs",
+    "vite.config.ts"
+  ],
+  "commits": [
+    "c7a1c98deb710221e0a937c79f9a65f17a66d295 fix(p0): restore missing backend source dependencies",
+    "a5981034ebc06828ba29340db91dee887ebe851b fix(p0): repair worker type guards and source lint failures",
+    "b814b2a66f32be6bc677d9ee262151c4be989b84 fix(p0): reconcile restored submission routes with Stage5.4",
+    "2139c2b03b952a0e16ce5f6755f638ee4dde6f3f fix(p0): restore preview dependencies and release contracts",
+    "64be755c34caa5ecb11fac0f0fc664e4102edb6e fix(p0): align build and preview runtime adapters",
+    "bc07312e34eaae3ec1d4d8eb3d988faa642411fb fix(p0): repair catalog search contract and localized runtime checks",
+    "90b400baf8b0fe6b91f370ece8b89a97132281eb fix(p0): restore missing canonical preview translations"
+  ],
+  "supabase": {
+    "project": "bzoikmppvwiidyjdaqgv",
+    "status": "FAIL",
+    "mode": "READ_ONLY",
+    "missing_relations": [
+      "creator_stats",
+      "likes",
+      "saves",
+      "follows",
+      "comments",
+      "prompt_views"
+    ],
+    "existing_migration": "supabase/migrations/20260710134256_58ccd951-1ccf-4d9b-a2e7-f343a0145223.sql",
+    "migration_history_query": "20260710% -> zero rows",
+    "ddl_executed": false
+  },
+  "workflow": {
+    "run": 34409950674,
+    "job": 102661806824,
+    "head": "90b400baf8b0fe6b91f370ece8b89a97132281eb",
+    "status": "COMPLETED",
+    "conclusion": "FAILURE",
+    "actual_outcomes": {
+      "CLEAN_INSTALL": "success",
+      "BUILD": "success",
+      "TYPECHECK": "success",
+      "LINT": "success",
+      "UNIT": "failure",
+      "INTEGRATION": "success",
+      "MIGRATIONS": "success",
+      "SMOKE": "success",
+      "STATIC": "success",
+      "I18N": "success",
+      "SECRETS": "success",
+      "RUNTIME_SMOKE": "success",
+      "BACKEND_STATIC": "success"
+    },
+    "http_status": 200,
+    "headless_browser_runtime": "PASS",
+    "log_sha256": "3cda9a0a0e07bf6a350c4b62eaa6924ec9ee20b4f5cabd7d082e5b2090409b6f",
+    "url": "https://github.com/Ehfamo/weave-render-app/actions/runs/34409950674"
+  },
+  "aggregator_modified": false,
+  "dependencies_modified": false,
+  "production_modified": false,
+  "p1_started": false,
+  "canonical_baseline_created": false,
+  "p0": "BLOCKED",
+  "runtime_limits": "Existing bounded smoke: localized home HTTP 200, HTML, desktop DOM, mobile screenshot, log-pattern checks. Not full J01-J12 or comprehensive hydration/accessibility coverage.",
+  "stored_log_normalization": "Trailing whitespace and extra EOF blank lines removed for Git hygiene; raw log hashes in local_checks refer to original command output.",
+  "stored_logs": {
+    "docs/project-status/p0-source-repair-2026-09-09/ci-outcomes.txt": {
+      "sha256": "2d8bb42b5737a1c08fcb117eef63d517e4b143e53360b5354d884e80439ad05c"
+    },
+    "docs/project-status/p0-source-repair-2026-09-09/integration.txt": {
+      "sha256": "942e602e7426c76729656465f0c8098c44e2063dce79c47e390c359e25aea1dc"
+    },
+    "docs/project-status/p0-source-repair-2026-09-09/unit.txt": {
+      "sha256": "3e7530101a7643e86cb67c0c5ae4e96aad5011c0134c10648acc2239b6a1c630"
+    },
+    "docs/project-status/p0-source-repair-2026-09-09/typecheck.txt": {
+      "sha256": "b19be1a127b43f4b12ff880203cd55855c61667abffe84f9f625a6078c3acec4"
+    },
+    "docs/project-status/p0-source-repair-2026-09-09/preview-render.txt": {
+      "sha256": "b252fcc6bb0f8bb841e0bc424d3f6978d7628963914af822e7f8b84ad3a7abba"
+    },
+    "docs/project-status/p0-source-repair-2026-09-09/lint.txt": {
+      "sha256": "9146ba4ac3ac7deed9d3496bae0863ab8200bbcbfd844781ce3ae5fd11906b87"
+    }
+  }
+}

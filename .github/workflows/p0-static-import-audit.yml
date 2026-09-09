@@ -1,0 +1,75 @@
+name: XEOMX P0 Static Import Audit
+
+on:
+  push:
+    branches:
+      - plan/xeomx-platform-expansion-20260909
+    paths:
+      - .github/workflows/p0-static-import-audit.yml
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: plan/xeomx-platform-expansion-20260909
+      - name: Scan unresolved local imports
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          root=Path.cwd()
+          exts=['.ts','.tsx','.js','.jsx','.json','.css']
+          imp_re=re.compile(r'''(?:import|export)\s+(?:type\s+)?(?:[^'\"]*?\s+from\s+)?[\"']([^\"']+)[\"']|import\([\"']([^\"']+)[\"']\)''')
+          def resolve(spec,current):
+              if spec.startswith('@/'):
+                  base=Path('src')/spec[2:]
+              elif spec.startswith('.'):
+                  try: base=(current.parent/spec).resolve().relative_to(root)
+                  except ValueError: return None
+              else: return None
+              candidates=[base]
+              if base.suffix=='':
+                  candidates += [Path(str(base)+e) for e in exts]
+                  candidates += [base/('index'+e) for e in exts]
+              return next((c for c in candidates if c.exists()), None)
+          missing={}
+          graph={}
+          for f in Path('src').rglob('*'):
+              if f.suffix not in ('.ts','.tsx','.js','.jsx'): continue
+              txt=f.read_text('utf-8',errors='ignore')
+              for m in imp_re.finditer(txt):
+                  spec=m.group(1) or m.group(2)
+                  if not (spec.startswith('@/') or spec.startswith('.')): continue
+                  r=resolve(spec,f)
+                  if r is None:
+                      missing.setdefault(spec,[]).append(str(f))
+                  else:
+                      graph.setdefault(str(f),[]).append(str(r))
+          print('UNRESOLVED_LOCAL_IMPORTS',len(missing))
+          for spec,importers in sorted(missing.items()):
+              print('MISSING',spec,'IMPORTERS',','.join(sorted(importers)))
+          # canonical reachability through currently resolved graph
+          seeds=[
+            'src/lib/core-workflows.ts','src/lib/platform-contracts.ts','src/lib/product-architecture.ts',
+            'src/components/xeomx/product/ProductWorkspacePreview.tsx'
+          ]
+          seen=set(); stack=list(seeds)
+          while stack:
+              f=stack.pop()
+              if f in seen: continue
+              seen.add(f)
+              stack.extend(graph.get(f,[]))
+          print('CURRENT_CANONICAL_RESOLVED_CLOSURE_FILES',len(seen))
+          for f in sorted(seen): print('CLOSURE',f)
+          print('CANONICAL_UNRESOLVED')
+          for spec,importers in sorted(missing.items()):
+              if any(i in seen for i in importers):
+                  print('CANONICAL_MISSING',spec,'IMPORTERS',','.join(sorted(i for i in importers if i in seen)))
+          PY

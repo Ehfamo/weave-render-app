@@ -16,7 +16,7 @@ import type {
   VerticalSliceRoutingMode,
 } from "@/lib/backend/vertical-slice";
 import {
-  REQUEST_7_LIVE_TEXT_PROVIDER,
+  REQUEST_7_TEXT_PROVIDER_ROUTES,
   VerticalSliceError,
   safeVerticalSliceError,
 } from "@/lib/backend/vertical-slice";
@@ -376,10 +376,14 @@ export async function submitTextGeneration(
 ): Promise<GenerationExecutionResult> {
   if (!input.actorId) throw new VerticalSliceError("UNAUTHENTICATED");
 
-  const route = REQUEST_7_LIVE_TEXT_PROVIDER;
   if (input.routingMode === "manual") {
-    if (input.requestedProvider !== route.id) throw new VerticalSliceError("PROVIDER_UNAVAILABLE");
-    if (input.requestedModel !== route.model) throw new VerticalSliceError("MODEL_UNAVAILABLE");
+    const routes = REQUEST_7_TEXT_PROVIDER_ROUTES.filter(
+      (route) => route.id === input.requestedProvider,
+    );
+    if (!routes.length) throw new VerticalSliceError("PROVIDER_UNAVAILABLE");
+    if (!routes.some((route) => route.model === input.requestedModel)) {
+      throw new VerticalSliceError("MODEL_UNAVAILABLE");
+    }
   }
 
   const request: GenerationSubmissionInput = {

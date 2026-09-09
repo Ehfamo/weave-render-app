@@ -82,11 +82,14 @@ export function safeVerticalSliceError(error: unknown): VerticalSliceError {
 
 export type VerticalSliceRoutingMode = "auto" | "manual";
 
-export const REQUEST_7_LIVE_TEXT_PROVIDER = {
-  id: "cloudflare",
-  model: "@cf/meta/llama-3.1-8b-instruct-fast",
-  reservedCreditUnits: 5,
-} as const;
+// Stage 5.4 worker and migration registry. This is a submission allowlist,
+// not a claim that provider credentials or external services are available.
+export const REQUEST_7_TEXT_PROVIDER_ROUTES = [
+  { id: "cloudflare", model: "@cf/meta/llama-3.1-8b-instruct-fast", reservedCreditUnits: 5 },
+  { id: "gemini", model: "gemini-3.5-flash", reservedCreditUnits: 5 },
+  { id: "groq", model: "llama-3.1-8b-instant", reservedCreditUnits: 5 },
+] as const;
+export const REQUEST_7_LIVE_TEXT_PROVIDER = REQUEST_7_TEXT_PROVIDER_ROUTES[0];
 export type PersistedJobState = "queued" | "running" | "succeeded" | "failed" | "cancelled";
 
 export type ProjectSummary = {

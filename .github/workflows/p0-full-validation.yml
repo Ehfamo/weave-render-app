@@ -1,0 +1,336 @@
+name: XEOMX P0 Full Validation
+
+on:
+  push:
+    branches:
+      - plan/xeomx-platform-expansion-20260909
+    paths:
+      - .github/workflows/p0-full-validation.yml
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: plan/xeomx-platform-expansion-20260909
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Runtime and lock evidence
+        id: runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "NODE=$(node --version)"
+          echo "NPM_BEFORE=$(npm --version)"
+          npm install --global npm@10.9.3 >/dev/null 2>&1
+          echo "NPM=$(npm --version)"
+          test "$(npm --version)" = "10.9.3"
+          echo "LOCK_SHA256=$(sha256sum package-lock.json | awk '{print $1}')"
+          test "$(sha256sum package-lock.json | awk '{print $1}')" = "c5340cf78e852c4ba0ac5ad3afe34a706323dfd37de46a2cf4f43f5dfa9d3b8d"
+          echo "PACKAGE_SHA256=$(sha256sum package.json | awk '{print $1}')"
+          test "$(sha256sum package.json | awk '{print $1}')" = "cbbc6aef37f0018eec592bccf22f0995d4eaf68634921d78d156ca8836ed4181"
+
+      - name: Canonical hash gate
+        id: canonical
+        shell: bash
+        run: |
+          set -euo pipefail
+          check(){ path="$1"; bytes="$2"; sha="$3"; test "$(wc -c < "$path")" -eq "$bytes"; test "$(sha256sum "$path" | awk '{print $1}')" = "$sha"; echo "PASS $path bytes=$bytes sha256=$sha"; }
+          check src/lib/core-workflows.ts 18262 fce4fb9d01bafd808f45dcd241323ab5c99ada8057f757a10f11afaf93b023f1
+          check src/lib/platform-contracts.ts 21587 840e9e012c244652492021223bbd55ae562bf702f06b65d03a67d81c50d5c4f2
+          check src/components/xeomx/product/ProductWorkspacePreview.tsx 31144 5504a029910f04541f61b7876fe2df60ab18e2d18f188a2e89d823302f948a11
+          check src/lib/product-architecture.ts 55566 4fed3a9cac34ab1c400f545438406802ee8c2dd2e8deac244cbd9dcba9b09ab3
+
+      - name: Clean install
+        id: install
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf node_modules .output dist
+          npm ci
+
+      - name: Production build
+        id: build
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: npm run build
+
+      - name: Typecheck
+        id: typecheck
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: npm run typecheck
+
+      - name: Lint
+        id: lint
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: npm run lint
+
+      - name: Full unit and contract tests
+        id: unit
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: npm run test
+
+      - name: Integration tests
+        id: integration
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: npm run test:integration
+
+      - name: Migration tests
+        id: migrations
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: npm run test:migrations
+
+      - name: Smoke tests
+        id: smoke
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: npm run test:smoke
+
+      - name: Static imports, duplicate contracts, routes, circular dependencies
+        id: static
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, sys
+          root=Path.cwd(); exts=['.ts','.tsx','.js','.jsx','.json','.css']
+          imp_re=re.compile(r'''(?:import|export)\s+(?:type\s+)?(?:[^'\"]*?\s+from\s+)?[\"']([^\"']+)[\"']|import\([\"']([^\"']+)[\"']\)''')
+          def resolve(spec,current):
+              spec=spec.split('?')[0]
+              if spec.startswith('@/'): base=Path('src')/spec[2:]
+              elif spec.startswith('.'):
+                  try: base=(current.parent/spec).resolve().relative_to(root)
+                  except ValueError: return None
+              else: return 'external'
+              cands=[base]
+              if base.suffix=='':
+                  cands += [Path(str(base)+e) for e in exts]
+                  cands += [base/('index'+e) for e in exts]
+              return next((str(c) for c in cands if c.exists()), None)
+          graph={}; missing=[]
+          for f in Path('src').rglob('*'):
+              if f.suffix not in ('.ts','.tsx','.js','.jsx'): continue
+              txt=f.read_text('utf-8',errors='ignore')
+              for m in imp_re.finditer(txt):
+                  spec=m.group(1) or m.group(2); r=resolve(spec,f)
+                  if r is None: missing.append((str(f),spec))
+                  elif r!='external' and str(r).endswith(('.ts','.tsx','.js','.jsx')): graph.setdefault(str(f),set()).add(r)
+          generated_allow=('paraglide/','routeTree.gen')
+          real_missing=[x for x in missing if not any(a in x[1] for a in generated_allow)]
+          print('UNRESOLVED_LOCAL_IMPORTS_TOTAL',len(missing))
+          print('UNRESOLVED_NON_GENERATED',len(real_missing))
+          for f,s in real_missing: print('MISSING',f,s)
+          if real_missing: sys.exit(2)
+          # no duplicate canonical basenames
+          for name in ['core-workflows.ts','platform-contracts.ts','product-architecture.ts','ProductWorkspacePreview.tsx']:
+              hits=[p for p in Path('.').rglob(name) if '.git' not in p.parts and 'node_modules' not in p.parts]
+              print('CANONICAL_BASENAME',name,'COUNT',len(hits))
+              if len(hits)!=1: sys.exit(3)
+          # DFS cycle detection among source modules
+          state={}; stack=[]; cycles=[]
+          def dfs(n):
+              state[n]=1; stack.append(n)
+              for m in graph.get(n,()):
+                  if m not in graph and not Path(m).exists(): continue
+                  if state.get(m,0)==0: dfs(m)
+                  elif state.get(m)==1:
+                      try: i=stack.index(m); cycles.append(stack[i:]+[m])
+                      except ValueError: pass
+              stack.pop(); state[n]=2
+          for n in list(graph):
+              if state.get(n,0)==0: dfs(n)
+          unique=[]; seen=set()
+          for c in cycles:
+              key=tuple(sorted(set(c)))
+              if key not in seen: seen.add(key); unique.append(c)
+          print('CIRCULAR_DEPENDENCIES',len(unique))
+          for c in unique[:20]: print('CYCLE',' -> '.join(c))
+          if unique: sys.exit(4)
+          routes=list(Path('src/routes').glob('*.tsx'))+list(Path('src/routes').glob('*.ts'))
+          print('ROUTE_SOURCE_FILES',len(routes))
+          if not Path('src/routeTree.gen.ts').exists():
+              print('MISSING routeTree.gen.ts'); sys.exit(5)
+          PY
+
+      - name: i18n parity and RTL source invariant
+        id: i18n
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, sys
+          from pathlib import Path
+          locs=['en','fa','ar','zh','hi']
+          def keys(o,p=''):
+              out=set()
+              if isinstance(o,dict):
+                  for k,v in o.items():
+                      q=f'{p}.{k}' if p else k
+                      if isinstance(v,dict): out |= keys(v,q)
+                      else: out.add(q)
+              return out
+          sets={}
+          for loc in locs:
+              p=Path('messages')/f'{loc}.json'
+              data=json.loads(p.read_text('utf-8')); sets[loc]=keys(data)
+              print('LOCALE_KEYS',loc,len(sets[loc]))
+          base=sets['en']; bad=False
+          for loc in locs[1:]:
+              missing=base-sets[loc]; extra=sets[loc]-base
+              print('PARITY',loc,'missing',len(missing),'extra',len(extra))
+              if missing or extra: bad=True
+          root=Path('src/routes/__root.tsx').read_text('utf-8')
+          required=['locale === "fa" || locale === "ar"','<html lang={locale} dir={dir}>']
+          for token in required:
+              if token not in root: print('RTL_INVARIANT_MISSING',token); bad=True
+          if bad: sys.exit(2)
+          print('I18N_RTL_STATIC_PASS')
+          PY
+
+      - name: Secret and credential scan
+        id: secrets
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, sys
+          skip={'.git','node_modules','.output','dist'}
+          patterns=[
+            re.compile(r'\bsk-(?:proj-)?[A-Za-z0-9_-]{20,}\b'),
+            re.compile(r'\bAIza[0-9A-Za-z_-]{30,}\b'),
+            re.compile(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----'),
+            re.compile(r'(?i)(service[_-]?role[_-]?key|stripe[_-]?secret[_-]?key|cloudflare[_-]?api[_-]?token)\s*[:=]\s*["\']?[A-Za-z0-9_\-\.]{20,}')
+          ]
+          findings=[]
+          for p in Path('.').rglob('*'):
+              if not p.is_file() or any(x in skip for x in p.parts): continue
+              if p.stat().st_size>2_000_000: continue
+              try: text=p.read_text('utf-8')
+              except: continue
+              for i,line in enumerate(text.splitlines(),1):
+                  if any(rx.search(line) for rx in patterns): findings.append((str(p),i))
+          print('SECRET_SCAN_FINDINGS',len(findings))
+          for p,i in findings: print('POTENTIAL_SECRET',p,'line',i)
+          if findings: sys.exit(2)
+          PY
+
+      - name: Local isolated runtime, hydration, console-pattern and responsive smoke
+        id: runtime_smoke
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/xeomx-preview.log 2>&1 &
+          PID=$!
+          trap 'kill $PID 2>/dev/null || true' EXIT
+          ok=0
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/ >/tmp/home.html; then ok=1; break; fi
+            sleep 1
+          done
+          test "$ok" -eq 1
+          echo "HOME_HTTP=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4173/)"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4173/)" = "200"
+          grep -qi '<html' /tmp/home.html
+          if grep -Eqi 'Hydration failed|hydration mismatch|ReferenceError:|TypeError:|Uncaught' /tmp/xeomx-preview.log; then
+            echo 'RUNTIME_ERROR_PATTERN_FOUND'; grep -Ein 'Hydration failed|hydration mismatch|ReferenceError:|TypeError:|Uncaught' /tmp/xeomx-preview.log | head -20; exit 2
+          fi
+          CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          if [ -n "$CHROME" ]; then
+            "$CHROME" --headless --no-sandbox --disable-gpu --window-size=1440,900 --dump-dom http://127.0.0.1:4173/ >/tmp/dom-desktop.html 2>/tmp/chrome-desktop.log
+            "$CHROME" --headless --no-sandbox --disable-gpu --window-size=390,844 --screenshot=/tmp/mobile.png http://127.0.0.1:4173/ >/tmp/chrome-mobile.out 2>/tmp/chrome-mobile.log
+            test -s /tmp/dom-desktop.html
+            test -s /tmp/mobile.png
+            if grep -Eqi 'Hydration failed|hydration mismatch|Uncaught (TypeError|ReferenceError)' /tmp/chrome-desktop.log /tmp/chrome-mobile.log; then exit 3; fi
+            echo 'HEADLESS_BROWSER_RUNTIME_PASS'
+          else
+            echo 'HEADLESS_BROWSER_UNAVAILABLE'
+            exit 4
+          fi
+
+      - name: Non-production backend source validation
+        id: backend_static
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -d supabase/migrations
+          test -f supabase/functions/xeomx-generation-worker/index.ts
+          echo "MIGRATION_FILES=$(find supabase/migrations -maxdepth 1 -type f -name '*.sql' | wc -l)"
+          echo "FUNCTION_FILES=$(find supabase/functions -type f | wc -l)"
+          if grep -RIn --exclude-dir=node_modules --exclude-dir=.git -E 'ALTER TABLE .* DISABLE ROW LEVEL SECURITY|set session_replication_role|auth\.uid\(\).*IS NULL.*allow' supabase 2>/dev/null; then
+            echo 'POTENTIAL_RLS_WEAKENING_PATTERN'; exit 2
+          fi
+          echo 'BACKEND_STATIC_SAFETY_PASS'
+
+      - name: External credential presence classification
+        id: external
+        if: always()
+        continue-on-error: true
+        shell: bash
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          GEMINI_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_KEY: ${{ secrets.GROQ_API_KEY }}
+          STRIPE_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+        run: |
+          set -euo pipefail
+          present(){ if [ -n "$2" ]; then echo "$1=PRESENT"; else echo "$1=ABSENT"; fi; }
+          present CLOUDFLARE_API_TOKEN "$CF_TOKEN"
+          present CLOUDFLARE_ACCOUNT_ID "$CF_ACCOUNT"
+          present GEMINI_API_KEY "$GEMINI_KEY"
+          present GROQ_API_KEY "$GROQ_KEY"
+          present STRIPE_SECRET_KEY "$STRIPE_KEY"
+
+      - name: Validation matrix
+        if: always()
+        shell: bash
+        run: |
+          echo "CLEAN_INSTALL=${{ steps.install.outcome }}"
+          echo "BUILD=${{ steps.build.outcome }}"
+          echo "TYPECHECK=${{ steps.typecheck.outcome }}"
+          echo "LINT=${{ steps.lint.outcome }}"
+          echo "UNIT=${{ steps.unit.outcome }}"
+          echo "INTEGRATION=${{ steps.integration.outcome }}"
+          echo "MIGRATIONS=${{ steps.migrations.outcome }}"
+          echo "SMOKE=${{ steps.smoke.outcome }}"
+          echo "STATIC=${{ steps.static.outcome }}"
+          echo "I18N=${{ steps.i18n.outcome }}"
+          echo "SECRETS=${{ steps.secrets.outcome }}"
+          echo "RUNTIME_SMOKE=${{ steps.runtime_smoke.outcome }}"
+          echo "BACKEND_STATIC=${{ steps.backend_static.outcome }}"
+          core='${{ steps.install.outcome }} ${{ steps.build.outcome }} ${{ steps.typecheck.outcome }} ${{ steps.lint.outcome }} ${{ steps.unit.outcome }} ${{ steps.integration.outcome }} ${{ steps.migrations.outcome }} ${{ steps.smoke.outcome }} ${{ steps.static.outcome }} ${{ steps.i18n.outcome }} ${{ steps.secrets.outcome }} ${{ steps.runtime_smoke.outcome }} ${{ steps.backend_static.outcome }}'
+          if echo "$core" | grep -q failure; then exit 1; fi

@@ -1,0 +1,92 @@
+name: XEOMX P0 16k Payload Forensic
+
+on:
+  push:
+    branches:
+      - plan/xeomx-platform-expansion-20260909
+    paths:
+      - .github/workflows/p0-16k-payload-forensic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  forensic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: plan/xeomx-platform-expansion-20260909
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Inspect every historical chunk-05 and 16k payload state
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --all --tags --force --prune
+          echo '=== CHUNK-05 HISTORY ==='
+          git log --all --full-history --date=iso-strict --format='%H %ad %s' -- .xeomx/chunk-05 || true
+          echo '=== CHUNK-05 REACHABLE BLOBS ==='
+          git rev-list --all --objects | awk '$2==".xeomx/chunk-05"{print}' || true
+          python3 - <<'PY'
+          import base64, hashlib, lzma, gzip, subprocess, re, itertools
+
+          # Locate candidate commits with 16k-style payloads.
+          commits=subprocess.check_output(['git','log','--all','--full-history','--format=%H','--','.xeomx'],text=True).splitlines()
+          seen=set(); states=[]
+          for c in commits:
+              if c in seen: continue
+              seen.add(c)
+              names=subprocess.run(['git','ls-tree','-r','--name-only',c,'.xeomx'],text=True,stdout=subprocess.PIPE).stdout.splitlines()
+              names=sorted([n for n in names if n.startswith('.xeomx/chunk-')])
+              if not names: continue
+              sizes=[]; datas=[]
+              for n in names:
+                  d=subprocess.check_output(['git','show',f'{c}:{n}'])
+                  sizes.append(len(d)); datas.append(d)
+              # 16k family: majority around 16k or total > 150k with 12-ish chunks.
+              if not (sum(1 for s in sizes if 15000 <= s <= 17000) >= 5):
+                  continue
+              raw=b''.join(datas)
+              key=(tuple(names),tuple(hashlib.sha256(d).hexdigest() for d in datas))
+              if any(s[0]==key for s in states): continue
+              states.append((key,c,names,sizes,datas,raw))
+
+          print('UNIQUE_16K_STATES',len(states))
+          for _,c,names,sizes,datas,raw in states:
+              print('\nSTATE',c,'count',len(names),'names',names,'sizes',sizes,'total',len(raw),'mod4',len(raw)%4,'sha',hashlib.sha256(raw).hexdigest())
+              # Show prefixes/suffixes for continuity diagnostics.
+              for n,d in zip(names,datas):
+                  print(' PART',n,'bytes',len(d),'sha',hashlib.sha256(d).hexdigest(),'head',d[:16],'tail',d[-16:])
+              enc=re.sub(rb'[\r\n\t ]+',b'',raw)
+              enc += b'='*((4-len(enc)%4)%4)
+              try:
+                  dec=base64.b64decode(enc,validate=True)
+                  print(' DECODED',len(dec),hashlib.sha256(dec).hexdigest(),dec[:8])
+                  for label,fn in [('xz',lzma.decompress),('gzip',gzip.decompress)]:
+                      try:
+                          out=fn(dec)
+                          print(' ',label.upper(),'OK bytes',len(out),'sha',hashlib.sha256(out).hexdigest(),'targets',{
+                              t:out.count(t.encode()) for t in ['product-architecture.ts','core-workflows.ts','platform-contracts.ts','ProductWorkspacePreview.tsx']
+                          })
+                      except Exception as e:
+                          print(' ',label.upper(),'FAIL',repr(e))
+              except Exception as e:
+                  print(' BASE64_FAIL',repr(e))
+
+          # Enumerate all distinct historical blobs ever associated with chunk-05.
+          lines=subprocess.check_output(['git','rev-list','--all','--objects'],text=True).splitlines()
+          blobs=[]
+          for line in lines:
+              if ' ' not in line: continue
+              obj,path=line.split(' ',1)
+              if path=='.xeomx/chunk-05':
+                  try:
+                      if subprocess.check_output(['git','cat-file','-t',obj],text=True).strip()!='blob': continue
+                      d=subprocess.check_output(['git','cat-file','blob',obj])
+                      blobs.append((obj,len(d),hashlib.sha256(d).hexdigest(),d[:16],d[-16:]))
+                  except Exception: pass
+          print('\nCHUNK05_BLOB_COUNT',len(blobs))
+          for b in blobs: print(' CHUNK05_BLOB',b)
+          PY

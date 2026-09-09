@@ -1,7 +1,5 @@
 export function validateResearchCitations(text, sourceIds) {
-  const allowed = new Set(
-    sourceIds.filter((value) => Number.isSafeInteger(value) && value > 0),
-  );
+  const allowed = new Set(sourceIds.filter((value) => Number.isSafeInteger(value) && value > 0));
   const citationLike = [...String(text).matchAll(/\[(\d[^\]]*)\]/g)];
 
   if (!citationLike.length) {

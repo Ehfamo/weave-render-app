@@ -1,0 +1,139 @@
+name: XEOMX P0 Exact Canonical Recovery
+
+on:
+  push:
+    branches:
+      - plan/xeomx-platform-expansion-20260909
+    paths:
+      - .github/workflows/p0-exact-recovery.yml
+
+permissions:
+  contents: write
+
+jobs:
+  exact-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout isolated P0 branch
+        uses: actions/checkout@v4
+        with:
+          ref: plan/xeomx-platform-expansion-20260909
+          fetch-depth: 0
+
+      - name: Assert isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git branch --show-current)" = "plan/xeomx-platform-expansion-20260909"
+          echo "P0 isolation confirmed. No deploy and no secrets are used by this workflow."
+
+      - name: Fetch sealed RC1 source branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --force origin \
+            release/xeomx-superapp-rc1-final:refs/remotes/origin/release/xeomx-superapp-rc1-final \
+            main:refs/remotes/origin/main
+          git rev-parse origin/release/xeomx-superapp-rc1-final
+          git rev-parse origin/main
+
+      - name: Reconstruct and cryptographically verify sealed RC1 patch
+        id: reconstruct
+        shell: bash
+        run: |
+          set -euo pipefail
+          RC_REF=origin/release/xeomx-superapp-rc1-final
+          : > /tmp/xeomx-rc1.raw.b64
+          mapfile -t CHUNKS < <(git ls-tree -r --name-only "$RC_REF" .xeomx | grep '^.xeomx/chunk-' | sort -V)
+          test "${#CHUNKS[@]}" -gt 0
+          printf 'chunks=%s\n' "${CHUNKS[*]}"
+          for f in "${CHUNKS[@]}"; do
+            git show "$RC_REF:$f" >> /tmp/xeomx-rc1.raw.b64
+          done
+          echo "raw_b64_bytes=$(wc -c < /tmp/xeomx-rc1.raw.b64)"
+          sha256sum /tmp/xeomx-rc1.raw.b64
+
+          decode_mode=STRICT
+          if ! base64 --decode /tmp/xeomx-rc1.raw.b64 > /tmp/xeomx-rc1.patch.gz 2>/tmp/strict-base64.err || ! gzip -t /tmp/xeomx-rc1.patch.gz 2>/tmp/strict-gzip.err; then
+            decode_mode=NORMALIZED_WHITESPACE
+            tr -d '\r\n\t ' < /tmp/xeomx-rc1.raw.b64 > /tmp/xeomx-rc1.normalized.b64
+            base64 --decode /tmp/xeomx-rc1.normalized.b64 > /tmp/xeomx-rc1.patch.gz
+            gzip -t /tmp/xeomx-rc1.patch.gz
+          fi
+          echo "decode_mode=$decode_mode"
+          gzip -dc /tmp/xeomx-rc1.patch.gz > /tmp/xeomx-rc1.patch
+          echo "5a0de1c393cc37cc0342af893e2c9dfd7e30329330d02456099ee3d6d983811  /tmp/xeomx-rc1.patch" | sha256sum -c -
+          echo "patch_bytes=$(wc -c < /tmp/xeomx-rc1.patch)"
+          sha256sum /tmp/xeomx-rc1.patch
+
+      - name: Materialize candidate source on historical main baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/xeomx-p0-base
+          git worktree add --detach /tmp/xeomx-p0-base origin/main
+          git -C /tmp/xeomx-p0-base apply --check /tmp/xeomx-rc1.patch
+          git -C /tmp/xeomx-p0-base apply /tmp/xeomx-rc1.patch
+
+          FILES=(
+            src/lib/product-architecture.ts
+            src/lib/core-workflows.ts
+            src/lib/platform-contracts.ts
+            src/components/xeomx/product/ProductWorkspacePreview.tsx
+          )
+          for f in "${FILES[@]}"; do
+            test -f "/tmp/xeomx-p0-base/$f"
+            printf '%s\t' "$f"
+            wc -c < "/tmp/xeomx-p0-base/$f" | tr -d '\n'
+            printf '\t'
+            sha256sum "/tmp/xeomx-p0-base/$f" | awk '{print $1}'
+          done
+
+      - name: Verify all four files against historical manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          check_file() {
+            local path="$1" bytes="$2" expected="$3"
+            local actual_bytes actual_sha
+            actual_bytes=$(wc -c < "/tmp/xeomx-p0-base/$path")
+            actual_sha=$(sha256sum "/tmp/xeomx-p0-base/$path" | awk '{print $1}')
+            printf '%s expected_bytes=%s actual_bytes=%s expected_sha=%s actual_sha=%s\n' \
+              "$path" "$bytes" "$actual_bytes" "$expected" "$actual_sha"
+            test "$actual_bytes" = "$bytes"
+            test "$actual_sha" = "$expected"
+          }
+
+          check_file src/lib/product-architecture.ts 48412 5c1cb52a5b1d692d18aa92adc558170bd4ca9d3fb732a0f45ee37485e3712504
+          check_file src/lib/core-workflows.ts 18262 fce4fb9d01bafd808f45dcd241323ab5c99ada8057f757a10f11afaf93b023f1
+          check_file src/lib/platform-contracts.ts 21587 840e9e012c244652492021223bbd55ae562bf702f06b65d03a67d81c50d5c4f2
+          check_file src/components/xeomx/product/ProductWorkspacePreview.tsx 31144 5504a029910f04541f61b7876fe2df60ab18e2d18f188a2e89d823302f948a11
+          echo EXACT_RECOVERY_PASS
+
+      - name: Restore exact files into isolated plan branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git branch --show-current)" = "plan/xeomx-platform-expansion-20260909"
+          mkdir -p src/lib src/components/xeomx/product
+          cp /tmp/xeomx-p0-base/src/lib/product-architecture.ts src/lib/product-architecture.ts
+          cp /tmp/xeomx-p0-base/src/lib/core-workflows.ts src/lib/core-workflows.ts
+          cp /tmp/xeomx-p0-base/src/lib/platform-contracts.ts src/lib/platform-contracts.ts
+          cp /tmp/xeomx-p0-base/src/components/xeomx/product/ProductWorkspacePreview.tsx src/components/xeomx/product/ProductWorkspacePreview.tsx
+          git diff --check
+
+      - name: Commit exact canonical recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "XEOMX P0 Recovery"
+          git config user.email "103573773+Ehfamo@users.noreply.github.com"
+          git add \
+            src/lib/product-architecture.ts \
+            src/lib/core-workflows.ts \
+            src/lib/platform-contracts.ts \
+            src/components/xeomx/product/ProductWorkspacePreview.tsx
+          git diff --cached --check
+          git commit -m "fix(p0): restore canonical architecture sources"
+          git push origin HEAD:plan/xeomx-platform-expansion-20260909

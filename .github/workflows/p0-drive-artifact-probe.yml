@@ -1,0 +1,31 @@
+name: XEOMX P0 Drive Exact Artifact Probe
+
+on:
+  push:
+    branches:
+      - plan/xeomx-platform-expansion-20260909
+    paths:
+      - .github/workflows/p0-drive-artifact-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch exact Stage54 patch from Drive without credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://drive.usercontent.google.com/download?id=1RQ4C40djhRayMYa0Cc94W1JX1pmiVMay&export=download&confirm=t'
+          curl --fail --location --silent --show-error --max-time 30 "$URL" -o /tmp/stage54.patch.xz
+          echo "bytes=$(wc -c </tmp/stage54.patch.xz)"
+          sha256sum /tmp/stage54.patch.xz
+          echo '1073f45550da69eea94f9dc9fbc385910225ed43295de01bbf4a3c35a8366113  /tmp/stage54.patch.xz' | sha256sum -c -
+          xz -t /tmp/stage54.patch.xz
+          xz -dc /tmp/stage54.patch.xz >/tmp/stage54.patch
+          echo '30698b142ecf25974a653af663c489b084e277a8394d264312854513bfbff0db  /tmp/stage54.patch' | sha256sum -c -
+          echo DRIVE_EXACT_ARTIFACT_PUBLICLY_FETCHABLE

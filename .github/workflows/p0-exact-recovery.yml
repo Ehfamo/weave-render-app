@@ -21,51 +21,133 @@ jobs:
           ref: plan/xeomx-platform-expansion-20260909
           fetch-depth: 0
 
-      - name: Assert isolation
+      - name: Assert isolation and fetch historical refs
         shell: bash
         run: |
           set -euo pipefail
           test "$(git branch --show-current)" = "plan/xeomx-platform-expansion-20260909"
-          echo "P0 isolation confirmed. No deploy and no secrets are used by this workflow."
-
-      - name: Fetch sealed RC1 source branch
-        shell: bash
-        run: |
-          set -euo pipefail
           git fetch --force origin \
             release/xeomx-superapp-rc1-final:refs/remotes/origin/release/xeomx-superapp-rc1-final \
             main:refs/remotes/origin/main
-          git rev-parse origin/release/xeomx-superapp-rc1-final
-          git rev-parse origin/main
+          echo "plan=$(git rev-parse HEAD)"
+          echo "rc1=$(git rev-parse origin/release/xeomx-superapp-rc1-final)"
+          echo "main=$(git rev-parse origin/main)"
+          echo "P0 isolation confirmed. This workflow uses no deployment command and no production secret."
 
-      - name: Reconstruct and cryptographically verify sealed RC1 patch
-        id: reconstruct
+      - name: Diagnose, reconstruct and cryptographically verify sealed RC1 patch
         shell: bash
         run: |
           set -euo pipefail
-          RC_REF=origin/release/xeomx-superapp-rc1-final
-          : > /tmp/xeomx-rc1.raw.b64
-          mapfile -t CHUNKS < <(git ls-tree -r --name-only "$RC_REF" .xeomx | grep '^.xeomx/chunk-' | sort -V)
-          test "${#CHUNKS[@]}" -gt 0
-          printf 'chunks=%s\n' "${CHUNKS[*]}"
-          for f in "${CHUNKS[@]}"; do
-            git show "$RC_REF:$f" >> /tmp/xeomx-rc1.raw.b64
-          done
-          echo "raw_b64_bytes=$(wc -c < /tmp/xeomx-rc1.raw.b64)"
-          sha256sum /tmp/xeomx-rc1.raw.b64
+          python3 - <<'PY'
+          import base64
+          import gzip
+          import hashlib
+          import pathlib
+          import re
+          import subprocess
+          import sys
 
-          decode_mode=STRICT
-          if ! base64 --decode /tmp/xeomx-rc1.raw.b64 > /tmp/xeomx-rc1.patch.gz 2>/tmp/strict-base64.err || ! gzip -t /tmp/xeomx-rc1.patch.gz 2>/tmp/strict-gzip.err; then
-            decode_mode=NORMALIZED_WHITESPACE
-            tr -d '\r\n\t ' < /tmp/xeomx-rc1.raw.b64 > /tmp/xeomx-rc1.normalized.b64
-            base64 --decode /tmp/xeomx-rc1.normalized.b64 > /tmp/xeomx-rc1.patch.gz
-            gzip -t /tmp/xeomx-rc1.patch.gz
-          fi
-          echo "decode_mode=$decode_mode"
-          gzip -dc /tmp/xeomx-rc1.patch.gz > /tmp/xeomx-rc1.patch
-          echo "5a0de1c393cc37cc0342af893e2c9dfd7e30329330d02456099ee3d6d983811  /tmp/xeomx-rc1.patch" | sha256sum -c -
-          echo "patch_bytes=$(wc -c < /tmp/xeomx-rc1.patch)"
-          sha256sum /tmp/xeomx-rc1.patch
+          ref = "origin/release/xeomx-superapp-rc1-final"
+          expected_patch_sha = "5a0de1c393cc37cc0342af893e2c9dfd7e30329330d02456099ee3d6d983811"
+          names = subprocess.check_output(
+              ["git", "ls-tree", "-r", "--name-only", ref, ".xeomx"], text=True
+          ).splitlines()
+          names = sorted([n for n in names if n.startswith(".xeomx/chunk-")])
+          if not names:
+              raise SystemExit("No sealed RC1 chunks found")
+
+          chunks = []
+          for name in names:
+              data = subprocess.check_output(["git", "show", f"{ref}:{name}"])
+              chunks.append(data)
+              allowed = set(b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=\r\n\t ")
+              invalid = [(i, b) for i, b in enumerate(data) if b not in allowed]
+              print(
+                  f"CHUNK {name} bytes={len(data)} sha256={hashlib.sha256(data).hexdigest()} "
+                  f"invalid_count={len(invalid)} mod4={len(data)%4}"
+              )
+              if invalid:
+                  print(" INVALID_SAMPLE", [(i, hex(b), chr(b) if 32 <= b < 127 else '.') for i, b in invalid[:40]])
+                  for i, b in invalid[:8]:
+                      lo=max(0,i-24); hi=min(len(data),i+25)
+                      print(" CONTEXT", i, repr(data[lo:hi]))
+              print(" HEAD", repr(data[:48]))
+              print(" TAIL", repr(data[-64:]))
+
+          raw = b"".join(chunks)
+          print(f"RAW bytes={len(raw)} sha256={hashlib.sha256(raw).hexdigest()} mod4={len(raw)%4}")
+
+          variants = []
+          variants.append(("raw", raw))
+          variants.append(("real-whitespace-removed", re.sub(rb"[\r\n\t ]+", b"", raw)))
+          literal_escapes_removed = raw.replace(b"\\r", b"").replace(b"\\n", b"").replace(b"\\t", b"")
+          variants.append(("literal-escapes-removed", re.sub(rb"[\r\n\t ]+", b"", literal_escapes_removed)))
+          literal_escapes_to_real = raw.replace(b"\\r", b"\r").replace(b"\\n", b"\n").replace(b"\\t", b"\t")
+          variants.append(("literal-escapes-normalized", re.sub(rb"[\r\n\t ]+", b"", literal_escapes_to_real)))
+          alphabet = set(b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=")
+          variants.append(("alphabet-only", bytes(b for b in raw if b in alphabet)))
+
+          seen = set()
+          patch = None
+          success_mode = None
+          for mode, encoded in variants:
+              digest = hashlib.sha256(encoded).hexdigest()
+              key = (len(encoded), digest)
+              if key in seen:
+                  continue
+              seen.add(key)
+              print(f"VARIANT {mode} bytes={len(encoded)} mod4={len(encoded)%4} sha256={digest} padding_count={encoded.count(b'=')}")
+              try:
+                  decoded = base64.b64decode(encoded, validate=True)
+                  print(f" DECODED bytes={len(decoded)} sha256={hashlib.sha256(decoded).hexdigest()} head={decoded[:8]!r}")
+              except Exception as exc:
+                  print(f" DECODE_FAIL {type(exc).__name__}: {exc}")
+                  continue
+              try:
+                  candidate = gzip.decompress(decoded)
+                  candidate_sha = hashlib.sha256(candidate).hexdigest()
+                  print(f" GZIP_OK patch_bytes={len(candidate)} patch_sha256={candidate_sha}")
+              except Exception as exc:
+                  print(f" GZIP_FAIL {type(exc).__name__}: {exc}")
+                  continue
+              if candidate_sha == expected_patch_sha:
+                  patch = candidate
+                  success_mode = mode
+                  break
+
+          if patch is None:
+              # Diagnostic only: test whether each chunk is an independently encoded fragment.
+              decoded_parts = []
+              chunkwise_ok = True
+              for name, data in zip(names, chunks):
+                  enc = re.sub(rb"[\r\n\t ]+", b"", data.replace(b"\\r",b"").replace(b"\\n",b"").replace(b"\\t",b""))
+                  try:
+                      # Allow missing terminal padding only for diagnostic chunk boundaries.
+                      enc += b"=" * ((4 - len(enc) % 4) % 4)
+                      decoded_parts.append(base64.b64decode(enc, validate=True))
+                  except Exception as exc:
+                      print(f"CHUNKWISE_DECODE_FAIL {name}: {exc}")
+                      chunkwise_ok = False
+                      break
+              if chunkwise_ok:
+                  joined = b"".join(decoded_parts)
+                  print(f"CHUNKWISE_DECODED bytes={len(joined)} sha256={hashlib.sha256(joined).hexdigest()} head={joined[:8]!r}")
+                  try:
+                      candidate = gzip.decompress(joined)
+                      candidate_sha = hashlib.sha256(candidate).hexdigest()
+                      print(f"CHUNKWISE_GZIP_OK patch_bytes={len(candidate)} patch_sha256={candidate_sha}")
+                      if candidate_sha == expected_patch_sha:
+                          patch = candidate
+                          success_mode = "chunkwise"
+                  except Exception as exc:
+                      print(f"CHUNKWISE_GZIP_FAIL {type(exc).__name__}: {exc}")
+
+          if patch is None:
+              raise SystemExit("SEALED_RC1_PATCH_NOT_EXACTLY_RECOVERABLE_FROM_CURRENT_CHUNKS")
+
+          pathlib.Path("/tmp/xeomx-rc1.patch").write_bytes(patch)
+          print(f"EXACT_PATCH_RECOVERY_PASS mode={success_mode} sha256={expected_patch_sha} bytes={len(patch)}")
+          PY
 
       - name: Materialize candidate source on historical main baseline
         shell: bash
@@ -84,10 +166,7 @@ jobs:
           )
           for f in "${FILES[@]}"; do
             test -f "/tmp/xeomx-p0-base/$f"
-            printf '%s\t' "$f"
-            wc -c < "/tmp/xeomx-p0-base/$f" | tr -d '\n'
-            printf '\t'
-            sha256sum "/tmp/xeomx-p0-base/$f" | awk '{print $1}'
+            printf '%s\t%s\t%s\n' "$f" "$(wc -c < "/tmp/xeomx-p0-base/$f")" "$(sha256sum "/tmp/xeomx-p0-base/$f" | awk '{print $1}')"
           done
 
       - name: Verify all four files against historical manifest
@@ -99,12 +178,10 @@ jobs:
             local actual_bytes actual_sha
             actual_bytes=$(wc -c < "/tmp/xeomx-p0-base/$path")
             actual_sha=$(sha256sum "/tmp/xeomx-p0-base/$path" | awk '{print $1}')
-            printf '%s expected_bytes=%s actual_bytes=%s expected_sha=%s actual_sha=%s\n' \
-              "$path" "$bytes" "$actual_bytes" "$expected" "$actual_sha"
+            echo "$path expected_bytes=$bytes actual_bytes=$actual_bytes expected_sha=$expected actual_sha=$actual_sha"
             test "$actual_bytes" = "$bytes"
             test "$actual_sha" = "$expected"
           }
-
           check_file src/lib/product-architecture.ts 48412 5c1cb52a5b1d692d18aa92adc558170bd4ca9d3fb732a0f45ee37485e3712504
           check_file src/lib/core-workflows.ts 18262 fce4fb9d01bafd808f45dcd241323ab5c99ada8057f757a10f11afaf93b023f1
           check_file src/lib/platform-contracts.ts 21587 840e9e012c244652492021223bbd55ae562bf702f06b65d03a67d81c50d5c4f2
@@ -129,11 +206,7 @@ jobs:
           set -euo pipefail
           git config user.name "XEOMX P0 Recovery"
           git config user.email "103573773+Ehfamo@users.noreply.github.com"
-          git add \
-            src/lib/product-architecture.ts \
-            src/lib/core-workflows.ts \
-            src/lib/platform-contracts.ts \
-            src/components/xeomx/product/ProductWorkspacePreview.tsx
+          git add src/lib/product-architecture.ts src/lib/core-workflows.ts src/lib/platform-contracts.ts src/components/xeomx/product/ProductWorkspacePreview.tsx
           git diff --cached --check
           git commit -m "fix(p0): restore canonical architecture sources"
           git push origin HEAD:plan/xeomx-platform-expansion-20260909

@@ -1,0 +1,118 @@
+name: XEOMX P0 Reconcile Audit
+
+on:
+  push:
+    branches:
+      - plan/xeomx-platform-expansion-20260909
+    paths:
+      - .github/workflows/p0-reconcile-audit.yml
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: plan/xeomx-platform-expansion-20260909
+          fetch-depth: 0
+      - name: Verify canonical hashes and inspect dependency graph
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib, re, json
+          expected = {
+            'src/lib/core-workflows.ts': ('fce4fb9d01bafd808f45dcd241323ab5c99ada8057f757a10f11afaf93b023f1', 18262),
+            'src/lib/platform-contracts.ts': ('840e9e012c244652492021223bbd55ae562bf702f06b65d03a67d81c50d5c4f2', 21587),
+            'src/components/xeomx/product/ProductWorkspacePreview.tsx': ('5504a029910f04541f61b7876fe2df60ab18e2d18f188a2e89d823302f948a11', 31144),
+            'src/lib/product-architecture.ts': ('4fed3a9cac34ab1c400f545438406802ee8c2dd2e8deac244cbd9dcba9b09ab3', 55566),
+          }
+          for path,(sha,size) in expected.items():
+              b=Path(path).read_bytes(); actual=hashlib.sha256(b).hexdigest()
+              print('CANONICAL', path, 'bytes', len(b), 'sha256', actual)
+              if len(b)!=size or actual!=sha: raise SystemExit('CANONICAL_MISMATCH '+path)
+
+          source_exts=['.ts','.tsx','.js','.jsx','.json']
+          def resolve(spec, current):
+              if spec.startswith('@/'):
+                  base=Path('src')/spec[2:]
+              elif spec.startswith('.'):
+                  base=(current.parent/spec).resolve().relative_to(Path.cwd())
+              else:
+                  return ('external',spec)
+              candidates=[base]
+              if base.suffix=='':
+                  candidates += [Path(str(base)+ext) for ext in source_exts]
+                  candidates += [base/('index'+ext) for ext in source_exts]
+              for c in candidates:
+                  if c.exists(): return ('resolved',str(c))
+              return ('missing',str(base))
+
+          imp_re=re.compile(r'''(?:import|export)\s+(?:type\s+)?(?:[^'\"]*?\s+from\s+)?[\"']([^\"']+)[\"']|import\([\"']([^\"']+)[\"']\)''')
+          for path in expected:
+              p=Path(path); text=p.read_text('utf-8')
+              specs=[]
+              for m in imp_re.finditer(text): specs.append(m.group(1) or m.group(2))
+              print('\nIMPORTS_FROM',path)
+              for spec in sorted(set(specs)):
+                  status,target=resolve(spec,p)
+                  print(status.upper(),spec,'=>',target)
+
+          print('\nCONSUMERS')
+          targets=['@/lib/core-workflows','@/lib/platform-contracts','@/lib/product-architecture','@/components/xeomx/product/ProductWorkspacePreview']
+          for f in Path('src').rglob('*'):
+              if f.suffix not in ('.ts','.tsx','.js','.jsx'): continue
+              text=f.read_text('utf-8',errors='ignore')
+              for t in targets:
+                  if t in text:
+                      print(t, '=>', f)
+
+          print('\nDUPLICATE_CANONICAL_BASENAMES')
+          for name in ['core-workflows.ts','platform-contracts.ts','product-architecture.ts','ProductWorkspacePreview.tsx']:
+              hits=[str(p) for p in Path('.').rglob(name) if '.git' not in p.parts and 'node_modules' not in p.parts]
+              print(name, hits)
+          PY
+      - name: Compare surviving Stage5.4 core overlay to current tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin payload/stage54-core-v2-20260815:refs/remotes/origin/payload/stage54-core-v2-20260815
+          REF=origin/payload/stage54-core-v2-20260815
+          mapfile -t chunks < <(git ls-tree -r --name-only "$REF" .xeomx-stage54-core-v2 | sort -V)
+          : > /tmp/stage54.b64
+          for f in "${chunks[@]}"; do git show "$REF:$f" >> /tmp/stage54.b64; done
+          base64 -d /tmp/stage54.b64 > /tmp/stage54.tar.xz
+          xz -t /tmp/stage54.tar.xz
+          mkdir -p /tmp/stage54
+          tar -xJf /tmp/stage54.tar.xz -C /tmp/stage54
+          echo "STAGE54_OVERLAY_ENTRIES=$(find /tmp/stage54 -type f | wc -l)"
+          echo '=== MISSING FROM CURRENT TREE ==='
+          while IFS= read -r f; do
+            rel=${f#/tmp/stage54/}
+            if [ ! -f "$rel" ]; then echo "MISSING $rel"; fi
+          done < <(find /tmp/stage54 -type f | sort)
+          echo '=== DIFFERENT FROM CURRENT TREE ==='
+          while IFS= read -r f; do
+            rel=${f#/tmp/stage54/}
+            if [ -f "$rel" ] && ! cmp -s "$f" "$rel"; then
+              echo "DIFF $rel stage54=$(sha256sum "$f"|awk '{print $1}') current=$(sha256sum "$rel"|awk '{print $1}')"
+            fi
+          done < <(find /tmp/stage54 -type f | sort)
+      - name: Repository shape and scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "HEAD=$(git rev-parse HEAD)"
+          echo "SRC_FILES=$(find src -type f | wc -l)"
+          echo "ROUTE_FILES=$(find src/routes -type f 2>/dev/null | wc -l)"
+          echo "TS_TSX_FILES=$(find src -type f \( -name '*.ts' -o -name '*.tsx' \) | wc -l)"
+          echo '=== PACKAGE SCRIPTS ==='
+          node -e "console.log(JSON.stringify(require('./package.json').scripts,null,2))"
+          echo '=== LOCKFILES ==='
+          for f in package-lock.json bun.lock pnpm-lock.yaml yarn.lock; do [ -f "$f" ] && sha256sum "$f"; done
+          echo '=== GIT STATUS ==='
+          git status --short

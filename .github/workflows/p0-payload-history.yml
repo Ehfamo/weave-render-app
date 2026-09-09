@@ -1,0 +1,109 @@
+name: XEOMX P0 Historical Payload Recovery
+
+on:
+  push:
+    branches:
+      - plan/xeomx-platform-expansion-20260909
+    paths:
+      - .github/workflows/p0-payload-history.yml
+
+permissions:
+  contents: read
+
+jobs:
+  payload-history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout all history
+        uses: actions/checkout@v4
+        with:
+          ref: plan/xeomx-platform-expansion-20260909
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Enumerate and test every historical payload state
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --all --tags --force --prune
+          python3 - <<'PY'
+          import base64, gzip, hashlib, re, subprocess
+
+          expected_patch_sha = '5a0de1c393cc37cc0342af893e2c9dfd7e30329330d02456099ee3d6d983811'
+
+          def run(args, check=True):
+              return subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=check).stdout
+
+          # Candidate commits that ever touched payload paths/workflows.
+          logs = subprocess.check_output([
+              'git','log','--all','--full-history','--format=%H', '--',
+              '.xeomx', '.github/workflows/xeomx-apply-rc1.yml'
+          ], text=True).splitlines()
+          commits=[]
+          seen=set()
+          for c in logs:
+              if c and c not in seen:
+                  seen.add(c); commits.append(c)
+          print(f'PAYLOAD_HISTORY_COMMITS={len(commits)}')
+
+          # Also list all payload-like object names reachable in any commit.
+          objects = subprocess.check_output(['git','rev-list','--all','--objects'], text=True).splitlines()
+          payload_names = sorted({line.split(' ',1)[1] for line in objects if ' ' in line and any(k in line.lower() for k in ['chunk-', 'payload', 'rc1.patch', 'patch.gz', 'patch.b64'])})
+          print('PAYLOAD_LIKE_PATHS')
+          for p in payload_names:
+              print(' ',p)
+
+          exact=[]
+          for c in commits:
+              tree_names = subprocess.run(['git','ls-tree','-r','--name-only',c], text=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout.splitlines()
+              chunks = sorted([p for p in tree_names if p.startswith('.xeomx/chunk-')])
+              if not chunks:
+                  continue
+              parts=[]
+              info=[]
+              for p in chunks:
+                  data=subprocess.check_output(['git','show',f'{c}:{p}'])
+                  parts.append(data)
+                  info.append((p,len(data),hashlib.sha256(data).hexdigest()))
+              raw=b''.join(parts)
+              print(f'COMMIT {c} chunks={len(chunks)} raw_bytes={len(raw)} raw_sha={hashlib.sha256(raw).hexdigest()} mod4={len(raw)%4}')
+              for x in info:
+                  print(' CHUNK',*x)
+
+              variants=[]
+              variants.append(('raw',raw))
+              variants.append(('ws-stripped',re.sub(rb'[\r\n\t ]+',b'',raw)))
+              alphabet=set(b'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=')
+              variants.append(('alphabet-only',bytes(b for b in raw if b in alphabet)))
+              done=set()
+              for mode,enc in variants:
+                  key=hashlib.sha256(enc).digest()
+                  if key in done: continue
+                  done.add(key)
+                  # exact RFC base64 first, then only terminal padding repair; never insert/drop data bytes.
+                  candidates=[('strict',enc)]
+                  if len(enc)%4 in (2,3):
+                      candidates.append(('terminal-pad',enc+b'='*((4-len(enc)%4)%4)))
+                  for decmode,e in candidates:
+                      try:
+                          decoded=base64.b64decode(e,validate=True)
+                      except Exception as exc:
+                          continue
+                      try:
+                          patch=gzip.decompress(decoded)
+                      except Exception:
+                          continue
+                      sha=hashlib.sha256(patch).hexdigest()
+                      print(f' PATCH_OK commit={c} mode={mode}/{decmode} bytes={len(patch)} sha={sha}')
+                      if sha==expected_patch_sha:
+                          exact.append((c,mode,decmode,chunks,info))
+
+          print(f'EXACT_PATCH_STATES={len(exact)}')
+          for item in exact:
+              print('EXACT_PATCH_STATE',repr(item))
+          if exact:
+              print('HISTORICAL_PAYLOAD_EXACT_RECOVERY_AVAILABLE')
+          else:
+              print('HISTORICAL_PAYLOAD_EXACT_RECOVERY_NOT_FOUND')
+          PY

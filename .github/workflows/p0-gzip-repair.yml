@@ -1,0 +1,126 @@
+name: XEOMX P0 Gzip Payload Single-Character Repair
+
+on:
+  push:
+    branches:
+      - plan/xeomx-platform-expansion-20260909
+    paths:
+      - .github/workflows/p0-gzip-repair.yml
+
+permissions:
+  contents: read
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: plan/xeomx-platform-expansion-20260909
+          fetch-depth: 0
+      - name: Localize and repair one missing Base64 character
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --force origin release/xeomx-superapp-rc1-final:refs/remotes/origin/release/xeomx-superapp-rc1-final main:refs/remotes/origin/main
+          python3 - <<'PY'
+          import base64, gzip, hashlib, pathlib, subprocess, zlib
+
+          ref='origin/release/xeomx-superapp-rc1-final'
+          expected='5a0de1c393cc37cc0342af893e2c9dfd7e30329330d02456099ee3d6d983811'
+          names=subprocess.check_output(['git','ls-tree','-r','--name-only',ref,'.xeomx'],text=True).splitlines()
+          names=sorted([n for n in names if n.startswith('.xeomx/chunk-')])
+          raw=b''.join(subprocess.check_output(['git','show',f'{ref}:{n}']) for n in names)
+          print('RAW_LEN',len(raw),'MOD4',len(raw)%4,'SHA',hashlib.sha256(raw).hexdigest())
+          if len(raw)%4 != 3:
+              raise SystemExit('Payload is not exactly one character short of a Base64 quantum; refusing this repair strategy')
+
+          # Decode the damaged stream by terminal-padding it. The prefix remains exact until the missing char.
+          damaged=base64.b64decode(raw+b'=', validate=True)
+          print('DAMAGED_DECODED_LEN',len(damaged),'SHA',hashlib.sha256(damaged).hexdigest(),'HEAD',damaged[:8])
+          if not damaged.startswith(b'\x1f\x8b'):
+              raise SystemExit('Not gzip after damaged Base64 decode')
+
+          # Feed one byte at a time to localize the first gzip/deflate decoding error.
+          d=zlib.decompressobj(31)
+          error_at=None
+          produced=0
+          for i,b in enumerate(damaged):
+              try:
+                  out=d.decompress(bytes([b]))
+                  produced += len(out)
+              except zlib.error as exc:
+                  error_at=i
+                  print('ZLIB_FIRST_ERROR_COMPRESSED_OFFSET',i,'OUTPUT_BYTES_BEFORE_ERROR',produced,'ERROR',repr(str(exc)))
+                  break
+          if error_at is None:
+              try:
+                  tail=d.flush(); produced += len(tail)
+                  print('NO_STREAM_ERROR_OUTPUT',produced,'EOF',d.eof)
+              except zlib.error as exc:
+                  print('ZLIB_FLUSH_ERROR',repr(str(exc)))
+              # A missing char can surface only as trailer/checksum failure; center search near the end.
+              error_at=len(damaged)-8
+
+          approx=(error_at*4)//3
+          alphabet=b'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+          print('APPROX_BASE64_INDEX',approx)
+
+          def test_range(lo,hi,label):
+              attempts=0
+              for pos in range(max(0,lo),min(len(raw)+1,hi)):
+                  for ch in alphabet:
+                      attempts += 1
+                      enc=raw[:pos]+bytes([ch])+raw[pos:]
+                      try:
+                          comp=base64.b64decode(enc,validate=True)
+                          patch=gzip.decompress(comp)
+                      except Exception:
+                          continue
+                      sha=hashlib.sha256(patch).hexdigest()
+                      print('GZIP_VALID_CANDIDATE',label,'pos',pos,'char',chr(ch),'comp_bytes',len(comp),'patch_bytes',len(patch),'patch_sha',sha)
+                      if sha==expected:
+                          return pos,ch,comp,patch,attempts
+              print('RANGE_DONE',label,'attempts',attempts)
+              return None
+
+          # Increasing windows around localized failure, then boundary neighborhoods.
+          result=None
+          for radius in (32,128,512,2048):
+              result=test_range(approx-radius,approx+radius+1,f'localized-{radius}')
+              if result: break
+          if not result:
+              boundary_positions=[]
+              cursor=0
+              for n in names:
+                  size=len(subprocess.check_output(['git','show',f'{ref}:{n}']))
+                  cursor += size
+                  boundary_positions.append(cursor)
+              print('CHUNK_BOUNDARIES',boundary_positions)
+              for b in boundary_positions:
+                  result=test_range(b-128,b+129,f'boundary-{b}')
+                  if result: break
+
+          if not result:
+              raise SystemExit('EXACT_SINGLE_CHARACTER_REPAIR_NOT_FOUND_IN_LOCALIZED_OR_BOUNDARY_SEARCH')
+
+          pos,ch,comp,patch,attempts=result
+          pathlib.Path('/tmp/xeomx-rc1.repaired.patch').write_bytes(patch)
+          print('EXACT_PATCH_RECOVERY_PASS','pos',pos,'char',chr(ch),'patch_bytes',len(patch),'sha256',hashlib.sha256(patch).hexdigest())
+
+          # Prove patch applies to historical main and report exact four target hashes from materialized candidate.
+          PY
+
+          rm -rf /tmp/p0-main
+          git worktree add --detach /tmp/p0-main origin/main
+          git -C /tmp/p0-main apply --check /tmp/xeomx-rc1.repaired.patch
+          git -C /tmp/p0-main apply /tmp/xeomx-rc1.repaired.patch
+          for f in \
+            src/lib/product-architecture.ts \
+            src/lib/core-workflows.ts \
+            src/lib/platform-contracts.ts \
+            src/components/xeomx/product/ProductWorkspacePreview.tsx; do
+            test -f "/tmp/p0-main/$f"
+            echo "RECOVERED $f bytes=$(wc -c <"/tmp/p0-main/$f") sha256=$(sha256sum "/tmp/p0-main/$f"|awk '{print $1}')"
+          done

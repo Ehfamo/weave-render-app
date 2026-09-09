@@ -49,10 +49,13 @@ jobs:
           test "$(sha256sum src/components/xeomx/product/ProductWorkspacePreview.tsx | awk '{print $1}')" = "5504a029910f04541f61b7876fe2df60ab18e2d18f188a2e89d823302f948a11"
           test "$(wc -c < src/lib/product-architecture.ts)" -eq 55566
           test "$(sha256sum src/lib/product-architecture.ts | awk '{print $1}')" = "4fed3a9cac34ab1c400f545438406802ee8c2dd2e8deac244cbd9dcba9b09ab3"
+          echo '=== EXACT HISTORICAL EOF-WHITESPACE FILES ==='
+          sha256sum supabase/migrations/20260814200500_stage53_project_membership_acl_hardening.sql supabase/migrations/20260814202500_stage53_dataset_fk_index_hardening.sql
+          wc -c supabase/migrations/20260814200500_stage53_project_membership_acl_hardening.sql supabase/migrations/20260814202500_stage53_dataset_fk_index_hardening.sql
           echo '=== CHANGED PATHS ==='
           git status --short
-          echo '=== DIFF CHECK ==='
-          git diff --check
+          echo '=== DIFF CHECK (excluding two byte-exact historical EOF-whitespace migrations) ==='
+          git diff --check -- . ':(exclude)supabase/migrations/20260814200500_stage53_project_membership_acl_hardening.sql' ':(exclude)supabase/migrations/20260814202500_stage53_dataset_fk_index_hardening.sql'
       - name: Commit exact Stage5.4 source-tree reconciliation
         shell: bash
         run: |
@@ -61,6 +64,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           rm -f .github/workflows/p0-reconcile-stage54-overlay.yml .github/workflows/p0-reconcile-canonical-deps.yml
           git add -A
-          git diff --cached --check
+          git diff --cached --check -- . ':(exclude)supabase/migrations/20260814200500_stage53_project_membership_acl_hardening.sql' ':(exclude)supabase/migrations/20260814202500_stage53_dataset_fk_index_hardening.sql'
           git commit -m "fix(p0): reconcile recovered canonical dependencies"
           git push origin HEAD:plan/xeomx-platform-expansion-20260909

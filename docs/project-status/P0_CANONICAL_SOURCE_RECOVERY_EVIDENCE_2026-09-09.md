@@ -1,6 +1,12 @@
 # XEOMX P0 Canonical Source Recovery Evidence — 2026-09-09
 
-Status: **BLOCKED_ON_EXACT_BASELINE_RECOVERY**
+Current status: **EXACT_CANONICAL_IDENTITY_RECOVERED; P0 BLOCKED_BY_SOURCE_TEST_AND_SCHEMA_DEFECTS**
+
+Fresh closure attempt: [P0/P1 execution report](P0_P1_EXECUTION_REPORT_2026-09-09.md). The four current canonical hashes and byte counts match. Workflow run 34367076011 at 9d6284d58f4143284996c9ee071cabc528944048 still has real source failures. P1 has not started.
+
+## Historical recovery record (preserved)
+
+Historical status before materialization: **BLOCKED_ON_EXACT_BASELINE_RECOVERY**
 
 Safety: **NO MERGE / NO PRODUCTION DEPLOY / NO PRODUCTION SUPABASE WRITE / NO DNS CHANGE / STAGE 6 NOT STARTED**
 

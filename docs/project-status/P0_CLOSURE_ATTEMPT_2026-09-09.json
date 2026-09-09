@@ -1,0 +1,295 @@
+{
+  "branch": "plan/xeomx-platform-expansion-20260909",
+  "branch_checks": [
+    {
+      "branch": "release/xeomx-superapp-rc1-tempcheck",
+      "files": [],
+      "sha": "fb18042fdb281f7ca2d2731c16edac899aa6222b",
+      "truncated": false
+    },
+    {
+      "branch": "payload/stage54-core-v2-20260815",
+      "files": [],
+      "sha": "3ebb9f3c89334da0260771c744b22acd8e7d4978",
+      "truncated": false
+    },
+    {
+      "branch": "plan/xeomx-platform-expansion-20260909",
+      "files": [],
+      "sha": "423b41393433dd598adfdc76dbc569d73a086ae9",
+      "truncated": false
+    },
+    {
+      "branch": "profile-region-update",
+      "files": [],
+      "sha": "35e197db3ac37d0a5ff29ffdbc18663666950fc3",
+      "truncated": false
+    },
+    {
+      "branch": "reconcile/source-export-20260813",
+      "files": [],
+      "sha": "2f4f7aa36c4c324aee8b09c90721dba018bfcb44",
+      "truncated": false
+    },
+    {
+      "branch": "release/xeomx-superapp-rc1-2",
+      "files": [],
+      "sha": "c11211d34485ab32b06ac2d5c68d77e9a9eec088",
+      "truncated": false
+    },
+    {
+      "branch": "release/xeomx-superapp-rc1-final",
+      "files": [],
+      "sha": "3cc83525d8fe25f3155f40b7bc120581c7b6254d",
+      "truncated": false
+    },
+    {
+      "branch": "release/xeomx-superapp-rc1-verified",
+      "files": [],
+      "sha": "78b9e79a0d74efe4a3de6b9305b9c9976c666bcc",
+      "truncated": false
+    },
+    {
+      "branch": "release/xeomx-superapp-rc1",
+      "files": [],
+      "sha": "b00e7f8e79425bd428b8a401f92616f7fc7601d2",
+      "truncated": false
+    },
+    {
+      "branch": "staging/xeomx-request7-cloudflare-live",
+      "files": [],
+      "sha": "0d5eef3adbf70b83b9dc2ffce0555137ba0ba4a7",
+      "truncated": false
+    },
+    {
+      "branch": "verify/rc1-verified-payload-check-20260815",
+      "files": [],
+      "sha": "8421d34fdbf4650f2e1eb869cfdbdd132332b6d5",
+      "truncated": false
+    },
+    {
+      "branch": "verify/stage5-4-exact-golden-20260815",
+      "files": [],
+      "sha": "94e6948a519756ce06de4e8e1a0ea72fc2eecf42",
+      "truncated": false
+    },
+    {
+      "branch": "verify/stage5-4-source-compare-20260815",
+      "files": [],
+      "sha": "ed5423b5a6e8c497b1c81bdf363cfdea55665fd8",
+      "truncated": false
+    },
+    {
+      "branch": "verify/stage54-from-rc1-tempcheck-20260815",
+      "files": [],
+      "sha": "f192da4d73b4f4df88e4e45a321f78b5d5e97246",
+      "truncated": false
+    },
+    {
+      "error": "SyntaxError: \"undefined\" is not valid JSON"
+    },
+    {
+      "branch": "verify/step4-exact-lock-20260814",
+      "files": [],
+      "sha": "744dedf980b7b0e0ae540a314424b75195c13f68",
+      "truncated": false
+    }
+  ],
+  "cloudflare": {
+    "classification": "BLOCKED_BY_EXTERNAL_DEPENDENCY",
+    "local_error": "uv_interface_addresses returned Unknown system error 1",
+    "preview_error": "TypeError: deployConfig.auxiliaryWorkers is not iterable",
+    "production_deploy": false
+  },
+  "inspected_source_head": "423b41393433dd598adfdc76dbc569d73a086ae9",
+  "job_id": 102518448125,
+  "journeys": [
+    {
+      "action_e2e": "NOT_RUN",
+      "id": "J01",
+      "preflight": "FAIL",
+      "reason": "src/lib/critical-journeys.ts absent; original journeys cannot be resolved or executed",
+      "route_e2e": "NOT_RUN"
+    },
+    {
+      "action_e2e": "NOT_RUN",
+      "id": "J02",
+      "preflight": "FAIL",
+      "reason": "src/lib/critical-journeys.ts absent; original journeys cannot be resolved or executed",
+      "route_e2e": "NOT_RUN"
+    },
+    {
+      "action_e2e": "NOT_RUN",
+      "id": "J03",
+      "preflight": "FAIL",
+      "reason": "src/lib/critical-journeys.ts absent; original journeys cannot be resolved or executed",
+      "route_e2e": "NOT_RUN"
+    },
+    {
+      "action_e2e": "NOT_RUN",
+      "id": "J04",
+      "preflight": "FAIL",
+      "reason": "src/lib/critical-journeys.ts absent; original journeys cannot be resolved or executed",
+      "route_e2e": "NOT_RUN"
+    },
+    {
+      "action_e2e": "NOT_RUN",
+      "id": "J05",
+      "preflight": "FAIL",
+      "reason": "src/lib/critical-journeys.ts absent; original journeys cannot be resolved or executed",
+      "route_e2e": "NOT_RUN"
+    },
+    {
+      "action_e2e": "NOT_RUN",
+      "id": "J06",
+      "preflight": "FAIL",
+      "reason": "src/lib/critical-journeys.ts absent; original journeys cannot be resolved or executed",
+      "route_e2e": "NOT_RUN"
+    },
+    {
+      "action_e2e": "NOT_RUN",
+      "id": "J07",
+      "preflight": "FAIL",
+      "reason": "src/lib/critical-journeys.ts absent; original journeys cannot be resolved or executed",
+      "route_e2e": "NOT_RUN"
+    },
+    {
+      "action_e2e": "NOT_RUN",
+      "id": "J08",
+      "preflight": "FAIL",
+      "reason": "src/lib/critical-journeys.ts absent; original journeys cannot be resolved or executed",
+      "route_e2e": "NOT_RUN"
+    },
+    {
+      "action_e2e": "NOT_RUN",
+      "id": "J09",
+      "preflight": "FAIL",
+      "reason": "src/lib/critical-journeys.ts absent; original journeys cannot be resolved or executed",
+      "route_e2e": "NOT_RUN"
+    },
+    {
+      "action_e2e": "NOT_RUN",
+      "id": "J10",
+      "preflight": "FAIL",
+      "reason": "src/lib/critical-journeys.ts absent; original journeys cannot be resolved or executed",
+      "route_e2e": "NOT_RUN"
+    },
+    {
+      "action_e2e": "NOT_RUN",
+      "id": "J11",
+      "preflight": "FAIL",
+      "reason": "src/lib/critical-journeys.ts absent; original journeys cannot be resolved or executed",
+      "route_e2e": "NOT_RUN"
+    },
+    {
+      "action_e2e": "NOT_RUN",
+      "id": "J12",
+      "preflight": "FAIL",
+      "reason": "src/lib/critical-journeys.ts absent; original journeys cannot be resolved or executed",
+      "route_e2e": "NOT_RUN"
+    }
+  ],
+  "new_outcomes": [
+    "2026-09-09T14:58:57.3763048Z # tests 75",
+    "2026-09-09T14:58:57.3763440Z # pass 57",
+    "2026-09-09T14:58:57.3763629Z # fail 18",
+    "2026-09-09T14:58:57.5703680Z # tests 1",
+    "2026-09-09T14:58:57.5704294Z # pass 0",
+    "2026-09-09T14:58:57.5704608Z # fail 1",
+    "2026-09-09T14:58:57.9461642Z # tests 36",
+    "2026-09-09T14:58:57.9462692Z # pass 36",
+    "2026-09-09T14:58:57.9463029Z # fail 0",
+    "2026-09-09T14:58:58.1678581Z # tests 1",
+    "2026-09-09T14:58:58.1679799Z # pass 1",
+    "2026-09-09T14:58:58.1681755Z # fail 0",
+    "2026-09-09T14:58:59.9409307Z SECRET_SCAN_FINDINGS 0",
+    "2026-09-09T14:59:30.2807768Z CLEAN_INSTALL=success",
+    "2026-09-09T14:59:30.2808116Z BUILD=success",
+    "2026-09-09T14:59:30.2808501Z TYPECHECK=failure",
+    "2026-09-09T14:59:30.2808751Z LINT=failure",
+    "2026-09-09T14:59:30.2809029Z UNIT=failure",
+    "2026-09-09T14:59:30.2809360Z INTEGRATION=failure",
+    "2026-09-09T14:59:30.2809692Z MIGRATIONS=success",
+    "2026-09-09T14:59:30.2810008Z SMOKE=success",
+    "2026-09-09T14:59:30.2810296Z STATIC=failure",
+    "2026-09-09T14:59:30.2810747Z I18N=success",
+    "2026-09-09T14:59:30.2811054Z SECRETS=success",
+    "2026-09-09T14:59:30.2811394Z RUNTIME_SMOKE=failure",
+    "2026-09-09T14:59:30.2811982Z BACKEND_STATIC=success",
+    "2026-09-09T14:59:30.2812428Z REQUIRED_GATE_NOT_SUCCESS=failure"
+  ],
+  "old_aggregator_input": "success success failure failure failure failure success success failure success failure failure success",
+  "old_job_id": 102416613605,
+  "old_run_id": 34336378328,
+  "p0": "BLOCKED",
+  "p1_ready": false,
+  "p1_started": false,
+  "production_modified": false,
+  "repository": "Ehfamo/weave-render-app",
+  "run_id": 34367076011,
+  "source_validation": "FAIL",
+  "supabase": {
+    "accessibility": "PASS",
+    "application_contract_compatibility": "FAIL",
+    "generated_types": "STALE: projects and generation_jobs absent",
+    "migrations": 42,
+    "missing_relations": [
+      "creator_stats",
+      "likes",
+      "saves",
+      "follows",
+      "comments",
+      "prompt_views"
+    ],
+    "mutation": false,
+    "private_asset_bucket": "xeomx-assets",
+    "project": "bzoikmppvwiidyjdaqgv",
+    "public_policies": 82,
+    "public_rls_enabled": 37,
+    "public_tables": 37
+  },
+  "validated_source_head": "9d6284d58f4143284996c9ee071cabc528944048",
+  "timestamp_utc": "2026-09-09T15:04:16.139466+00:00",
+  "node": "v22.23.2 (GitHub Actions); v24.19.0 (local)",
+  "npm": "10.9.3 (GitHub Actions); 11.9.0 (local)",
+  "canonical": [
+    {
+      "path": "src/lib/core-workflows.ts",
+      "expected_sha256": "fce4fb9d01bafd808f45dcd241323ab5c99ada8057f757a10f11afaf93b023f1",
+      "actual_sha256": "fce4fb9d01bafd808f45dcd241323ab5c99ada8057f757a10f11afaf93b023f1",
+      "expected_bytes": 18262,
+      "actual_bytes": 18262,
+      "status": "PASS"
+    },
+    {
+      "path": "src/lib/platform-contracts.ts",
+      "expected_sha256": "840e9e012c244652492021223bbd55ae562bf702f06b65d03a67d81c50d5c4f2",
+      "actual_sha256": "840e9e012c244652492021223bbd55ae562bf702f06b65d03a67d81c50d5c4f2",
+      "expected_bytes": 21587,
+      "actual_bytes": 21587,
+      "status": "PASS"
+    },
+    {
+      "path": "src/components/xeomx/product/ProductWorkspacePreview.tsx",
+      "expected_sha256": "5504a029910f04541f61b7876fe2df60ab18e2d18f188a2e89d823302f948a11",
+      "actual_sha256": "5504a029910f04541f61b7876fe2df60ab18e2d18f188a2e89d823302f948a11",
+      "expected_bytes": 31144,
+      "actual_bytes": 31144,
+      "status": "PASS"
+    },
+    {
+      "path": "src/lib/product-architecture.ts",
+      "expected_sha256": "4fed3a9cac34ab1c400f545438406802ee8c2dd2e8deac244cbd9dcba9b09ab3",
+      "actual_sha256": "4fed3a9cac34ab1c400f545438406802ee8c2dd2e8deac244cbd9dcba9b09ab3",
+      "expected_bytes": 55566,
+      "actual_bytes": 55566,
+      "status": "PASS"
+    }
+  ],
+  "lockfile": {
+    "expected_sha256": "c5340cf78e852c4ba0ac5ad3afe34a706323dfd37de46a2cf4f43f5dfa9d3b8d",
+    "actual_sha256": "c5340cf78e852c4ba0ac5ad3afe34a706323dfd37de46a2cf4f43f5dfa9d3b8d",
+    "bytes": 348592
+  },
+  "hash_command": "Python hashlib.sha256(Path(path).read_bytes()).hexdigest(); len(bytes), checked against Git blob SHA1; independently rerun by sha256sum and wc -c in Actions"
+}

@@ -1,0 +1,97 @@
+name: XEOMX P0 Forensic Git History
+
+on:
+  push:
+    branches:
+      - plan/xeomx-platform-expansion-20260909
+    paths:
+      - .github/workflows/p0-forensic-history.yml
+
+permissions:
+  contents: read
+
+jobs:
+  forensic-history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout full reachable history
+        uses: actions/checkout@v4
+        with:
+          ref: plan/xeomx-platform-expansion-20260909
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Exhaustive reachable-object search
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --all --tags --force --prune
+          echo '=== BRANCHES ==='
+          git branch -a
+          echo '=== TAGS ==='
+          git tag -l --format='%(refname:short) %(objectname)'
+          echo '=== TARGET PATH HISTORY ==='
+          for p in \
+            src/lib/product-architecture.ts \
+            src/lib/core-workflows.ts \
+            src/lib/platform-contracts.ts \
+            src/components/xeomx/product/ProductWorkspacePreview.tsx; do
+            echo "--- $p ---"
+            git log --all --full-history --date=iso-strict --format='%H %ad %s' -- "$p" || true
+          done
+
+          echo '=== REACHABLE OBJECT/PATH MATCHES ==='
+          git rev-list --all --objects > /tmp/all-objects.txt
+          grep -E '(src/lib/product-architecture\.ts|src/lib/core-workflows\.ts|src/lib/platform-contracts\.ts|src/components/xeomx/product/ProductWorkspacePreview\.tsx)$' /tmp/all-objects.txt | tee /tmp/target-objects.txt || true
+
+          python3 - <<'PY'
+          import hashlib
+          import pathlib
+          import subprocess
+
+          expected = {
+              'src/lib/product-architecture.ts': (48412, '5c1cb52a5b1d692d18aa92adc558170bd4ca9d3fb732a0f45ee37485e3712504'),
+              'src/lib/core-workflows.ts': (18262, 'fce4fb9d01bafd808f45dcd241323ab5c99ada8057f757a10f11afaf93b023f1'),
+              'src/lib/platform-contracts.ts': (21587, '840e9e012c244652492021223bbd55ae562bf702f06b65d03a67d81c50d5c4f2'),
+              'src/components/xeomx/product/ProductWorkspacePreview.tsx': (31144, '5504a029910f04541f61b7876fe2df60ab18e2d18f188a2e89d823302f948a11'),
+          }
+          matches = {p: [] for p in expected}
+          path = pathlib.Path('/tmp/target-objects.txt')
+          if path.exists():
+              for line in path.read_text().splitlines():
+                  if ' ' not in line:
+                      continue
+                  obj, p = line.split(' ', 1)
+                  if p not in expected:
+                      continue
+                  typ = subprocess.check_output(['git','cat-file','-t',obj], text=True).strip()
+                  if typ != 'blob':
+                      continue
+                  data = subprocess.check_output(['git','cat-file','blob',obj])
+                  size = len(data)
+                  sha = hashlib.sha256(data).hexdigest()
+                  ok = (size, sha) == expected[p]
+                  print(f'CANDIDATE path={p} git_blob={obj} bytes={size} sha256={sha} exact={ok}')
+                  if ok:
+                      matches[p].append(obj)
+                      log = subprocess.run(
+                          ['git','log','--all','--find-object='+obj,'--format=%H %ad %s','--date=iso-strict','--max-count=20'],
+                          text=True, capture_output=True, check=False
+                      ).stdout.strip()
+                      print(' EXACT_OBJECT_HISTORY', p, obj, repr(log))
+          for p in expected:
+              print(f'FORENSIC_RESULT path={p} exact_blob_count={len(set(matches[p]))}')
+          if all(matches[p] for p in expected):
+              print('ALL_FOUR_EXACT_BLOBS_REACHABLE')
+          else:
+              print('ALL_FOUR_EXACT_BLOBS_NOT_REACHABLE')
+          PY
+
+      - name: Inspect unreachable objects available in runner clone
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '=== FSCK UNREACHABLE SAMPLE ==='
+          git fsck --full --no-reflogs --unreachable 2>&1 | tee /tmp/fsck.txt || true
+          echo "unreachable_lines=$(wc -l < /tmp/fsck.txt)"

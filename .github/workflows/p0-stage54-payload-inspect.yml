@@ -1,0 +1,99 @@
+name: XEOMX P0 Inspect Stage54 Payload Families
+
+on:
+  push:
+    branches:
+      - plan/xeomx-platform-expansion-20260909
+    paths:
+      - .github/workflows/p0-stage54-payload-inspect.yml
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: plan/xeomx-platform-expansion-20260909
+          fetch-depth: 0
+      - name: Decode every Stage54 payload family and inspect target coverage
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --force origin payload/stage54-core-v2-20260815:refs/remotes/origin/payload/stage54-core-v2-20260815
+          REF=origin/payload/stage54-core-v2-20260815
+          python3 - <<'PY'
+          import base64, hashlib, lzma, gzip, pathlib, subprocess, tarfile, io, re
+
+          ref='origin/payload/stage54-core-v2-20260815'
+          targets=['product-architecture.ts','core-workflows.ts','platform-contracts.ts','ProductWorkspacePreview.tsx']
+          tree=subprocess.check_output(['git','ls-tree','-r','--name-only',ref],text=True).splitlines()
+          families={
+            '.xeomx-stage54-core-v2/': [p for p in tree if p.startswith('.xeomx-stage54-core-v2/core.')],
+            '.xeomx-stage54-core/': [p for p in tree if p.startswith('.xeomx-stage54-core/core.')],
+            '.xeomx-stage54-small/': [p for p in tree if p.startswith('.xeomx-stage54-small/payload.')],
+            '.xeomx-stage54/': [p for p in tree if p.startswith('.xeomx-stage54/payload.')],
+          }
+          for fam,names in families.items():
+              names=sorted(names)
+              if not names:
+                  print('FAMILY',fam,'ABSENT'); continue
+              raw=b''.join(subprocess.check_output(['git','show',f'{ref}:{n}']) for n in names)
+              print('\nFAMILY',fam,'files',len(names),'b64_bytes',len(raw),'b64_sha',hashlib.sha256(raw).hexdigest(),'mod4',len(raw)%4)
+              for n in names:
+                  d=subprocess.check_output(['git','show',f'{ref}:{n}'])
+                  print(' PART',n,'bytes',len(d),'sha',hashlib.sha256(d).hexdigest())
+              try:
+                  enc=re.sub(rb'[\r\n\t ]+',b'',raw)
+                  enc += b'='*((4-len(enc)%4)%4)
+                  decoded=base64.b64decode(enc,validate=True)
+              except Exception as e:
+                  print(' BASE64_FAIL',repr(e)); continue
+              print(' DECODED bytes',len(decoded),'sha',hashlib.sha256(decoded).hexdigest(),'magic',decoded[:8])
+              out=None; mode=None
+              for typ,fn in [('xz',lambda b:lzma.decompress(b)),('gzip',lambda b:gzip.decompress(b))]:
+                  try:
+                      out=fn(decoded); mode=typ; break
+                  except Exception as e:
+                      print(' ',typ.upper()+'_FULL_FAIL',repr(e))
+              if out is None and decoded.startswith(b'\xfd7zXZ'):
+                  # partial stream salvage
+                  try:
+                      d=lzma.LZMADecompressor()
+                      out=d.decompress(decoded)
+                      mode='xz-partial'
+                  except Exception as e:
+                      # Python may return no partial on exception; shell xz fallback not available here.
+                      print(' XZ_PARTIAL_PY_FAIL',repr(e))
+              if out is None:
+                  print(' NO_DECOMPRESSED_OUTPUT'); continue
+              print(' OUTPUT mode',mode,'bytes',len(out),'sha',hashlib.sha256(out).hexdigest(),'head',repr(out[:80]))
+              text=out.decode('utf-8','ignore')
+              for t in targets:
+                  print(' TARGET_OCCURRENCE',t,text.count(t))
+              # Try tar archive.
+              try:
+                  tf=tarfile.open(fileobj=io.BytesIO(out),mode='r:*')
+                  members=tf.getmembers()
+                  print(' TAR_ENTRIES',len(members))
+                  matched=[m for m in members if any(t in m.name for t in targets)]
+                  for m in matched:
+                      f=tf.extractfile(m)
+                      if f:
+                          data=f.read()
+                          print(' TAR_TARGET',m.name,'bytes',len(data),'sha',hashlib.sha256(data).hexdigest())
+              except Exception as e:
+                  print(' NOT_TAR',type(e).__name__)
+              # Check git patch headers.
+              if b'diff --git' in out or out.startswith(b'From '):
+                  print(' PATCH_LIKE=YES')
+                  for t in targets:
+                      pos=text.find(t)
+                      if pos>=0:
+                          print(' PATCH_TARGET_CONTEXT',t,repr(text[max(0,pos-160):pos+240]))
+              else:
+                  print(' PATCH_LIKE=NO')
+          PY

@@ -1,0 +1,68 @@
+name: XEOMX P0 Verified XZ Salvage
+
+on:
+  push:
+    branches:
+      - plan/xeomx-platform-expansion-20260909
+    paths:
+      - .github/workflows/p0-xz-salvage.yml
+
+permissions:
+  contents: read
+
+jobs:
+  salvage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: plan/xeomx-platform-expansion-20260909
+          fetch-depth: 0
+      - name: Stream-salvage verified XZ payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --force origin verify/rc1-verified-payload-check-20260815:refs/remotes/origin/verify/rc1-verified-payload-check-20260815
+          REF=origin/verify/rc1-verified-payload-check-20260815
+          mapfile -t chunks < <(git ls-tree -r --name-only "$REF" .xeomx | grep '^.xeomx/chunk-' | sort -V)
+          : > /tmp/payload.b64
+          for f in "${chunks[@]}"; do git show "$REF:$f" >> /tmp/payload.b64; done
+          base64 --decode /tmp/payload.b64 > /tmp/payload.xz
+          echo "XZ_BYTES=$(wc -c </tmp/payload.xz)"
+          sha256sum /tmp/payload.xz
+          file /tmp/payload.xz
+
+          set +e
+          xz -dc /tmp/payload.xz > /tmp/payload.out 2>/tmp/xz.err
+          rc=$?
+          set -e
+          echo "XZ_STREAM_RC=$rc"
+          echo "OUT_BYTES=$(wc -c </tmp/payload.out)"
+          sha256sum /tmp/payload.out
+          file /tmp/payload.out || true
+          echo '=== XZ STDERR ==='
+          cat /tmp/xz.err || true
+          echo '=== OUT HEAD ==='
+          head -c 256 /tmp/payload.out | od -An -tx1 -c || true
+          echo '=== OUT TEXT HEAD ==='
+          head -80 /tmp/payload.out || true
+          echo '=== TARGET NAME OCCURRENCES ==='
+          grep -aobE 'product-architecture\.ts|core-workflows\.ts|platform-contracts\.ts|ProductWorkspacePreview\.tsx' /tmp/payload.out || true
+
+          if tar -tf /tmp/payload.out >/tmp/tar-list 2>/tmp/tar.err; then
+            echo FORMAT=TAR
+            echo "TAR_ENTRIES=$(wc -l </tmp/tar-list)"
+            grep -E 'product-architecture\.ts|core-workflows\.ts|platform-contracts\.ts|ProductWorkspacePreview\.tsx' /tmp/tar-list || true
+            mkdir -p /tmp/extract
+            tar -xf /tmp/payload.out -C /tmp/extract || true
+            find /tmp/extract -type f | sed 's#^/tmp/extract/##' | grep -E 'product-architecture\.ts|core-workflows\.ts|platform-contracts\.ts|ProductWorkspacePreview\.tsx' || true
+            for f in $(find /tmp/extract -type f | grep -E 'product-architecture\.ts|core-workflows\.ts|platform-contracts\.ts|ProductWorkspacePreview\.tsx' || true); do
+              echo "SALVAGED_FILE=$f bytes=$(wc -c <"$f") sha256=$(sha256sum "$f"|awk '{print $1}')"
+            done
+          elif head -c 16 /tmp/payload.out | grep -aq '^diff --git'; then
+            echo FORMAT=RAW_GIT_PATCH
+            grep -anE '^diff --git .*?(product-architecture\.ts|core-workflows\.ts|platform-contracts\.ts|ProductWorkspacePreview\.tsx)' /tmp/payload.out || true
+          else
+            echo FORMAT=UNKNOWN_OR_PARTIAL
+          fi

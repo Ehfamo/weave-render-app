@@ -1,3 +1,4 @@
+import { promptSearchFilter, searchCatalogPlan } from "./search-contract";
 import { supabase } from "@/integrations/supabase/client";
 import type { Prompt, Collection, Creator } from "@/lib/prompts";
 import { _covers } from "@/lib/prompts";
@@ -100,8 +101,9 @@ export async function fetchPromptsList(opts?: {
 
   if (opts?.category && opts.category !== "All") q = q.eq("category", opts.category);
   if (opts?.search) {
-    const s = opts.search.replace(/[%_]/g, "");
-    q = q.or(`title.ilike.%${s}%,description.ilike.%${s}%,body.ilike.%${s}%`);
+    const plan = searchCatalogPlan(opts.search);
+    if (!plan.enabled) return [];
+    q = q.or(promptSearchFilter(plan.pattern));
   }
   q = q.order("published_at", { ascending: false, nullsFirst: false });
 
@@ -423,9 +425,9 @@ export async function fetchCreators(limit = 24): Promise<{ creators: Creator[]; 
 }
 
 export async function searchAll(query: string) {
-  const s = query.trim();
-  if (!s) return { prompts: [] as Prompt[] };
-  const prompts = await fetchPromptsList({ search: s, limit: 20 });
+  const plan = searchCatalogPlan(query);
+  if (!plan.enabled) return { prompts: [] as Prompt[] };
+  const prompts = await fetchPromptsList({ search: plan.term, limit: 20 });
   return { prompts };
 }
 

@@ -210,20 +210,20 @@ jobs:
           trap 'result=$?; cat /tmp/xeomx-preview.log; kill $PID 2>/dev/null || true; exit $result' EXIT
           ok=0
           for i in $(seq 1 30); do
-            if curl -fsS http://127.0.0.1:4173/ >/tmp/home.html; then ok=1; break; fi
+            if curl -fsS http://127.0.0.1:4173/en >/tmp/home.html; then ok=1; break; fi
             sleep 1
           done
           test "$ok" -eq 1
-          echo "HOME_HTTP=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4173/)"
-          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4173/)" = "200"
+          echo "HOME_HTTP=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4173/en)"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4173/en)" = "200"
           grep -qi '<html' /tmp/home.html
           if grep -Eqi 'Hydration failed|hydration mismatch|ReferenceError:|TypeError:|Uncaught' /tmp/xeomx-preview.log; then
             echo 'RUNTIME_ERROR_PATTERN_FOUND'; grep -Ein 'Hydration failed|hydration mismatch|ReferenceError:|TypeError:|Uncaught' /tmp/xeomx-preview.log | head -20; exit 2
           fi
           CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
           if [ -n "$CHROME" ]; then
-            "$CHROME" --headless --no-sandbox --disable-gpu --window-size=1440,900 --dump-dom http://127.0.0.1:4173/ >/tmp/dom-desktop.html 2>/tmp/chrome-desktop.log
-            "$CHROME" --headless --no-sandbox --disable-gpu --window-size=390,844 --screenshot=/tmp/mobile.png http://127.0.0.1:4173/ >/tmp/chrome-mobile.out 2>/tmp/chrome-mobile.log
+            "$CHROME" --headless --no-sandbox --disable-gpu --window-size=1440,900 --dump-dom http://127.0.0.1:4173/en >/tmp/dom-desktop.html 2>/tmp/chrome-desktop.log
+            "$CHROME" --headless --no-sandbox --disable-gpu --window-size=390,844 --screenshot=/tmp/mobile.png http://127.0.0.1:4173/en >/tmp/chrome-mobile.out 2>/tmp/chrome-mobile.log
             test -s /tmp/dom-desktop.html
             test -s /tmp/mobile.png
             if grep -Eqi 'Hydration failed|hydration mismatch|Uncaught (TypeError|ReferenceError)' /tmp/chrome-desktop.log /tmp/chrome-mobile.log; then exit 3; fi

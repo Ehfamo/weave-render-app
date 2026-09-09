@@ -25,11 +25,13 @@ export function SystemState({
   variant,
   title,
   description,
+  compact = false,
   className = "",
 }: {
   variant: SystemStateVariant;
   title: string;
   description: string;
+  compact?: boolean;
   className?: string;
 }) {
   const headingId = useId();
@@ -41,7 +43,7 @@ export function SystemState({
       aria-busy={busy}
       aria-labelledby={headingId}
       data-state={variant}
-      className={`rounded-xl border border-border p-5 text-start ${className}`}
+      className={`rounded-xl border border-border text-start ${compact ? "p-3" : "p-5"} ${className}`}
     >
       <h3 id={headingId} className="font-medium">
         {title}

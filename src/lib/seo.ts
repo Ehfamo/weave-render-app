@@ -12,6 +12,19 @@ export function pageUrl(path: string): string {
   return abs;
 }
 
+export function buildAlternateLinks(path: string) {
+  const normalized = path.replace(/^\/(en|fa|ar|zh|hi)(?=\/|$)/, "");
+  const suffix = normalized.startsWith("/") ? normalized : `/${normalized}`;
+  return [
+    ...["en", "fa", "ar", "zh", "hi"].map((locale) => ({
+      rel: "alternate",
+      hrefLang: locale,
+      href: `${SITE_URL}/${locale}${suffix}`,
+    })),
+    { rel: "alternate", hrefLang: "x-default", href: `${SITE_URL}/en${suffix}` },
+  ];
+}
+
 export type SeoInput = {
   path: string;
   title: string;
@@ -46,6 +59,6 @@ export function buildSeo({ path, title, description, image, type = "website" }: 
   }
   return {
     meta,
-    links: [{ rel: "canonical", href: url }],
+    links: [{ rel: "canonical", href: url }, ...buildAlternateLinks(path)],
   };
 }

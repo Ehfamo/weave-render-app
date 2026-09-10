@@ -51,7 +51,9 @@ export function formatCount(n: number | null | undefined): string {
 const firstCount = (arr: { count: number }[] | undefined) =>
   Array.isArray(arr) && arr.length ? arr[0].count : 0;
 
-export function toPromptCard(row: PromptRow): Prompt {
+export type PromptListRow = Omit<PromptRow, "body">;
+
+export function toPromptCard(row: PromptListRow | PromptRow): Prompt {
   const views = firstCount(row.prompt_views);
   const likes = firstCount(row.likes);
   const saves = firstCount(row.saves);
@@ -70,7 +72,7 @@ export function toPromptCard(row: PromptRow): Prompt {
     author,
     views: formatCount(views),
     likes: formatCount(likes),
-    prompt: row.body || row.description || "",
+    prompt: ("body" in row ? row.body : row.description) || "",
     breakdown: [],
     copies: views,
     saves,
@@ -84,9 +86,11 @@ export function toPromptCard(row: PromptRow): Prompt {
 }
 
 const PROMPT_LIST_SELECT =
-  "id, slug, title, body, description, category, cover_url, price_cents, published_at, is_published, author_id, tags, " +
+  "id, slug, title, description, category, cover_url, price_cents, published_at, is_published, author_id, tags, " +
   "author:profiles!prompts_author_id_profiles_fkey(username, display_name, avatar_url), " +
   "likes(count), saves(count), prompt_views(count), comments(count)";
+
+const PROMPT_DETAIL_SELECT = PROMPT_LIST_SELECT + ", body";
 
 // -------------------- Prompt queries --------------------
 
@@ -109,11 +113,11 @@ export async function fetchPromptsList(opts?: {
 
   const { data, error } = await q;
   if (error) throw error;
-  return (data as unknown as PromptRow[]).map(toPromptCard);
+  return (data as unknown as PromptListRow[]).map(toPromptCard);
 }
 
-export async function fetchViralPrompts(limit = 12) {
-  // "viral" = most views in last 30d; fallback most-liked; ensures non-empty for empty DBs.
+export async function fetchFeedPrompts(limit = 12) {
+  // Recent published entries, ordered by observed view counts; no viral-performance claim.
   const { data, error } = await supabase
     .from("prompts")
     .select(PROMPT_LIST_SELECT)
@@ -121,14 +125,14 @@ export async function fetchViralPrompts(limit = 12) {
     .order("published_at", { ascending: false, nullsFirst: false })
     .limit(limit);
   if (error) throw error;
-  const rows = (data as unknown as PromptRow[]).map(toPromptCard);
+  const rows = (data as unknown as PromptListRow[]).map(toPromptCard);
   return rows.sort((a, b) => (b.copies ?? 0) - (a.copies ?? 0));
 }
 
 export async function fetchPromptBySlug(slug: string) {
   const { data, error } = await supabase
     .from("prompts")
-    .select(PROMPT_LIST_SELECT)
+    .select(PROMPT_DETAIL_SELECT)
     .eq("slug", slug)
     .maybeSingle();
   if (error) throw error;
@@ -148,7 +152,7 @@ export async function fetchRelatedPrompts(row: PromptRow, limit = 4) {
   q = q.order("published_at", { ascending: false, nullsFirst: false });
   const { data, error } = await q;
   if (error) throw error;
-  return (data as unknown as PromptRow[]).map(toPromptCard);
+  return (data as unknown as PromptListRow[]).map(toPromptCard);
 }
 
 export async function recordPromptView(promptId: string) {
@@ -478,5 +482,5 @@ export async function fetchPromptsByAuthor(authorId: string, limit = 24): Promis
     .order("published_at", { ascending: false, nullsFirst: false })
     .limit(limit);
   if (error) throw error;
-  return (data as unknown as PromptRow[]).map(toPromptCard);
+  return (data as unknown as PromptListRow[]).map(toPromptCard);
 }

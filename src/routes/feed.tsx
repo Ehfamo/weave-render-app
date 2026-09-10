@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchViralPrompts } from "@/lib/marketplace";
+import { fetchFeedPrompts } from "@/lib/marketplace";
 import { ViralFeedCard } from "@/components/xeomx/ViralFeedCard";
 import { pageUrl } from "@/lib/seo";
 import { m } from "@/paraglide/messages.js";
@@ -31,7 +31,7 @@ function Feed() {
     error,
   } = useQuery({
     queryKey: ["viral-feed"],
-    queryFn: () => fetchViralPrompts(20),
+    queryFn: () => fetchFeedPrompts(20),
     staleTime: 60_000,
   });
   return (

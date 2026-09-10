@@ -1,0 +1,285 @@
+{
+  "repository": "Ehfamo/weave-render-app",
+  "branch": "plan/xeomx-platform-expansion-20260909",
+  "starting_head": "ae14d85bb344226fe44512d02adf531a8e346be6",
+  "validated_source_head": "297319f496376d5aeb8400c3363138b9648d57b8",
+  "timestamp": "2026-09-10T13:33:55.522720+00:00",
+  "source_commits": [
+    "3d75620972306ab085dc3d53a41de3b96c3249d3",
+    "297319f496376d5aeb8400c3363138b9648d57b8"
+  ],
+  "unit_before": {
+    "total": 123,
+    "pass": 116,
+    "fail": 7
+  },
+  "unit_after": {
+    "total": 126,
+    "pass": 124,
+    "fail": 2,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "new_regression_tests": 3,
+  "canonical": [
+    {
+      "path": "src/lib/core-workflows.ts",
+      "expected_sha256": "fce4fb9d01bafd808f45dcd241323ab5c99ada8057f757a10f11afaf93b023f1",
+      "actual_sha256": "fce4fb9d01bafd808f45dcd241323ab5c99ada8057f757a10f11afaf93b023f1",
+      "expected_bytes": 18262,
+      "actual_bytes": 18262,
+      "status": "PASS"
+    },
+    {
+      "path": "src/lib/platform-contracts.ts",
+      "expected_sha256": "840e9e012c244652492021223bbd55ae562bf702f06b65d03a67d81c50d5c4f2",
+      "actual_sha256": "840e9e012c244652492021223bbd55ae562bf702f06b65d03a67d81c50d5c4f2",
+      "expected_bytes": 21587,
+      "actual_bytes": 21587,
+      "status": "PASS"
+    },
+    {
+      "path": "src/components/xeomx/product/ProductWorkspacePreview.tsx",
+      "expected_sha256": "5504a029910f04541f61b7876fe2df60ab18e2d18f188a2e89d823302f948a11",
+      "actual_sha256": "5504a029910f04541f61b7876fe2df60ab18e2d18f188a2e89d823302f948a11",
+      "expected_bytes": 31144,
+      "actual_bytes": 31144,
+      "status": "PASS"
+    },
+    {
+      "path": "src/lib/product-architecture.ts",
+      "expected_sha256": "4fed3a9cac34ab1c400f545438406802ee8c2dd2e8deac244cbd9dcba9b09ab3",
+      "actual_sha256": "4fed3a9cac34ab1c400f545438406802ee8c2dd2e8deac244cbd9dcba9b09ab3",
+      "expected_bytes": 55566,
+      "actual_bytes": 55566,
+      "status": "PASS"
+    },
+    {
+      "path": "package-lock.json",
+      "expected_sha256": "c5340cf78e852c4ba0ac5ad3afe34a706323dfd37de46a2cf4f43f5dfa9d3b8d",
+      "actual_sha256": "c5340cf78e852c4ba0ac5ad3afe34a706323dfd37de46a2cf4f43f5dfa9d3b8d",
+      "expected_bytes": 348592,
+      "actual_bytes": 348592,
+      "status": "PASS"
+    }
+  ],
+  "canonical_hash_method": "hashlib.sha256(Path(path).read_bytes()); len(bytes)",
+  "changed_paths": [
+    ".github/workflows/p0-full-validation.yml",
+    "messages/ar.json",
+    "messages/en.json",
+    "messages/fa.json",
+    "messages/hi.json",
+    "messages/zh.json",
+    "public/sitemap.xml",
+    "scripts/p0-last-mile-browser.mjs",
+    "src/components/xeomx/SupportButton.tsx",
+    "src/components/xeomx/os/GlobalLauncher.tsx",
+    "src/components/xeomx/os/GlobalLauncherProvider.tsx",
+    "src/components/xeomx/os/HomeDiscoverySection.tsx",
+    "src/components/xeomx/os/HomeExperience.tsx",
+    "src/components/xeomx/os/ProjectContextProvider.tsx",
+    "src/components/xeomx/os/ProjectContextSummary.tsx",
+    "src/components/xeomx/product/ProductEnvironmentPage.tsx",
+    "src/components/xeomx/status/CapabilityBoundary.tsx",
+    "src/lib/discovery.ts",
+    "src/lib/marketplace.ts",
+    "src/lib/navigation-policy.ts",
+    "src/lib/prompts.ts",
+    "src/lib/seo.ts",
+    "src/routeTree.gen.ts",
+    "src/routes/__root.tsx",
+    "src/routes/_authenticated/dashboard.tsx",
+    "src/routes/ecosystem.tsx",
+    "src/routes/explore_.$slug.tsx",
+    "src/routes/feed.tsx",
+    "src/routes/index.tsx",
+    "src/routes/os.$environment.$view.tsx",
+    "src/routes/studio.tsx",
+    "src/routes/xeomx-ai.tsx",
+    "tests/p0-last-mile-boundaries.test.mjs"
+  ],
+  "ci": {
+    "run": 34483114678,
+    "job": 102890559760,
+    "source_head": "297319f496376d5aeb8400c3363138b9648d57b8",
+    "conclusion": "failure",
+    "fresh": true,
+    "outcomes": {
+      "CLEAN_INSTALL": "success",
+      "BUILD": "success",
+      "TYPECHECK": "success",
+      "LINT": "success",
+      "UNIT": "failure",
+      "INTEGRATION": "success",
+      "MIGRATIONS": "success",
+      "SMOKE": "success",
+      "STATIC": "success",
+      "I18N": "success",
+      "SECRETS": "success",
+      "RUNTIME_SMOKE": "success",
+      "BACKEND_STATIC": "success"
+    }
+  },
+  "interactive_browser": {
+    "status": "PASS",
+    "checks": [
+      "visible navigation dialog",
+      "route action",
+      "dialog closes on navigation",
+      "heading focus",
+      "preview execution boundary",
+      "mobile Persian RTL no horizontal overflow",
+      "no uncaught exceptions"
+    ]
+  },
+  "journeys": [
+    {
+      "id": "J01",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J02",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J03",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J04",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J05",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J06",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J07",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J08",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J09",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J10",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J11",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J12",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    }
+  ],
+  "locale": {
+    "keys_per_language": 515,
+    "languages": [
+      "en",
+      "fa",
+      "ar",
+      "zh",
+      "hi"
+    ],
+    "parity": "PASS",
+    "original_threshold": "more than 850",
+    "threshold_result": "FAIL",
+    "historical_revision_count": 14,
+    "historical_max_keys": 511,
+    "assertion_changed": false,
+    "filler_keys_added": false
+  },
+  "supabase": {
+    "project": "bzoikmppvwiidyjdaqgv",
+    "status": "FAIL",
+    "reason": "Migration not applied/recorded; six relations missing",
+    "read_only": true,
+    "missing": [
+      "creator_stats",
+      "likes",
+      "saves",
+      "follows",
+      "comments",
+      "prompt_views"
+    ],
+    "existing_migration": "20260710134256_58ccd951-1ccf-4d9b-a2e7-f343a0145223.sql",
+    "migration_history_record": false,
+    "credential_or_catalog_permission_failure": false,
+    "mutations": false
+  },
+  "cloudflare": {
+    "status": "BLOCKED_BY_EXTERNAL_DEPENDENCY",
+    "reason": "No verified isolated remote target; both current and historical staging branch wrangler name weave-render-app. No production-target deployment was invoked.",
+    "local_ci_worker_preview": "PASS",
+    "remote_staging_deployed": false
+  },
+  "baseline_established": false,
+  "p0": "BLOCKED",
+  "p1_ready": false,
+  "p1_started": false,
+  "production_modified": false,
+  "aggregator_modified": false,
+  "original_tests_modified": false,
+  "dependencies_modified": false,
+  "limits": [
+    "Migration checks are source/static tests, not applied database validation.",
+    "Browser checks are bounded P0 regression coverage, not original J01-J12.",
+    "No accepted canonical baseline can be created while original journeys, locale acceptance and staging compatibility are unresolved."
+  ],
+  "log_hashes": {
+    "imports.json": "aba6518519b63f0ff2f29a874505971085194bf9a967cc5fe4a342dde9033fe3",
+    "lint.txt": "adf64566d7d9d4c04faa0c2a08047a4479be40e71aae2a9c3dc7351e2c13d5de",
+    "typecheck.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "unit-after.txt": "57ed5bcebd45bb52d78ca5247b54d8facc0e2dfd2201502c28013a7313465c8b",
+    "historical-search.json": "312e92f20d7bfb8d91c50ab1c52c45d44108d9788f9f6cef70822414b22112e6",
+    "ci-outcomes.txt": "be5fcecf3a816bde9d1bdb0f0ae4844c3016c2b8f0791eca39203cc7096317d2",
+    "unit-before.txt": "4734c31942cea541204621fc4cc605666b411cd82d8267137d60910210b90b2e"
+  }
+}

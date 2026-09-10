@@ -1,0 +1,335 @@
+{
+  "heads": [
+    {
+      "artifacts": [],
+      "branch": "release/xeomx-superapp-rc1-tempcheck",
+      "journeys": [],
+      "locale": {
+        "mode": "100644",
+        "path": "messages/en.json",
+        "sha": "119f219a6dce34718e1ce32e2de6399ad33773cf",
+        "size": 28519,
+        "type": "blob",
+        "url": "https://api.github.com/repos/Ehfamo/weave-render-app/git/blobs/119f219a6dce34718e1ce32e2de6399ad33773cf"
+      },
+      "sha": "fb18042fdb281f7ca2d2731c16edac899aa6222b",
+      "truncated": false
+    },
+    {
+      "artifacts": [],
+      "branch": "payload/stage54-core-v2-20260815",
+      "journeys": [],
+      "locale": {
+        "mode": "100644",
+        "path": "messages/en.json",
+        "sha": "119f219a6dce34718e1ce32e2de6399ad33773cf",
+        "size": 28519,
+        "type": "blob",
+        "url": "https://api.github.com/repos/Ehfamo/weave-render-app/git/blobs/119f219a6dce34718e1ce32e2de6399ad33773cf"
+      },
+      "sha": "3ebb9f3c89334da0260771c744b22acd8e7d4978",
+      "truncated": false
+    },
+    {
+      "artifacts": [],
+      "branch": "plan/xeomx-platform-expansion-20260909",
+      "journeys": [],
+      "locale": {
+        "mode": "100644",
+        "path": "messages/en.json",
+        "sha": "96839e13698bc5dc503bf3e934a50a25fbe63eea",
+        "size": 30335,
+        "type": "blob",
+        "url": "https://api.github.com/repos/Ehfamo/weave-render-app/git/blobs/96839e13698bc5dc503bf3e934a50a25fbe63eea"
+      },
+      "sha": "3d75620972306ab085dc3d53a41de3b96c3249d3",
+      "truncated": false
+    },
+    {
+      "artifacts": [],
+      "branch": "profile-region-update",
+      "journeys": [],
+      "locale": {
+        "mode": "100644",
+        "path": "messages/en.json",
+        "sha": "4655eb803e6b78c3f2b23a45f0fa7c2ed80e6c5d",
+        "size": 29000,
+        "type": "blob",
+        "url": "https://api.github.com/repos/Ehfamo/weave-render-app/git/blobs/4655eb803e6b78c3f2b23a45f0fa7c2ed80e6c5d"
+      },
+      "sha": "35e197db3ac37d0a5ff29ffdbc18663666950fc3",
+      "truncated": false
+    },
+    {
+      "artifacts": [],
+      "branch": "reconcile/source-export-20260813",
+      "journeys": [],
+      "locale": {
+        "mode": "100644",
+        "path": "messages/en.json",
+        "sha": "119f219a6dce34718e1ce32e2de6399ad33773cf",
+        "size": 28519,
+        "type": "blob",
+        "url": "https://api.github.com/repos/Ehfamo/weave-render-app/git/blobs/119f219a6dce34718e1ce32e2de6399ad33773cf"
+      },
+      "sha": "2f4f7aa36c4c324aee8b09c90721dba018bfcb44",
+      "truncated": false
+    },
+    {
+      "artifacts": [],
+      "branch": "release/xeomx-superapp-rc1-2",
+      "journeys": [],
+      "locale": {
+        "mode": "100644",
+        "path": "messages/en.json",
+        "sha": "119f219a6dce34718e1ce32e2de6399ad33773cf",
+        "size": 28519,
+        "type": "blob",
+        "url": "https://api.github.com/repos/Ehfamo/weave-render-app/git/blobs/119f219a6dce34718e1ce32e2de6399ad33773cf"
+      },
+      "sha": "c11211d34485ab32b06ac2d5c68d77e9a9eec088",
+      "truncated": false
+    },
+    {
+      "artifacts": [],
+      "branch": "release/xeomx-superapp-rc1-final",
+      "journeys": [],
+      "locale": {
+        "mode": "100644",
+        "path": "messages/en.json",
+        "sha": "119f219a6dce34718e1ce32e2de6399ad33773cf",
+        "size": 28519,
+        "type": "blob",
+        "url": "https://api.github.com/repos/Ehfamo/weave-render-app/git/blobs/119f219a6dce34718e1ce32e2de6399ad33773cf"
+      },
+      "sha": "3cc83525d8fe25f3155f40b7bc120581c7b6254d",
+      "truncated": false
+    },
+    {
+      "artifacts": [],
+      "branch": "release/xeomx-superapp-rc1-verified",
+      "journeys": [],
+      "locale": {
+        "mode": "100644",
+        "path": "messages/en.json",
+        "sha": "119f219a6dce34718e1ce32e2de6399ad33773cf",
+        "size": 28519,
+        "type": "blob",
+        "url": "https://api.github.com/repos/Ehfamo/weave-render-app/git/blobs/119f219a6dce34718e1ce32e2de6399ad33773cf"
+      },
+      "sha": "78b9e79a0d74efe4a3de6b9305b9c9976c666bcc",
+      "truncated": false
+    },
+    {
+      "artifacts": [],
+      "branch": "release/xeomx-superapp-rc1",
+      "journeys": [],
+      "locale": {
+        "mode": "100644",
+        "path": "messages/en.json",
+        "sha": "119f219a6dce34718e1ce32e2de6399ad33773cf",
+        "size": 28519,
+        "type": "blob",
+        "url": "https://api.github.com/repos/Ehfamo/weave-render-app/git/blobs/119f219a6dce34718e1ce32e2de6399ad33773cf"
+      },
+      "sha": "b00e7f8e79425bd428b8a401f92616f7fc7601d2",
+      "truncated": false
+    },
+    {
+      "artifacts": [],
+      "branch": "staging/xeomx-request7-cloudflare-live",
+      "journeys": [],
+      "locale": {
+        "mode": "100644",
+        "path": "messages/en.json",
+        "sha": "119f219a6dce34718e1ce32e2de6399ad33773cf",
+        "size": 28519,
+        "type": "blob",
+        "url": "https://api.github.com/repos/Ehfamo/weave-render-app/git/blobs/119f219a6dce34718e1ce32e2de6399ad33773cf"
+      },
+      "sha": "0d5eef3adbf70b83b9dc2ffce0555137ba0ba4a7",
+      "truncated": false
+    },
+    {
+      "artifacts": [],
+      "branch": "verify/rc1-verified-payload-check-20260815",
+      "journeys": [],
+      "locale": {
+        "mode": "100644",
+        "path": "messages/en.json",
+        "sha": "119f219a6dce34718e1ce32e2de6399ad33773cf",
+        "size": 28519,
+        "type": "blob",
+        "url": "https://api.github.com/repos/Ehfamo/weave-render-app/git/blobs/119f219a6dce34718e1ce32e2de6399ad33773cf"
+      },
+      "sha": "8421d34fdbf4650f2e1eb869cfdbdd132332b6d5",
+      "truncated": false
+    },
+    {
+      "artifacts": [
+        {
+          "path": ".xeomx-diagnostics/final-gate/stage54-lint-fix.patch",
+          "size": 6987
+        },
+        {
+          "path": ".xeomx-diagnostics/stage54-lint-fix-2026-08-15.patch",
+          "size": 6987
+        }
+      ],
+      "branch": "verify/stage5-4-exact-golden-20260815",
+      "journeys": [],
+      "locale": {
+        "mode": "100644",
+        "path": "messages/en.json",
+        "sha": "119f219a6dce34718e1ce32e2de6399ad33773cf",
+        "size": 28519,
+        "type": "blob",
+        "url": "https://api.github.com/repos/Ehfamo/weave-render-app/git/blobs/119f219a6dce34718e1ce32e2de6399ad33773cf"
+      },
+      "sha": "94e6948a519756ce06de4e8e1a0ea72fc2eecf42",
+      "truncated": false
+    },
+    {
+      "artifacts": [],
+      "branch": "verify/stage5-4-source-compare-20260815",
+      "journeys": [],
+      "locale": {
+        "mode": "100644",
+        "path": "messages/en.json",
+        "sha": "119f219a6dce34718e1ce32e2de6399ad33773cf",
+        "size": 28519,
+        "type": "blob",
+        "url": "https://api.github.com/repos/Ehfamo/weave-render-app/git/blobs/119f219a6dce34718e1ce32e2de6399ad33773cf"
+      },
+      "sha": "ed5423b5a6e8c497b1c81bdf363cfdea55665fd8",
+      "truncated": false
+    },
+    {
+      "artifacts": [],
+      "branch": "verify/stage54-from-rc1-tempcheck-20260815",
+      "journeys": [],
+      "locale": {
+        "mode": "100644",
+        "path": "messages/en.json",
+        "sha": "119f219a6dce34718e1ce32e2de6399ad33773cf",
+        "size": 28519,
+        "type": "blob",
+        "url": "https://api.github.com/repos/Ehfamo/weave-render-app/git/blobs/119f219a6dce34718e1ce32e2de6399ad33773cf"
+      },
+      "sha": "f192da4d73b4f4df88e4e45a321f78b5d5e97246",
+      "truncated": false
+    },
+    {
+      "artifacts": [],
+      "branch": "verify/stage54-from-step4-20260815",
+      "journeys": [],
+      "locale": {
+        "mode": "100644",
+        "path": "messages/en.json",
+        "sha": "119f219a6dce34718e1ce32e2de6399ad33773cf",
+        "size": 28519,
+        "type": "blob",
+        "url": "https://api.github.com/repos/Ehfamo/weave-render-app/git/blobs/119f219a6dce34718e1ce32e2de6399ad33773cf"
+      },
+      "sha": "7efd060328c69e87e2db742e33e3f5e05693a932",
+      "truncated": false
+    },
+    {
+      "artifacts": [],
+      "branch": "verify/step4-exact-lock-20260814",
+      "journeys": [],
+      "locale": {
+        "mode": "100644",
+        "path": "messages/en.json",
+        "sha": "119f219a6dce34718e1ce32e2de6399ad33773cf",
+        "size": 28519,
+        "type": "blob",
+        "url": "https://api.github.com/repos/Ehfamo/weave-render-app/git/blobs/119f219a6dce34718e1ce32e2de6399ad33773cf"
+      },
+      "sha": "744dedf980b7b0e0ae540a314424b75195c13f68",
+      "truncated": false
+    }
+  ],
+  "path_history": [],
+  "code_search": {
+    "total_count": 0,
+    "incomplete_results": true,
+    "items": []
+  },
+  "locale_history": [
+    {
+      "keys": 511,
+      "sha": "90b400baf8b0fe6b91f370ece8b89a97132281eb"
+    },
+    {
+      "keys": 483,
+      "sha": "2139c2b03b952a0e16ce5f6755f638ee4dde6f3f"
+    },
+    {
+      "keys": 480,
+      "sha": "4614417ed832249de0335488a54a544c32e1d314"
+    },
+    {
+      "keys": 462,
+      "sha": "de763b57405137645339325dc7c8f326ea89e462"
+    },
+    {
+      "keys": 434,
+      "sha": "be49f6052033fb1a84d714fccd474417a410c1d8"
+    },
+    {
+      "keys": 355,
+      "sha": "e97478ac7b6990696eaba3b3d38bb5edc3830812"
+    },
+    {
+      "keys": 331,
+      "sha": "af2de4cf252e854a29d72aa440e8a06822b2a1bc"
+    },
+    {
+      "keys": 275,
+      "sha": "1bb497a9f17ba84effa5976c74ade16fa774feaf"
+    },
+    {
+      "keys": 272,
+      "sha": "609476c3b895b2eff93525639165646e47eb5aef"
+    },
+    {
+      "keys": 255,
+      "sha": "a9279b700fac72181c3723b77847de27ddf5b513"
+    },
+    {
+      "keys": 204,
+      "sha": "127c15c3df34bc4f3679f6c61e5355221319436c"
+    },
+    {
+      "keys": 203,
+      "sha": "bc18b931d3df58bec728202370c862153a9b1182"
+    },
+    {
+      "keys": 80,
+      "sha": "7e3b2e0d7af7a53abeb10ddd6f769b01f1b12b32"
+    },
+    {
+      "keys": 35,
+      "sha": "25d06612c9e7082ebc85c347adb77088d224872f"
+    }
+  ],
+  "patches": [
+    {
+      "journey_path": false,
+      "journey_symbol": false,
+      "path": ".xeomx-diagnostics/final-gate/stage54-lint-fix.patch"
+    },
+    {
+      "journey_path": false,
+      "journey_symbol": false,
+      "path": ".xeomx-diagnostics/stage54-lint-fix-2026-08-15.patch"
+    }
+  ],
+  "attachment_scan": {
+    "archives": 3,
+    "matching_journey_paths": 0,
+    "symbol_mentions": 0
+  },
+  "limits": "Bounded search of available branch trees, P0 path history, listed patches, current docs and supplied archives. GitHub code search flagged incomplete_results; no universal absence claim."
+}

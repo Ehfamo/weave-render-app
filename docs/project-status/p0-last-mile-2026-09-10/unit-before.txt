@@ -1,0 +1,240 @@
+✔ all 21 former non-P0 gaps have exact direct routes (3.199186ms)
+✔ all 21 former non-P0 gaps have target-specific registered surfaces (12.856354ms)
+✔ full UI closure preserves guarded dependency language (0.355397ms)
+✔ the Cloudflare build emits a deployable Worker package (10.621571ms)
+✔ all twenty core workflows have unique identities and real route targets (1.869625ms)
+✔ the event core preserves policy, audit and notification boundaries (0.732267ms)
+✔ provider routing fails closed without verified capability evidence (0.266569ms)
+✔ model evidence sources remain explicitly separated (0.185906ms)
+✖ home defers marketplace discovery and its heavy prompt-card dependency (7.511191ms)
+✔ reconstructed P0 status components render with fail-closed controls (1969.044829ms)
+✔ catalog filters quote user syntax and retain public-query boundaries (50.119897ms)
+✔ all 17 P0 target routes exist with exact route declarations (2.610765ms)
+✔ four formerly missing P0 product surfaces are now registered (0.264672ms)
+✔ P0 partial targets receive distinct target-specific surfaces (0.643176ms)
+✔ high-risk P0 surfaces retain approval or policy boundaries (0.20545ms)
+✔ matrix accepts all required successes and does not claim external verification (6.622927ms)
+✔ every required gate fails closed for failure, cancellation, skipped and missing outcomes (1492.887988ms)
+✔ source audit resolves dotted modules and ignores import text inside comments (1311.666239ms)
+✔ the release vocabulary is canonical and backend adapters fail closed (2.543409ms)
+✔ job transitions support recovery without allowing fabricated completion (0.841724ms)
+✔ payment state never grants entitlement before confirmed payment (0.642421ms)
+✔ payment failure preserves the order and exposes a safe retry (0.225061ms)
+✔ effective permission preview fails closed and requires exact approval (0.265352ms)
+✔ project handoff preserves every opaque context reference (1.057556ms)
+✔ future telemetry metadata strips sensitive payload fields (0.296107ms)
+✔ the 25-environment product contract is complete and internally unique after the full target-surface closure wave (89.630618ms)
+✖ all twelve critical journeys point to real product views (31.280702ms)
+✖ locale contracts stay in exact parity (13.21163ms)
+✔ release truth and safety controls are explicit in product previews (2.061563ms)
+✖ legacy simulations, fake metrics, and soft product 404s stay removed (11.371085ms)
+✖ public listing, auth, SEO, and runtime warning boundaries remain safe (1.66932ms)
+✔ release dependency surface excludes proven unused direct packages (2.685666ms)
+✖ secondary global tools stay outside the initial client path (1.431435ms)
+✖ request 4 hardening stays centralized, fail-closed, and context preserving (10.03546ms)
+✔ Request 7 migration is additive, indexed and RLS protected (7.291947ms)
+✔ Request 7 migration keeps sensitive writes server-only and storage private (3.025414ms)
+✔ Request 7 workflow maturity is connected but never falsely live-verified (2.45791ms)
+✔ authentication is required before the generation path (0.924535ms)
+✔ project ownership is enforced before unavailable requests are persisted (0.764238ms)
+✔ provider unavailable is persisted honestly without a credit charge (0.662853ms)
+✔ successful CI provider execution persists output, asset, usage, ledger and audit (1.005262ms)
+✔ failed provider execution releases the full reservation and records failure (1.463931ms)
+✔ cancelling a queued job is authorized, idempotent and releases its reservation once (0.474867ms)
+✔ insufficient credits creates no job, message, usage or charge (0.559338ms)
+✔ an idempotent retry does not execute the provider or charge twice (0.63344ms)
+✔ reusing an idempotency key for different input is rejected (2.232762ms)
+✔ manual routing requires the exact verified provider and model (0.316482ms)
+✔ full CI vertical slice survives project reload (0.640898ms)
+✔ research citations accept only provided source ids (3.383234ms)
+✔ research citations require at least one citation (0.161552ms)
+✔ research citations reject unknown source ids (0.137762ms)
+✔ research citations reject malformed numeric citation groups (0.116433ms)
+✔ Stage 5 migration adds the three missing foreign-key indexes (5.077564ms)
+✔ Stage 5 migration preserves RLS and narrows policy roles (4.91483ms)
+✔ Stage 5 migration is transactional and non-destructive to data (5.811779ms)
+✔ compensating agent JSON guard normalizes and recursively rejects common secret keys (5.278004ms)
+✔ hardened guard remains fixed-path and private to trusted execution (11.328232ms)
+✔ R0 and R1 admit only their explicit sandbox allowlists (3.041151ms)
+✔ R2 waits and cannot execute without the exact owner approval synchronizer (0.86568ms)
+✔ R2 exact-owner denial is terminal (0.877542ms)
+✔ R3 remains default-deny even when ordinary approval is claimed (0.237844ms)
+✔ service lifecycle covers failure, bounded recovery, success and cancel (0.254748ms)
+✔ credential values and secret-shaped nested fields are rejected (1.476388ms)
+✔ idempotency envelope and canonical payload are deterministic (1.067015ms)
+✔ definition maximum risk is enforced before admission (0.189026ms)
+✔ Stage 5.3 creates six durable RLS-protected control-plane tables (58.47055ms)
+✔ risk and state constraints encode R0/R1 allowlists, R2 approval and R3 denial (5.892206ms)
+✔ R2 cannot queue before an exact project-owner approval (4.47923ms)
+✔ idempotency, opaque references, secret rejection and audits are durable (1.735394ms)
+✔ all foreign keys have intentional covering indexes (6.443651ms)
+✔ private trigger helpers are never executable by authenticated clients (6.010312ms)
+✔ authenticated mutations remain narrow and RLS ownership-bound (1.632852ms)
+✔ checkout fails closed when no payment provider is configured (1.175629ms)
+✔ an injected generic adapter remains behind the verification boundary (0.780877ms)
+✔ provider and webhook mismatches fail closed (0.289101ms)
+✔ payment event identity is idempotent by provider and event id (1.047137ms)
+✔ checkout and subscription models cover failure, cancel and refund (0.250094ms)
+✔ entitlement activation requires matching confirmed payment evidence (0.298993ms)
+✔ Stage 5.3 billing migration is additive and lets apply_migration own the transaction (33.013998ms)
+✔ authenticated clients can read only their own billing rows (86.557918ms)
+✔ foreign keys have covering indexes and payment events are idempotent (31.533412ms)
+✔ aggregate advisory locks make create/event/entitlement idempotency race-safe (8.689854ms)
+✔ checkout and subscription lifecycle transitions fail closed (117.826743ms)
+✔ service-only helpers revoke public and client execution (139.304278ms)
+✔ entitlement activation locks and validates a confirmed payment event (29.174364ms)
+✔ migration remains provider-neutral and contains no credentials (11.79096ms)
+✔ metadata is recursively filtered and raw webhook payloads are never persisted (1.965088ms)
+✔ JSON rejects cycles, accessors and sparse arrays without evaluating them (1.78224ms)
+✔ control-plane bounds match existing migration constraints and R2 retries need approval (0.49321ms)
+✔ evidence cannot report a fabricated score for empty or inconsistent evaluation (0.731159ms)
+✔ payment ledger snapshots resist mutation and reject cross-owner activation (2.755773ms)
+✔ Stage 5.3 covers both composite Dataset/Evals foreign keys (4.946928ms)
+✔ Stage 5.3 evidence migration is apply_migration-owned and additive (8.231889ms)
+✔ all browser-visible writes have explicit RLS checks and no anonymous grants (4.85414ms)
+✔ trigger helpers are fixed-path, service-only SECURITY DEFINER functions (6.98448ms)
+✔ version, result, link and provenance immutability fail closed (4.725375ms)
+✔ recursive SQL boundary rejects secret-like JSON keys on every JSON surface (2.525266ms)
+✔ provider compute is disconnected until verified and FK paths are indexed (3.186125ms)
+✔ eval run constraints have non-colliding explicit names (1.764831ms)
+✔ dataset item admission locks the version against concurrent finalization (4.019892ms)
+✔ migration contains no credential values or broad authenticated result writes (2.218153ms)
+✔ dataset validation preserves explicit empty and invalid states (2.404399ms)
+✔ dataset duplicate validation is deterministic (0.751097ms)
+✔ eval and experiment state machines reject terminal rewrites (0.771584ms)
+✔ surface state distinguishes loading, empty, invalid and failure (0.27103ms)
+✔ provider eval compute remains explicitly disconnected and fail-closed (0.28312ms)
+✔ recursive JSON boundary rejects secret-like keys without storing values (0.807011ms)
+✔ canonical evidence and safe database errors are deterministic (0.400243ms)
+✔ authenticated membership mutation privileges are removed while RLS read remains (5.870025ms)
+✔ search planning is Unicode-safe, bounded and wildcard-neutral (2.388397ms)
+✔ search aggregation removes duplicates without inventing empty results (0.243773ms)
+✔ project update audit is trigger-only, fixed-path and privacy-safe (10.677931ms)
+✔ stale running generation jobs have a partial-indexed lease recovery path (1.195162ms)
+✔ lease recovery fails stale work closed through the canonical failure RPC (0.458674ms)
+✔ lease recovery is fixed-path and service-role only (0.894829ms)
+✔ lease recovery validates bounded timeout and batch size (0.325557ms)
+✔ generation worker performs stale-lease cleanup before claiming queued work (0.415096ms)
+✔ Stage 5.4 app routing registers the exact Cloudflare, Gemini, and Groq models (2.120729ms)
+✔ the verified Cloudflare route remains the default live route (0.224638ms)
+✔ server-side manual submission validates against the exact provider registry (6.387031ms)
+✔ provider success followed by persistence failure fails closed without cross-provider fallback (1.43047ms)
+✔ credit ledger Stage 5.4 migration restores authenticated read-only ACL (1.091859ms)
+✔ pending entitlement audit trigger is provider-neutral and privilege-contained (0.912058ms)
+ℹ tests 123
+ℹ suites 0
+ℹ pass 116
+ℹ fail 7
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2961.071302
+
+✖ failing tests:
+
+test at tests/core-workflows.test.mjs:127:1
+✖ home defers marketplace discovery and its heavy prompt-card dependency (7.511191ms)
+  Error: ENOENT: no such file or directory, open '/workspace/scratch/c2e7c7c5940e/p0-inspection/src/components/xeomx/os/HomeExperience.tsx'
+      at async open (node:internal/fs/promises:697:25)
+      at async readFile (node:internal/fs/promises:1348:14)
+      at async TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/core-workflows.test.mjs:128:16)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: '/workspace/scratch/c2e7c7c5940e/p0-inspection/src/components/xeomx/os/HomeExperience.tsx'
+  }
+
+test at tests/product-readiness.test.mjs:120:1
+✖ all twelve critical journeys point to real product views (31.280702ms)
+  Error: ENOENT: no such file or directory, open '/workspace/scratch/c2e7c7c5940e/p0-inspection/src/lib/critical-journeys.ts'
+      at async open (node:internal/fs/promises:697:25)
+      at async readFile (node:internal/fs/promises:1348:14)
+      at async TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/product-readiness.test.mjs:127:16)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: '/workspace/scratch/c2e7c7c5940e/p0-inspection/src/lib/critical-journeys.ts'
+  }
+
+test at tests/product-readiness.test.mjs:159:1
+✖ locale contracts stay in exact parity (13.21163ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(baseline.length > 850)
+
+      at TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/product-readiness.test.mjs:165:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/product-readiness.test.mjs:219:1
+✖ legacy simulations, fake metrics, and soft product 404s stay removed (11.371085ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(text.includes("ProductEnvironmentPage"))
+
+      at TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/product-readiness.test.mjs:222:12)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/product-readiness.test.mjs:256:1
+✖ public listing, auth, SEO, and runtime warning boundaries remain safe (1.66932ms)
+  AssertionError [ERR_ASSERTION]: listing queries must not fetch full prompt bodies
+      at TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/product-readiness.test.mjs:262:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/product-readiness.test.mjs:300:1
+✖ secondary global tools stay outside the initial client path (1.431435ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(root.includes("GlobalLauncherProvider"))
+
+      at TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/product-readiness.test.mjs:302:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/product-readiness.test.mjs:317:1
+✖ request 4 hardening stays centralized, fail-closed, and context preserving (10.03546ms)
+  AssertionError [ERR_ASSERTION]: Missing route hardening: CapabilityBoundary
+      at TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/product-readiness.test.mjs:352:12)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

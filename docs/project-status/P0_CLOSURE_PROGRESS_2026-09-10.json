@@ -1,0 +1,294 @@
+{
+  "repository": "Ehfamo/weave-render-app",
+  "branch": "plan/xeomx-platform-expansion-20260909",
+  "starting_head": "1a70bcf765aacc4818883615ef65e1ce11ab98ae",
+  "validated_source_head": "7281190377c446b71fdfd90365f1342792667702",
+  "timestamp": "2026-09-10T07:46:42.364955+00:00",
+  "node": "v24.19.0",
+  "hash_command": "Python hashlib.sha256(Path(path).read_bytes()); len(bytes)",
+  "canonical": [
+    {
+      "path": "src/lib/core-workflows.ts",
+      "expected_sha256": "fce4fb9d01bafd808f45dcd241323ab5c99ada8057f757a10f11afaf93b023f1",
+      "actual_sha256": "fce4fb9d01bafd808f45dcd241323ab5c99ada8057f757a10f11afaf93b023f1",
+      "expected_bytes": 18262,
+      "actual_bytes": 18262,
+      "status": "PASS"
+    },
+    {
+      "path": "src/lib/platform-contracts.ts",
+      "expected_sha256": "840e9e012c244652492021223bbd55ae562bf702f06b65d03a67d81c50d5c4f2",
+      "actual_sha256": "840e9e012c244652492021223bbd55ae562bf702f06b65d03a67d81c50d5c4f2",
+      "expected_bytes": 21587,
+      "actual_bytes": 21587,
+      "status": "PASS"
+    },
+    {
+      "path": "src/components/xeomx/product/ProductWorkspacePreview.tsx",
+      "expected_sha256": "5504a029910f04541f61b7876fe2df60ab18e2d18f188a2e89d823302f948a11",
+      "actual_sha256": "5504a029910f04541f61b7876fe2df60ab18e2d18f188a2e89d823302f948a11",
+      "expected_bytes": 31144,
+      "actual_bytes": 31144,
+      "status": "PASS"
+    },
+    {
+      "path": "src/lib/product-architecture.ts",
+      "expected_sha256": "4fed3a9cac34ab1c400f545438406802ee8c2dd2e8deac244cbd9dcba9b09ab3",
+      "actual_sha256": "4fed3a9cac34ab1c400f545438406802ee8c2dd2e8deac244cbd9dcba9b09ab3",
+      "expected_bytes": 55566,
+      "actual_bytes": 55566,
+      "status": "PASS"
+    },
+    {
+      "path": "package-lock.json",
+      "expected_sha256": "c5340cf78e852c4ba0ac5ad3afe34a706323dfd37de46a2cf4f43f5dfa9d3b8d",
+      "actual_sha256": "c5340cf78e852c4ba0ac5ad3afe34a706323dfd37de46a2cf4f43f5dfa9d3b8d",
+      "expected_bytes": 348592,
+      "actual_bytes": 348592,
+      "status": "PASS"
+    }
+  ],
+  "source_commits": [
+    "5c4526861dc761027e17530758cfc564ca4c4774",
+    "7281190377c446b71fdfd90365f1342792667702"
+  ],
+  "changed_paths": [
+    ".github/workflows/p0-full-validation.yml",
+    "scripts/p0-route-runtime.py",
+    "src/components/xeomx/product/LegalHubPage.tsx",
+    "src/components/xeomx/product/ProductEnvironmentPage.tsx",
+    "src/lib/agents/control-plane.ts",
+    "src/lib/billing/index.ts",
+    "src/lib/evidence/evidence.ts",
+    "src/lib/stage53-json.ts",
+    "src/routeTree.gen.ts",
+    "src/routes/agents.observability.tsx",
+    "src/routes/agents.registry.tsx",
+    "src/routes/agents.runtime.tsx",
+    "src/routes/agents.teams.tsx",
+    "src/routes/billing.disputes.tsx",
+    "src/routes/build.backend.tsx",
+    "src/routes/build.database.tsx",
+    "src/routes/build.git.tsx",
+    "src/routes/community.challenges.tsx",
+    "src/routes/context.tsx",
+    "src/routes/create.avatar.tsx",
+    "src/routes/create.dubbing.tsx",
+    "src/routes/data.annotation.tsx",
+    "src/routes/data.synthetic.tsx",
+    "src/routes/data.tsx",
+    "src/routes/evals.experiments.tsx",
+    "src/routes/evals.registry.tsx",
+    "src/routes/evals.tsx",
+    "src/routes/events.tsx",
+    "src/routes/for-you.tsx",
+    "src/routes/inbox.tsx",
+    "src/routes/integrations.tsx",
+    "src/routes/knowledge.graph.tsx",
+    "src/routes/legal.tsx",
+    "src/routes/models.deployments.tsx",
+    "src/routes/models.fine-tune.tsx",
+    "src/routes/models.registry.tsx",
+    "src/routes/observability.tsx",
+    "src/routes/operator.tsx",
+    "src/routes/org.admin.tsx",
+    "src/routes/provenance.tsx",
+    "src/routes/publish.tsx",
+    "src/routes/research.monitoring.tsx",
+    "src/routes/security.automation.tsx",
+    "src/routes/security.evidence.tsx",
+    "src/routes/security.lab.tsx",
+    "src/routes/security.supply-chain.tsx",
+    "src/routes/tools.tsx",
+    "tests/stage53-boundary-regression.test.mjs"
+  ],
+  "unit_before": {
+    "total": 101,
+    "passed": 88,
+    "failed": 13
+  },
+  "unit_after": {
+    "total": 123,
+    "passed": 116,
+    "failed": 7
+  },
+  "stage53": {
+    "status": "PASS",
+    "existing_tests": 21,
+    "new_regressions": 4,
+    "provenance": "Minimal reconstruction from existing Stage5.3 SQL and original tests; not an exact historical-source recovery."
+  },
+  "ci": {
+    "run_id": 34451420982,
+    "job_id": 102787799003,
+    "source_head": "7281190377c446b71fdfd90365f1342792667702",
+    "result": "failure",
+    "fresh": true
+  },
+  "journeys": [
+    {
+      "id": "J01",
+      "classification": "FAIL",
+      "definition_check": "Fresh current-tree check: src/lib/critical-journeys.ts absent",
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN",
+      "reason": "Original journey definition unavailable; no substitute invented"
+    },
+    {
+      "id": "J02",
+      "classification": "FAIL",
+      "definition_check": "Fresh current-tree check: src/lib/critical-journeys.ts absent",
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN",
+      "reason": "Original journey definition unavailable; no substitute invented"
+    },
+    {
+      "id": "J03",
+      "classification": "FAIL",
+      "definition_check": "Fresh current-tree check: src/lib/critical-journeys.ts absent",
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN",
+      "reason": "Original journey definition unavailable; no substitute invented"
+    },
+    {
+      "id": "J04",
+      "classification": "FAIL",
+      "definition_check": "Fresh current-tree check: src/lib/critical-journeys.ts absent",
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN",
+      "reason": "Original journey definition unavailable; no substitute invented"
+    },
+    {
+      "id": "J05",
+      "classification": "FAIL",
+      "definition_check": "Fresh current-tree check: src/lib/critical-journeys.ts absent",
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN",
+      "reason": "Original journey definition unavailable; no substitute invented"
+    },
+    {
+      "id": "J06",
+      "classification": "FAIL",
+      "definition_check": "Fresh current-tree check: src/lib/critical-journeys.ts absent",
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN",
+      "reason": "Original journey definition unavailable; no substitute invented"
+    },
+    {
+      "id": "J07",
+      "classification": "FAIL",
+      "definition_check": "Fresh current-tree check: src/lib/critical-journeys.ts absent",
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN",
+      "reason": "Original journey definition unavailable; no substitute invented"
+    },
+    {
+      "id": "J08",
+      "classification": "FAIL",
+      "definition_check": "Fresh current-tree check: src/lib/critical-journeys.ts absent",
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN",
+      "reason": "Original journey definition unavailable; no substitute invented"
+    },
+    {
+      "id": "J09",
+      "classification": "FAIL",
+      "definition_check": "Fresh current-tree check: src/lib/critical-journeys.ts absent",
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN",
+      "reason": "Original journey definition unavailable; no substitute invented"
+    },
+    {
+      "id": "J10",
+      "classification": "FAIL",
+      "definition_check": "Fresh current-tree check: src/lib/critical-journeys.ts absent",
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN",
+      "reason": "Original journey definition unavailable; no substitute invented"
+    },
+    {
+      "id": "J11",
+      "classification": "FAIL",
+      "definition_check": "Fresh current-tree check: src/lib/critical-journeys.ts absent",
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN",
+      "reason": "Original journey definition unavailable; no substitute invented"
+    },
+    {
+      "id": "J12",
+      "classification": "FAIL",
+      "definition_check": "Fresh current-tree check: src/lib/critical-journeys.ts absent",
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN",
+      "reason": "Original journey definition unavailable; no substitute invented"
+    }
+  ],
+  "supabase": {
+    "project": "bzoikmppvwiidyjdaqgv",
+    "classification": "FAIL",
+    "read_only": true,
+    "missing_relations": [
+      "creator_stats",
+      "likes",
+      "saves",
+      "follows",
+      "comments",
+      "prompt_views"
+    ],
+    "existing_migration": "supabase/migrations/20260710134256_58ccd951-1ccf-4d9b-a2e7-f343a0145223.sql",
+    "migration_record_present": false,
+    "public_tables": 37,
+    "rls_enabled": 37,
+    "mutations": false
+  },
+  "cloudflare": {
+    "classification": "BLOCKED_BY_EXTERNAL_DEPENDENCY",
+    "local_preview": "uv_interface_addresses returned Unknown system error 1",
+    "ci_local_worker_runtime": "PASS",
+    "remote_staging": "NOT_RUN: current deployment configuration targets weave-render-app; no verified isolated remote target configured on this branch",
+    "credential_presence": "PRESENT in CI; scope/permission not proven by presence",
+    "deployment": false
+  },
+  "aggregator_modified": false,
+  "baseline_established": false,
+  "baseline_reason": "7 source/contract failures, original journeys absent, staging schema mismatch",
+  "p0": "BLOCKED",
+  "p1_ready": false,
+  "p1_started": false,
+  "production_modified": false,
+  "main_head": "fb18042fdb281f7ca2d2731c16edac899aa6222b",
+  "validation": {
+    "Clean install": "PASS",
+    "Typecheck": "PASS",
+    "Lint": "PASS",
+    "Build": "PASS",
+    "Unit / Contract": "FAIL",
+    "Integration": "PASS",
+    "Migration static checks": "PASS",
+    "Smoke": "PASS",
+    "Routes / Imports": "PASS",
+    "Circular dependency": "PASS",
+    "Runtime smoke": "PASS",
+    "i18n key parity": "PASS",
+    "RTL source invariant": "PASS",
+    "Secret scan": "PASS",
+    "Backend static safety": "PASS"
+  },
+  "validation_limits": [
+    "Migration tests inspect SQL source; they do not apply migrations or prove deployed schema compatibility.",
+    "Runtime checks cover homepage and four restored HTTP entries, desktop DOM/mobile screenshot and log patterns; not comprehensive hydration, responsive, RTL or J01-J12 end-to-end certification.",
+    "i18n parity at 511 keys passes the workflow; the original >850-key unit acceptance remains failing."
+  ],
+  "stored_logs": {
+    "migrations.txt": "a2700c4d132d5c2c54b9215e033dea944ec2d0a3aa42c4a7054175077924a0c9",
+    "unit-after.txt": "0b35986b0d5033657a900fefbdc47e2443f0d7c242c9c3f976a2b012475e17fb",
+    "smoke.txt": "c412f890713f5bb1aa10948c1390edaa144beb4977200026b10bf52061e70317",
+    "typecheck.txt": "b19be1a127b43f4b12ff880203cd55855c61667abffe84f9f625a6078c3acec4",
+    "integration.txt": "02588693d1d1d344997af9193ab4052d689c482037ea1b8515bd6169835d66bd",
+    "ci-outcomes.txt": "347266a2fcd635020f821feb7fe3445a9a9e74a4a7b493b39bd59a32f9809926",
+    "unit-before.txt": "49326b41fbc3d02bb5d6b25ae3b6e391400606cbe29b172e5298d808987fd9b3",
+    "imports.json": "aba6518519b63f0ff2f29a874505971085194bf9a967cc5fe4a342dde9033fe3",
+    "local-runtime.txt": "ab9a18803d112df1e58164e1c3ca46eef015717416712275fad75b8cae38d573",
+    "lint.txt": "9146ba4ac3ac7deed9d3496bae0863ab8200bbcbfd844781ce3ae5fd11906b87"
+  }
+}

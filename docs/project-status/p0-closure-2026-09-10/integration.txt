@@ -1,0 +1,25 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> test:integration
+> node --experimental-strip-types --test tests/request-7-vertical-slice.test.mjs
+
+✔ Request 7 workflow maturity is connected but never falsely live-verified (1.489736ms)
+✔ authentication is required before the generation path (0.66943ms)
+✔ project ownership is enforced before unavailable requests are persisted (0.443631ms)
+✔ provider unavailable is persisted honestly without a credit charge (0.371351ms)
+✔ successful CI provider execution persists output, asset, usage, ledger and audit (0.793128ms)
+✔ failed provider execution releases the full reservation and records failure (0.33911ms)
+✔ cancelling a queued job is authorized, idempotent and releases its reservation once (0.297585ms)
+✔ insufficient credits creates no job, message, usage or charge (0.211842ms)
+✔ an idempotent retry does not execute the provider or charge twice (0.377634ms)
+✔ reusing an idempotency key for different input is rejected (1.424016ms)
+✔ manual routing requires the exact verified provider and model (0.1917ms)
+✔ full CI vertical slice survives project reload (0.392496ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 158.298317

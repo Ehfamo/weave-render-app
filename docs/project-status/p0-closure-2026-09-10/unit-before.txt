@@ -1,0 +1,344 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> test
+> node --experimental-strip-types --test tests/*.test.mjs
+
+✖ all 21 former non-P0 gaps have exact direct routes (3.989203ms)
+✔ all 21 former non-P0 gaps have target-specific registered surfaces (0.9293ms)
+✔ full UI closure preserves guarded dependency language (0.450228ms)
+✔ the Cloudflare build emits a deployable Worker package (9.422586ms)
+✔ all twenty core workflows have unique identities and real route targets (3.593627ms)
+✔ the event core preserves policy, audit and notification boundaries (1.074496ms)
+✔ provider routing fails closed without verified capability evidence (0.447603ms)
+✔ model evidence sources remain explicitly separated (0.66181ms)
+✖ home defers marketplace discovery and its heavy prompt-card dependency (9.844587ms)
+✔ reconstructed P0 status components render with fail-closed controls (2332.624291ms)
+✔ catalog filters quote user syntax and retain public-query boundaries (44.37379ms)
+✖ all 17 P0 target routes exist with exact route declarations (2.802608ms)
+✔ four formerly missing P0 product surfaces are now registered (0.625501ms)
+✖ P0 partial targets receive distinct target-specific surfaces (0.655315ms)
+✔ high-risk P0 surfaces retain approval or policy boundaries (0.338169ms)
+✔ matrix accepts all required successes and does not claim external verification (10.18335ms)
+✔ every required gate fails closed for failure, cancellation, skipped and missing outcomes (389.155025ms)
+✔ source audit resolves dotted modules and ignores import text inside comments (1584.702205ms)
+✔ the release vocabulary is canonical and backend adapters fail closed (6.621629ms)
+✔ job transitions support recovery without allowing fabricated completion (1.194892ms)
+✔ payment state never grants entitlement before confirmed payment (1.217571ms)
+✔ payment failure preserves the order and exposes a safe retry (1.022018ms)
+✔ effective permission preview fails closed and requires exact approval (0.784122ms)
+✔ project handoff preserves every opaque context reference (0.661509ms)
+✔ future telemetry metadata strips sensitive payload fields (0.668559ms)
+✔ the 25-environment product contract is complete and internally unique after the full target-surface closure wave (53.68146ms)
+✖ all twelve critical journeys point to real product views (26.069028ms)
+✖ locale contracts stay in exact parity (21.664857ms)
+✔ release truth and safety controls are explicit in product previews (6.806351ms)
+✖ legacy simulations, fake metrics, and soft product 404s stay removed (2.497457ms)
+✖ public listing, auth, SEO, and runtime warning boundaries remain safe (3.044244ms)
+✔ release dependency surface excludes proven unused direct packages (2.94446ms)
+✖ secondary global tools stay outside the initial client path (2.678453ms)
+✖ request 4 hardening stays centralized, fail-closed, and context preserving (3.570991ms)
+✔ Request 7 migration is additive, indexed and RLS protected (9.087723ms)
+✔ Request 7 migration keeps sensitive writes server-only and storage private (8.023627ms)
+✔ Request 7 workflow maturity is connected but never falsely live-verified (6.588882ms)
+✔ authentication is required before the generation path (1.456521ms)
+✔ project ownership is enforced before unavailable requests are persisted (0.874597ms)
+✔ provider unavailable is persisted honestly without a credit charge (0.998426ms)
+✔ successful CI provider execution persists output, asset, usage, ledger and audit (1.512784ms)
+✔ failed provider execution releases the full reservation and records failure (0.787775ms)
+✔ cancelling a queued job is authorized, idempotent and releases its reservation once (0.570889ms)
+✔ insufficient credits creates no job, message, usage or charge (0.566103ms)
+✔ an idempotent retry does not execute the provider or charge twice (0.815859ms)
+✔ reusing an idempotency key for different input is rejected (2.542564ms)
+✔ manual routing requires the exact verified provider and model (0.223493ms)
+✔ full CI vertical slice survives project reload (2.088099ms)
+✔ research citations accept only provided source ids (4.308413ms)
+✔ research citations require at least one citation (0.267663ms)
+✔ research citations reject unknown source ids (0.226104ms)
+✔ research citations reject malformed numeric citation groups (0.186942ms)
+✔ Stage 5 migration adds the three missing foreign-key indexes (4.814551ms)
+✔ Stage 5 migration preserves RLS and narrows policy roles (2.264822ms)
+✔ Stage 5 migration is transactional and non-destructive to data (5.402974ms)
+✔ compensating agent JSON guard normalizes and recursively rejects common secret keys (4.59218ms)
+✔ hardened guard remains fixed-path and private to trusted execution (2.871419ms)
+node:internal/modules/esm/resolve:271
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/workspace/scratch/c2e7c7c5940e/p0-inspection/src/lib/agents/control-plane.ts' imported from /workspace/scratch/c2e7c7c5940e/p0-inspection/tests/stage53-agent-workflow-control-plane.test.mjs
+    at finalizeResolution (node:internal/modules/esm/resolve:271:11)
+    at moduleResolve (node:internal/modules/esm/resolve:865:10)
+    at defaultResolve (node:internal/modules/esm/resolve:992:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)
+    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:759:56)
+    at #resolve (node:internal/modules/esm/loader:683:17)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:35)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:253:17) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///workspace/scratch/c2e7c7c5940e/p0-inspection/src/lib/agents/control-plane.ts'
+}
+
+Node.js v24.19.0
+✖ tests/stage53-agent-workflow-control-plane.test.mjs (112.685226ms)
+✔ Stage 5.3 creates six durable RLS-protected control-plane tables (9.738778ms)
+✔ risk and state constraints encode R0/R1 allowlists, R2 approval and R3 denial (7.741377ms)
+✔ R2 cannot queue before an exact project-owner approval (2.398427ms)
+✔ idempotency, opaque references, secret rejection and audits are durable (3.821945ms)
+✔ all foreign keys have intentional covering indexes (2.25361ms)
+✔ private trigger helpers are never executable by authenticated clients (3.293645ms)
+✔ authenticated mutations remain narrow and RLS ownership-bound (3.182229ms)
+node:internal/modules/esm/resolve:271
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/workspace/scratch/c2e7c7c5940e/p0-inspection/src/lib/billing/index.ts' imported from /workspace/scratch/c2e7c7c5940e/p0-inspection/tests/stage53-billing-boundary.test.mjs
+    at finalizeResolution (node:internal/modules/esm/resolve:271:11)
+    at moduleResolve (node:internal/modules/esm/resolve:865:10)
+    at defaultResolve (node:internal/modules/esm/resolve:992:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)
+    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:759:56)
+    at #resolve (node:internal/modules/esm/loader:683:17)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:35)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:253:17) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///workspace/scratch/c2e7c7c5940e/p0-inspection/src/lib/billing/index.ts'
+}
+
+Node.js v24.19.0
+✖ tests/stage53-billing-boundary.test.mjs (76.248734ms)
+✔ Stage 5.3 billing migration is additive and lets apply_migration own the transaction (9.066793ms)
+✔ authenticated clients can read only their own billing rows (4.213208ms)
+✔ foreign keys have covering indexes and payment events are idempotent (1.414487ms)
+✔ aggregate advisory locks make create/event/entitlement idempotency race-safe (1.854605ms)
+✔ checkout and subscription lifecycle transitions fail closed (1.562743ms)
+✔ service-only helpers revoke public and client execution (2.236255ms)
+✔ entitlement activation locks and validates a confirmed payment event (6.564113ms)
+✔ migration remains provider-neutral and contains no credentials (1.731485ms)
+✔ metadata is recursively filtered and raw webhook payloads are never persisted (2.198926ms)
+✔ Stage 5.3 covers both composite Dataset/Evals foreign keys (5.760654ms)
+✔ Stage 5.3 evidence migration is apply_migration-owned and additive (12.920654ms)
+✔ all browser-visible writes have explicit RLS checks and no anonymous grants (5.344976ms)
+✔ trigger helpers are fixed-path, service-only SECURITY DEFINER functions (8.041921ms)
+✔ version, result, link and provenance immutability fail closed (2.645176ms)
+✔ recursive SQL boundary rejects secret-like JSON keys on every JSON surface (3.321868ms)
+✔ provider compute is disconnected until verified and FK paths are indexed (7.495601ms)
+✔ eval run constraints have non-colliding explicit names (5.023214ms)
+✔ dataset item admission locks the version against concurrent finalization (3.700251ms)
+✔ migration contains no credential values or broad authenticated result writes (1.634946ms)
+node:internal/modules/esm/resolve:271
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/workspace/scratch/c2e7c7c5940e/p0-inspection/src/lib/evidence/evidence.ts' imported from /workspace/scratch/c2e7c7c5940e/p0-inspection/tests/stage53-evidence.test.mjs
+    at finalizeResolution (node:internal/modules/esm/resolve:271:11)
+    at moduleResolve (node:internal/modules/esm/resolve:865:10)
+    at defaultResolve (node:internal/modules/esm/resolve:992:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)
+    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:759:56)
+    at #resolve (node:internal/modules/esm/loader:683:17)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:35)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:253:17) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///workspace/scratch/c2e7c7c5940e/p0-inspection/src/lib/evidence/evidence.ts'
+}
+
+Node.js v24.19.0
+✖ tests/stage53-evidence.test.mjs (85.916992ms)
+✔ authenticated membership mutation privileges are removed while RLS read remains (6.465732ms)
+✔ search planning is Unicode-safe, bounded and wildcard-neutral (2.658067ms)
+✔ search aggregation removes duplicates without inventing empty results (0.36325ms)
+✔ project update audit is trigger-only, fixed-path and privacy-safe (10.626226ms)
+✔ stale running generation jobs have a partial-indexed lease recovery path (1.474985ms)
+✔ lease recovery fails stale work closed through the canonical failure RPC (0.256832ms)
+✔ lease recovery is fixed-path and service-role only (0.647554ms)
+✔ lease recovery validates bounded timeout and batch size (0.170644ms)
+✔ generation worker performs stale-lease cleanup before claiming queued work (0.298629ms)
+✔ Stage 5.4 app routing registers the exact Cloudflare, Gemini, and Groq models (1.810245ms)
+✔ the verified Cloudflare route remains the default live route (0.190631ms)
+✔ server-side manual submission validates against the exact provider registry (13.155435ms)
+✔ provider success followed by persistence failure fails closed without cross-provider fallback (5.744123ms)
+✔ credit ledger Stage 5.4 migration restores authenticated read-only ACL (1.182633ms)
+✔ pending entitlement audit trigger is provider-neutral and privilege-contained (1.581209ms)
+ℹ tests 101
+ℹ suites 0
+ℹ pass 88
+ℹ fail 13
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2623.395823
+
+✖ failing tests:
+
+test at tests/all-target-surfaces.test.mjs:34:1
+✖ all 21 former non-P0 gaps have exact direct routes (3.989203ms)
+  AssertionError [ERR_ASSERTION]: for-you.tsx must exist
+      at TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/all-target-surfaces.test.mjs:37:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/core-workflows.test.mjs:127:1
+✖ home defers marketplace discovery and its heavy prompt-card dependency (9.844587ms)
+  Error: ENOENT: no such file or directory, open '/workspace/scratch/c2e7c7c5940e/p0-inspection/src/components/xeomx/os/HomeExperience.tsx'
+      at async open (node:internal/fs/promises:697:25)
+      at async readFile (node:internal/fs/promises:1348:14)
+      at async TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/core-workflows.test.mjs:128:16)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: '/workspace/scratch/c2e7c7c5940e/p0-inspection/src/components/xeomx/os/HomeExperience.tsx'
+  }
+
+test at tests/p0-target-surfaces.test.mjs:30:1
+✖ all 17 P0 target routes exist with exact route declarations (2.802608ms)
+  AssertionError [ERR_ASSERTION]: inbox.tsx must exist
+      at TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/p0-target-surfaces.test.mjs:33:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/p0-target-surfaces.test.mjs:53:1
+✖ P0 partial targets receive distinct target-specific surfaces (0.655315ms)
+  Error: ENOENT: no such file or directory, open '/workspace/scratch/c2e7c7c5940e/p0-inspection/src/components/xeomx/product/LegalHubPage.tsx'
+      at Object.readFileSync (node:fs:484:20)
+      at TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/p0-target-surfaces.test.mjs:70:20)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: '/workspace/scratch/c2e7c7c5940e/p0-inspection/src/components/xeomx/product/LegalHubPage.tsx'
+  }
+
+test at tests/product-readiness.test.mjs:120:1
+✖ all twelve critical journeys point to real product views (26.069028ms)
+  Error: ENOENT: no such file or directory, open '/workspace/scratch/c2e7c7c5940e/p0-inspection/src/lib/critical-journeys.ts'
+      at async open (node:internal/fs/promises:697:25)
+      at async readFile (node:internal/fs/promises:1348:14)
+      at async TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/product-readiness.test.mjs:127:16)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: '/workspace/scratch/c2e7c7c5940e/p0-inspection/src/lib/critical-journeys.ts'
+  }
+
+test at tests/product-readiness.test.mjs:159:1
+✖ locale contracts stay in exact parity (21.664857ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(baseline.length > 850)
+
+      at TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/product-readiness.test.mjs:165:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/product-readiness.test.mjs:219:1
+✖ legacy simulations, fake metrics, and soft product 404s stay removed (2.497457ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(text.includes("ProductEnvironmentPage"))
+
+      at TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/product-readiness.test.mjs:222:12)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/product-readiness.test.mjs:256:1
+✖ public listing, auth, SEO, and runtime warning boundaries remain safe (3.044244ms)
+  AssertionError [ERR_ASSERTION]: listing queries must not fetch full prompt bodies
+      at TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/product-readiness.test.mjs:262:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/product-readiness.test.mjs:300:1
+✖ secondary global tools stay outside the initial client path (2.678453ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(root.includes("GlobalLauncherProvider"))
+
+      at TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/product-readiness.test.mjs:302:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/product-readiness.test.mjs:317:1
+✖ request 4 hardening stays centralized, fail-closed, and context preserving (3.570991ms)
+  Error: ENOENT: no such file or directory, open '/workspace/scratch/c2e7c7c5940e/p0-inspection/src/components/xeomx/product/ProductEnvironmentPage.tsx'
+      at async open (node:internal/fs/promises:697:25)
+      at async readFile (node:internal/fs/promises:1348:14)
+      at async TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/product-readiness.test.mjs:345:27)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: '/workspace/scratch/c2e7c7c5940e/p0-inspection/src/components/xeomx/product/ProductEnvironmentPage.tsx'
+  }
+
+test at tests/stage53-agent-workflow-control-plane.test.mjs:1:1
+✖ tests/stage53-agent-workflow-control-plane.test.mjs (112.685226ms)
+  'test failed'
+
+test at tests/stage53-billing-boundary.test.mjs:1:1
+✖ tests/stage53-billing-boundary.test.mjs (76.248734ms)
+  'test failed'
+
+test at tests/stage53-evidence.test.mjs:1:1
+✖ tests/stage53-evidence.test.mjs (85.916992ms)
+  'test failed'

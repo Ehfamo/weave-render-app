@@ -1,0 +1,49 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> test:migrations
+> node --test tests/*migration*.test.mjs
+
+✔ Request 7 migration is additive, indexed and RLS protected (6.426404ms)
+✔ Request 7 migration keeps sensitive writes server-only and storage private (5.13512ms)
+✔ Stage 5 migration adds the three missing foreign-key indexes (9.31783ms)
+✔ Stage 5 migration preserves RLS and narrows policy roles (2.274228ms)
+✔ Stage 5 migration is transactional and non-destructive to data (3.746095ms)
+✔ Stage 5.3 creates six durable RLS-protected control-plane tables (7.841178ms)
+✔ risk and state constraints encode R0/R1 allowlists, R2 approval and R3 denial (2.860292ms)
+✔ R2 cannot queue before an exact project-owner approval (4.059332ms)
+✔ idempotency, opaque references, secret rejection and audits are durable (3.172641ms)
+✔ all foreign keys have intentional covering indexes (1.299525ms)
+✔ private trigger helpers are never executable by authenticated clients (2.078841ms)
+✔ authenticated mutations remain narrow and RLS ownership-bound (4.93238ms)
+✔ Stage 5.3 billing migration is additive and lets apply_migration own the transaction (6.797766ms)
+✔ authenticated clients can read only their own billing rows (4.497751ms)
+✔ foreign keys have covering indexes and payment events are idempotent (2.541386ms)
+✔ aggregate advisory locks make create/event/entitlement idempotency race-safe (7.23724ms)
+✔ checkout and subscription lifecycle transitions fail closed (1.731386ms)
+✔ service-only helpers revoke public and client execution (5.150698ms)
+✔ entitlement activation locks and validates a confirmed payment event (4.977111ms)
+✔ migration remains provider-neutral and contains no credentials (1.511095ms)
+✔ metadata is recursively filtered and raw webhook payloads are never persisted (1.107491ms)
+✔ Stage 5.3 evidence migration is apply_migration-owned and additive (9.637808ms)
+✔ all browser-visible writes have explicit RLS checks and no anonymous grants (4.81334ms)
+✔ trigger helpers are fixed-path, service-only SECURITY DEFINER functions (5.161099ms)
+✔ version, result, link and provenance immutability fail closed (2.056102ms)
+✔ recursive SQL boundary rejects secret-like JSON keys on every JSON surface (3.133166ms)
+✔ provider compute is disconnected until verified and FK paths are indexed (2.907305ms)
+✔ eval run constraints have non-colliding explicit names (1.906204ms)
+✔ dataset item admission locks the version against concurrent finalization (4.256663ms)
+✔ migration contains no credential values or broad authenticated result writes (3.871704ms)
+✔ authenticated membership mutation privileges are removed while RLS read remains (5.521899ms)
+✔ stale running generation jobs have a partial-indexed lease recovery path (1.737102ms)
+✔ lease recovery fails stale work closed through the canonical failure RPC (0.377074ms)
+✔ lease recovery is fixed-path and service-role only (1.006362ms)
+✔ lease recovery validates bounded timeout and batch size (0.362042ms)
+✔ generation worker performs stale-lease cleanup before claiming queued work (0.406841ms)
+ℹ tests 36
+ℹ suites 0
+ℹ pass 36
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 187.738891

@@ -10,38 +10,81 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as XeomxAiRouteImport } from './routes/xeomx-ai'
+import { Route as ToolsRouteImport } from './routes/tools'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
+import { Route as PublishRouteImport } from './routes/publish'
+import { Route as ProvenanceRouteImport } from './routes/provenance'
 import { Route as PromptHubRouteImport } from './routes/prompt-hub'
 import { Route as ProfileEditRouteImport } from './routes/profile-edit'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as OperatorRouteImport } from './routes/operator'
+import { Route as ObservabilityRouteImport } from './routes/observability'
 import { Route as MagazineRouteImport } from './routes/magazine'
+import { Route as LegalRouteImport } from './routes/legal'
+import { Route as IntegrationsRouteImport } from './routes/integrations'
+import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as ForYouRouteImport } from './routes/for-you'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as EventsRouteImport } from './routes/events'
+import { Route as EvalsRouteImport } from './routes/evals'
+import { Route as DataRouteImport } from './routes/data'
 import { Route as CreatorsRouteImport } from './routes/creators'
 import { Route as CookiesRouteImport } from './routes/cookies'
+import { Route as ContextRouteImport } from './routes/context'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SecuritySupplyChainRouteImport } from './routes/security.supply-chain'
+import { Route as SecurityLabRouteImport } from './routes/security.lab'
+import { Route as SecurityEvidenceRouteImport } from './routes/security.evidence'
+import { Route as SecurityAutomationRouteImport } from './routes/security.automation'
+import { Route as ResearchMonitoringRouteImport } from './routes/research.monitoring'
 import { Route as PromptIdRouteImport } from './routes/prompt.$id'
+import { Route as OrgAdminRouteImport } from './routes/org.admin'
+import { Route as ModelsRegistryRouteImport } from './routes/models.registry'
+import { Route as ModelsFineTuneRouteImport } from './routes/models.fine-tune'
+import { Route as ModelsDeploymentsRouteImport } from './routes/models.deployments'
 import { Route as MagazineSlugRouteImport } from './routes/magazine.$slug'
+import { Route as KnowledgeGraphRouteImport } from './routes/knowledge.graph'
 import { Route as ExploreSlugRouteImport } from './routes/explore_.$slug'
+import { Route as EvalsRegistryRouteImport } from './routes/evals.registry'
+import { Route as EvalsExperimentsRouteImport } from './routes/evals.experiments'
+import { Route as DataSyntheticRouteImport } from './routes/data.synthetic'
+import { Route as DataAnnotationRouteImport } from './routes/data.annotation'
 import { Route as CreatorsHandleRouteImport } from './routes/creators.$handle'
+import { Route as CreateDubbingRouteImport } from './routes/create.dubbing'
+import { Route as CreateAvatarRouteImport } from './routes/create.avatar'
+import { Route as CommunityChallengesRouteImport } from './routes/community.challenges'
 import { Route as CollectionsIdRouteImport } from './routes/collections.$id'
+import { Route as BuildGitRouteImport } from './routes/build.git'
+import { Route as BuildDatabaseRouteImport } from './routes/build.database'
+import { Route as BuildBackendRouteImport } from './routes/build.backend'
+import { Route as BillingDisputesRouteImport } from './routes/billing.disputes'
+import { Route as AgentsTeamsRouteImport } from './routes/agents.teams'
+import { Route as AgentsRuntimeRouteImport } from './routes/agents.runtime'
+import { Route as AgentsRegistryRouteImport } from './routes/agents.registry'
+import { Route as AgentsObservabilityRouteImport } from './routes/agents.observability'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
 const XeomxAiRoute = XeomxAiRouteImport.update({
   id: '/xeomx-ai',
   path: '/xeomx-ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsRoute = ToolsRouteImport.update({
+  id: '/tools',
+  path: '/tools',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -74,6 +117,16 @@ const RefundPolicyRoute = RefundPolicyRouteImport.update({
   path: '/refund-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PublishRoute = PublishRouteImport.update({
+  id: '/publish',
+  path: '/publish',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProvenanceRoute = ProvenanceRouteImport.update({
+  id: '/provenance',
+  path: '/provenance',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PromptHubRoute = PromptHubRouteImport.update({
   id: '/prompt-hub',
   path: '/prompt-hub',
@@ -94,14 +147,44 @@ const PricingRoute = PricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OperatorRoute = OperatorRouteImport.update({
+  id: '/operator',
+  path: '/operator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ObservabilityRoute = ObservabilityRouteImport.update({
+  id: '/observability',
+  path: '/observability',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MagazineRoute = MagazineRouteImport.update({
   id: '/magazine',
   path: '/magazine',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LegalRoute = LegalRouteImport.update({
+  id: '/legal',
+  path: '/legal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegrationsRoute = IntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InboxRoute = InboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForYouRoute = ForYouRouteImport.update({
+  id: '/for-you',
+  path: '/for-you',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeedRoute = FeedRouteImport.update({
@@ -114,6 +197,21 @@ const ExploreRoute = ExploreRouteImport.update({
   path: '/explore',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EvalsRoute = EvalsRouteImport.update({
+  id: '/evals',
+  path: '/evals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DataRoute = DataRouteImport.update({
+  id: '/data',
+  path: '/data',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreatorsRoute = CreatorsRouteImport.update({
   id: '/creators',
   path: '/creators',
@@ -122,6 +220,11 @@ const CreatorsRoute = CreatorsRouteImport.update({
 const CookiesRoute = CookiesRouteImport.update({
   id: '/cookies',
   path: '/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContextRoute = ContextRouteImport.update({
+  id: '/context',
+  path: '/context',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -148,9 +251,54 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SecuritySupplyChainRoute = SecuritySupplyChainRouteImport.update({
+  id: '/security/supply-chain',
+  path: '/security/supply-chain',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SecurityLabRoute = SecurityLabRouteImport.update({
+  id: '/security/lab',
+  path: '/security/lab',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SecurityEvidenceRoute = SecurityEvidenceRouteImport.update({
+  id: '/security/evidence',
+  path: '/security/evidence',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SecurityAutomationRoute = SecurityAutomationRouteImport.update({
+  id: '/security/automation',
+  path: '/security/automation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResearchMonitoringRoute = ResearchMonitoringRouteImport.update({
+  id: '/research/monitoring',
+  path: '/research/monitoring',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PromptIdRoute = PromptIdRouteImport.update({
   id: '/prompt/$id',
   path: '/prompt/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrgAdminRoute = OrgAdminRouteImport.update({
+  id: '/org/admin',
+  path: '/org/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModelsRegistryRoute = ModelsRegistryRouteImport.update({
+  id: '/models/registry',
+  path: '/models/registry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModelsFineTuneRoute = ModelsFineTuneRouteImport.update({
+  id: '/models/fine-tune',
+  path: '/models/fine-tune',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModelsDeploymentsRoute = ModelsDeploymentsRouteImport.update({
+  id: '/models/deployments',
+  path: '/models/deployments',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MagazineSlugRoute = MagazineSlugRouteImport.update({
@@ -158,20 +306,100 @@ const MagazineSlugRoute = MagazineSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => MagazineRoute,
 } as any)
+const KnowledgeGraphRoute = KnowledgeGraphRouteImport.update({
+  id: '/knowledge/graph',
+  path: '/knowledge/graph',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExploreSlugRoute = ExploreSlugRouteImport.update({
   id: '/explore_/$slug',
   path: '/explore/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const EvalsRegistryRoute = EvalsRegistryRouteImport.update({
+  id: '/registry',
+  path: '/registry',
+  getParentRoute: () => EvalsRoute,
+} as any)
+const EvalsExperimentsRoute = EvalsExperimentsRouteImport.update({
+  id: '/experiments',
+  path: '/experiments',
+  getParentRoute: () => EvalsRoute,
+} as any)
+const DataSyntheticRoute = DataSyntheticRouteImport.update({
+  id: '/synthetic',
+  path: '/synthetic',
+  getParentRoute: () => DataRoute,
+} as any)
+const DataAnnotationRoute = DataAnnotationRouteImport.update({
+  id: '/annotation',
+  path: '/annotation',
+  getParentRoute: () => DataRoute,
 } as any)
 const CreatorsHandleRoute = CreatorsHandleRouteImport.update({
   id: '/$handle',
   path: '/$handle',
   getParentRoute: () => CreatorsRoute,
 } as any)
+const CreateDubbingRoute = CreateDubbingRouteImport.update({
+  id: '/create/dubbing',
+  path: '/create/dubbing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreateAvatarRoute = CreateAvatarRouteImport.update({
+  id: '/create/avatar',
+  path: '/create/avatar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityChallengesRoute = CommunityChallengesRouteImport.update({
+  id: '/community/challenges',
+  path: '/community/challenges',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CollectionsIdRoute = CollectionsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => CollectionsRoute,
+} as any)
+const BuildGitRoute = BuildGitRouteImport.update({
+  id: '/build/git',
+  path: '/build/git',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BuildDatabaseRoute = BuildDatabaseRouteImport.update({
+  id: '/build/database',
+  path: '/build/database',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BuildBackendRoute = BuildBackendRouteImport.update({
+  id: '/build/backend',
+  path: '/build/backend',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BillingDisputesRoute = BillingDisputesRouteImport.update({
+  id: '/billing/disputes',
+  path: '/billing/disputes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentsTeamsRoute = AgentsTeamsRouteImport.update({
+  id: '/agents/teams',
+  path: '/agents/teams',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentsRuntimeRoute = AgentsRuntimeRouteImport.update({
+  id: '/agents/runtime',
+  path: '/agents/runtime',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentsRegistryRoute = AgentsRegistryRouteImport.update({
+  id: '/agents/registry',
+  path: '/agents/registry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentsObservabilityRoute = AgentsObservabilityRouteImport.update({
+  id: '/agents/observability',
+  path: '/agents/observability',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedSavedRoute = AuthenticatedSavedRouteImport.update({
   id: '/saved',
@@ -189,60 +417,136 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/collections': typeof CollectionsRouteWithChildren
   '/contact': typeof ContactRoute
+  '/context': typeof ContextRoute
   '/cookies': typeof CookiesRoute
   '/creators': typeof CreatorsRouteWithChildren
+  '/data': typeof DataRouteWithChildren
+  '/evals': typeof EvalsRouteWithChildren
+  '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
+  '/for-you': typeof ForYouRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/inbox': typeof InboxRoute
+  '/integrations': typeof IntegrationsRoute
+  '/legal': typeof LegalRoute
   '/magazine': typeof MagazineRouteWithChildren
+  '/observability': typeof ObservabilityRoute
+  '/operator': typeof OperatorRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/profile-edit': typeof ProfileEditRoute
   '/prompt-hub': typeof PromptHubRoute
+  '/provenance': typeof ProvenanceRoute
+  '/publish': typeof PublishRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
+  '/tools': typeof ToolsRoute
   '/xeomx-ai': typeof XeomxAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/saved': typeof AuthenticatedSavedRoute
+  '/agents/observability': typeof AgentsObservabilityRoute
+  '/agents/registry': typeof AgentsRegistryRoute
+  '/agents/runtime': typeof AgentsRuntimeRoute
+  '/agents/teams': typeof AgentsTeamsRoute
+  '/billing/disputes': typeof BillingDisputesRoute
+  '/build/backend': typeof BuildBackendRoute
+  '/build/database': typeof BuildDatabaseRoute
+  '/build/git': typeof BuildGitRoute
   '/collections/$id': typeof CollectionsIdRoute
+  '/community/challenges': typeof CommunityChallengesRoute
+  '/create/avatar': typeof CreateAvatarRoute
+  '/create/dubbing': typeof CreateDubbingRoute
   '/creators/$handle': typeof CreatorsHandleRoute
+  '/data/annotation': typeof DataAnnotationRoute
+  '/data/synthetic': typeof DataSyntheticRoute
+  '/evals/experiments': typeof EvalsExperimentsRoute
+  '/evals/registry': typeof EvalsRegistryRoute
   '/explore/$slug': typeof ExploreSlugRoute
+  '/knowledge/graph': typeof KnowledgeGraphRoute
   '/magazine/$slug': typeof MagazineSlugRoute
+  '/models/deployments': typeof ModelsDeploymentsRoute
+  '/models/fine-tune': typeof ModelsFineTuneRoute
+  '/models/registry': typeof ModelsRegistryRoute
+  '/org/admin': typeof OrgAdminRoute
   '/prompt/$id': typeof PromptIdRoute
+  '/research/monitoring': typeof ResearchMonitoringRoute
+  '/security/automation': typeof SecurityAutomationRoute
+  '/security/evidence': typeof SecurityEvidenceRoute
+  '/security/lab': typeof SecurityLabRoute
+  '/security/supply-chain': typeof SecuritySupplyChainRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/collections': typeof CollectionsRouteWithChildren
   '/contact': typeof ContactRoute
+  '/context': typeof ContextRoute
   '/cookies': typeof CookiesRoute
   '/creators': typeof CreatorsRouteWithChildren
+  '/data': typeof DataRouteWithChildren
+  '/evals': typeof EvalsRouteWithChildren
+  '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
+  '/for-you': typeof ForYouRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/inbox': typeof InboxRoute
+  '/integrations': typeof IntegrationsRoute
+  '/legal': typeof LegalRoute
   '/magazine': typeof MagazineRouteWithChildren
+  '/observability': typeof ObservabilityRoute
+  '/operator': typeof OperatorRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/profile-edit': typeof ProfileEditRoute
   '/prompt-hub': typeof PromptHubRoute
+  '/provenance': typeof ProvenanceRoute
+  '/publish': typeof PublishRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
+  '/tools': typeof ToolsRoute
   '/xeomx-ai': typeof XeomxAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/saved': typeof AuthenticatedSavedRoute
+  '/agents/observability': typeof AgentsObservabilityRoute
+  '/agents/registry': typeof AgentsRegistryRoute
+  '/agents/runtime': typeof AgentsRuntimeRoute
+  '/agents/teams': typeof AgentsTeamsRoute
+  '/billing/disputes': typeof BillingDisputesRoute
+  '/build/backend': typeof BuildBackendRoute
+  '/build/database': typeof BuildDatabaseRoute
+  '/build/git': typeof BuildGitRoute
   '/collections/$id': typeof CollectionsIdRoute
+  '/community/challenges': typeof CommunityChallengesRoute
+  '/create/avatar': typeof CreateAvatarRoute
+  '/create/dubbing': typeof CreateDubbingRoute
   '/creators/$handle': typeof CreatorsHandleRoute
+  '/data/annotation': typeof DataAnnotationRoute
+  '/data/synthetic': typeof DataSyntheticRoute
+  '/evals/experiments': typeof EvalsExperimentsRoute
+  '/evals/registry': typeof EvalsRegistryRoute
   '/explore/$slug': typeof ExploreSlugRoute
+  '/knowledge/graph': typeof KnowledgeGraphRoute
   '/magazine/$slug': typeof MagazineSlugRoute
+  '/models/deployments': typeof ModelsDeploymentsRoute
+  '/models/fine-tune': typeof ModelsFineTuneRoute
+  '/models/registry': typeof ModelsRegistryRoute
+  '/org/admin': typeof OrgAdminRoute
   '/prompt/$id': typeof PromptIdRoute
+  '/research/monitoring': typeof ResearchMonitoringRoute
+  '/security/automation': typeof SecurityAutomationRoute
+  '/security/evidence': typeof SecurityEvidenceRoute
+  '/security/lab': typeof SecurityLabRoute
+  '/security/supply-chain': typeof SecuritySupplyChainRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -251,30 +555,68 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/collections': typeof CollectionsRouteWithChildren
   '/contact': typeof ContactRoute
+  '/context': typeof ContextRoute
   '/cookies': typeof CookiesRoute
   '/creators': typeof CreatorsRouteWithChildren
+  '/data': typeof DataRouteWithChildren
+  '/evals': typeof EvalsRouteWithChildren
+  '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
   '/feed': typeof FeedRoute
+  '/for-you': typeof ForYouRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/inbox': typeof InboxRoute
+  '/integrations': typeof IntegrationsRoute
+  '/legal': typeof LegalRoute
   '/magazine': typeof MagazineRouteWithChildren
+  '/observability': typeof ObservabilityRoute
+  '/operator': typeof OperatorRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/profile-edit': typeof ProfileEditRoute
   '/prompt-hub': typeof PromptHubRoute
+  '/provenance': typeof ProvenanceRoute
+  '/publish': typeof PublishRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
+  '/tools': typeof ToolsRoute
   '/xeomx-ai': typeof XeomxAiRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
+  '/agents/observability': typeof AgentsObservabilityRoute
+  '/agents/registry': typeof AgentsRegistryRoute
+  '/agents/runtime': typeof AgentsRuntimeRoute
+  '/agents/teams': typeof AgentsTeamsRoute
+  '/billing/disputes': typeof BillingDisputesRoute
+  '/build/backend': typeof BuildBackendRoute
+  '/build/database': typeof BuildDatabaseRoute
+  '/build/git': typeof BuildGitRoute
   '/collections/$id': typeof CollectionsIdRoute
+  '/community/challenges': typeof CommunityChallengesRoute
+  '/create/avatar': typeof CreateAvatarRoute
+  '/create/dubbing': typeof CreateDubbingRoute
   '/creators/$handle': typeof CreatorsHandleRoute
+  '/data/annotation': typeof DataAnnotationRoute
+  '/data/synthetic': typeof DataSyntheticRoute
+  '/evals/experiments': typeof EvalsExperimentsRoute
+  '/evals/registry': typeof EvalsRegistryRoute
   '/explore_/$slug': typeof ExploreSlugRoute
+  '/knowledge/graph': typeof KnowledgeGraphRoute
   '/magazine/$slug': typeof MagazineSlugRoute
+  '/models/deployments': typeof ModelsDeploymentsRoute
+  '/models/fine-tune': typeof ModelsFineTuneRoute
+  '/models/registry': typeof ModelsRegistryRoute
+  '/org/admin': typeof OrgAdminRoute
   '/prompt/$id': typeof PromptIdRoute
+  '/research/monitoring': typeof ResearchMonitoringRoute
+  '/security/automation': typeof SecurityAutomationRoute
+  '/security/evidence': typeof SecurityEvidenceRoute
+  '/security/lab': typeof SecurityLabRoute
+  '/security/supply-chain': typeof SecuritySupplyChainRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -283,60 +625,136 @@ export interface FileRouteTypes {
     | '/auth'
     | '/collections'
     | '/contact'
+    | '/context'
     | '/cookies'
     | '/creators'
+    | '/data'
+    | '/evals'
+    | '/events'
     | '/explore'
     | '/feed'
+    | '/for-you'
     | '/forgot-password'
+    | '/inbox'
+    | '/integrations'
+    | '/legal'
     | '/magazine'
+    | '/observability'
+    | '/operator'
     | '/pricing'
     | '/privacy'
     | '/profile-edit'
     | '/prompt-hub'
+    | '/provenance'
+    | '/publish'
     | '/refund-policy'
     | '/reset-password'
     | '/search'
     | '/settings'
     | '/studio'
     | '/terms'
+    | '/tools'
     | '/xeomx-ai'
     | '/dashboard'
     | '/saved'
+    | '/agents/observability'
+    | '/agents/registry'
+    | '/agents/runtime'
+    | '/agents/teams'
+    | '/billing/disputes'
+    | '/build/backend'
+    | '/build/database'
+    | '/build/git'
     | '/collections/$id'
+    | '/community/challenges'
+    | '/create/avatar'
+    | '/create/dubbing'
     | '/creators/$handle'
+    | '/data/annotation'
+    | '/data/synthetic'
+    | '/evals/experiments'
+    | '/evals/registry'
     | '/explore/$slug'
+    | '/knowledge/graph'
     | '/magazine/$slug'
+    | '/models/deployments'
+    | '/models/fine-tune'
+    | '/models/registry'
+    | '/org/admin'
     | '/prompt/$id'
+    | '/research/monitoring'
+    | '/security/automation'
+    | '/security/evidence'
+    | '/security/lab'
+    | '/security/supply-chain'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/collections'
     | '/contact'
+    | '/context'
     | '/cookies'
     | '/creators'
+    | '/data'
+    | '/evals'
+    | '/events'
     | '/explore'
     | '/feed'
+    | '/for-you'
     | '/forgot-password'
+    | '/inbox'
+    | '/integrations'
+    | '/legal'
     | '/magazine'
+    | '/observability'
+    | '/operator'
     | '/pricing'
     | '/privacy'
     | '/profile-edit'
     | '/prompt-hub'
+    | '/provenance'
+    | '/publish'
     | '/refund-policy'
     | '/reset-password'
     | '/search'
     | '/settings'
     | '/studio'
     | '/terms'
+    | '/tools'
     | '/xeomx-ai'
     | '/dashboard'
     | '/saved'
+    | '/agents/observability'
+    | '/agents/registry'
+    | '/agents/runtime'
+    | '/agents/teams'
+    | '/billing/disputes'
+    | '/build/backend'
+    | '/build/database'
+    | '/build/git'
     | '/collections/$id'
+    | '/community/challenges'
+    | '/create/avatar'
+    | '/create/dubbing'
     | '/creators/$handle'
+    | '/data/annotation'
+    | '/data/synthetic'
+    | '/evals/experiments'
+    | '/evals/registry'
     | '/explore/$slug'
+    | '/knowledge/graph'
     | '/magazine/$slug'
+    | '/models/deployments'
+    | '/models/fine-tune'
+    | '/models/registry'
+    | '/org/admin'
     | '/prompt/$id'
+    | '/research/monitoring'
+    | '/security/automation'
+    | '/security/evidence'
+    | '/security/lab'
+    | '/security/supply-chain'
   id:
     | '__root__'
     | '/'
@@ -344,30 +762,68 @@ export interface FileRouteTypes {
     | '/auth'
     | '/collections'
     | '/contact'
+    | '/context'
     | '/cookies'
     | '/creators'
+    | '/data'
+    | '/evals'
+    | '/events'
     | '/explore'
     | '/feed'
+    | '/for-you'
     | '/forgot-password'
+    | '/inbox'
+    | '/integrations'
+    | '/legal'
     | '/magazine'
+    | '/observability'
+    | '/operator'
     | '/pricing'
     | '/privacy'
     | '/profile-edit'
     | '/prompt-hub'
+    | '/provenance'
+    | '/publish'
     | '/refund-policy'
     | '/reset-password'
     | '/search'
     | '/settings'
     | '/studio'
     | '/terms'
+    | '/tools'
     | '/xeomx-ai'
     | '/_authenticated/dashboard'
     | '/_authenticated/saved'
+    | '/agents/observability'
+    | '/agents/registry'
+    | '/agents/runtime'
+    | '/agents/teams'
+    | '/billing/disputes'
+    | '/build/backend'
+    | '/build/database'
+    | '/build/git'
     | '/collections/$id'
+    | '/community/challenges'
+    | '/create/avatar'
+    | '/create/dubbing'
     | '/creators/$handle'
+    | '/data/annotation'
+    | '/data/synthetic'
+    | '/evals/experiments'
+    | '/evals/registry'
     | '/explore_/$slug'
+    | '/knowledge/graph'
     | '/magazine/$slug'
+    | '/models/deployments'
+    | '/models/fine-tune'
+    | '/models/registry'
+    | '/org/admin'
     | '/prompt/$id'
+    | '/research/monitoring'
+    | '/security/automation'
+    | '/security/evidence'
+    | '/security/lab'
+    | '/security/supply-chain'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -376,25 +832,59 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CollectionsRoute: typeof CollectionsRouteWithChildren
   ContactRoute: typeof ContactRoute
+  ContextRoute: typeof ContextRoute
   CookiesRoute: typeof CookiesRoute
   CreatorsRoute: typeof CreatorsRouteWithChildren
+  DataRoute: typeof DataRouteWithChildren
+  EvalsRoute: typeof EvalsRouteWithChildren
+  EventsRoute: typeof EventsRoute
   ExploreRoute: typeof ExploreRoute
   FeedRoute: typeof FeedRoute
+  ForYouRoute: typeof ForYouRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  InboxRoute: typeof InboxRoute
+  IntegrationsRoute: typeof IntegrationsRoute
+  LegalRoute: typeof LegalRoute
   MagazineRoute: typeof MagazineRouteWithChildren
+  ObservabilityRoute: typeof ObservabilityRoute
+  OperatorRoute: typeof OperatorRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileEditRoute: typeof ProfileEditRoute
   PromptHubRoute: typeof PromptHubRoute
+  ProvenanceRoute: typeof ProvenanceRoute
+  PublishRoute: typeof PublishRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRoute
   StudioRoute: typeof StudioRoute
   TermsRoute: typeof TermsRoute
+  ToolsRoute: typeof ToolsRoute
   XeomxAiRoute: typeof XeomxAiRoute
+  AgentsObservabilityRoute: typeof AgentsObservabilityRoute
+  AgentsRegistryRoute: typeof AgentsRegistryRoute
+  AgentsRuntimeRoute: typeof AgentsRuntimeRoute
+  AgentsTeamsRoute: typeof AgentsTeamsRoute
+  BillingDisputesRoute: typeof BillingDisputesRoute
+  BuildBackendRoute: typeof BuildBackendRoute
+  BuildDatabaseRoute: typeof BuildDatabaseRoute
+  BuildGitRoute: typeof BuildGitRoute
+  CommunityChallengesRoute: typeof CommunityChallengesRoute
+  CreateAvatarRoute: typeof CreateAvatarRoute
+  CreateDubbingRoute: typeof CreateDubbingRoute
   ExploreSlugRoute: typeof ExploreSlugRoute
+  KnowledgeGraphRoute: typeof KnowledgeGraphRoute
+  ModelsDeploymentsRoute: typeof ModelsDeploymentsRoute
+  ModelsFineTuneRoute: typeof ModelsFineTuneRoute
+  ModelsRegistryRoute: typeof ModelsRegistryRoute
+  OrgAdminRoute: typeof OrgAdminRoute
   PromptIdRoute: typeof PromptIdRoute
+  ResearchMonitoringRoute: typeof ResearchMonitoringRoute
+  SecurityAutomationRoute: typeof SecurityAutomationRoute
+  SecurityEvidenceRoute: typeof SecurityEvidenceRoute
+  SecurityLabRoute: typeof SecurityLabRoute
+  SecuritySupplyChainRoute: typeof SecuritySupplyChainRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -404,6 +894,13 @@ declare module '@tanstack/react-router' {
       path: '/xeomx-ai'
       fullPath: '/xeomx-ai'
       preLoaderRoute: typeof XeomxAiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools': {
+      id: '/tools'
+      path: '/tools'
+      fullPath: '/tools'
+      preLoaderRoute: typeof ToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -448,6 +945,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RefundPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/publish': {
+      id: '/publish'
+      path: '/publish'
+      fullPath: '/publish'
+      preLoaderRoute: typeof PublishRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/provenance': {
+      id: '/provenance'
+      path: '/provenance'
+      fullPath: '/provenance'
+      preLoaderRoute: typeof ProvenanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/prompt-hub': {
       id: '/prompt-hub'
       path: '/prompt-hub'
@@ -476,6 +987,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/operator': {
+      id: '/operator'
+      path: '/operator'
+      fullPath: '/operator'
+      preLoaderRoute: typeof OperatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/observability': {
+      id: '/observability'
+      path: '/observability'
+      fullPath: '/observability'
+      preLoaderRoute: typeof ObservabilityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/magazine': {
       id: '/magazine'
       path: '/magazine'
@@ -483,11 +1008,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MagazineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/legal': {
+      id: '/legal'
+      path: '/legal'
+      fullPath: '/legal'
+      preLoaderRoute: typeof LegalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integrations': {
+      id: '/integrations'
+      path: '/integrations'
+      fullPath: '/integrations'
+      preLoaderRoute: typeof IntegrationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inbox': {
+      id: '/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof InboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/forgot-password': {
       id: '/forgot-password'
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for-you': {
+      id: '/for-you'
+      path: '/for-you'
+      fullPath: '/for-you'
+      preLoaderRoute: typeof ForYouRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/feed': {
@@ -504,6 +1057,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExploreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/evals': {
+      id: '/evals'
+      path: '/evals'
+      fullPath: '/evals'
+      preLoaderRoute: typeof EvalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/data': {
+      id: '/data'
+      path: '/data'
+      fullPath: '/data'
+      preLoaderRoute: typeof DataRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/creators': {
       id: '/creators'
       path: '/creators'
@@ -516,6 +1090,13 @@ declare module '@tanstack/react-router' {
       path: '/cookies'
       fullPath: '/cookies'
       preLoaderRoute: typeof CookiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/context': {
+      id: '/context'
+      path: '/context'
+      fullPath: '/context'
+      preLoaderRoute: typeof ContextRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -553,11 +1134,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/security/supply-chain': {
+      id: '/security/supply-chain'
+      path: '/security/supply-chain'
+      fullPath: '/security/supply-chain'
+      preLoaderRoute: typeof SecuritySupplyChainRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/security/lab': {
+      id: '/security/lab'
+      path: '/security/lab'
+      fullPath: '/security/lab'
+      preLoaderRoute: typeof SecurityLabRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/security/evidence': {
+      id: '/security/evidence'
+      path: '/security/evidence'
+      fullPath: '/security/evidence'
+      preLoaderRoute: typeof SecurityEvidenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/security/automation': {
+      id: '/security/automation'
+      path: '/security/automation'
+      fullPath: '/security/automation'
+      preLoaderRoute: typeof SecurityAutomationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/research/monitoring': {
+      id: '/research/monitoring'
+      path: '/research/monitoring'
+      fullPath: '/research/monitoring'
+      preLoaderRoute: typeof ResearchMonitoringRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/prompt/$id': {
       id: '/prompt/$id'
       path: '/prompt/$id'
       fullPath: '/prompt/$id'
       preLoaderRoute: typeof PromptIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/org/admin': {
+      id: '/org/admin'
+      path: '/org/admin'
+      fullPath: '/org/admin'
+      preLoaderRoute: typeof OrgAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/models/registry': {
+      id: '/models/registry'
+      path: '/models/registry'
+      fullPath: '/models/registry'
+      preLoaderRoute: typeof ModelsRegistryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/models/fine-tune': {
+      id: '/models/fine-tune'
+      path: '/models/fine-tune'
+      fullPath: '/models/fine-tune'
+      preLoaderRoute: typeof ModelsFineTuneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/models/deployments': {
+      id: '/models/deployments'
+      path: '/models/deployments'
+      fullPath: '/models/deployments'
+      preLoaderRoute: typeof ModelsDeploymentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/magazine/$slug': {
@@ -567,12 +1211,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MagazineSlugRouteImport
       parentRoute: typeof MagazineRoute
     }
+    '/knowledge/graph': {
+      id: '/knowledge/graph'
+      path: '/knowledge/graph'
+      fullPath: '/knowledge/graph'
+      preLoaderRoute: typeof KnowledgeGraphRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/explore_/$slug': {
       id: '/explore_/$slug'
       path: '/explore/$slug'
       fullPath: '/explore/$slug'
       preLoaderRoute: typeof ExploreSlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/evals/registry': {
+      id: '/evals/registry'
+      path: '/registry'
+      fullPath: '/evals/registry'
+      preLoaderRoute: typeof EvalsRegistryRouteImport
+      parentRoute: typeof EvalsRoute
+    }
+    '/evals/experiments': {
+      id: '/evals/experiments'
+      path: '/experiments'
+      fullPath: '/evals/experiments'
+      preLoaderRoute: typeof EvalsExperimentsRouteImport
+      parentRoute: typeof EvalsRoute
+    }
+    '/data/synthetic': {
+      id: '/data/synthetic'
+      path: '/synthetic'
+      fullPath: '/data/synthetic'
+      preLoaderRoute: typeof DataSyntheticRouteImport
+      parentRoute: typeof DataRoute
+    }
+    '/data/annotation': {
+      id: '/data/annotation'
+      path: '/annotation'
+      fullPath: '/data/annotation'
+      preLoaderRoute: typeof DataAnnotationRouteImport
+      parentRoute: typeof DataRoute
     }
     '/creators/$handle': {
       id: '/creators/$handle'
@@ -581,12 +1260,89 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreatorsHandleRouteImport
       parentRoute: typeof CreatorsRoute
     }
+    '/create/dubbing': {
+      id: '/create/dubbing'
+      path: '/create/dubbing'
+      fullPath: '/create/dubbing'
+      preLoaderRoute: typeof CreateDubbingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/create/avatar': {
+      id: '/create/avatar'
+      path: '/create/avatar'
+      fullPath: '/create/avatar'
+      preLoaderRoute: typeof CreateAvatarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community/challenges': {
+      id: '/community/challenges'
+      path: '/community/challenges'
+      fullPath: '/community/challenges'
+      preLoaderRoute: typeof CommunityChallengesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/collections/$id': {
       id: '/collections/$id'
       path: '/$id'
       fullPath: '/collections/$id'
       preLoaderRoute: typeof CollectionsIdRouteImport
       parentRoute: typeof CollectionsRoute
+    }
+    '/build/git': {
+      id: '/build/git'
+      path: '/build/git'
+      fullPath: '/build/git'
+      preLoaderRoute: typeof BuildGitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/build/database': {
+      id: '/build/database'
+      path: '/build/database'
+      fullPath: '/build/database'
+      preLoaderRoute: typeof BuildDatabaseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/build/backend': {
+      id: '/build/backend'
+      path: '/build/backend'
+      fullPath: '/build/backend'
+      preLoaderRoute: typeof BuildBackendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/billing/disputes': {
+      id: '/billing/disputes'
+      path: '/billing/disputes'
+      fullPath: '/billing/disputes'
+      preLoaderRoute: typeof BillingDisputesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agents/teams': {
+      id: '/agents/teams'
+      path: '/agents/teams'
+      fullPath: '/agents/teams'
+      preLoaderRoute: typeof AgentsTeamsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agents/runtime': {
+      id: '/agents/runtime'
+      path: '/agents/runtime'
+      fullPath: '/agents/runtime'
+      preLoaderRoute: typeof AgentsRuntimeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agents/registry': {
+      id: '/agents/registry'
+      path: '/agents/registry'
+      fullPath: '/agents/registry'
+      preLoaderRoute: typeof AgentsRegistryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agents/observability': {
+      id: '/agents/observability'
+      path: '/agents/observability'
+      fullPath: '/agents/observability'
+      preLoaderRoute: typeof AgentsObservabilityRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/saved': {
       id: '/_authenticated/saved'
@@ -642,6 +1398,30 @@ const CreatorsRouteWithChildren = CreatorsRoute._addFileChildren(
   CreatorsRouteChildren,
 )
 
+interface DataRouteChildren {
+  DataAnnotationRoute: typeof DataAnnotationRoute
+  DataSyntheticRoute: typeof DataSyntheticRoute
+}
+
+const DataRouteChildren: DataRouteChildren = {
+  DataAnnotationRoute: DataAnnotationRoute,
+  DataSyntheticRoute: DataSyntheticRoute,
+}
+
+const DataRouteWithChildren = DataRoute._addFileChildren(DataRouteChildren)
+
+interface EvalsRouteChildren {
+  EvalsExperimentsRoute: typeof EvalsExperimentsRoute
+  EvalsRegistryRoute: typeof EvalsRegistryRoute
+}
+
+const EvalsRouteChildren: EvalsRouteChildren = {
+  EvalsExperimentsRoute: EvalsExperimentsRoute,
+  EvalsRegistryRoute: EvalsRegistryRoute,
+}
+
+const EvalsRouteWithChildren = EvalsRoute._addFileChildren(EvalsRouteChildren)
+
 interface MagazineRouteChildren {
   MagazineSlugRoute: typeof MagazineSlugRoute
 }
@@ -660,26 +1440,70 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CollectionsRoute: CollectionsRouteWithChildren,
   ContactRoute: ContactRoute,
+  ContextRoute: ContextRoute,
   CookiesRoute: CookiesRoute,
   CreatorsRoute: CreatorsRouteWithChildren,
+  DataRoute: DataRouteWithChildren,
+  EvalsRoute: EvalsRouteWithChildren,
+  EventsRoute: EventsRoute,
   ExploreRoute: ExploreRoute,
   FeedRoute: FeedRoute,
+  ForYouRoute: ForYouRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  InboxRoute: InboxRoute,
+  IntegrationsRoute: IntegrationsRoute,
+  LegalRoute: LegalRoute,
   MagazineRoute: MagazineRouteWithChildren,
+  ObservabilityRoute: ObservabilityRoute,
+  OperatorRoute: OperatorRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileEditRoute: ProfileEditRoute,
   PromptHubRoute: PromptHubRoute,
+  ProvenanceRoute: ProvenanceRoute,
+  PublishRoute: PublishRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
   SettingsRoute: SettingsRoute,
   StudioRoute: StudioRoute,
   TermsRoute: TermsRoute,
+  ToolsRoute: ToolsRoute,
   XeomxAiRoute: XeomxAiRoute,
+  AgentsObservabilityRoute: AgentsObservabilityRoute,
+  AgentsRegistryRoute: AgentsRegistryRoute,
+  AgentsRuntimeRoute: AgentsRuntimeRoute,
+  AgentsTeamsRoute: AgentsTeamsRoute,
+  BillingDisputesRoute: BillingDisputesRoute,
+  BuildBackendRoute: BuildBackendRoute,
+  BuildDatabaseRoute: BuildDatabaseRoute,
+  BuildGitRoute: BuildGitRoute,
+  CommunityChallengesRoute: CommunityChallengesRoute,
+  CreateAvatarRoute: CreateAvatarRoute,
+  CreateDubbingRoute: CreateDubbingRoute,
   ExploreSlugRoute: ExploreSlugRoute,
+  KnowledgeGraphRoute: KnowledgeGraphRoute,
+  ModelsDeploymentsRoute: ModelsDeploymentsRoute,
+  ModelsFineTuneRoute: ModelsFineTuneRoute,
+  ModelsRegistryRoute: ModelsRegistryRoute,
+  OrgAdminRoute: OrgAdminRoute,
   PromptIdRoute: PromptIdRoute,
+  ResearchMonitoringRoute: ResearchMonitoringRoute,
+  SecurityAutomationRoute: SecurityAutomationRoute,
+  SecurityEvidenceRoute: SecurityEvidenceRoute,
+  SecurityLabRoute: SecurityLabRoute,
+  SecuritySupplyChainRoute: SecuritySupplyChainRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

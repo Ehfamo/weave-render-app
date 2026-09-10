@@ -220,6 +220,7 @@ jobs:
           if grep -Eqi 'Hydration failed|hydration mismatch|ReferenceError:|TypeError:|Uncaught' /tmp/xeomx-preview.log; then
             echo 'RUNTIME_ERROR_PATTERN_FOUND'; grep -Ein 'Hydration failed|hydration mismatch|ReferenceError:|TypeError:|Uncaught' /tmp/xeomx-preview.log | head -20; exit 2
           fi
+          python3 scripts/p0-route-runtime.py
           CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
           if [ -n "$CHROME" ]; then
             "$CHROME" --headless --no-sandbox --disable-gpu --window-size=1440,900 --dump-dom http://127.0.0.1:4173/en/ >/tmp/dom-desktop.html 2>/tmp/chrome-desktop.log

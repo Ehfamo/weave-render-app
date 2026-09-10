@@ -509,5 +509,9 @@
   "product_read_only_preview": "Read-only preview",
   "product_requires_auth": "Sign-in required",
   "product_route_state": "Route status",
-  "product_surface_preview": "Workspace preview"
+  "product_surface_preview": "Workspace preview",
+  "p0_context_title": "Project context",
+  "p0_context_empty": "No project selected",
+  "p0_preview_only": "Preview only. Actions require server authorization and an available service.",
+  "p0_navigation": "Navigation"
 }

@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { LifeBuoy } from "lucide-react";
-import { SupportDrawer } from "./SupportDrawer";
+const SupportDrawer = lazy(() =>
+  import("./SupportDrawer").then((module) => ({ default: module.SupportDrawer })),
+);
 
 export function SupportButton() {
   const [open, setOpen] = useState(false);
@@ -21,7 +23,11 @@ export function SupportButton() {
         <LifeBuoy className="h-5 w-5" />
         <span className="hidden text-sm font-medium md:inline">Support</span>
       </button>
-      <SupportDrawer open={open} onOpenChange={setOpen} />
+      {open ? (
+        <Suspense fallback={null}>
+          <SupportDrawer open={open} onOpenChange={setOpen} />
+        </Suspense>
+      ) : null}
     </>
   );
 }

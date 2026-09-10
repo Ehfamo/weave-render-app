@@ -509,5 +509,9 @@
   "product_read_only_preview": "معاينة للقراءة فقط",
   "product_requires_auth": "تسجيل الدخول مطلوب",
   "product_route_state": "حالة المسار",
-  "product_surface_preview": "معاينة مساحة العمل"
+  "product_surface_preview": "معاينة مساحة العمل",
+  "p0_context_title": "سياق المشروع",
+  "p0_context_empty": "لم يتم اختيار مشروع",
+  "p0_preview_only": "معاينة فقط. تتطلب العمليات تفويض الخادم وخدمة متاحة.",
+  "p0_navigation": "التنقل"
 }

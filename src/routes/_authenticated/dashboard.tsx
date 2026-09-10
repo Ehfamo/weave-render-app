@@ -4,7 +4,6 @@ import { useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Bell,
-  ChevronDown,
   Sparkles,
   Box,
   Users,
@@ -260,7 +259,7 @@ function Dashboard() {
     );
   }
 
-  const username = profile?.username || user.email?.split("@")[0] || "nocturne";
+  const username = profile?.username || user.email?.split("@")[0] || "XeomX";
   const avatarUrl = profile?.avatar_url || avatarImg;
 
   async function signOut() {
@@ -318,10 +317,9 @@ function TopNav({
           Xeom<span style={{ color: "#ff2d87" }}>X</span>
         </Link>
         <div className="flex items-center gap-3">
-          <button className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-white/80 transition hover:bg-white/[0.06]">
-            This Month <ChevronDown className="h-4 w-4" />
-          </button>
-          <button
+          <Link
+            to="/os/$environment/$view"
+            params={{ environment: "settings", view: "notifications" }}
             className="relative grid h-10 w-10 place-items-center rounded-full border border-white/10 bg-white/[0.03] transition hover:bg-white/[0.06]"
             aria-label={unreadCount > 0 ? `${unreadCount} unread notifications` : "Notifications"}
           >
@@ -329,7 +327,7 @@ function TopNav({
             {unreadCount > 0 ? (
               <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#ff2d87] shadow-[0_0_8px_#ff2d87]" />
             ) : null}
-          </button>
+          </Link>
           <Link
             to="/profile-edit"
             className="relative block h-10 w-10 overflow-hidden rounded-full ring-2 ring-[#ff8a3d]/70"

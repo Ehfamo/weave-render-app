@@ -35,6 +35,7 @@ import { Route as FeedRouteImport } from './routes/feed'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as EvalsRouteImport } from './routes/evals'
+import { Route as EcosystemRouteImport } from './routes/ecosystem'
 import { Route as DataRouteImport } from './routes/data'
 import { Route as CreatorsRouteImport } from './routes/creators'
 import { Route as CookiesRouteImport } from './routes/cookies'
@@ -76,6 +77,7 @@ import { Route as AgentsRegistryRouteImport } from './routes/agents.registry'
 import { Route as AgentsObservabilityRouteImport } from './routes/agents.observability'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as OsEnvironmentViewRouteImport } from './routes/os.$environment.$view'
 
 const XeomxAiRoute = XeomxAiRouteImport.update({
   id: '/xeomx-ai',
@@ -205,6 +207,11 @@ const EventsRoute = EventsRouteImport.update({
 const EvalsRoute = EvalsRouteImport.update({
   id: '/evals',
   path: '/evals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EcosystemRoute = EcosystemRouteImport.update({
+  id: '/ecosystem',
+  path: '/ecosystem',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DataRoute = DataRouteImport.update({
@@ -411,6 +418,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const OsEnvironmentViewRoute = OsEnvironmentViewRouteImport.update({
+  id: '/os/$environment/$view',
+  path: '/os/$environment/$view',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -421,6 +433,7 @@ export interface FileRoutesByFullPath {
   '/cookies': typeof CookiesRoute
   '/creators': typeof CreatorsRouteWithChildren
   '/data': typeof DataRouteWithChildren
+  '/ecosystem': typeof EcosystemRoute
   '/evals': typeof EvalsRouteWithChildren
   '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
@@ -479,6 +492,7 @@ export interface FileRoutesByFullPath {
   '/security/evidence': typeof SecurityEvidenceRoute
   '/security/lab': typeof SecurityLabRoute
   '/security/supply-chain': typeof SecuritySupplyChainRoute
+  '/os/$environment/$view': typeof OsEnvironmentViewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -489,6 +503,7 @@ export interface FileRoutesByTo {
   '/cookies': typeof CookiesRoute
   '/creators': typeof CreatorsRouteWithChildren
   '/data': typeof DataRouteWithChildren
+  '/ecosystem': typeof EcosystemRoute
   '/evals': typeof EvalsRouteWithChildren
   '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
@@ -547,6 +562,7 @@ export interface FileRoutesByTo {
   '/security/evidence': typeof SecurityEvidenceRoute
   '/security/lab': typeof SecurityLabRoute
   '/security/supply-chain': typeof SecuritySupplyChainRoute
+  '/os/$environment/$view': typeof OsEnvironmentViewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -559,6 +575,7 @@ export interface FileRoutesById {
   '/cookies': typeof CookiesRoute
   '/creators': typeof CreatorsRouteWithChildren
   '/data': typeof DataRouteWithChildren
+  '/ecosystem': typeof EcosystemRoute
   '/evals': typeof EvalsRouteWithChildren
   '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
@@ -617,6 +634,7 @@ export interface FileRoutesById {
   '/security/evidence': typeof SecurityEvidenceRoute
   '/security/lab': typeof SecurityLabRoute
   '/security/supply-chain': typeof SecuritySupplyChainRoute
+  '/os/$environment/$view': typeof OsEnvironmentViewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -629,6 +647,7 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/creators'
     | '/data'
+    | '/ecosystem'
     | '/evals'
     | '/events'
     | '/explore'
@@ -687,6 +706,7 @@ export interface FileRouteTypes {
     | '/security/evidence'
     | '/security/lab'
     | '/security/supply-chain'
+    | '/os/$environment/$view'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -697,6 +717,7 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/creators'
     | '/data'
+    | '/ecosystem'
     | '/evals'
     | '/events'
     | '/explore'
@@ -755,6 +776,7 @@ export interface FileRouteTypes {
     | '/security/evidence'
     | '/security/lab'
     | '/security/supply-chain'
+    | '/os/$environment/$view'
   id:
     | '__root__'
     | '/'
@@ -766,6 +788,7 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/creators'
     | '/data'
+    | '/ecosystem'
     | '/evals'
     | '/events'
     | '/explore'
@@ -824,6 +847,7 @@ export interface FileRouteTypes {
     | '/security/evidence'
     | '/security/lab'
     | '/security/supply-chain'
+    | '/os/$environment/$view'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -836,6 +860,7 @@ export interface RootRouteChildren {
   CookiesRoute: typeof CookiesRoute
   CreatorsRoute: typeof CreatorsRouteWithChildren
   DataRoute: typeof DataRouteWithChildren
+  EcosystemRoute: typeof EcosystemRoute
   EvalsRoute: typeof EvalsRouteWithChildren
   EventsRoute: typeof EventsRoute
   ExploreRoute: typeof ExploreRoute
@@ -885,6 +910,7 @@ export interface RootRouteChildren {
   SecurityEvidenceRoute: typeof SecurityEvidenceRoute
   SecurityLabRoute: typeof SecurityLabRoute
   SecuritySupplyChainRoute: typeof SecuritySupplyChainRoute
+  OsEnvironmentViewRoute: typeof OsEnvironmentViewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1069,6 +1095,13 @@ declare module '@tanstack/react-router' {
       path: '/evals'
       fullPath: '/evals'
       preLoaderRoute: typeof EvalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ecosystem': {
+      id: '/ecosystem'
+      path: '/ecosystem'
+      fullPath: '/ecosystem'
+      preLoaderRoute: typeof EcosystemRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/data': {
@@ -1358,6 +1391,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/os/$environment/$view': {
+      id: '/os/$environment/$view'
+      path: '/os/$environment/$view'
+      fullPath: '/os/$environment/$view'
+      preLoaderRoute: typeof OsEnvironmentViewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1444,6 +1484,7 @@ const rootRouteChildren: RootRouteChildren = {
   CookiesRoute: CookiesRoute,
   CreatorsRoute: CreatorsRouteWithChildren,
   DataRoute: DataRouteWithChildren,
+  EcosystemRoute: EcosystemRoute,
   EvalsRoute: EvalsRouteWithChildren,
   EventsRoute: EventsRoute,
   ExploreRoute: ExploreRoute,
@@ -1493,6 +1534,7 @@ const rootRouteChildren: RootRouteChildren = {
   SecurityEvidenceRoute: SecurityEvidenceRoute,
   SecurityLabRoute: SecurityLabRoute,
   SecuritySupplyChainRoute: SecuritySupplyChainRoute,
+  OsEnvironmentViewRoute: OsEnvironmentViewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

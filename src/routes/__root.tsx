@@ -18,6 +18,9 @@ import { getLocale } from "../paraglide/runtime.js";
 import { m } from "../paraglide/messages.js";
 import { SITE_URL } from "../lib/seo";
 
+import { ProjectContextProvider } from "@/components/xeomx/os/ProjectContextProvider";
+import { GlobalLauncherProvider } from "@/components/xeomx/os/GlobalLauncherProvider";
+
 const LOCALES = ["en", "fa", "ar", "zh", "hi"] as const;
 
 function NotFoundComponent() {
@@ -190,12 +193,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16.png" },
         { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
         { rel: "manifest", href: "/site.webmanifest" },
-        {
-          rel: "preconnect",
-          href: "https://ovqhdzppfbdvnzuglukf.supabase.co",
-          crossOrigin: "anonymous",
-        },
-        { rel: "dns-prefetch", href: "https://ovqhdzppfbdvnzuglukf.supabase.co" },
         // Warm the custom-domain origin early so the LCP asset request skips a
         // fresh TLS+DNS roundtrip on cold mobile connections.
         { rel: "preconnect", href: "https://xeomx.com", crossOrigin: "anonymous" },
@@ -253,29 +250,6 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
 
-  // Production runtime sanitization: silence noisy console.log/info/debug/warn
-  // in production builds (preserve console.error for real errors). Guarded by
-  // import.meta.env.PROD so DX in dev is unaffected.
-  useEffect(() => {
-    if (!import.meta.env.PROD) return;
-    // Defer to idle so the main thread stays free during hydration / LCP.
-    const runSuppress = () => {
-      const noop = () => {};
-      // eslint-disable-next-line no-console
-      console.log = noop;
-      // eslint-disable-next-line no-console
-      console.info = noop;
-      // eslint-disable-next-line no-console
-      console.debug = noop;
-      // eslint-disable-next-line no-console
-      console.warn = noop;
-    };
-    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void) => number })
-      .requestIdleCallback;
-    if (typeof ric === "function") ric(runSuppress);
-    else setTimeout(runSuppress, 0);
-  }, []);
-
   // Global auth listener: keeps router + query cache in sync across tabs.
   // Supabase persists sessions to localStorage; storage events propagate
   // sign-in/out to every open tab, and this listener fires there too.
@@ -296,7 +270,10 @@ function RootComponent() {
       >
         Skip to content
       </a>
-      <Outlet />
+      <ProjectContextProvider>
+        <Outlet />
+        <GlobalLauncherProvider />
+      </ProjectContextProvider>
       <SupportButton />
       <Toaster richColors closeButton position="top-right" />
     </QueryClientProvider>

@@ -509,5 +509,9 @@
   "product_read_only_preview": "只读预览",
   "product_requires_auth": "需要登录",
   "product_route_state": "路由状态",
-  "product_surface_preview": "工作区预览"
+  "product_surface_preview": "工作区预览",
+  "p0_context_title": "项目上下文",
+  "p0_context_empty": "尚未选择项目",
+  "p0_preview_only": "仅供预览。操作需要服务器授权和可用的服务。",
+  "p0_navigation": "导航"
 }

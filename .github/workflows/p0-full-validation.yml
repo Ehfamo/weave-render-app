@@ -228,6 +228,7 @@ jobs:
             test -s /tmp/dom-desktop.html
             test -s /tmp/mobile.png
             if grep -Eqi 'Hydration failed|hydration mismatch|Uncaught (TypeError|ReferenceError)' /tmp/chrome-desktop.log /tmp/chrome-mobile.log; then exit 3; fi
+            P0_CHROME="$CHROME" node scripts/p0-last-mile-browser.mjs
             echo 'HEADLESS_BROWSER_RUNTIME_PASS'
           else
             echo 'HEADLESS_BROWSER_UNAVAILABLE'

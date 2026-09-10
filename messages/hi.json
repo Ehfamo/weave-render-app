@@ -509,5 +509,9 @@
   "product_read_only_preview": "केवल पढ़ने का पूर्वावलोकन",
   "product_requires_auth": "साइन इन आवश्यक है",
   "product_route_state": "मार्ग की स्थिति",
-  "product_surface_preview": "कार्यस्थान का पूर्वावलोकन"
+  "product_surface_preview": "कार्यस्थान का पूर्वावलोकन",
+  "p0_context_title": "प्रोजेक्ट संदर्भ",
+  "p0_context_empty": "कोई प्रोजेक्ट नहीं चुना गया",
+  "p0_preview_only": "केवल पूर्वावलोकन। कार्यों के लिए सर्वर की अनुमति और उपलब्ध सेवा आवश्यक है।",
+  "p0_navigation": "नेविगेशन"
 }

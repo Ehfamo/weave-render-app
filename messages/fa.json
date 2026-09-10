@@ -509,5 +509,9 @@
   "product_read_only_preview": "پیش‌نمایش فقط‌خواندنی",
   "product_requires_auth": "ورود لازم است",
   "product_route_state": "وضعیت مسیر",
-  "product_surface_preview": "پیش‌نمایش فضای کار"
+  "product_surface_preview": "پیش‌نمایش فضای کار",
+  "p0_context_title": "زمینهٔ پروژه",
+  "p0_context_empty": "پروژه‌ای انتخاب نشده",
+  "p0_preview_only": "فقط پیش‌نمایش. اجرای عملیات به مجوز سرور و سرویس آماده نیاز دارد.",
+  "p0_navigation": "پیمایش"
 }

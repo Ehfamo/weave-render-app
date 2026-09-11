@@ -14,7 +14,7 @@ CREATE TABLE public.xeomx_memories (
   type text NOT NULL CHECK (type IN ('UserMemory','ProjectMemory','ConversationMemory','CharacterMemory','VoiceMemory','BrandMemory','PreferenceMemory','InstructionMemory')),
   content text NOT NULL CHECK (char_length(btrim(content)) BETWEEN 1 AND 8000),
   importance double precision NOT NULL CHECK (importance >= 0 AND importance <= 1),
-  source jsonb NOT NULL CHECK (jsonb_typeof(source) = 'object' AND source->>'kind' IN ('user','conversation','import') AND octet_length(source::text) <= 4000),
+  source jsonb NOT NULL CHECK (jsonb_typeof(source) = 'object' AND source ? 'kind' AND jsonb_typeof(source->'kind') = 'string' AND source->>'kind' IN ('user','conversation','import') AND octet_length(source::text) <= 4000),
   status text NOT NULL DEFAULT 'active' CHECK (status IN ('active','archived')),
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),

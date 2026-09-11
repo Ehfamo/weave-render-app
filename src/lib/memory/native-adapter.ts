@@ -23,9 +23,14 @@ export class NativeMemoryAdapter implements MemoryAdapter {
     this.client = client;
   }
   private async call(operation: string, payload: Record<string, unknown> = {}): Promise<unknown> {
-    const { data, error } = await this.client.rpc("xeomx_memory", { operation, payload });
-    if (error) throw new Error("MEMORY_STORAGE_ERROR");
-    return data;
+    try {
+      const { data, error } = await this.client.rpc("xeomx_memory", { operation, payload });
+      if (error) throw new Error("MEMORY_STORAGE_ERROR");
+      return data;
+    } catch {
+      // Transport exceptions may contain private request details. Never forward them.
+      throw new Error("MEMORY_STORAGE_ERROR");
+    }
   }
   private row(value: unknown): MemoryRecord {
     const r = object(value);

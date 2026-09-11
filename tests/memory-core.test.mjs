@@ -196,6 +196,10 @@ test("native adapter maps storage rows, binds user and does not forward storage 
     rpc: async () => ({ data: null, error: { message: "secret value" } }),
   });
   await assert.rejects(broken.get(conversation), (e) => e.message === "MEMORY_STORAGE_ERROR");
+  const rejected = new NativeMemoryAdapter(user, {
+    rpc: async () => { throw new Error("private transport details"); },
+  });
+  await assert.rejects(rejected.get(conversation), (e) => e.message === "MEMORY_STORAGE_ERROR");
 });
 
 test("memory contracts do not import provider/framework SDK types", async () => {

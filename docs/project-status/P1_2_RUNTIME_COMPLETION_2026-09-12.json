@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-09-11T19:04:36.277172+00:00",
+  "source_head": "9853826f3f011865f8982b38cfdc2fffaf32b203",
+  "validation": {
+    "unit": {
+      "pass": 148,
+      "fail": 0,
+      "skipped": 0
+    },
+    "gateway_integration": {
+      "pass": 22,
+      "fail": 0
+    },
+    "typecheck": "PASS",
+    "lint": "PASS (0 errors, 9 warnings)",
+    "build": "PASS"
+  },
+  "live": "BLOCKED_BY_CREDENTIAL",
+  "groq_key_present": false,
+  "production_modified": false,
+  "memory_started": false,
+  "log_sha256": {
+    "unit": "4ae0b8fed0f699650648ed6a16bd2225904eeaa0674de03b1ac59d5132f40d87",
+    "focused": "18960abc730919f81370fdfe587744737eb3f8acd68935a60bce9af324131fbb",
+    "typecheck": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "lint": "dbaced66d22859f240e3a42c9085594e5796ae7b60876a2618e3339c7a587e9b",
+    "build": "6b2691eb219265b469f94ec092617ebb02750737137d79effd1c14b99f4bee9c"
+  }
+}

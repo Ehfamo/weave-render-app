@@ -34,6 +34,7 @@ export type JsonValue =
 export interface ModelUsage {
   inputTokens: number;
   outputTokens: number;
+  totalTokens?: number;
 }
 export type ModelErrorCode =
   | "AUTH_ERROR"

@@ -117,14 +117,22 @@ function cleanResult(result: AdapterResult, request: ModelRequest): AdapterResul
     (!Number.isSafeInteger(usage.inputTokens) ||
       usage.inputTokens < 0 ||
       !Number.isSafeInteger(usage.outputTokens) ||
-      usage.outputTokens < 0)
+      usage.outputTokens < 0 ||
+      (usage.totalTokens !== undefined &&
+        (!Number.isSafeInteger(usage.totalTokens) || usage.totalTokens < 0)))
   )
     throw new Error("Invalid usage");
   return {
     ok: true,
     output,
     ...(usage
-      ? { usage: { inputTokens: usage.inputTokens, outputTokens: usage.outputTokens } }
+      ? {
+          usage: {
+            inputTokens: usage.inputTokens,
+            outputTokens: usage.outputTokens,
+            ...(usage.totalTokens === undefined ? {} : { totalTokens: usage.totalTokens }),
+          },
+        }
       : {}),
   };
 }

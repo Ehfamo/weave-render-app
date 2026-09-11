@@ -124,12 +124,19 @@ test("historical journeys have explicit non-blocking missing-evidence policy", a
   assert.equal(policy.decision, "OWNER_EXPLICIT_RELEASE_GOVERNANCE");
   assert.equal(policy.scope, "SOURCE_BASELINE_ONLY");
   assert.deepEqual(policy.historical_gates["J01-J12"], {
-    status: "MISSING_EVIDENCE", blocking: false,
-    classification: "NON_BLOCKING_HISTORICAL_GATE", invented: false,
+    status: "MISSING_EVIDENCE",
+    blocking: false,
+    classification: "NON_BLOCKING_HISTORICAL_GATE",
+    invented: false,
   });
-  assert.deepEqual(policy.journeys, Array.from({ length: 12 }, (_, i) => ({
-    id: `J${String(i + 1).padStart(2, "0")}`, status: "MISSING_EVIDENCE", execution: "NOT_RUN",
-  })));
+  assert.deepEqual(
+    policy.journeys,
+    Array.from({ length: 12 }, (_, i) => ({
+      id: `J${String(i + 1).padStart(2, "0")}`,
+      status: "MISSING_EVIDENCE",
+      execution: "NOT_RUN",
+    })),
+  );
 });
 
 test("locale contracts stay in exact parity", async () => {
@@ -144,7 +151,9 @@ test("locale contracts stay in exact parity", async () => {
   assert.equal(policy.translation.minimum_real_keys, 515);
   assert.equal(policy.translation.filler_allowed, false);
   assert.deepEqual(policy.historical_gates.translation_gt_850, {
-    status: "MISSING_EVIDENCE", blocking: false, classification: "NON_BLOCKING_HISTORICAL_GATE",
+    status: "MISSING_EVIDENCE",
+    blocking: false,
+    classification: "NON_BLOCKING_HISTORICAL_GATE",
   });
   assert.ok(baseline.length >= policy.translation.minimum_real_keys);
   // Prevent losing existing real keys while allowing real product translations later.

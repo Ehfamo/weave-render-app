@@ -197,7 +197,9 @@ test("native adapter maps storage rows, binds user and does not forward storage 
   });
   await assert.rejects(broken.get(conversation), (e) => e.message === "MEMORY_STORAGE_ERROR");
   const rejected = new NativeMemoryAdapter(user, {
-    rpc: async () => { throw new Error("private transport details"); },
+    rpc: async () => {
+      throw new Error("private transport details");
+    },
   });
   await assert.rejects(rejected.get(conversation), (e) => e.message === "MEMORY_STORAGE_ERROR");
 });

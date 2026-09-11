@@ -1,0 +1,167 @@
+✔ all 21 former non-P0 gaps have exact direct routes (3.081656ms)
+✔ all 21 former non-P0 gaps have target-specific registered surfaces (0.83551ms)
+✔ full UI closure preserves guarded dependency language (0.510124ms)
+✔ the Cloudflare build emits a deployable Worker package (229.225592ms)
+✔ all twenty core workflows have unique identities and real route targets (4.360716ms)
+✔ the event core preserves policy, audit and notification boundaries (1.185689ms)
+✔ provider routing fails closed without verified capability evidence (0.58065ms)
+✔ model evidence sources remain explicitly separated (0.277094ms)
+✔ home defers marketplace discovery and its heavy prompt-card dependency (30.976084ms)
+✔ discovery removes unknown and repeated references without mutating source rails (2.776932ms)
+✔ recent navigation excludes external URLs, arbitrary actions and malformed storage (0.552931ms)
+✔ navigation handoff retains opaque project references and leaves previous context intact (0.821083ms)
+✔ reconstructed P0 status components render with fail-closed controls (4265.350736ms)
+✔ catalog filters quote user syntax and retain public-query boundaries (47.755195ms)
+✔ all 17 P0 target routes exist with exact route declarations (1.988524ms)
+✔ four formerly missing P0 product surfaces are now registered (0.282938ms)
+✔ P0 partial targets receive distinct target-specific surfaces (0.559598ms)
+✔ high-risk P0 surfaces retain approval or policy boundaries (0.214703ms)
+✔ matrix accepts all required successes and does not claim external verification (22.731069ms)
+✔ every required gate fails closed for failure, cancellation, skipped and missing outcomes (979.758071ms)
+✔ source audit resolves dotted modules and ignores import text inside comments (2342.008376ms)
+✔ the release vocabulary is canonical and backend adapters fail closed (3.872129ms)
+✔ job transitions support recovery without allowing fabricated completion (1.268399ms)
+✔ payment state never grants entitlement before confirmed payment (0.695991ms)
+✔ payment failure preserves the order and exposes a safe retry (0.570441ms)
+✔ effective permission preview fails closed and requires exact approval (0.764528ms)
+✔ project handoff preserves every opaque context reference (0.523575ms)
+✔ future telemetry metadata strips sensitive payload fields (0.482946ms)
+✔ the 25-environment product contract is complete and internally unique after the full target-surface closure wave (61.637328ms)
+✖ all twelve critical journeys point to real product views (36.746885ms)
+✖ locale contracts stay in exact parity (16.827392ms)
+✔ release truth and safety controls are explicit in product previews (6.00606ms)
+✔ legacy simulations, fake metrics, and soft product 404s stay removed (15.171831ms)
+✔ public listing, auth, SEO, and runtime warning boundaries remain safe (13.081831ms)
+✔ release dependency surface excludes proven unused direct packages (2.92155ms)
+✔ secondary global tools stay outside the initial client path (2.101699ms)
+✔ request 4 hardening stays centralized, fail-closed, and context preserving (4.95091ms)
+✔ Request 7 migration is additive, indexed and RLS protected (104.592406ms)
+✔ Request 7 migration keeps sensitive writes server-only and storage private (222.496868ms)
+✔ Request 7 workflow maturity is connected but never falsely live-verified (2.415341ms)
+✔ authentication is required before the generation path (1.037344ms)
+✔ project ownership is enforced before unavailable requests are persisted (0.613275ms)
+✔ provider unavailable is persisted honestly without a credit charge (0.735708ms)
+✔ successful CI provider execution persists output, asset, usage, ledger and audit (1.268744ms)
+✔ failed provider execution releases the full reservation and records failure (0.619262ms)
+✔ cancelling a queued job is authorized, idempotent and releases its reservation once (0.586225ms)
+✔ insufficient credits creates no job, message, usage or charge (0.345696ms)
+✔ an idempotent retry does not execute the provider or charge twice (0.619791ms)
+✔ reusing an idempotency key for different input is rejected (3.892499ms)
+✔ manual routing requires the exact verified provider and model (0.394294ms)
+✔ full CI vertical slice survives project reload (0.510294ms)
+✔ research citations accept only provided source ids (3.710694ms)
+✔ research citations require at least one citation (0.484925ms)
+✔ research citations reject unknown source ids (1.058584ms)
+✔ research citations reject malformed numeric citation groups (0.302299ms)
+✔ Stage 5 migration adds the three missing foreign-key indexes (7.413499ms)
+✔ Stage 5 migration preserves RLS and narrows policy roles (2.672474ms)
+✔ Stage 5 migration is transactional and non-destructive to data (4.537072ms)
+✔ compensating agent JSON guard normalizes and recursively rejects common secret keys (8.940287ms)
+✔ hardened guard remains fixed-path and private to trusted execution (2.82266ms)
+✔ R0 and R1 admit only their explicit sandbox allowlists (3.005704ms)
+✔ R2 waits and cannot execute without the exact owner approval synchronizer (0.677889ms)
+✔ R2 exact-owner denial is terminal (0.337434ms)
+✔ R3 remains default-deny even when ordinary approval is claimed (0.256429ms)
+✔ service lifecycle covers failure, bounded recovery, success and cancel (0.311695ms)
+✔ credential values and secret-shaped nested fields are rejected (1.28969ms)
+✔ idempotency envelope and canonical payload are deterministic (0.783525ms)
+✔ definition maximum risk is enforced before admission (0.155061ms)
+✔ Stage 5.3 creates six durable RLS-protected control-plane tables (11.114554ms)
+✔ risk and state constraints encode R0/R1 allowlists, R2 approval and R3 denial (3.827551ms)
+✔ R2 cannot queue before an exact project-owner approval (9.522838ms)
+✔ idempotency, opaque references, secret rejection and audits are durable (2.379286ms)
+✔ all foreign keys have intentional covering indexes (1.378441ms)
+✔ private trigger helpers are never executable by authenticated clients (2.008994ms)
+✔ authenticated mutations remain narrow and RLS ownership-bound (2.649032ms)
+✔ checkout fails closed when no payment provider is configured (2.334842ms)
+✔ an injected generic adapter remains behind the verification boundary (1.37534ms)
+✔ provider and webhook mismatches fail closed (0.756774ms)
+✔ payment event identity is idempotent by provider and event id (1.279658ms)
+✔ checkout and subscription models cover failure, cancel and refund (0.445154ms)
+✔ entitlement activation requires matching confirmed payment evidence (1.030778ms)
+✔ Stage 5.3 billing migration is additive and lets apply_migration own the transaction (9.56274ms)
+✔ authenticated clients can read only their own billing rows (8.900855ms)
+✔ foreign keys have covering indexes and payment events are idempotent (1.637045ms)
+✔ aggregate advisory locks make create/event/entitlement idempotency race-safe (3.798266ms)
+✔ checkout and subscription lifecycle transitions fail closed (2.443755ms)
+✔ service-only helpers revoke public and client execution (3.432758ms)
+✔ entitlement activation locks and validates a confirmed payment event (3.194642ms)
+✔ migration remains provider-neutral and contains no credentials (2.851148ms)
+✔ metadata is recursively filtered and raw webhook payloads are never persisted (1.794353ms)
+✔ JSON rejects cycles, accessors and sparse arrays without evaluating them (1.689991ms)
+✔ control-plane bounds match existing migration constraints and R2 retries need approval (0.545724ms)
+✔ evidence cannot report a fabricated score for empty or inconsistent evaluation (0.427097ms)
+✔ payment ledger snapshots resist mutation and reject cross-owner activation (1.295323ms)
+✔ Stage 5.3 covers both composite Dataset/Evals foreign keys (12.224561ms)
+✔ Stage 5.3 evidence migration is apply_migration-owned and additive (21.914646ms)
+✔ all browser-visible writes have explicit RLS checks and no anonymous grants (23.557605ms)
+✔ trigger helpers are fixed-path, service-only SECURITY DEFINER functions (4.785507ms)
+✔ version, result, link and provenance immutability fail closed (1.730221ms)
+✔ recursive SQL boundary rejects secret-like JSON keys on every JSON surface (3.364369ms)
+✔ provider compute is disconnected until verified and FK paths are indexed (2.229397ms)
+✔ eval run constraints have non-colliding explicit names (3.707808ms)
+✔ dataset item admission locks the version against concurrent finalization (3.042651ms)
+✔ migration contains no credential values or broad authenticated result writes (3.232976ms)
+✔ dataset validation preserves explicit empty and invalid states (2.393625ms)
+✔ dataset duplicate validation is deterministic (1.018638ms)
+✔ eval and experiment state machines reject terminal rewrites (0.844556ms)
+✔ surface state distinguishes loading, empty, invalid and failure (0.258568ms)
+✔ provider eval compute remains explicitly disconnected and fail-closed (0.307875ms)
+✔ recursive JSON boundary rejects secret-like keys without storing values (0.720373ms)
+✔ canonical evidence and safe database errors are deterministic (0.496467ms)
+✔ authenticated membership mutation privileges are removed while RLS read remains (4.206621ms)
+✔ search planning is Unicode-safe, bounded and wildcard-neutral (2.288261ms)
+✔ search aggregation removes duplicates without inventing empty results (0.49413ms)
+✔ project update audit is trigger-only, fixed-path and privacy-safe (10.400232ms)
+✔ stale running generation jobs have a partial-indexed lease recovery path (2.091502ms)
+✔ lease recovery fails stale work closed through the canonical failure RPC (0.285313ms)
+✔ lease recovery is fixed-path and service-role only (0.637917ms)
+✔ lease recovery validates bounded timeout and batch size (0.175533ms)
+✔ generation worker performs stale-lease cleanup before claiming queued work (0.253186ms)
+✔ Stage 5.4 app routing registers the exact Cloudflare, Gemini, and Groq models (1.517577ms)
+✔ the verified Cloudflare route remains the default live route (0.166444ms)
+✔ server-side manual submission validates against the exact provider registry (11.888087ms)
+✔ provider success followed by persistence failure fails closed without cross-provider fallback (5.701241ms)
+✔ credit ledger Stage 5.4 migration restores authenticated read-only ACL (1.733527ms)
+✔ pending entitlement audit trigger is provider-neutral and privilege-contained (5.85224ms)
+ℹ tests 126
+ℹ suites 0
+ℹ pass 124
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5007.597985
+
+✖ failing tests:
+
+test at tests/product-readiness.test.mjs:120:1
+✖ all twelve critical journeys point to real product views (36.746885ms)
+  Error: ENOENT: no such file or directory, open '/workspace/scratch/c2e7c7c5940e/p0-inspection/src/lib/critical-journeys.ts'
+      at async open (node:internal/fs/promises:697:25)
+      at async readFile (node:internal/fs/promises:1348:14)
+      at async TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/product-readiness.test.mjs:127:16)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: '/workspace/scratch/c2e7c7c5940e/p0-inspection/src/lib/critical-journeys.ts'
+  }
+
+test at tests/product-readiness.test.mjs:159:1
+✖ locale contracts stay in exact parity (16.827392ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(baseline.length > 850)
+
+      at TestContext.<anonymous> (file:///workspace/scratch/c2e7c7c5940e/p0-inspection/tests/product-readiness.test.mjs:165:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

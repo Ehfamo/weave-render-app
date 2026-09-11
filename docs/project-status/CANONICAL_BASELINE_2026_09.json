@@ -1,0 +1,287 @@
+{
+  "designation": "CANONICAL_BASELINE_2026_09",
+  "acceptance": "NOT_ACCEPTED",
+  "p0": "BLOCKED",
+  "p1_ready": false,
+  "p1_started": false,
+  "repository": "Ehfamo/weave-render-app",
+  "branch": "plan/xeomx-platform-expansion-20260909",
+  "validated_source_head": "721f344096fb73bbce396be355fc772fae2297cb",
+  "validated_source_head_meaning": "Reviewed snapshot; does not imply every validation passed",
+  "baseline_evidence_commit": "Resolve with git log -1 --format=%H -- docs/project-status/CANONICAL_BASELINE_2026_09.json; exact SHA also recorded in Issue #3",
+  "timestamp": "2026-09-11T06:55:10.982491+00:00",
+  "node": "v24.19.0",
+  "npm": "11.9.0",
+  "canonical": [
+    {
+      "path": "src/lib/core-workflows.ts",
+      "expected_sha256": "fce4fb9d01bafd808f45dcd241323ab5c99ada8057f757a10f11afaf93b023f1",
+      "actual_sha256": "fce4fb9d01bafd808f45dcd241323ab5c99ada8057f757a10f11afaf93b023f1",
+      "expected_bytes": 18262,
+      "actual_bytes": 18262,
+      "status": "PASS"
+    },
+    {
+      "path": "src/lib/platform-contracts.ts",
+      "expected_sha256": "840e9e012c244652492021223bbd55ae562bf702f06b65d03a67d81c50d5c4f2",
+      "actual_sha256": "840e9e012c244652492021223bbd55ae562bf702f06b65d03a67d81c50d5c4f2",
+      "expected_bytes": 21587,
+      "actual_bytes": 21587,
+      "status": "PASS"
+    },
+    {
+      "path": "src/components/xeomx/product/ProductWorkspacePreview.tsx",
+      "expected_sha256": "5504a029910f04541f61b7876fe2df60ab18e2d18f188a2e89d823302f948a11",
+      "actual_sha256": "5504a029910f04541f61b7876fe2df60ab18e2d18f188a2e89d823302f948a11",
+      "expected_bytes": 31144,
+      "actual_bytes": 31144,
+      "status": "PASS"
+    },
+    {
+      "path": "src/lib/product-architecture.ts",
+      "expected_sha256": "4fed3a9cac34ab1c400f545438406802ee8c2dd2e8deac244cbd9dcba9b09ab3",
+      "actual_sha256": "4fed3a9cac34ab1c400f545438406802ee8c2dd2e8deac244cbd9dcba9b09ab3",
+      "expected_bytes": 55566,
+      "actual_bytes": 55566,
+      "status": "PASS"
+    },
+    {
+      "path": "package-lock.json",
+      "expected_sha256": "c5340cf78e852c4ba0ac5ad3afe34a706323dfd37de46a2cf4f43f5dfa9d3b8d",
+      "actual_sha256": "c5340cf78e852c4ba0ac5ad3afe34a706323dfd37de46a2cf4f43f5dfa9d3b8d",
+      "expected_bytes": 348592,
+      "actual_bytes": 348592,
+      "status": "PASS"
+    }
+  ],
+  "canonical_hash_method": "hashlib.sha256(Path(path).read_bytes()); len(bytes)",
+  "prior_commits": [
+    "3d75620972306ab085dc3d53a41de3b96c3249d3",
+    "297319f496376d5aeb8400c3363138b9648d57b8",
+    "721f344096fb73bbce396be355fc772fae2297cb"
+  ],
+  "journeys": [
+    {
+      "id": "J01",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J02",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J03",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J04",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J05",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J06",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J07",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J08",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J09",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J10",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J11",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    },
+    {
+      "id": "J12",
+      "status": "MISSING_EVIDENCE",
+      "definition_available": false,
+      "route_execution": "NOT_RUN",
+      "action_execution": "NOT_RUN"
+    }
+  ],
+  "production_modified": false,
+  "main_modified": false,
+  "supabase": {
+    "project": "bzoikmppvwiidyjdaqgv",
+    "status": "FAIL",
+    "reason": "All six to_regclass results null; migration version 20260710134256 absent from accessible migration ledger. Consistent with unapplied migration, not credential failure; cannot exclude historical out-of-band drift.",
+    "read_only": true,
+    "missing": [
+      "creator_stats",
+      "likes",
+      "saves",
+      "follows",
+      "comments",
+      "prompt_views"
+    ],
+    "existing_migration": "20260710134256_58ccd951-1ccf-4d9b-a2e7-f343a0145223.sql",
+    "migration_history_record": false,
+    "credential_or_catalog_permission_failure": false,
+    "mutations": false,
+    "execution": "FRESH_READ_ONLY",
+    "public_tables": 37,
+    "public_tables_without_rls": 0
+  },
+  "cloudflare": {
+    "status": "BLOCKED_BY_EXTERNAL_DEPENDENCY",
+    "reason": "Current wrangler name weave-render-app; deploy workflow targets main and plain wrangler deploy. No verified isolated target. CI credential-presence evidence cannot establish permission. No remote deployment attempted.",
+    "local_ci_worker_preview": "PASS",
+    "remote_staging_deployed": false,
+    "execution": "CONFIG_REVIEW"
+  },
+  "unit": {
+    "execution": "FRESHLY_RERUN",
+    "command": "node --experimental-strip-types --test tests/*.test.mjs",
+    "total": 126,
+    "pass": 124,
+    "fail": 2,
+    "skip": 0,
+    "status": "FAIL",
+    "failures": [
+      "Missing src/lib/critical-journeys.ts",
+      "baseline.length > 850; actual 515"
+    ]
+  },
+  "validation_reuse": {
+    "reason": "Source, tests, lockfile and workflow unchanged since CI source 297319f; 721f adds only documentation",
+    "run": 34483114678,
+    "job": 102890559760,
+    "ci_source_head": "297319f496376d5aeb8400c3363138b9648d57b8",
+    "classification": "SAFE_TO_REUSE_SOURCE_UNCHANGED",
+    "outcomes": {
+      "CLEAN_INSTALL": "success",
+      "BUILD": "success",
+      "TYPECHECK": "success",
+      "LINT": "success",
+      "UNIT": "failure",
+      "INTEGRATION": "success",
+      "MIGRATIONS": "success",
+      "SMOKE": "success",
+      "STATIC": "success",
+      "I18N": "success",
+      "SECRETS": "success",
+      "RUNTIME_SMOKE": "success",
+      "BACKEND_STATIC": "success"
+    },
+    "interactive_browser": {
+      "status": "PASS",
+      "checks": [
+        "visible navigation dialog",
+        "route action",
+        "dialog closes on navigation",
+        "heading focus",
+        "preview execution boundary",
+        "mobile Persian RTL no horizontal overflow",
+        "no uncaught exceptions"
+      ]
+    },
+    "limits": [
+      "Migration checks are source/static tests, not applied database validation.",
+      "Browser checks are bounded P0 regression coverage, not original J01-J12."
+    ]
+  },
+  "translation": {
+    "status": "MISSING_EVIDENCE",
+    "parity": "PASS",
+    "nonempty_strings": "PASS",
+    "keys_each": 515,
+    "locales": [
+      "en",
+      "fa",
+      "ar",
+      "zh",
+      "hi"
+    ],
+    "threshold_test": "FAIL",
+    "origin_on_p0_branch": "8bca11a2c46a08b0b0b24c2d7f638d91d4a0fdf3 adds tests/product-readiness.test.mjs with >850 assertion",
+    "catalog_keys_at_introduction": 480,
+    "requirement_validity": "Unproven: no independent required-key manifest or superseding decision located. Neither obsolete nor genuine missing product keys can be established from a numeric assertion alone.",
+    "historical_locale_revisions": 14,
+    "historical_max_keys": 511,
+    "archive_translation_850_matches": 0,
+    "assertions_changed": false
+  },
+  "search_evidence": {
+    "journey_details": "p0-last-mile-2026-09-10/historical-search.json",
+    "scope": "21 branch refs / 16 distinct HEAD trees; path-specific history empty; two Stage5.4 patches; three supplied ZIP text scans. Code search returned zero with incomplete_results=true. Prior search reused, not represented as fresh journey execution.",
+    "translation_origin_api": "https://api.github.com/repos/Ehfamo/weave-render-app/commits?sha=plan%2Fxeomx-platform-expansion-20260909&path=tests%2Fproduct-readiness.test.mjs&per_page=100",
+    "introduction_catalog": "https://raw.githubusercontent.com/Ehfamo/weave-render-app/8bca11a2c46a08b0b0b24c2d7f638d91d4a0fdf3/messages/en.json",
+    "fresh_archive_scan": "All three supplied ZIPs: .md/.txt/.json/.ts/.tsx/.patch entries under 20 MB; 850 within 100 characters of translat/locale/keys/ترجمه. Zero matches; not proof of absence outside scanned evidence."
+  },
+  "recovery_provenance": {
+    "materialization": "b0fbaf553696953915fa22301a579ccef020e6aa",
+    "reconciliation": "8bca11a2c46a08b0b0b24c2d7f638d91d4a0fdf3",
+    "archive": "XEOMX_STAGE54_FROM_RECONCILE_EXACT.patch.xz",
+    "archive_sha256": "1073f45550da69eea94f9dc9fbc385910225ed43295de01bbf4a3c35a8366113",
+    "patch_sha256": "30698b142ecf25974a653af663c489b084e277a8394d264312854513bfbff0db",
+    "historical_v34_bytes": 48412,
+    "historical_v34_sha256": "5c1cb52a5b1d692d18aa92adc558170bd4ca9d3fb732a0f45ee37485e3712504",
+    "current_lineage": "Stage3.5 / Stage5.4; 55566 bytes preserved"
+  },
+  "decision_reason": "External infrastructure alone does not block source acceptance. However the unchanged required unit suite remains red, and the translation contract cannot yet be proved valid or obsolete. No known new runtime defect is asserted; validation completeness is unresolved. Evidence snapshot created, accepted PASS baseline not established.",
+  "remaining_blockers": [
+    {
+      "category": "EVIDENCE",
+      "item": "Original J01-J12 definitions unavailable; all twelve MISSING_EVIDENCE, not executed"
+    },
+    {
+      "category": "EVIDENCE / TEST",
+      "item": "Translation threshold lacks independent required-key manifest or supersession; unit 124/126 remains FAIL"
+    },
+    {
+      "category": "DATABASE",
+      "item": "Staging six missing relations and unrecorded existing migration; no mutation authorized in read-only investigation"
+    },
+    {
+      "category": "EXTERNAL_INFRASTRUCTURE",
+      "item": "Verified isolated Cloudflare target unavailable"
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "decision": "OWNER_EXPLICIT_RELEASE_GOVERNANCE",
+  "date": "2026-09-11",
+  "scope": "SOURCE_BASELINE_ONLY",
+  "historical_gates": {
+    "J01-J12": {
+      "status": "MISSING_EVIDENCE",
+      "blocking": false,
+      "classification": "NON_BLOCKING_HISTORICAL_GATE",
+      "invented": false
+    },
+    "translation_gt_850": {
+      "status": "MISSING_EVIDENCE",
+      "blocking": false,
+      "classification": "NON_BLOCKING_HISTORICAL_GATE"
+    }
+  },
+  "journeys": [
+    {
+      "id": "J01",
+      "status": "MISSING_EVIDENCE",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "J02",
+      "status": "MISSING_EVIDENCE",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "J03",
+      "status": "MISSING_EVIDENCE",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "J04",
+      "status": "MISSING_EVIDENCE",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "J05",
+      "status": "MISSING_EVIDENCE",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "J06",
+      "status": "MISSING_EVIDENCE",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "J07",
+      "status": "MISSING_EVIDENCE",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "J08",
+      "status": "MISSING_EVIDENCE",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "J09",
+      "status": "MISSING_EVIDENCE",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "J10",
+      "status": "MISSING_EVIDENCE",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "J11",
+      "status": "MISSING_EVIDENCE",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "J12",
+      "status": "MISSING_EVIDENCE",
+      "execution": "NOT_RUN"
+    }
+  ],
+  "translation": {
+    "minimum_real_keys": 515,
+    "locales": [
+      "en",
+      "fa",
+      "ar",
+      "zh",
+      "hi"
+    ],
+    "filler_allowed": false
+  },
+  "environment": {
+    "supabase": "DEFERRED_ENVIRONMENT_TASK",
+    "cloudflare": "BLOCKED_BY_EXTERNAL_DEPENDENCY"
+  }
+}

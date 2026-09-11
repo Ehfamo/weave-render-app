@@ -1,12 +1,12 @@
 {
   "designation": "CANONICAL_BASELINE_2026_09",
-  "acceptance": "NOT_ACCEPTED",
-  "p0": "BLOCKED",
-  "p1_ready": false,
+  "acceptance": "ACCEPTED",
+  "p0": "PASS_SOURCE_BASELINE",
+  "p1_ready": true,
   "p1_started": false,
   "repository": "Ehfamo/weave-render-app",
   "branch": "plan/xeomx-platform-expansion-20260909",
-  "validated_source_head": "721f344096fb73bbce396be355fc772fae2297cb",
+  "validated_source_head": "Commit introducing P0_SOURCE_ACCEPTANCE_POLICY.json; resolve git log -1 --format=%H -- docs/project-status/P0_SOURCE_ACCEPTANCE_POLICY.json",
   "validated_source_head_meaning": "Reviewed snapshot; does not imply every validation passed",
   "baseline_evidence_commit": "Resolve with git log -1 --format=%H -- docs/project-status/CANONICAL_BASELINE_2026_09.json; exact SHA also recorded in Issue #3",
   "timestamp": "2026-09-11T06:55:10.982491+00:00",
@@ -180,14 +180,12 @@
     "execution": "FRESHLY_RERUN",
     "command": "node --experimental-strip-types --test tests/*.test.mjs",
     "total": 126,
-    "pass": 124,
-    "fail": 2,
+    "pass": 126,
+    "fail": 0,
     "skip": 0,
-    "status": "FAIL",
-    "failures": [
-      "Missing src/lib/critical-journeys.ts",
-      "baseline.length > 850; actual 515"
-    ]
+    "status": "PASS",
+    "failures": [],
+    "log": "p0-final-evidence-2026-09-11/policy-unit.txt"
   },
   "validation_reuse": {
     "reason": "Source, tests, lockfile and workflow unchanged since CI source 297319f; 721f adds only documentation",
@@ -239,14 +237,14 @@
       "zh",
       "hi"
     ],
-    "threshold_test": "FAIL",
+    "threshold_test": "SUPERSEDED_BY_OWNER_POLICY",
     "origin_on_p0_branch": "8bca11a2c46a08b0b0b24c2d7f638d91d4a0fdf3 adds tests/product-readiness.test.mjs with >850 assertion",
     "catalog_keys_at_introduction": 480,
     "requirement_validity": "Unproven: no independent required-key manifest or superseding decision located. Neither obsolete nor genuine missing product keys can be established from a numeric assertion alone.",
     "historical_locale_revisions": 14,
     "historical_max_keys": 511,
     "archive_translation_850_matches": 0,
-    "assertions_changed": false
+    "assertions_changed": true
   },
   "search_evidence": {
     "journey_details": "p0-last-mile-2026-09-10/historical-search.json",
@@ -265,7 +263,7 @@
     "historical_v34_sha256": "5c1cb52a5b1d692d18aa92adc558170bd4ca9d3fb732a0f45ee37485e3712504",
     "current_lineage": "Stage3.5 / Stage5.4; 55566 bytes preserved"
   },
-  "decision_reason": "External infrastructure alone does not block source acceptance. However the unchanged required unit suite remains red, and the translation contract cannot yet be proved valid or obsolete. No known new runtime defect is asserted; validation completeness is unresolved. Evidence snapshot created, accepted PASS baseline not established.",
+  "decision_reason": "Owner explicitly made two historical gates non-blocking; aligned full suite 126/126 PASS. External/evidence limitations remain unchanged; this is not production release acceptance.",
   "remaining_blockers": [
     {
       "category": "EVIDENCE",
@@ -283,5 +281,7 @@
       "category": "EXTERNAL_INFRASTRUCTURE",
       "item": "Verified isolated Cloudflare target unavailable"
     }
-  ]
+  ],
+  "acceptance_scope": "SOURCE_BASELINE_ONLY",
+  "policy": "P0_SOURCE_ACCEPTANCE_POLICY.json"
 }

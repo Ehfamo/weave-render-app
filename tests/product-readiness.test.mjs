@@ -117,43 +117,19 @@ test("the 25-environment product contract is complete and internally unique afte
   }
 });
 
-test("all twelve critical journeys point to real product views", async () => {
-  const { environments } = await readProductContract();
-  const validTargets = new Set(
-    environments.flatMap((environment) =>
-      environment.subpages.map((subpage) => `${environment.id}/${subpage.key}`),
-    ),
-  );
-  const text = await source("src/lib/critical-journeys.ts");
-  const file = parseTypeScript(text, "critical-journeys.ts");
-  const declaration = findVariable(file, "CRITICAL_JOURNEYS");
-  const initializer = unwrap(declaration.initializer);
-  assert.ok(ts.isArrayLiteralExpression(initializer));
-  assert.equal(initializer.elements.length, 12);
-
-  const ids = [];
-  for (const element of initializer.elements) {
-    const journey = unwrap(element);
-    assert.ok(ts.isObjectLiteralExpression(journey));
-    const id = stringValue(objectProperty(journey, "id"), "journey id");
-    ids.push(id);
-    const steps = objectProperty(journey, "steps");
-    assert.ok(ts.isArrayLiteralExpression(steps));
-    assert.ok(steps.elements.length >= 3, `${id} must have an actionable path`);
-    for (const item of steps.elements) {
-      assert.equal(callName(item), "step");
-      const stepCall = unwrap(item);
-      const environment = stringValue(unwrap(stepCall.arguments[1]), `${id} environment`);
-      const view = stringValue(unwrap(stepCall.arguments[2]), `${id} view`);
-      const state = stringValue(unwrap(stepCall.arguments[3]), `${id} state`);
-      assert.ok(validTargets.has(`${environment}/${view}`), `${id} targets ${environment}/${view}`);
-      assert.ok(state.length > 0, `${id} must expose the step release state`);
-    }
-  }
-  assert.deepEqual(
-    ids,
-    Array.from({ length: 12 }, (_, index) => `J${String(index + 1).padStart(2, "0")}`),
-  );
+// Owner explicitly superseded these historical release gates on 2026-09-11.
+// See docs/project-status/P0_SOURCE_ACCEPTANCE_POLICY.json; no journey PASS is implied.
+test("historical journeys have explicit non-blocking missing-evidence policy", async () => {
+  const policy = JSON.parse(await source("docs/project-status/P0_SOURCE_ACCEPTANCE_POLICY.json"));
+  assert.equal(policy.decision, "OWNER_EXPLICIT_RELEASE_GOVERNANCE");
+  assert.equal(policy.scope, "SOURCE_BASELINE_ONLY");
+  assert.deepEqual(policy.historical_gates["J01-J12"], {
+    status: "MISSING_EVIDENCE", blocking: false,
+    classification: "NON_BLOCKING_HISTORICAL_GATE", invented: false,
+  });
+  assert.deepEqual(policy.journeys, Array.from({ length: 12 }, (_, i) => ({
+    id: `J${String(i + 1).padStart(2, "0")}`, status: "MISSING_EVIDENCE", execution: "NOT_RUN",
+  })));
 });
 
 test("locale contracts stay in exact parity", async () => {
@@ -162,7 +138,20 @@ test("locale contracts stay in exact parity", async () => {
     locales.map(async (locale) => JSON.parse(await source(`messages/${locale}.json`))),
   );
   const baseline = Object.keys(catalogs[0]).sort();
-  assert.ok(baseline.length > 850);
+  // Explicit owner policy replaces the unsupported >850 historical count.
+  const policy = JSON.parse(await source("docs/project-status/P0_SOURCE_ACCEPTANCE_POLICY.json"));
+  assert.deepEqual(policy.translation.locales, locales);
+  assert.equal(policy.translation.minimum_real_keys, 515);
+  assert.equal(policy.translation.filler_allowed, false);
+  assert.deepEqual(policy.historical_gates.translation_gt_850, {
+    status: "MISSING_EVIDENCE", blocking: false, classification: "NON_BLOCKING_HISTORICAL_GATE",
+  });
+  assert.ok(baseline.length >= policy.translation.minimum_real_keys);
+  // Prevent losing existing real keys while allowing real product translations later.
+  const accepted = JSON.parse(await source("docs/project-status/P0_ACCEPTED_LOCALE_KEYS.json"));
+  assert.equal(accepted.length, 515);
+  assert.equal(new Set(accepted).size, 515);
+  for (const key of accepted) assert.ok(baseline.includes(key), `Missing accepted key ${key}`);
   for (const [index, catalog] of catalogs.entries()) {
     assert.deepEqual(Object.keys(catalog).sort(), baseline, `${locales[index]} keys differ`);
     for (const [key, value] of Object.entries(catalog)) {

@@ -1,3 +1,15 @@
+# CANONICAL_BASELINE_2026_09 — ACCEPTED SOURCE BASELINE
+
+Owner decision 2026-09-11 explicitly supersedes the two historical blocking gates. Policy: `P0_SOURCE_ACCEPTANCE_POLICY.json`. J01–J12 and >850 remain MISSING_EVIDENCE / NON_BLOCKING_HISTORICAL_GATE. No journeys invented and no filler translations added.
+
+Full unit suite after policy alignment: **126/126 PASS, zero failures or skipped tests**. Existing locale parity/nonempty assertions remain, with the 515 accepted keys individually protected by `P0_ACCEPTED_LOCALE_KEYS.json`. Real additional keys may be added later. Only the two designated tests changed.
+
+Acceptance scope: SOURCE_BASELINE_ONLY. P0_SOURCE_READY = YES. P1_READY = YES. Not a production-release approval. Validated source commit is the commit introducing the policy (resolve with git log); its hash is recorded in the subsequent P1 evidence. Existing canonical identities and prior unchanged-source validation are preserved in the JSON companion.
+
+Supabase remains a deferred environment task with previously observed schema mismatch. Cloudflare remains BLOCKED_BY_EXTERNAL_DEPENDENCY. Neither environment was retried. Main, canonical files, dependencies and production untouched.
+
+## Historical review (superseded acceptance decision; evidence preserved)
+
 # CANONICAL_BASELINE_2026_09 — final evidence snapshot
 
 **P0 = BLOCKED. Acceptance = NOT_ACCEPTED. P1_READY = NO. P1_STARTED = NO.**

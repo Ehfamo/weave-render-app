@@ -114,11 +114,19 @@ export class GroqAdapter implements ProviderAdapter {
       return {
         ok: true,
         output: { kind: "text", text },
-        ...(tokenCount(usage.prompt_tokens) && tokenCount(usage.completion_tokens)
+        completion: {
+          ...(typeof body.id === "string" ? { requestId: body.id } : {}),
+          ...(typeof choice.finish_reason === "string"
+            ? { finishReason: choice.finish_reason }
+            : {}),
+        },
+        ...([usage.prompt_tokens, usage.completion_tokens, usage.total_tokens].some(tokenCount)
           ? {
               usage: {
-                inputTokens: usage.prompt_tokens,
-                outputTokens: usage.completion_tokens,
+                ...(tokenCount(usage.prompt_tokens) ? { inputTokens: usage.prompt_tokens } : {}),
+                ...(tokenCount(usage.completion_tokens)
+                  ? { outputTokens: usage.completion_tokens }
+                  : {}),
                 ...(tokenCount(usage.total_tokens) ? { totalTokens: usage.total_tokens } : {}),
               },
             }

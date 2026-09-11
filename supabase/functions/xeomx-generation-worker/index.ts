@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2.95.0";
+import { createGroqGatewayRoute, GatewayRouteFailure } from "./groq-gateway.ts";
 import { validateResearchCitations } from "./citation-validation.mjs";
 
 declare const EdgeRuntime: { waitUntil(task: Promise<unknown>): void };
@@ -59,11 +60,13 @@ const AUTO_ROUTE_ORDER: readonly ProviderId[] = ["cloudflare", "gemini", "groq"]
 
 class ProviderFailure extends Error {
   readonly code: ProviderFailureCode;
+  readonly retryable: boolean;
 
-  constructor(code: ProviderFailureCode, message: string) {
+  constructor(code: ProviderFailureCode, message: string, retryable = true) {
     super(message);
     this.name = "ProviderFailure";
     this.code = code;
+    this.retryable = retryable;
   }
 }
 
@@ -84,6 +87,8 @@ async function authorized(req: Request) {
 }
 
 function failure(error: unknown): ProviderFailure {
+  if (error instanceof GatewayRouteFailure)
+    return new ProviderFailure(error.code, error.message, error.retryable);
   if (error instanceof ProviderFailure) return error;
   if (error instanceof DOMException && error.name === "AbortError") {
     return new ProviderFailure("PROVIDER_TIMEOUT", "provider timed out");
@@ -225,47 +230,10 @@ function geminiRoute(): Route {
 }
 
 function groqRoute(): Route {
-  const model = "llama-3.1-8b-instant";
-  return {
-    id: "groq",
-    model,
-    configured: () => Boolean(Deno.env.get("GROQ_API_KEY")),
-    generate: async ({ prompt, maxTokens }) => {
-      const apiKey = Deno.env.get("GROQ_API_KEY");
-      if (!apiKey) throw new ProviderFailure("PROVIDER_UNAVAILABLE", "groq is not configured");
-      const { response, body } = await fetchJson(
-        "https://api.groq.com/openai/v1/chat/completions",
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-          body: JSON.stringify({
-            model,
-            messages: [
-              { role: "system", content: SYSTEM_PROMPT },
-              { role: "user", content: prompt },
-            ],
-            max_tokens: maxTokens,
-            temperature: 0,
-          }),
-        },
-      );
-      if (!response.ok) throw responseFailure("groq", response.status);
-      const text = String(body?.choices?.[0]?.message?.content ?? "").trim();
-      if (!text) throw new ProviderFailure("GENERATION_FAILED", "groq returned empty output");
-      const usage = body?.usage ?? null;
-      return {
-        text,
-        providerRequestId: body?.id ?? response.headers.get("x-request-id") ?? null,
-        finishReason: String(body?.choices?.[0]?.finish_reason ?? "stop"),
-        usage: {
-          inputUnits: usage?.prompt_tokens ?? null,
-          outputUnits: usage?.completion_tokens ?? null,
-          actualCostMicrounits: null,
-          unavailable: !usage,
-        },
-      };
-    },
-  };
+  return createGroqGatewayRoute({
+    getApiKey: () => Deno.env.get("GROQ_API_KEY"),
+    systemInstruction: SYSTEM_PROMPT,
+  });
 }
 
 function routesForJob(job: JobInput): Route[] {
@@ -530,7 +498,7 @@ async function processOne() {
           code: previousFailure.code,
         }),
       );
-      if (job.routing_mode === "manual") break;
+      if (job.routing_mode === "manual" || !previousFailure.retryable) break;
     }
   }
 

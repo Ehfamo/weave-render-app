@@ -112,25 +112,28 @@ function cleanResult(result: AdapterResult, request: ModelRequest): AdapterResul
     output = { kind: "structured" as const, value: JSON.parse(JSON.stringify(out.value)) };
   }
   const usage = result.usage;
-  if (
-    usage &&
-    (!Number.isSafeInteger(usage.inputTokens) ||
-      usage.inputTokens < 0 ||
-      !Number.isSafeInteger(usage.outputTokens) ||
-      usage.outputTokens < 0 ||
-      (usage.totalTokens !== undefined &&
-        (!Number.isSafeInteger(usage.totalTokens) || usage.totalTokens < 0)))
-  )
-    throw new Error("Invalid usage");
+  const normalizedUsage: import("./contracts.ts").ModelUsage = {};
+  for (const key of ["inputTokens", "outputTokens", "totalTokens"] as const) {
+    const value = usage?.[key];
+    if (value !== undefined) {
+      if (!Number.isSafeInteger(value) || value < 0) throw new Error("Invalid usage");
+      normalizedUsage[key] = value;
+    }
+  }
+  const completion = result.completion;
   return {
     ok: true,
     output,
-    ...(usage
+    ...(Object.keys(normalizedUsage).length ? { usage: normalizedUsage } : {}),
+    ...(completion
       ? {
-          usage: {
-            inputTokens: usage.inputTokens,
-            outputTokens: usage.outputTokens,
-            ...(usage.totalTokens === undefined ? {} : { totalTokens: usage.totalTokens }),
+          completion: {
+            ...(typeof completion.requestId === "string"
+              ? { requestId: completion.requestId }
+              : {}),
+            ...(typeof completion.finishReason === "string"
+              ? { finishReason: completion.finishReason }
+              : {}),
           },
         }
       : {}),

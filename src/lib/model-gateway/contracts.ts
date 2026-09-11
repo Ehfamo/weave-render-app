@@ -32,8 +32,8 @@ export type ModelOutput =
 export type JsonValue =
   null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
 export interface ModelUsage {
-  inputTokens: number;
-  outputTokens: number;
+  inputTokens?: number;
+  outputTokens?: number;
   totalTokens?: number;
 }
 export type ModelErrorCode =
@@ -55,7 +55,13 @@ export interface ProviderHealth {
   checkedAt: string;
 }
 export type AdapterResult =
-  { ok: true; output: ModelOutput; usage?: ModelUsage } | { ok: false; error: ModelError };
+  | {
+      ok: true;
+      output: ModelOutput;
+      usage?: ModelUsage;
+      completion?: { requestId?: string; finishReason?: string };
+    }
+  | { ok: false; error: ModelError };
 export type ModelResponse = AdapterResult & {
   requestId: string;
   model?: ModelIdentity;

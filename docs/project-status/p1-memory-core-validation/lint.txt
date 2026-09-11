@@ -1,0 +1,29 @@
+
+/workspace/scratch/c2e7c7c5940e/p0-inspection/src/components/ui/badge.tsx
+  32:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/workspace/scratch/c2e7c7c5940e/p0-inspection/src/components/ui/button.tsx
+  49:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/workspace/scratch/c2e7c7c5940e/p0-inspection/src/components/ui/form.tsx
+  163:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/workspace/scratch/c2e7c7c5940e/p0-inspection/src/components/ui/navigation-menu.tsx
+  111:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/workspace/scratch/c2e7c7c5940e/p0-inspection/src/components/ui/sidebar.tsx
+  743:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/workspace/scratch/c2e7c7c5940e/p0-inspection/src/components/ui/toggle.tsx
+  42:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/workspace/scratch/c2e7c7c5940e/p0-inspection/src/components/xeomx/HeroBackground.tsx
+  48:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/workspace/scratch/c2e7c7c5940e/p0-inspection/src/components/xeomx/os/ProjectContextProvider.tsx
+  35:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/workspace/scratch/c2e7c7c5940e/p0-inspection/src/routes/magazine.tsx
+  56:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+✖ 9 problems (0 errors, 9 warnings)

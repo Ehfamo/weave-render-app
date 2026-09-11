@@ -1,0 +1,25 @@
+Build log excerpt (asset listing omitted; full transient log: p13-build.txt)
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> build
+> vite build
+
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+vite v8.1.3 building client environment for production...
+✔ [paraglide-js] Compilation complete (message-modules)
+... asset listing omitted ...
+.output/server/_libs/framer-motion.mjs                             344.26 kB │ gzip:  89.72 kB
+.output/server/_libs/recharts+[...].mjs                            521.15 kB │ gzip:  96.46 kB
+.output/server/_libs/@tanstack/react-router+[...].mjs              657.43 kB │ gzip: 138.64 kB
+
+✓ built in 689ms
+
+[nitro]  WARN  [cloudflare] Wrangler config main is overridden and will be ignored.
+
+ℹ Generated .output/server/wrangler.json
+ℹ Generated .wrangler/deploy/config.json
+ℹ Generated .output/public/_headers
+ℹ Generated .output/nitro.json
+
+[nitro] ✔ You can preview this build using npx vite preview
+[nitro] ✔ You can deploy this build using npx nitro deploy --prebuilt

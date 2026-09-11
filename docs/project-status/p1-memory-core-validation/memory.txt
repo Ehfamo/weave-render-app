@@ -1,0 +1,18 @@
+✔ memory opt-in, CRUD, immutable provenance, archive and deletion (4.973169ms)
+✔ two users sharing storage cannot read update or delete each other's memory (0.613602ms)
+✔ project and conversation scopes never mix implicitly (1.828549ms)
+✔ all eight categories work and disabled categories stop writes/retrieval but retain inspection (9.924233ms)
+✔ query validation, importance, recency, lexical relevance and limits are deterministic (1.142819ms)
+✔ service rejects leaking adapter results and detaches returned memory references (0.343667ms)
+✔ native adapter maps storage rows, binds user and does not forward storage errors (0.593141ms)
+✔ memory contracts do not import provider/framework SDK types (11.33203ms)
+✔ memory migration protects both tables and uses caller RLS for RPC (1.857853ms)
+✔ memory migration preserves immutable ownership/provenance and existing domain entities (0.340992ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 159.623598

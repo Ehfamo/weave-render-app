@@ -1,7 +1,8 @@
 # P2 Agent Platform validation
 
-Repository: Ehfamo/weave-render-app  
-Branch: feature/xeomx-p2-agent-platform-20260913  
+Repository: Ehfamo/weave-render-app
+
+Branch: feature/xeomx-p2-agent-platform-20260913
 Starting HEAD: 89d3da3d7d4f0534c545935b7ce247db55bc3daa
 
 ## Capability inventory

@@ -77,41 +77,37 @@ export function CommandCenter({
   async function execute(id: ActionId) {
     if (busy) return;
     setFailed(false);
-    if (id === "more") {
-      onLegacy();
-      return;
+    setBusy(true);
+    try {
+      await runAction(id, {
+        recent,
+        navigate: go,
+        search: () => setText(""),
+        more: onLegacy,
+        createProject: async () => {
+          if (!user) return "/auth";
+          const r = await createProjectFn({
+            data: { name: text.trim().slice(0, 120) || labels.newProject },
+          });
+          if (!r.ok) throw new Error("ACTION_FAILED");
+          return `/workspace?projectId=${encodeURIComponent(r.data.id)}`;
+        },
+      });
+    } catch {
+      setFailed(true);
+    } finally {
+      setBusy(false);
     }
-    if (id === "search") {
-      setText("");
-      return;
-    }
-    if (id === "newProject") {
-      if (!user) {
-        go("/auth");
-        return;
-      }
-      setBusy(true);
-      try {
-        const r = await createProjectFn({
-          data: { name: text.trim().slice(0, 120) || labels.newProject },
-        });
-        if (!r.ok) throw new Error();
-        go(`/workspace?projectId=${encodeURIComponent(r.data.id)}`);
-      } catch {
-        setFailed(true);
-      } finally {
-        setBusy(false);
-      }
-      return;
-    }
-    const target = actionTarget(id, recent);
-    if (target) go(target);
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          document.querySelector<HTMLButtonElement>("[data-command-trigger]")?.focus();
+        }}
         dir={["fa", "ar"].includes(getLocale()) ? "rtl" : "ltr"}
-        className="max-h-[85svh] w-[calc(100%-1rem)] overflow-hidden p-4 text-start"
+        className="max-h-[85svh] w-[calc(100%_-_1rem)] overflow-hidden p-4 text-start"
       >
         <DialogTitle>{m.cc_title()}</DialogTitle>
         <DialogDescription>{m.cc_recent()}</DialogDescription>

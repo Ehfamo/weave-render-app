@@ -23,6 +23,7 @@ export function GlobalLauncherProvider() {
   return (
     <>
       <button
+        data-command-trigger
         type="button"
         aria-label={m.cc_title()}
         onClick={() => setOpen(true)}

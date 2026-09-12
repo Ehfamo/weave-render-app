@@ -50,3 +50,31 @@ export function actionTarget(id: ActionId, recent?: string) {
   if (!a) throw new Error("UNKNOWN_ACTION");
   return id === "recentProject" ? recent : a.target;
 }
+
+export interface ActionHandlers {
+  recent?: string;
+  navigate(target: string): void;
+  createProject(): Promise<string>;
+  search(): void;
+  more(): void;
+}
+/** Explicit selection only: intent classification never executes a side effect. */
+export async function runAction(id: ActionId, handlers: ActionHandlers) {
+  const action = ACTIONS.find((a) => a.id === id);
+  if (!action) throw new Error("UNKNOWN_ACTION");
+  if (action.kind === "create-project") {
+    handlers.navigate(await handlers.createProject());
+    return;
+  }
+  if (action.kind === "search") {
+    handlers.search();
+    return;
+  }
+  if (action.kind === "legacy") {
+    handlers.more();
+    return;
+  }
+  const target = actionTarget(id, handlers.recent);
+  if (!target) throw new Error("ACTION_UNAVAILABLE");
+  handlers.navigate(target);
+}

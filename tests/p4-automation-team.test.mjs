@@ -99,6 +99,48 @@ test("risky action pauses for canonical approval", async () => {
   assert.equal(r.execution.status, "waiting_approval");
   assert.match(r.execution.approvalId, /w:e:x/);
 });
+test("durable exact approval resumes once", async () => {
+  const workflows = new Map(),
+    executions = new Map();
+  let consumed = 0,
+    writes = 0;
+  const approvals = {
+    request: async () => {},
+    authorizeContinuation: async (x) => {
+      assert.equal(x.stepId, "x");
+      if (consumed++) throw Error("CONSUMED");
+    },
+  };
+  const store = {
+    actorId,
+    role: async () => "owner",
+    saveWorkflow: async (w) => workflows.set(w.id, w),
+    workflow: async (id) => workflows.get(id),
+    workflows: async () => [],
+    saveExecution: async (x) => executions.set(x.id, structuredClone(x)),
+    execution: async (id) => executions.get(id),
+    executions: async () => [...executions.values()],
+    seenEvent: async () => false,
+  };
+  const service = new AutomationService(
+    store,
+    [{ id: "write", risk: "LOW_RISK_WRITE", execute: async () => ({ writes: ++writes }) }],
+    () => now,
+    approvals,
+  );
+  await service.create(workflow([{ id: "x", order: 0, actionId: "write", input: {} }]));
+  const paused = await service.manual("w", event());
+  assert.equal(paused.execution.status, "waiting_approval");
+  assert.equal(
+    (await service.resume(paused.execution.id, paused.execution.approvalId)).execution.status,
+    "completed",
+  );
+  assert.equal(writes, 1);
+  await assert.rejects(
+    () => service.resume(paused.execution.id, paused.execution.approvalId),
+    /NOT_RESUMABLE/,
+  );
+});
 test("roles are server authoritative", () => {
   assert.equal(permits("owner", "manage_members"), true);
   assert.equal(permits("editor", "assign"), true);

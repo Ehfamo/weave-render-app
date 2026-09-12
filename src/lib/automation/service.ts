@@ -5,6 +5,7 @@ import type {
   AutomationResult,
   AutomationWorkflow,
 } from "./contracts.ts";
+import type { DurableApprovalAuthority } from "../agents/durable-approval.ts";
 export interface AutomationStore {
   actorId: string;
   role(projectId: string): Promise<"owner" | "admin" | "editor" | "viewer" | null>;
@@ -13,20 +14,24 @@ export interface AutomationStore {
   workflows(projectId: string): Promise<AutomationWorkflow[]>;
   saveExecution(v: AutomationExecution): Promise<void>;
   executions(workflowId: string): Promise<AutomationExecution[]>;
+  execution?(id: string): Promise<AutomationExecution | null>;
   seenEvent(workflowId: string, eventId: string): Promise<boolean>;
 }
 export class AutomationService {
   private store: AutomationStore;
   private actions: Map<string, AutomationAction>;
   private now: () => string;
+  private approvals?: DurableApprovalAuthority;
   constructor(
     store: AutomationStore,
     actions: AutomationAction[],
     now = () => new Date().toISOString(),
+    approvals?: DurableApprovalAuthority,
   ) {
     this.store = store;
     this.actions = new Map(actions.map((a) => [a.id, a]));
     this.now = now;
+    this.approvals = approvals;
   }
   private async auth(projectId: string, write = true) {
     const role = await this.store.role(projectId);
@@ -95,6 +100,16 @@ export class AutomationService {
       if (step.requiresApproval || a.risk !== "SAFE_READ") {
         x.status = "waiting_approval";
         x.approvalId = `${x.id}:${step.id}`;
+        await this.approvals?.request({
+          id: x.approvalId,
+          taskId: w.id,
+          executionId: x.id,
+          stepId: step.id,
+          toolId: a.id,
+          risk: a.risk,
+          requestedBy: this.store.actorId,
+          projectId: w.projectId,
+        });
         break;
       }
       let attempts = 0;
@@ -124,5 +139,31 @@ export class AutomationService {
   async history(id: string) {
     const w = await this.need(id);
     return this.store.executions(w.id);
+  }
+  async resume(executionId: string, approvalId: string, signal?: AbortSignal) {
+    if (!this.store.execution || !this.approvals) throw Error("DURABLE_RESUME_UNAVAILABLE");
+    const x = await this.store.execution(executionId);
+    if (!x || x.status !== "waiting_approval" || x.approvalId !== approvalId)
+      throw Error("EXECUTION_NOT_RESUMABLE");
+    const w = await this.need(x.workflowId),
+      step = [...w.steps]
+        .sort((a, b) => a.order - b.order)
+        .find((s) => !x.completedStepIds.includes(s.id));
+    if (!step) throw Error("STEP_NOT_FOUND");
+    const action = this.actions.get(step.actionId)!;
+    await this.approvals.authorizeContinuation({
+      approvalId,
+      taskId: w.id,
+      executionId: x.id,
+      stepId: step.id,
+      toolId: action.id,
+      projectId: w.projectId,
+    });
+    const output = await action.execute(step.input, signal);
+    x.completedStepIds.push(step.id);
+    x.status = "completed";
+    x.updatedAt = this.now();
+    await this.store.saveExecution(x);
+    return { execution: x, outputs: [output] };
   }
 }

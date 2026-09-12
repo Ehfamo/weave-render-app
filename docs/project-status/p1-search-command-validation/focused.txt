@@ -1,0 +1,22 @@
+✔ Ctrl and Cmd K shortcuts ignore composition and unrelated keys (0.763809ms)
+✔ intent mapping is deterministic and does not execute actions (1.04047ms)
+✔ canonical actions execute only selected handlers and resume authorized recent project (0.973568ms)
+✔ action failures do not navigate and registry contains no provider execution (0.242708ms)
+✔ command composition retains keyboard primitives RTL touch sizes and private query boundaries (6.186574ms)
+✔ all five locale catalogs include the same real command labels (3.53005ms)
+✔ all six source types participate in unified lexical search and safe targets (9.037292ms)
+✔ ranking favors exact title then lexical matches with deterministic ties (1.117878ms)
+✔ source/project filters pagination limits and recent sorting are stable (1.314185ms)
+✔ tenant ownership and project membership exclude unauthorized data (0.5401ms)
+✔ query validation rejects malformed excessive and invalid pagination input (0.418525ms)
+✔ unavailable sources remain visible as unavailable without leaking errors (0.36184ms)
+✔ native sources map existing storage and respect disabled memory and brain controls (1.443371ms)
+✔ candidate row corruption fails that source closed and duplicate registration is rejected (0.28303ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 145.020852

@@ -534,5 +534,20 @@
   "cc_open": "فتح",
   "cc_next": "نتائج إضافية",
   "cc_recent": "العناصر الأخيرة في مساحة عملك",
-  "cc_failed": "تعذر إكمال هذا الإجراء"
+  "cc_failed": "تعذر إكمال هذا الإجراء",
+  "creative_title": "مساحة العمل الإبداعية",
+  "creative_project": "مشروع بلا عنوان",
+  "creative_generate": "إنشاء",
+  "creative_assets": "الأصول",
+  "creative_add": "إضافة",
+  "creative_create": "إنشاء",
+  "creative_image": "صورة",
+  "creative_video": "فيديو",
+  "creative_audio": "صوت",
+  "creative_advanced": "متقدم",
+  "creative_quality": "الجودة",
+  "creative_timeline": "المخطط الزمني",
+  "creative_prompt_default": "أنشئ قصة سينمائية للمنتج",
+  "creative_play": "تشغيل المعاينة",
+  "creative_pause": "إيقاف المعاينة"
 }

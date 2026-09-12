@@ -534,5 +534,20 @@
   "cc_open": "Open",
   "cc_next": "More results",
   "cc_recent": "Recent items from your workspace",
-  "cc_failed": "Could not complete this action"
+  "cc_failed": "Could not complete this action",
+  "creative_title": "Creative Workspace",
+  "creative_project": "Untitled project",
+  "creative_generate": "Generate",
+  "creative_assets": "Assets",
+  "creative_add": "Add",
+  "creative_create": "Create",
+  "creative_image": "Image",
+  "creative_video": "Video",
+  "creative_audio": "Audio",
+  "creative_advanced": "Advanced",
+  "creative_quality": "Quality",
+  "creative_timeline": "Timeline",
+  "creative_prompt_default": "Create a cinematic product story",
+  "creative_play": "Play preview",
+  "creative_pause": "Pause preview"
 }

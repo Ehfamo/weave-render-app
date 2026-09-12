@@ -534,5 +534,20 @@
   "cc_open": "打开",
   "cc_next": "更多结果",
   "cc_recent": "工作区最近项目",
-  "cc_failed": "无法完成此操作"
+  "cc_failed": "无法完成此操作",
+  "creative_title": "创意工作区",
+  "creative_project": "未命名项目",
+  "creative_generate": "生成",
+  "creative_assets": "素材",
+  "creative_add": "添加",
+  "creative_create": "创作",
+  "creative_image": "图片",
+  "creative_video": "视频",
+  "creative_audio": "音频",
+  "creative_advanced": "高级",
+  "creative_quality": "质量",
+  "creative_timeline": "时间线",
+  "creative_prompt_default": "创作一个电影感产品故事",
+  "creative_play": "播放预览",
+  "creative_pause": "暂停预览"
 }

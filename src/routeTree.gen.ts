@@ -78,6 +78,7 @@ import { Route as AgentsRegistryRouteImport } from './routes/agents.registry'
 import { Route as AgentsObservabilityRouteImport } from './routes/agents.observability'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCreativeWorkspaceRouteImport } from './routes/_authenticated/creative-workspace'
 import { Route as OsEnvironmentViewRouteImport } from './routes/os.$environment.$view'
 
 const XeomxAiRoute = XeomxAiRouteImport.update({
@@ -424,6 +425,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCreativeWorkspaceRoute =
+  AuthenticatedCreativeWorkspaceRouteImport.update({
+    id: '/creative-workspace',
+    path: '/creative-workspace',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const OsEnvironmentViewRoute = OsEnvironmentViewRouteImport.update({
   id: '/os/$environment/$view',
   path: '/os/$environment/$view',
@@ -467,6 +474,7 @@ export interface FileRoutesByFullPath {
   '/tools': typeof ToolsRoute
   '/workspace': typeof WorkspaceRoute
   '/xeomx-ai': typeof XeomxAiRoute
+  '/creative-workspace': typeof AuthenticatedCreativeWorkspaceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/agents/observability': typeof AgentsObservabilityRoute
@@ -538,6 +546,7 @@ export interface FileRoutesByTo {
   '/tools': typeof ToolsRoute
   '/workspace': typeof WorkspaceRoute
   '/xeomx-ai': typeof XeomxAiRoute
+  '/creative-workspace': typeof AuthenticatedCreativeWorkspaceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/agents/observability': typeof AgentsObservabilityRoute
@@ -611,6 +620,7 @@ export interface FileRoutesById {
   '/tools': typeof ToolsRoute
   '/workspace': typeof WorkspaceRoute
   '/xeomx-ai': typeof XeomxAiRoute
+  '/_authenticated/creative-workspace': typeof AuthenticatedCreativeWorkspaceRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/agents/observability': typeof AgentsObservabilityRoute
@@ -684,6 +694,7 @@ export interface FileRouteTypes {
     | '/tools'
     | '/workspace'
     | '/xeomx-ai'
+    | '/creative-workspace'
     | '/dashboard'
     | '/saved'
     | '/agents/observability'
@@ -755,6 +766,7 @@ export interface FileRouteTypes {
     | '/tools'
     | '/workspace'
     | '/xeomx-ai'
+    | '/creative-workspace'
     | '/dashboard'
     | '/saved'
     | '/agents/observability'
@@ -827,6 +839,7 @@ export interface FileRouteTypes {
     | '/tools'
     | '/workspace'
     | '/xeomx-ai'
+    | '/_authenticated/creative-workspace'
     | '/_authenticated/dashboard'
     | '/_authenticated/saved'
     | '/agents/observability'
@@ -1411,6 +1424,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/creative-workspace': {
+      id: '/_authenticated/creative-workspace'
+      path: '/creative-workspace'
+      fullPath: '/creative-workspace'
+      preLoaderRoute: typeof AuthenticatedCreativeWorkspaceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/os/$environment/$view': {
       id: '/os/$environment/$view'
       path: '/os/$environment/$view'
@@ -1422,11 +1442,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCreativeWorkspaceRoute: typeof AuthenticatedCreativeWorkspaceRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCreativeWorkspaceRoute: AuthenticatedCreativeWorkspaceRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedSavedRoute: AuthenticatedSavedRoute,
 }

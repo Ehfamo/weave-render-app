@@ -35,7 +35,7 @@ export const ACTIONS: CanonicalAction[] = [
   { id: "newProject", kind: "create-project" },
   { id: "recentProject", kind: "navigate" },
   { id: "search", kind: "search" },
-  { id: "create", kind: "navigate", target: "/studio" },
+  { id: "create", kind: "navigate", target: "/creative-workspace" },
   { id: "chat", kind: "navigate", target: "/xeomx-ai" },
   { id: "memory", kind: "navigate", target: "/workspace?type=memory" },
   { id: "generations", kind: "navigate", target: "/workspace?type=generation" },

@@ -534,5 +534,20 @@
   "cc_open": "باز کردن",
   "cc_next": "نتایج بیشتر",
   "cc_recent": "موارد اخیر فضای کار شما",
-  "cc_failed": "انجام این کار ممکن نشد"
+  "cc_failed": "انجام این کار ممکن نشد",
+  "creative_title": "فضای کار خلاقه",
+  "creative_project": "پروژه بدون عنوان",
+  "creative_generate": "تولید",
+  "creative_assets": "دارایی‌ها",
+  "creative_add": "افزودن",
+  "creative_create": "ساختن",
+  "creative_image": "تصویر",
+  "creative_video": "ویدیو",
+  "creative_audio": "صدا",
+  "creative_advanced": "پیشرفته",
+  "creative_quality": "کیفیت",
+  "creative_timeline": "خط زمانی",
+  "creative_prompt_default": "یک داستان سینمایی برای محصول بساز",
+  "creative_play": "پخش پیش‌نمایش",
+  "creative_pause": "توقف پیش‌نمایش"
 }

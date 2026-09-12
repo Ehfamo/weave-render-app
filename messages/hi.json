@@ -534,5 +534,20 @@
   "cc_open": "खोलें",
   "cc_next": "और परिणाम",
   "cc_recent": "आपके कार्यक्षेत्र के हाल के आइटम",
-  "cc_failed": "यह कार्रवाई पूरी नहीं हो सकी"
+  "cc_failed": "यह कार्रवाई पूरी नहीं हो सकी",
+  "creative_title": "क्रिएटिव वर्कस्पेस",
+  "creative_project": "बिना नाम का प्रोजेक्ट",
+  "creative_generate": "बनाएँ",
+  "creative_assets": "एसेट",
+  "creative_add": "जोड़ें",
+  "creative_create": "बनाएँ",
+  "creative_image": "चित्र",
+  "creative_video": "वीडियो",
+  "creative_audio": "ऑडियो",
+  "creative_advanced": "उन्नत",
+  "creative_quality": "गुणवत्ता",
+  "creative_timeline": "टाइमलाइन",
+  "creative_prompt_default": "एक सिनेमाई उत्पाद कहानी बनाएँ",
+  "creative_play": "पूर्वावलोकन चलाएँ",
+  "creative_pause": "पूर्वावलोकन रोकें"
 }

@@ -1,0 +1,1030 @@
+TAP version 13
+# Subtest: all 21 former non-P0 gaps have exact direct routes
+ok 1 - all 21 former non-P0 gaps have exact direct routes
+  ---
+  duration_ms: 1.251095
+  type: 'test'
+  ...
+# Subtest: all 21 former non-P0 gaps have target-specific registered surfaces
+ok 2 - all 21 former non-P0 gaps have target-specific registered surfaces
+  ---
+  duration_ms: 0.580865
+  type: 'test'
+  ...
+# Subtest: full UI closure preserves guarded dependency language
+ok 3 - full UI closure preserves guarded dependency language
+  ---
+  duration_ms: 0.291449
+  type: 'test'
+  ...
+# Subtest: the Cloudflare build emits a deployable Worker package
+ok 4 - the Cloudflare build emits a deployable Worker package
+  ---
+  duration_ms: 6.980099
+  type: 'test'
+  ...
+# Subtest: all twenty core workflows have unique identities and real route targets
+ok 5 - all twenty core workflows have unique identities and real route targets
+  ---
+  duration_ms: 2.27549
+  type: 'test'
+  ...
+# Subtest: the event core preserves policy, audit and notification boundaries
+ok 6 - the event core preserves policy, audit and notification boundaries
+  ---
+  duration_ms: 0.522337
+  type: 'test'
+  ...
+# Subtest: provider routing fails closed without verified capability evidence
+ok 7 - provider routing fails closed without verified capability evidence
+  ---
+  duration_ms: 0.243507
+  type: 'test'
+  ...
+# Subtest: model evidence sources remain explicitly separated
+ok 8 - model evidence sources remain explicitly separated
+  ---
+  duration_ms: 0.115544
+  type: 'test'
+  ...
+# Subtest: home defers marketplace discovery and its heavy prompt-card dependency
+ok 9 - home defers marketplace discovery and its heavy prompt-card dependency
+  ---
+  duration_ms: 9.479075
+  type: 'test'
+  ...
+# Subtest: memory opt-in, CRUD, immutable provenance, archive and deletion
+ok 10 - memory opt-in, CRUD, immutable provenance, archive and deletion
+  ---
+  duration_ms: 3.676009
+  type: 'test'
+  ...
+# Subtest: two users sharing storage cannot read update or delete each other's memory
+ok 11 - two users sharing storage cannot read update or delete each other's memory
+  ---
+  duration_ms: 0.392481
+  type: 'test'
+  ...
+# Subtest: project and conversation scopes never mix implicitly
+ok 12 - project and conversation scopes never mix implicitly
+  ---
+  duration_ms: 3.261696
+  type: 'test'
+  ...
+# Subtest: all eight categories work and disabled categories stop writes/retrieval but retain inspection
+ok 13 - all eight categories work and disabled categories stop writes/retrieval but retain inspection
+  ---
+  duration_ms: 7.124167
+  type: 'test'
+  ...
+# Subtest: query validation, importance, recency, lexical relevance and limits are deterministic
+ok 14 - query validation, importance, recency, lexical relevance and limits are deterministic
+  ---
+  duration_ms: 1.052987
+  type: 'test'
+  ...
+# Subtest: service rejects leaking adapter results and detaches returned memory references
+ok 15 - service rejects leaking adapter results and detaches returned memory references
+  ---
+  duration_ms: 0.313202
+  type: 'test'
+  ...
+# Subtest: native adapter maps storage rows, binds user and does not forward storage errors
+ok 16 - native adapter maps storage rows, binds user and does not forward storage errors
+  ---
+  duration_ms: 0.714056
+  type: 'test'
+  ...
+# Subtest: memory contracts do not import provider/framework SDK types
+ok 17 - memory contracts do not import provider/framework SDK types
+  ---
+  duration_ms: 9.652597
+  type: 'test'
+  ...
+# Subtest: memory migration protects both tables and uses caller RLS for RPC
+ok 18 - memory migration protects both tables and uses caller RLS for RPC
+  ---
+  duration_ms: 0.681196
+  type: 'test'
+  ...
+# Subtest: memory migration preserves immutable ownership/provenance and existing domain entities
+ok 19 - memory migration preserves immutable ownership/provenance and existing domain entities
+  ---
+  duration_ms: 0.243006
+  type: 'test'
+  ...
+# Subtest: registry exposes safe independent snapshots and enforces enabled state
+ok 20 - registry exposes safe independent snapshots and enforces enabled state
+  ---
+  duration_ms: 7.755057
+  type: 'test'
+  ...
+# Subtest: runtime executes all routing modes and deterministic ties
+ok 21 - runtime executes all routing modes and deterministic ties
+  ---
+  duration_ms: 9.70124
+  type: 'test'
+  ...
+# Subtest: transient failure falls back with recorded attempts and latency
+ok 22 - transient failure falls back with recorded attempts and latency
+  ---
+  duration_ms: 1.059357
+  type: 'test'
+  ...
+# Subtest: non-retryable normalized failures never fallback regardless of adapter retry hint
+ok 23 - non-retryable normalized failures never fallback regardless of adapter retry hint
+  ---
+  duration_ms: 1.013507
+  type: 'test'
+  ...
+# Subtest: retries are bounded and no usage is invented for failures
+ok 24 - retries are bounded and no usage is invented for failures
+  ---
+  duration_ms: 0.637521
+  type: 'test'
+  ...
+# Subtest: hard timeout and caller abort terminate non-cooperative requests
+ok 25 - hard timeout and caller abort terminate non-cooperative requests
+  ---
+  duration_ms: 13.307956
+  type: 'test'
+  ...
+# Subtest: Groq REST integration returns canonical text and supplied usage only
+ok 26 - Groq REST integration returns canonical text and supplied usage only
+  ---
+  duration_ms: 7.449877
+  type: 'test'
+  ...
+# Subtest: Groq HTTP errors normalize and retry only transient classes
+ok 27 - Groq HTTP errors normalize and retry only transient classes
+  ---
+  duration_ms: 2.721481
+  type: 'test'
+  ...
+# Subtest: Groq missing credentials and unsupported capabilities never make requests
+ok 28 - Groq missing credentials and unsupported capabilities never make requests
+  ---
+  duration_ms: 5.835284
+  type: 'test'
+  ...
+# Subtest: refusals and malformed successful payloads do not masquerade as success
+ok 29 - refusals and malformed successful payloads do not masquerade as success
+  ---
+  duration_ms: 3.667036
+  type: 'test'
+  ...
+# Subtest: server composition is guarded and SDK-free contracts stay isolated
+ok 30 - server composition is guarded and SDK-free contracts stay isolated
+  ---
+  duration_ms: 3.133552
+  type: 'test'
+  ...
+# Subtest: real worker bridge preserves system instructions, output identifiers and partial usage
+ok 31 - real worker bridge preserves system instructions, output identifiers and partial usage
+  ---
+  duration_ms: 6.059371
+  type: 'test'
+  ...
+# Subtest: worker bridge cannot multiply retry budget or retry authorization rejection
+ok 32 - worker bridge cannot multiply retry budget or retry authorization rejection
+  ---
+  duration_ms: 6.21403
+  type: 'test'
+  ...
+# Subtest: worker keeps authorization/queue/persistence and bundles one canonical gateway dependency graph
+ok 33 - worker keeps authorization/queue/persistence and bundles one canonical gateway dependency graph
+  ---
+  duration_ms: 35.048514
+  type: 'test'
+  ...
+# Subtest: gateway projects canonical requests/responses and does not mutate caller input
+ok 34 - gateway projects canonical requests/responses and does not mutate caller input
+  ---
+  duration_ms: 1.877409
+  type: 'test'
+  ...
+# Subtest: all normalized errors discard provider messages and credential-bearing details
+ok 35 - all normalized errors discard provider messages and credential-bearing details
+  ---
+  duration_ms: 0.48456
+  type: 'test'
+  ...
+# Subtest: unavailable or failed providers do not break healthy independent adapters
+ok 36 - unavailable or failed providers do not break healthy independent adapters
+  ---
+  duration_ms: 0.567996
+  type: 'test'
+  ...
+# Subtest: capabilities and discovery identities constrain provider selection
+ok 37 - capabilities and discovery identities constrain provider selection
+  ---
+  duration_ms: 0.308936
+  type: 'test'
+  ...
+# Subtest: FAST BALANCED BEST are deterministic quality/latency/cost policies, not provider aliases
+ok 38 - FAST BALANCED BEST are deterministic quality/latency/cost policies, not provider aliases
+  ---
+  duration_ms: 6.506346
+  type: 'test'
+  ...
+# Subtest: invalid requests and cancellation never execute adapters
+ok 39 - invalid requests and cancellation never execute adapters
+  ---
+  duration_ms: 0.366012
+  type: 'test'
+  ...
+# Subtest: malformed provider results fail closed and structured/embedding output is isolated
+ok 40 - malformed provider results fail closed and structured/embedding output is isolated
+  ---
+  duration_ms: 0.708057
+  type: 'test'
+  ...
+# Subtest: canonical contract surface imports no SDK and exposes no credential or native response types
+ok 41 - canonical contract surface imports no SDK and exposes no credential or native response types
+  ---
+  duration_ms: 8.170433
+  type: 'test'
+  ...
+# Subtest: discovery removes unknown and repeated references without mutating source rails
+ok 42 - discovery removes unknown and repeated references without mutating source rails
+  ---
+  duration_ms: 1.209973
+  type: 'test'
+  ...
+# Subtest: recent navigation excludes external URLs, arbitrary actions and malformed storage
+ok 43 - recent navigation excludes external URLs, arbitrary actions and malformed storage
+  ---
+  duration_ms: 0.237168
+  type: 'test'
+  ...
+# Subtest: navigation handoff retains opaque project references and leaves previous context intact
+ok 44 - navigation handoff retains opaque project references and leaves previous context intact
+  ---
+  duration_ms: 0.337989
+  type: 'test'
+  ...
+# Subtest: reconstructed P0 status components render with fail-closed controls
+ok 45 - reconstructed P0 status components render with fail-closed controls
+  ---
+  duration_ms: 1369.145922
+  type: 'test'
+  ...
+# Subtest: catalog filters quote user syntax and retain public-query boundaries
+ok 46 - catalog filters quote user syntax and retain public-query boundaries
+  ---
+  duration_ms: 35.361465
+  type: 'test'
+  ...
+# Subtest: all 17 P0 target routes exist with exact route declarations
+ok 47 - all 17 P0 target routes exist with exact route declarations
+  ---
+  duration_ms: 1.961075
+  type: 'test'
+  ...
+# Subtest: four formerly missing P0 product surfaces are now registered
+ok 48 - four formerly missing P0 product surfaces are now registered
+  ---
+  duration_ms: 0.19279
+  type: 'test'
+  ...
+# Subtest: P0 partial targets receive distinct target-specific surfaces
+ok 49 - P0 partial targets receive distinct target-specific surfaces
+  ---
+  duration_ms: 0.379011
+  type: 'test'
+  ...
+# Subtest: high-risk P0 surfaces retain approval or policy boundaries
+ok 50 - high-risk P0 surfaces retain approval or policy boundaries
+  ---
+  duration_ms: 0.131698
+  type: 'test'
+  ...
+# Subtest: matrix accepts all required successes and does not claim external verification
+ok 51 - matrix accepts all required successes and does not claim external verification
+  ---
+  duration_ms: 4.398759
+  type: 'test'
+  ...
+# Subtest: every required gate fails closed for failure, cancellation, skipped and missing outcomes
+ok 52 - every required gate fails closed for failure, cancellation, skipped and missing outcomes
+  ---
+  duration_ms: 246.477623
+  type: 'test'
+  ...
+# Subtest: source audit resolves dotted modules and ignores import text inside comments
+ok 53 - source audit resolves dotted modules and ignores import text inside comments
+  ---
+  duration_ms: 832.809244
+  type: 'test'
+  ...
+# Subtest: the release vocabulary is canonical and backend adapters fail closed
+ok 54 - the release vocabulary is canonical and backend adapters fail closed
+  ---
+  duration_ms: 2.555812
+  type: 'test'
+  ...
+# Subtest: job transitions support recovery without allowing fabricated completion
+ok 55 - job transitions support recovery without allowing fabricated completion
+  ---
+  duration_ms: 0.833406
+  type: 'test'
+  ...
+# Subtest: payment state never grants entitlement before confirmed payment
+ok 56 - payment state never grants entitlement before confirmed payment
+  ---
+  duration_ms: 0.477439
+  type: 'test'
+  ...
+# Subtest: payment failure preserves the order and exposes a safe retry
+ok 57 - payment failure preserves the order and exposes a safe retry
+  ---
+  duration_ms: 0.169565
+  type: 'test'
+  ...
+# Subtest: effective permission preview fails closed and requires exact approval
+ok 58 - effective permission preview fails closed and requires exact approval
+  ---
+  duration_ms: 0.410349
+  type: 'test'
+  ...
+# Subtest: project handoff preserves every opaque context reference
+ok 59 - project handoff preserves every opaque context reference
+  ---
+  duration_ms: 0.266281
+  type: 'test'
+  ...
+# Subtest: future telemetry metadata strips sensitive payload fields
+ok 60 - future telemetry metadata strips sensitive payload fields
+  ---
+  duration_ms: 0.18552
+  type: 'test'
+  ...
+# Subtest: the 25-environment product contract is complete and internally unique after the full target-surface closure wave
+ok 61 - the 25-environment product contract is complete and internally unique after the full target-surface closure wave
+  ---
+  duration_ms: 65.660562
+  type: 'test'
+  ...
+# Subtest: historical journeys have explicit non-blocking missing-evidence policy
+ok 62 - historical journeys have explicit non-blocking missing-evidence policy
+  ---
+  duration_ms: 10.461085
+  type: 'test'
+  ...
+# Subtest: locale contracts stay in exact parity
+ok 63 - locale contracts stay in exact parity
+  ---
+  duration_ms: 25.634292
+  type: 'test'
+  ...
+# Subtest: release truth and safety controls are explicit in product previews
+ok 64 - release truth and safety controls are explicit in product previews
+  ---
+  duration_ms: 10.226211
+  type: 'test'
+  ...
+# Subtest: legacy simulations, fake metrics, and soft product 404s stay removed
+ok 65 - legacy simulations, fake metrics, and soft product 404s stay removed
+  ---
+  duration_ms: 4.351899
+  type: 'test'
+  ...
+# Subtest: public listing, auth, SEO, and runtime warning boundaries remain safe
+ok 66 - public listing, auth, SEO, and runtime warning boundaries remain safe
+  ---
+  duration_ms: 11.087879
+  type: 'test'
+  ...
+# Subtest: release dependency surface excludes proven unused direct packages
+ok 67 - release dependency surface excludes proven unused direct packages
+  ---
+  duration_ms: 0.814878
+  type: 'test'
+  ...
+# Subtest: secondary global tools stay outside the initial client path
+ok 68 - secondary global tools stay outside the initial client path
+  ---
+  duration_ms: 2.120636
+  type: 'test'
+  ...
+# Subtest: request 4 hardening stays centralized, fail-closed, and context preserving
+ok 69 - request 4 hardening stays centralized, fail-closed, and context preserving
+  ---
+  duration_ms: 13.14172
+  type: 'test'
+  ...
+# Subtest: goal is persisted through MemoryService and reconstructed by a new service
+ok 70 - goal is persisted through MemoryService and reconstructed by a new service
+  ---
+  duration_ms: 4.796369
+  type: 'test'
+  ...
+# Subtest: instructions decisions constraints entities and open items support updates
+ok 71 - instructions decisions constraints entities and open items support updates
+  ---
+  duration_ms: 8.193558
+  type: 'test'
+  ...
+# Subtest: user and project isolation preserve independent private brains
+ok 72 - user and project isolation preserve independent private brains
+  ---
+  duration_ms: 0.949671
+  type: 'test'
+  ...
+# Subtest: membership revocation denies reads writes and context construction
+ok 73 - membership revocation denies reads writes and context construction
+  ---
+  duration_ms: 1.182222
+  type: 'test'
+  ...
+# Subtest: project continuity survives switching conversations; conversation memory stays scoped
+ok 74 - project continuity survives switching conversations; conversation memory stays scoped
+  ---
+  duration_ms: 3.713386
+  type: 'test'
+  ...
+# Subtest: character voice brand preference facts and relevance reuse canonical memory
+ok 75 - character voice brand preference facts and relevance reuse canonical memory
+  ---
+  duration_ms: 1.281051
+  type: 'test'
+  ...
+# Subtest: snapshots and bounded context are deterministic and need no model credentials
+ok 76 - snapshots and bounded context are deterministic and need no model credentials
+  ---
+  duration_ms: 0.924954
+  type: 'test'
+  ...
+# Subtest: disabled memory excludes stored brain from context while inspection remains available
+ok 77 - disabled memory excludes stored brain from context while inspection remains available
+  ---
+  duration_ms: 0.922009
+  type: 'test'
+  ...
+# Subtest: invalid entries and capacity fail without discarding canonical state
+ok 78 - invalid entries and capacity fail without discarding canonical state
+  ---
+  duration_ms: 0.880347
+  type: 'test'
+  ...
+# Subtest: native domain requires explicit membership and rejects mismatched project/conversation data
+ok 79 - native domain requires explicit membership and rejects mismatched project/conversation data
+  ---
+  duration_ms: 0.868979
+  type: 'test'
+  ...
+# Subtest: corrupt or conflicting brain documents fail closed
+ok 80 - corrupt or conflicting brain documents fail closed
+  ---
+  duration_ms: 0.33198
+  type: 'test'
+  ...
+# Subtest: contracts remain provider neutral and runtime retains server-only user authentication
+ok 81 - contracts remain provider neutral and runtime retains server-only user authentication
+  ---
+  duration_ms: 7.239119
+  type: 'test'
+  ...
+# Subtest: Request 7 migration is additive, indexed and RLS protected
+ok 82 - Request 7 migration is additive, indexed and RLS protected
+  ---
+  duration_ms: 4.478579
+  type: 'test'
+  ...
+# Subtest: Request 7 migration keeps sensitive writes server-only and storage private
+ok 83 - Request 7 migration keeps sensitive writes server-only and storage private
+  ---
+  duration_ms: 3.241175
+  type: 'test'
+  ...
+# Subtest: Request 7 workflow maturity is connected but never falsely live-verified
+ok 84 - Request 7 workflow maturity is connected but never falsely live-verified
+  ---
+  duration_ms: 1.596766
+  type: 'test'
+  ...
+# Subtest: authentication is required before the generation path
+ok 85 - authentication is required before the generation path
+  ---
+  duration_ms: 0.564431
+  type: 'test'
+  ...
+# Subtest: project ownership is enforced before unavailable requests are persisted
+ok 86 - project ownership is enforced before unavailable requests are persisted
+  ---
+  duration_ms: 0.363057
+  type: 'test'
+  ...
+# Subtest: provider unavailable is persisted honestly without a credit charge
+ok 87 - provider unavailable is persisted honestly without a credit charge
+  ---
+  duration_ms: 0.328395
+  type: 'test'
+  ...
+# Subtest: successful CI provider execution persists output, asset, usage, ledger and audit
+ok 88 - successful CI provider execution persists output, asset, usage, ledger and audit
+  ---
+  duration_ms: 0.628307
+  type: 'test'
+  ...
+# Subtest: failed provider execution releases the full reservation and records failure
+ok 89 - failed provider execution releases the full reservation and records failure
+  ---
+  duration_ms: 0.290268
+  type: 'test'
+  ...
+# Subtest: cancelling a queued job is authorized, idempotent and releases its reservation once
+ok 90 - cancelling a queued job is authorized, idempotent and releases its reservation once
+  ---
+  duration_ms: 0.274253
+  type: 'test'
+  ...
+# Subtest: insufficient credits creates no job, message, usage or charge
+ok 91 - insufficient credits creates no job, message, usage or charge
+  ---
+  duration_ms: 0.264479
+  type: 'test'
+  ...
+# Subtest: an idempotent retry does not execute the provider or charge twice
+ok 92 - an idempotent retry does not execute the provider or charge twice
+  ---
+  duration_ms: 4.987055
+  type: 'test'
+  ...
+# Subtest: reusing an idempotency key for different input is rejected
+ok 93 - reusing an idempotency key for different input is rejected
+  ---
+  duration_ms: 0.402536
+  type: 'test'
+  ...
+# Subtest: manual routing requires the exact verified provider and model
+ok 94 - manual routing requires the exact verified provider and model
+  ---
+  duration_ms: 0.154302
+  type: 'test'
+  ...
+# Subtest: full CI vertical slice survives project reload
+ok 95 - full CI vertical slice survives project reload
+  ---
+  duration_ms: 3.299783
+  type: 'test'
+  ...
+# Subtest: research citations accept only provided source ids
+ok 96 - research citations accept only provided source ids
+  ---
+  duration_ms: 1.838972
+  type: 'test'
+  ...
+# Subtest: research citations require at least one citation
+ok 97 - research citations require at least one citation
+  ---
+  duration_ms: 0.1918
+  type: 'test'
+  ...
+# Subtest: research citations reject unknown source ids
+ok 98 - research citations reject unknown source ids
+  ---
+  duration_ms: 0.223337
+  type: 'test'
+  ...
+# Subtest: research citations reject malformed numeric citation groups
+ok 99 - research citations reject malformed numeric citation groups
+  ---
+  duration_ms: 0.149395
+  type: 'test'
+  ...
+# Subtest: Stage 5 migration adds the three missing foreign-key indexes
+ok 100 - Stage 5 migration adds the three missing foreign-key indexes
+  ---
+  duration_ms: 3.248095
+  type: 'test'
+  ...
+# Subtest: Stage 5 migration preserves RLS and narrows policy roles
+ok 101 - Stage 5 migration preserves RLS and narrows policy roles
+  ---
+  duration_ms: 2.424264
+  type: 'test'
+  ...
+# Subtest: Stage 5 migration is transactional and non-destructive to data
+ok 102 - Stage 5 migration is transactional and non-destructive to data
+  ---
+  duration_ms: 2.792208
+  type: 'test'
+  ...
+# Subtest: compensating agent JSON guard normalizes and recursively rejects common secret keys
+ok 103 - compensating agent JSON guard normalizes and recursively rejects common secret keys
+  ---
+  duration_ms: 4.458199
+  type: 'test'
+  ...
+# Subtest: hardened guard remains fixed-path and private to trusted execution
+ok 104 - hardened guard remains fixed-path and private to trusted execution
+  ---
+  duration_ms: 4.423317
+  type: 'test'
+  ...
+# Subtest: R0 and R1 admit only their explicit sandbox allowlists
+ok 105 - R0 and R1 admit only their explicit sandbox allowlists
+  ---
+  duration_ms: 1.611819
+  type: 'test'
+  ...
+# Subtest: R2 waits and cannot execute without the exact owner approval synchronizer
+ok 106 - R2 waits and cannot execute without the exact owner approval synchronizer
+  ---
+  duration_ms: 0.342826
+  type: 'test'
+  ...
+# Subtest: R2 exact-owner denial is terminal
+ok 107 - R2 exact-owner denial is terminal
+  ---
+  duration_ms: 0.124748
+  type: 'test'
+  ...
+# Subtest: R3 remains default-deny even when ordinary approval is claimed
+ok 108 - R3 remains default-deny even when ordinary approval is claimed
+  ---
+  duration_ms: 0.114102
+  type: 'test'
+  ...
+# Subtest: service lifecycle covers failure, bounded recovery, success and cancel
+ok 109 - service lifecycle covers failure, bounded recovery, success and cancel
+  ---
+  duration_ms: 0.149856
+  type: 'test'
+  ...
+# Subtest: credential values and secret-shaped nested fields are rejected
+ok 110 - credential values and secret-shaped nested fields are rejected
+  ---
+  duration_ms: 0.688928
+  type: 'test'
+  ...
+# Subtest: idempotency envelope and canonical payload are deterministic
+ok 111 - idempotency envelope and canonical payload are deterministic
+  ---
+  duration_ms: 0.267343
+  type: 'test'
+  ...
+# Subtest: definition maximum risk is enforced before admission
+ok 112 - definition maximum risk is enforced before admission
+  ---
+  duration_ms: 0.107893
+  type: 'test'
+  ...
+# Subtest: Stage 5.3 creates six durable RLS-protected control-plane tables
+ok 113 - Stage 5.3 creates six durable RLS-protected control-plane tables
+  ---
+  duration_ms: 3.701619
+  type: 'test'
+  ...
+# Subtest: risk and state constraints encode R0/R1 allowlists, R2 approval and R3 denial
+ok 114 - risk and state constraints encode R0/R1 allowlists, R2 approval and R3 denial
+  ---
+  duration_ms: 5.318274
+  type: 'test'
+  ...
+# Subtest: R2 cannot queue before an exact project-owner approval
+ok 115 - R2 cannot queue before an exact project-owner approval
+  ---
+  duration_ms: 4.547433
+  type: 'test'
+  ...
+# Subtest: idempotency, opaque references, secret rejection and audits are durable
+ok 116 - idempotency, opaque references, secret rejection and audits are durable
+  ---
+  duration_ms: 1.030433
+  type: 'test'
+  ...
+# Subtest: all foreign keys have intentional covering indexes
+ok 117 - all foreign keys have intentional covering indexes
+  ---
+  duration_ms: 0.664331
+  type: 'test'
+  ...
+# Subtest: private trigger helpers are never executable by authenticated clients
+ok 118 - private trigger helpers are never executable by authenticated clients
+  ---
+  duration_ms: 1.066717
+  type: 'test'
+  ...
+# Subtest: authenticated mutations remain narrow and RLS ownership-bound
+ok 119 - authenticated mutations remain narrow and RLS ownership-bound
+  ---
+  duration_ms: 1.184685
+  type: 'test'
+  ...
+# Subtest: checkout fails closed when no payment provider is configured
+ok 120 - checkout fails closed when no payment provider is configured
+  ---
+  duration_ms: 1.08183
+  type: 'test'
+  ...
+# Subtest: an injected generic adapter remains behind the verification boundary
+ok 121 - an injected generic adapter remains behind the verification boundary
+  ---
+  duration_ms: 0.591011
+  type: 'test'
+  ...
+# Subtest: provider and webhook mismatches fail closed
+ok 122 - provider and webhook mismatches fail closed
+  ---
+  duration_ms: 0.277368
+  type: 'test'
+  ...
+# Subtest: payment event identity is idempotent by provider and event id
+ok 123 - payment event identity is idempotent by provider and event id
+  ---
+  duration_ms: 0.537901
+  type: 'test'
+  ...
+# Subtest: checkout and subscription models cover failure, cancel and refund
+ok 124 - checkout and subscription models cover failure, cancel and refund
+  ---
+  duration_ms: 0.183687
+  type: 'test'
+  ...
+# Subtest: entitlement activation requires matching confirmed payment evidence
+ok 125 - entitlement activation requires matching confirmed payment evidence
+  ---
+  duration_ms: 0.199791
+  type: 'test'
+  ...
+# Subtest: Stage 5.3 billing migration is additive and lets apply_migration own the transaction
+ok 126 - Stage 5.3 billing migration is additive and lets apply_migration own the transaction
+  ---
+  duration_ms: 6.827674
+  type: 'test'
+  ...
+# Subtest: authenticated clients can read only their own billing rows
+ok 127 - authenticated clients can read only their own billing rows
+  ---
+  duration_ms: 1.808826
+  type: 'test'
+  ...
+# Subtest: foreign keys have covering indexes and payment events are idempotent
+ok 128 - foreign keys have covering indexes and payment events are idempotent
+  ---
+  duration_ms: 1.107509
+  type: 'test'
+  ...
+# Subtest: aggregate advisory locks make create/event/entitlement idempotency race-safe
+ok 129 - aggregate advisory locks make create/event/entitlement idempotency race-safe
+  ---
+  duration_ms: 1.095391
+  type: 'test'
+  ...
+# Subtest: checkout and subscription lifecycle transitions fail closed
+ok 130 - checkout and subscription lifecycle transitions fail closed
+  ---
+  duration_ms: 1.151626
+  type: 'test'
+  ...
+# Subtest: service-only helpers revoke public and client execution
+ok 131 - service-only helpers revoke public and client execution
+  ---
+  duration_ms: 1.911401
+  type: 'test'
+  ...
+# Subtest: entitlement activation locks and validates a confirmed payment event
+ok 132 - entitlement activation locks and validates a confirmed payment event
+  ---
+  duration_ms: 3.105305
+  type: 'test'
+  ...
+# Subtest: migration remains provider-neutral and contains no credentials
+ok 133 - migration remains provider-neutral and contains no credentials
+  ---
+  duration_ms: 1.111165
+  type: 'test'
+  ...
+# Subtest: metadata is recursively filtered and raw webhook payloads are never persisted
+ok 134 - metadata is recursively filtered and raw webhook payloads are never persisted
+  ---
+  duration_ms: 5.702184
+  type: 'test'
+  ...
+# Subtest: JSON rejects cycles, accessors and sparse arrays without evaluating them
+ok 135 - JSON rejects cycles, accessors and sparse arrays without evaluating them
+  ---
+  duration_ms: 1.092647
+  type: 'test'
+  ...
+# Subtest: control-plane bounds match existing migration constraints and R2 retries need approval
+ok 136 - control-plane bounds match existing migration constraints and R2 retries need approval
+  ---
+  duration_ms: 0.330438
+  type: 'test'
+  ...
+# Subtest: evidence cannot report a fabricated score for empty or inconsistent evaluation
+ok 137 - evidence cannot report a fabricated score for empty or inconsistent evaluation
+  ---
+  duration_ms: 0.33173
+  type: 'test'
+  ...
+# Subtest: payment ledger snapshots resist mutation and reject cross-owner activation
+ok 138 - payment ledger snapshots resist mutation and reject cross-owner activation
+  ---
+  duration_ms: 2.962354
+  type: 'test'
+  ...
+# Subtest: Stage 5.3 covers both composite Dataset/Evals foreign keys
+ok 139 - Stage 5.3 covers both composite Dataset/Evals foreign keys
+  ---
+  duration_ms: 8.95787
+  type: 'test'
+  ...
+# Subtest: Stage 5.3 evidence migration is apply_migration-owned and additive
+ok 140 - Stage 5.3 evidence migration is apply_migration-owned and additive
+  ---
+  duration_ms: 6.139352
+  type: 'test'
+  ...
+# Subtest: all browser-visible writes have explicit RLS checks and no anonymous grants
+ok 141 - all browser-visible writes have explicit RLS checks and no anonymous grants
+  ---
+  duration_ms: 4.364187
+  type: 'test'
+  ...
+# Subtest: trigger helpers are fixed-path, service-only SECURITY DEFINER functions
+ok 142 - trigger helpers are fixed-path, service-only SECURITY DEFINER functions
+  ---
+  duration_ms: 3.509298
+  type: 'test'
+  ...
+# Subtest: version, result, link and provenance immutability fail closed
+ok 143 - version, result, link and provenance immutability fail closed
+  ---
+  duration_ms: 9.448439
+  type: 'test'
+  ...
+# Subtest: recursive SQL boundary rejects secret-like JSON keys on every JSON surface
+ok 144 - recursive SQL boundary rejects secret-like JSON keys on every JSON surface
+  ---
+  duration_ms: 2.203952
+  type: 'test'
+  ...
+# Subtest: provider compute is disconnected until verified and FK paths are indexed
+ok 145 - provider compute is disconnected until verified and FK paths are indexed
+  ---
+  duration_ms: 1.828977
+  type: 'test'
+  ...
+# Subtest: eval run constraints have non-colliding explicit names
+ok 146 - eval run constraints have non-colliding explicit names
+  ---
+  duration_ms: 1.699451
+  type: 'test'
+  ...
+# Subtest: dataset item admission locks the version against concurrent finalization
+ok 147 - dataset item admission locks the version against concurrent finalization
+  ---
+  duration_ms: 4.384177
+  type: 'test'
+  ...
+# Subtest: migration contains no credential values or broad authenticated result writes
+ok 148 - migration contains no credential values or broad authenticated result writes
+  ---
+  duration_ms: 5.519498
+  type: 'test'
+  ...
+# Subtest: dataset validation preserves explicit empty and invalid states
+ok 149 - dataset validation preserves explicit empty and invalid states
+  ---
+  duration_ms: 1.769817
+  type: 'test'
+  ...
+# Subtest: dataset duplicate validation is deterministic
+ok 150 - dataset duplicate validation is deterministic
+  ---
+  duration_ms: 0.546804
+  type: 'test'
+  ...
+# Subtest: eval and experiment state machines reject terminal rewrites
+ok 151 - eval and experiment state machines reject terminal rewrites
+  ---
+  duration_ms: 0.587365
+  type: 'test'
+  ...
+# Subtest: surface state distinguishes loading, empty, invalid and failure
+ok 152 - surface state distinguishes loading, empty, invalid and failure
+  ---
+  duration_ms: 0.150998
+  type: 'test'
+  ...
+# Subtest: provider eval compute remains explicitly disconnected and fail-closed
+ok 153 - provider eval compute remains explicitly disconnected and fail-closed
+  ---
+  duration_ms: 0.193382
+  type: 'test'
+  ...
+# Subtest: recursive JSON boundary rejects secret-like keys without storing values
+ok 154 - recursive JSON boundary rejects secret-like keys without storing values
+  ---
+  duration_ms: 0.399132
+  type: 'test'
+  ...
+# Subtest: canonical evidence and safe database errors are deterministic
+ok 155 - canonical evidence and safe database errors are deterministic
+  ---
+  duration_ms: 0.235114
+  type: 'test'
+  ...
+# Subtest: authenticated membership mutation privileges are removed while RLS read remains
+ok 156 - authenticated membership mutation privileges are removed while RLS read remains
+  ---
+  duration_ms: 3.904804
+  type: 'test'
+  ...
+# Subtest: search planning is Unicode-safe, bounded and wildcard-neutral
+ok 157 - search planning is Unicode-safe, bounded and wildcard-neutral
+  ---
+  duration_ms: 1.391747
+  type: 'test'
+  ...
+# Subtest: search aggregation removes duplicates without inventing empty results
+ok 158 - search aggregation removes duplicates without inventing empty results
+  ---
+  duration_ms: 0.176026
+  type: 'test'
+  ...
+# Subtest: project update audit is trigger-only, fixed-path and privacy-safe
+ok 159 - project update audit is trigger-only, fixed-path and privacy-safe
+  ---
+  duration_ms: 5.350162
+  type: 'test'
+  ...
+# Subtest: stale running generation jobs have a partial-indexed lease recovery path
+ok 160 - stale running generation jobs have a partial-indexed lease recovery path
+  ---
+  duration_ms: 0.797762
+  type: 'test'
+  ...
+# Subtest: lease recovery fails stale work closed through the canonical failure RPC
+ok 161 - lease recovery fails stale work closed through the canonical failure RPC
+  ---
+  duration_ms: 0.377429
+  type: 'test'
+  ...
+# Subtest: lease recovery is fixed-path and service-role only
+ok 162 - lease recovery is fixed-path and service-role only
+  ---
+  duration_ms: 0.746986
+  type: 'test'
+  ...
+# Subtest: lease recovery validates bounded timeout and batch size
+ok 163 - lease recovery validates bounded timeout and batch size
+  ---
+  duration_ms: 0.250558
+  type: 'test'
+  ...
+# Subtest: generation worker performs stale-lease cleanup before claiming queued work
+ok 164 - generation worker performs stale-lease cleanup before claiming queued work
+  ---
+  duration_ms: 0.35152
+  type: 'test'
+  ...
+# Subtest: Stage 5.4 app routing registers the exact Cloudflare, Gemini, and Groq models
+ok 165 - Stage 5.4 app routing registers the exact Cloudflare, Gemini, and Groq models
+  ---
+  duration_ms: 1.312808
+  type: 'test'
+  ...
+# Subtest: the verified Cloudflare route remains the default live route
+ok 166 - the verified Cloudflare route remains the default live route
+  ---
+  duration_ms: 0.156906
+  type: 'test'
+  ...
+# Subtest: server-side manual submission validates against the exact provider registry
+ok 167 - server-side manual submission validates against the exact provider registry
+  ---
+  duration_ms: 4.518809
+  type: 'test'
+  ...
+# Subtest: provider success followed by persistence failure fails closed without cross-provider fallback
+ok 168 - provider success followed by persistence failure fails closed without cross-provider fallback
+  ---
+  duration_ms: 0.985726
+  type: 'test'
+  ...
+# Subtest: credit ledger Stage 5.4 migration restores authenticated read-only ACL
+ok 169 - credit ledger Stage 5.4 migration restores authenticated read-only ACL
+  ---
+  duration_ms: 0.847818
+  type: 'test'
+  ...
+# Subtest: pending entitlement audit trigger is provider-neutral and privilege-contained
+ok 170 - pending entitlement audit trigger is provider-neutral and privilege-contained
+  ---
+  duration_ms: 1.046918
+  type: 'test'
+  ...
+1..170
+# tests 170
+# suites 0
+# pass 170
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1606.906091

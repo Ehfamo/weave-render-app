@@ -1,0 +1,42 @@
+✔ memory opt-in, CRUD, immutable provenance, archive and deletion (3.658453ms)
+✔ two users sharing storage cannot read update or delete each other's memory (0.356317ms)
+✔ project and conversation scopes never mix implicitly (1.722646ms)
+✔ all eight categories work and disabled categories stop writes/retrieval but retain inspection (6.949263ms)
+✔ query validation, importance, recency, lexical relevance and limits are deterministic (0.900997ms)
+✔ service rejects leaking adapter results and detaches returned memory references (0.306522ms)
+✔ native adapter maps storage rows, binds user and does not forward storage errors (0.59703ms)
+✔ memory contracts do not import provider/framework SDK types (6.252613ms)
+✔ memory migration protects both tables and uses caller RLS for RPC (0.742819ms)
+✔ memory migration preserves immutable ownership/provenance and existing domain entities (0.289095ms)
+✔ goal is persisted through MemoryService and reconstructed by a new service (4.533522ms)
+✔ instructions decisions constraints entities and open items support updates (8.994205ms)
+✔ user and project isolation preserve independent private brains (1.019637ms)
+✔ membership revocation denies reads writes and context construction (1.365478ms)
+✔ project continuity survives switching conversations; conversation memory stays scoped (2.920426ms)
+✔ character voice brand preference facts and relevance reuse canonical memory (1.406419ms)
+✔ snapshots and bounded context are deterministic and need no model credentials (0.925706ms)
+✔ disabled memory excludes stored brain from context while inspection remains available (0.539824ms)
+✔ invalid entries and capacity fail without discarding canonical state (0.798633ms)
+✔ native domain requires explicit membership and rejects mismatched project/conversation data (0.805424ms)
+✔ corrupt or conflicting brain documents fail closed (0.374855ms)
+✔ contracts remain provider neutral and runtime retains server-only user authentication (5.261139ms)
+✔ Request 7 workflow maturity is connected but never falsely live-verified (1.30729ms)
+✔ authentication is required before the generation path (0.609409ms)
+✔ project ownership is enforced before unavailable requests are persisted (0.342506ms)
+✔ provider unavailable is persisted honestly without a credit charge (0.315175ms)
+✔ successful CI provider execution persists output, asset, usage, ledger and audit (0.618132ms)
+✔ failed provider execution releases the full reservation and records failure (0.283337ms)
+✔ cancelling a queued job is authorized, idempotent and releases its reservation once (0.276777ms)
+✔ insufficient credits creates no job, message, usage or charge (0.19907ms)
+✔ an idempotent retry does not execute the provider or charge twice (0.388395ms)
+✔ reusing an idempotency key for different input is rejected (1.558348ms)
+✔ manual routing requires the exact verified provider and model (0.240623ms)
+✔ full CI vertical slice survives project reload (0.273933ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 164.452719

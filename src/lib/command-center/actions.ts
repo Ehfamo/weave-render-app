@@ -11,11 +11,16 @@ export const ACTION_IDS = [
   "more",
 ] as const;
 export type ActionId = (typeof ACTION_IDS)[number];
-export type AgentTaskIntent = "research" | "coding" | "browser" | "continue";
+export type AgentTaskIntent =
+  "research" | "coding" | "browser" | "continue" | "automation" | "assignment" | "approval";
 export function classifyAgentTaskIntent(
   input: string,
 ): { intent: AgentTaskIntent; goal: string } | null {
   const goal = normalize(input);
+  if (/^(create|run).*(workflow|automation)|^(ساخت|اجرای).*(گردش.?کار|اتوماسیون)/.test(goal))
+    return { intent: "automation", goal };
+  if (/^(assign|delegate)|^(واگذار|اختصاص)/.test(goal)) return { intent: "assignment", goal };
+  if (/waiting.*approval|منتظر.*تایید/.test(goal)) return { intent: "approval", goal };
   if (/^(research|compare|investigate)\b|^(تحقیق|بررسی رقبا)/.test(goal))
     return { intent: "research", goal };
   if (/^(analyze|review|fix|change).*(code|repository)|^(کد|مخزن).*(تحلیل|بررسی)/.test(goal))

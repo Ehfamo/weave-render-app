@@ -157,11 +157,13 @@ test("snapshots and bounded context are deterministic and need no model credenti
   await f.brain.setGoal(p, "A long goal ".repeat(50));
   assert.deepEqual(await f.brain.snapshot(p), await f.brain.snapshot(p));
   const a = await f.brain.buildContext(p, { maxCharacters: 128 });
-  assert.equal(a.text.length, 128);
+  assert.ok(a.text.length <= 128);
+  assert.equal(JSON.parse(a.text).projectId, p);
+  assert.ok(!("snapshot" in a));
   assert.equal(a.truncated, true);
   assert.deepEqual(a, await f.brain.buildContext(p, { maxCharacters: 128 }));
   await assert.rejects(f.brain.buildContext(p, { maxCharacters: Infinity }));
-  assert.equal(a.snapshot.summary.method, "deterministic");
+  assert.equal((await f.brain.snapshot(p)).summary.method, "deterministic");
 });
 test("disabled memory excludes stored brain from context while inspection remains available", async () => {
   const f = fixture();

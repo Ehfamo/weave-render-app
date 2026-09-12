@@ -68,7 +68,8 @@ export interface ProjectContext {
   text: string;
   maxCharacters: number;
   truncated: boolean;
-  snapshot: ProjectBrainSnapshot;
+  sourceCount: number;
+  updatedAt: string;
 }
 /** Optional future integration; generated output is never authoritative stored state. */
 export interface ProjectSummaryAdapter {

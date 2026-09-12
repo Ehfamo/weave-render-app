@@ -218,25 +218,43 @@ export class ProjectBrainService {
     if (!Number.isInteger(maxCharacters) || maxCharacters < 128 || maxCharacters > 32000)
       throw new Error("INVALID_CONTEXT_LIMIT");
     const snapshot = await this.snapshot(projectId, options.conversationId);
-    const full = JSON.stringify({
-      project: snapshot.project,
-      goal: snapshot.goal,
-      instructions: snapshot.instructions,
-      constraints: snapshot.constraints,
-      decisions: snapshot.decisions,
-      openItems: snapshot.openItems,
-      entities: snapshot.entities,
-      other: snapshot.entries.filter((e) => e.kind === "fact" || e.kind === "preference"),
-      memories: snapshot.memories.map((r) => ({ id: r.id, type: r.type, content: r.content })),
-      recentActivity: snapshot.recentActivity,
-    });
-    // Text budget is UTF-16 characters, not tokens; snapshot remains structured and separately bounded.
+    const candidates = [
+      { kind: "identity", text: snapshot.project.name },
+      ...[
+        snapshot.goal,
+        ...snapshot.instructions,
+        ...snapshot.constraints,
+        ...snapshot.decisions,
+        ...snapshot.openItems,
+        ...snapshot.entities,
+        ...snapshot.entries.filter((e) => e.kind === "fact" || e.kind === "preference"),
+      ]
+        .filter((e): e is BrainEntry => e !== null)
+        .map((e) => ({ kind: e.kind, text: e.text })),
+      { kind: "description", text: snapshot.project.description ?? "" },
+      ...snapshot.memories.map((r) => ({ kind: r.type, text: r.content })),
+      ...snapshot.recentActivity.map((a) => ({ kind: "activity", text: a.title })),
+    ];
+    const sections: { kind: string; text: string }[] = [];
+    const encode = () => JSON.stringify({ projectId, sections });
+    let truncated = false;
+    for (const candidate of candidates) {
+      sections.push(candidate);
+      if (encode().length > maxCharacters) {
+        sections.pop();
+        truncated = true;
+        break;
+      }
+    }
+    // Whole sections preserve valid structured JSON. Budget applies to serialized text,
+    // including escapes; no full snapshot is attached to accidentally bypass this bound.
     return {
       projectId,
-      text: full.slice(0, maxCharacters),
+      text: encode(),
       maxCharacters,
-      truncated: full.length > maxCharacters,
-      snapshot,
+      truncated,
+      sourceCount: sections.length,
+      updatedAt: snapshot.updatedAt,
     };
   }
 }

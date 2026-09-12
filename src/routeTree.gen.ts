@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as XeomxAiRouteImport } from './routes/xeomx-ai'
+import { Route as WorkspaceRouteImport } from './routes/workspace'
 import { Route as ToolsRouteImport } from './routes/tools'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as StudioRouteImport } from './routes/studio'
@@ -82,6 +83,11 @@ import { Route as OsEnvironmentViewRouteImport } from './routes/os.$environment.
 const XeomxAiRoute = XeomxAiRouteImport.update({
   id: '/xeomx-ai',
   path: '/xeomx-ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkspaceRoute = WorkspaceRouteImport.update({
+  id: '/workspace',
+  path: '/workspace',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsRoute = ToolsRouteImport.update({
@@ -459,6 +465,7 @@ export interface FileRoutesByFullPath {
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
   '/tools': typeof ToolsRoute
+  '/workspace': typeof WorkspaceRoute
   '/xeomx-ai': typeof XeomxAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/saved': typeof AuthenticatedSavedRoute
@@ -529,6 +536,7 @@ export interface FileRoutesByTo {
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
   '/tools': typeof ToolsRoute
+  '/workspace': typeof WorkspaceRoute
   '/xeomx-ai': typeof XeomxAiRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/saved': typeof AuthenticatedSavedRoute
@@ -601,6 +609,7 @@ export interface FileRoutesById {
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
   '/tools': typeof ToolsRoute
+  '/workspace': typeof WorkspaceRoute
   '/xeomx-ai': typeof XeomxAiRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
@@ -673,6 +682,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/terms'
     | '/tools'
+    | '/workspace'
     | '/xeomx-ai'
     | '/dashboard'
     | '/saved'
@@ -743,6 +753,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/terms'
     | '/tools'
+    | '/workspace'
     | '/xeomx-ai'
     | '/dashboard'
     | '/saved'
@@ -814,6 +825,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/terms'
     | '/tools'
+    | '/workspace'
     | '/xeomx-ai'
     | '/_authenticated/dashboard'
     | '/_authenticated/saved'
@@ -886,6 +898,7 @@ export interface RootRouteChildren {
   StudioRoute: typeof StudioRoute
   TermsRoute: typeof TermsRoute
   ToolsRoute: typeof ToolsRoute
+  WorkspaceRoute: typeof WorkspaceRoute
   XeomxAiRoute: typeof XeomxAiRoute
   AgentsObservabilityRoute: typeof AgentsObservabilityRoute
   AgentsRegistryRoute: typeof AgentsRegistryRoute
@@ -920,6 +933,13 @@ declare module '@tanstack/react-router' {
       path: '/xeomx-ai'
       fullPath: '/xeomx-ai'
       preLoaderRoute: typeof XeomxAiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/workspace': {
+      id: '/workspace'
+      path: '/workspace'
+      fullPath: '/workspace'
+      preLoaderRoute: typeof WorkspaceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools': {
@@ -1510,6 +1530,7 @@ const rootRouteChildren: RootRouteChildren = {
   StudioRoute: StudioRoute,
   TermsRoute: TermsRoute,
   ToolsRoute: ToolsRoute,
+  WorkspaceRoute: WorkspaceRoute,
   XeomxAiRoute: XeomxAiRoute,
   AgentsObservabilityRoute: AgentsObservabilityRoute,
   AgentsRegistryRoute: AgentsRegistryRoute,

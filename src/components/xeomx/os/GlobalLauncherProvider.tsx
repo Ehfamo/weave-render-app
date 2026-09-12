@@ -1,4 +1,5 @@
-import { lazy, Suspense, useState } from "react";
+import { isCommandShortcut } from "@/lib/command-center/actions";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { Menu } from "lucide-react";
 import { m } from "@/paraglide/messages.js";
 const GlobalLauncher = lazy(() =>
@@ -9,11 +10,21 @@ const GlobalLauncher = lazy(() =>
 
 export function GlobalLauncherProvider() {
   const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      if (isCommandShortcut(event)) {
+        event.preventDefault();
+        setOpen((v) => !v);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
   return (
     <>
       <button
         type="button"
-        aria-label={m.p0_navigation()}
+        aria-label={m.cc_title()}
         onClick={() => setOpen(true)}
         className="fixed bottom-20 end-4 z-50 min-h-11 min-w-11 rounded-full border bg-background p-3 shadow"
       >

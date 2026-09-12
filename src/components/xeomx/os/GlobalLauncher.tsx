@@ -1,3 +1,4 @@
+import { CommandCenter } from "@/components/xeomx/command-center/CommandCenter";
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -9,7 +10,7 @@ import {
 } from "@/lib/navigation-policy";
 import { m } from "@/paraglide/messages.js";
 
-/** Existing P0 navigation only: no search engine, AI actions or command execution. */
+/** Command Center entry with the existing preview navigation available under More. */
 export function GlobalLauncher({
   open,
   onOpenChange,
@@ -17,6 +18,7 @@ export function GlobalLauncher({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const [legacy, setLegacy] = useState(false);
   const [recent, setRecent] = useState<string[]>([]);
   useEffect(() => {
     try {
@@ -37,6 +39,10 @@ export function GlobalLauncher({
     }
     onOpenChange(false);
   }
+  if (!legacy)
+    return (
+      <CommandCenter open={open} onOpenChange={onOpenChange} onLegacy={() => setLegacy(true)} />
+    );
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[85svh] overflow-y-auto text-start">

@@ -1,6 +1,7 @@
 import type { ModelGateway } from "../model-gateway/gateway.ts";
 import type { ProjectBrainService } from "../project-brain/service.ts";
 import { defaultApprovalPolicy, type ApprovalStore } from "./approval.ts";
+import type { DurableApprovalAuthority } from "./durable-approval.ts";
 import type {
   AgentContext,
   AgentExecution,
@@ -34,6 +35,7 @@ export class TaskOrchestrator {
   private readonly deps: {
     registry: AgentRegistry;
     approvals: ApprovalStore;
+    durableApprovals?: DurableApprovalAuthority;
     brain: ProjectBrainService;
     gateway: ModelGateway;
     now?: () => string;
@@ -43,6 +45,7 @@ export class TaskOrchestrator {
     deps: {
       registry: AgentRegistry;
       approvals: ApprovalStore;
+      durableApprovals?: DurableApprovalAuthority;
       brain: ProjectBrainService;
       gateway: ModelGateway;
       now?: () => string;
@@ -76,7 +79,7 @@ export class TaskOrchestrator {
   }
   async execute(
     task: AgentTask,
-    options: { signal?: AbortSignal; approvals?: ReadonlySet<string> } = {},
+    options: { signal?: AbortSignal; resumeApprovalId?: string } = {},
   ): Promise<AgentExecution> {
     const startedAt = this.now(),
       events: AgentTraceEvent[] = [],
@@ -162,18 +165,48 @@ export class TaskOrchestrator {
         if (!tool) throw new Error("TOOL_NOT_FOUND");
         const approvalRequired = defaultApprovalPolicy.requiresApproval(tool.risk),
           approvalId = `${task.id}:${planned.id}:${tool.id}`;
-        if (approvalRequired && !options.approvals?.has(approvalId)) {
-          await this.deps.approvals.create({
-            id: approvalId,
+        let approved = false;
+        if (approvalRequired && options.resumeApprovalId) {
+          if (!this.deps.durableApprovals) throw new Error("DURABLE_APPROVAL_REQUIRED");
+          await this.deps.durableApprovals.authorizeContinuation({
+            approvalId: options.resumeApprovalId,
             taskId: task.id,
+            executionId: task.id,
             stepId: planned.id,
             toolId: tool.id,
-            risk: tool.risk,
-            requestedBy: task.userId,
             projectId: task.projectId,
-            status: "pending",
-            createdAt: this.now(),
           });
+          approved = true;
+          event(
+            "approval",
+            { approvalId: options.resumeApprovalId, decision: "approved" },
+            planned.id,
+          );
+        }
+        if (approvalRequired && !approved) {
+          if (this.deps.durableApprovals) {
+            await this.deps.durableApprovals.request({
+              id: approvalId,
+              taskId: task.id,
+              executionId: task.id,
+              stepId: planned.id,
+              toolId: tool.id,
+              risk: tool.risk,
+              requestedBy: task.userId,
+              projectId: task.projectId,
+            });
+          } else
+            await this.deps.approvals.create({
+              id: approvalId,
+              taskId: task.id,
+              stepId: planned.id,
+              toolId: tool.id,
+              risk: tool.risk,
+              requestedBy: task.userId,
+              projectId: task.projectId,
+              status: "pending",
+              createdAt: this.now(),
+            });
           steps.push({ id: planned.id, toolId: tool.id, status: "waiting_approval" });
           event("approval", { approvalId, risk: tool.risk }, planned.id);
           setStatus("waiting_approval");
@@ -193,7 +226,7 @@ export class TaskOrchestrator {
             { id: tool.id, taskId: task.id, stepId: planned.id, input: planned.input },
             {
               policy: defaultApprovalPolicy,
-              approved: !approvalRequired || !!options.approvals?.has(approvalId),
+              approved: !approvalRequired || approved,
               signal: controller.signal,
             },
           );

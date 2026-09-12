@@ -125,6 +125,27 @@ export class ProjectBrainService {
   setGoal(projectId: string, text: string) {
     return this.put(projectId, { id: "goal", kind: "goal", text, resolved: false });
   }
+  async relevantProjectMemories(projectId: string, query?: string, limit = 20) {
+    await this.project(projectId);
+    return (
+      await this.memory.relevant({ scope: { kind: "project", projectId }, query, limit })
+    ).filter((m) => this.owned(m.memory, projectId).source.reference !== marker);
+  }
+  setInstruction(projectId: string, id: string, text: string) {
+    return this.put(projectId, { id, kind: "instruction", text, resolved: false });
+  }
+  recordDecision(projectId: string, id: string, text: string) {
+    return this.put(projectId, { id, kind: "decision", text, resolved: false });
+  }
+  recordConstraint(projectId: string, id: string, text: string) {
+    return this.put(projectId, { id, kind: "constraint", text, resolved: false });
+  }
+  trackEntity(projectId: string, id: string, text: string) {
+    return this.put(projectId, { id, kind: "entity", text, resolved: false });
+  }
+  trackOpenItem(projectId: string, id: string, text: string, resolved = false) {
+    return this.put(projectId, { id, kind: "openItem", text, resolved });
+  }
   async snapshot(projectId: string, conversationId?: string): Promise<ProjectBrainSnapshot> {
     const project = await this.project(projectId);
     if (

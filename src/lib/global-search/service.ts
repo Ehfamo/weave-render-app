@@ -119,7 +119,8 @@ export class GlobalSearchService {
               (q.text && title === q.text ? 100 : 0) +
               tokens.reduce(
                 (score, t) =>
-                  score + (title.split(/\W+/u).includes(t) ? 10 : title.includes(t) ? 5 : 1),
+                  score +
+                  (title.split(/[^\p{L}\p{N}]+/u).includes(t) ? 10 : title.includes(t) ? 5 : 1),
                 0,
               ) +
               importance;

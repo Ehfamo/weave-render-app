@@ -12,7 +12,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { globalSearchFn } from "@/lib/global-search/search.functions";
 import { createProjectFn } from "@/lib/backend/vertical-slice.functions";
-import { ACTIONS, actionTarget, classifyIntent, type ActionId } from "@/lib/command-center/actions";
+import { ACTIONS, runAction, classifyIntent, type ActionId } from "@/lib/command-center/actions";
 import { m } from "@/paraglide/messages.js";
 import { getLocale, localizeHref } from "@/paraglide/runtime.js";
 export function CommandCenter({

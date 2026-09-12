@@ -1,15 +1,29 @@
 import type { JsonValue, RoutingMode } from "../model-gateway/contracts.ts";
 
 export const AGENT_TASK_STATUSES = [
-  "queued", "planning", "waiting_approval", "running", "completed", "failed", "cancelled",
+  "queued",
+  "planning",
+  "waiting_approval",
+  "running",
+  "completed",
+  "failed",
+  "cancelled",
 ] as const;
 export type AgentTaskStatus = (typeof AGENT_TASK_STATUSES)[number];
 export type AgentKind = "research" | "coding" | "browser";
 export type AgentCapability =
-  | "workspace.search" | "project.context" | "memory.read" | "model.reason"
-  | "code.read" | "code.propose" | "code.validate"
-  | "browser.navigate" | "browser.inspect" | "browser.interact";
-export type RiskClass = "SAFE_READ" | "LOW_RISK_WRITE" | "EXTERNAL_ACTION" | "DESTRUCTIVE" | "SENSITIVE";
+  | "workspace.search"
+  | "project.context"
+  | "memory.read"
+  | "model.reason"
+  | "code.read"
+  | "code.propose"
+  | "code.validate"
+  | "browser.navigate"
+  | "browser.inspect"
+  | "browser.interact";
+export type RiskClass =
+  "SAFE_READ" | "LOW_RISK_WRITE" | "EXTERNAL_ACTION" | "DESTRUCTIVE" | "SENSITIVE";
 
 export interface AgentDefinition {
   id: AgentKind;
@@ -44,12 +58,24 @@ export interface AgentPlanStep {
   toolId?: string;
   input: JsonValue;
 }
-export interface AgentPlan { objective: string; steps: readonly AgentPlanStep[]; }
-export interface AgentError { code: string; message: string; retryable: boolean; }
+export interface AgentPlan {
+  objective: string;
+  steps: readonly AgentPlanStep[];
+}
+export interface AgentError {
+  code: string;
+  message: string;
+  retryable: boolean;
+}
 export interface AgentResult {
   summary: string;
   data?: JsonValue;
-  sources?: readonly { id: string; title: string; target?: string; provenance: "workspace" | "external" }[];
+  sources?: readonly {
+    id: string;
+    title: string;
+    target?: string;
+    provenance: "workspace" | "external";
+  }[];
   changes?: readonly { path: string; patch: string; status: "proposed" | "applied" }[];
   validations?: readonly { commandId: string; ok: boolean; summary: string }[];
 }
@@ -80,10 +106,20 @@ export interface AgentTrace {
   startedAt: string;
   completedAt?: string;
 }
-export interface AgentExecution { trace: AgentTrace; result?: AgentResult; error?: AgentError; }
+export interface AgentExecution {
+  trace: AgentTrace;
+  result?: AgentResult;
+  error?: AgentError;
+}
 
-export interface SkillInput { taskId: string; value: JsonValue; }
-export interface SkillOutput { value: JsonValue; metadata?: Readonly<Record<string, JsonValue>>; }
+export interface SkillInput {
+  taskId: string;
+  value: JsonValue;
+}
+export interface SkillOutput {
+  value: JsonValue;
+  metadata?: Readonly<Record<string, JsonValue>>;
+}
 export interface SkillDefinition {
   id: string;
   description: string;
@@ -91,8 +127,17 @@ export interface SkillDefinition {
   toolIds: readonly string[];
   enabled: boolean;
 }
-export interface ToolInvocation { id: string; taskId: string; stepId: string; input: JsonValue; }
-export interface ToolResult { ok: boolean; value?: JsonValue; error?: AgentError; }
+export interface ToolInvocation {
+  id: string;
+  taskId: string;
+  stepId: string;
+  input: JsonValue;
+}
+export interface ToolResult {
+  ok: boolean;
+  value?: JsonValue;
+  error?: AgentError;
+}
 export interface ToolDefinition {
   id: string;
   description: string;
@@ -103,12 +148,29 @@ export interface ToolDefinition {
   execute(input: JsonValue, signal?: AbortSignal): Promise<JsonValue>;
 }
 export interface ApprovalRequest {
-  id: string; taskId: string; stepId: string; toolId: string; risk: RiskClass;
-  requestedBy: string; projectId: string; status: "pending" | "approved" | "rejected";
-  createdAt: string; decidedAt?: string; decidedBy?: string; reason?: string;
+  id: string;
+  taskId: string;
+  stepId: string;
+  toolId: string;
+  risk: RiskClass;
+  requestedBy: string;
+  projectId: string;
+  status: "pending" | "approved" | "rejected";
+  createdAt: string;
+  decidedAt?: string;
+  decidedBy?: string;
+  reason?: string;
 }
-export interface ApprovalDecision { requestId: string; decision: "approved" | "rejected"; decidedBy: string; reason?: string; }
-export interface ApprovalPolicy { classify(tool: ToolDefinition): RiskClass; requiresApproval(risk: RiskClass): boolean; }
+export interface ApprovalDecision {
+  requestId: string;
+  decision: "approved" | "rejected";
+  decidedBy: string;
+  reason?: string;
+}
+export interface ApprovalPolicy {
+  classify(tool: ToolDefinition): RiskClass;
+  requiresApproval(risk: RiskClass): boolean;
+}
 
 export interface AgentRuntime {
   definition: AgentDefinition;

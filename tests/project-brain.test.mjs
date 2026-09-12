@@ -164,6 +164,12 @@ test("snapshots and bounded context are deterministic and need no model credenti
   assert.deepEqual(a, await f.brain.buildContext(p, { maxCharacters: 128 }));
   await assert.rejects(f.brain.buildContext(p, { maxCharacters: Infinity }));
   assert.equal((await f.brain.snapshot(p)).summary.method, "deterministic");
+  const original = f.domain.getAuthorizedProject;
+  f.domain.getAuthorizedProject = async (id) => ({
+    ...(await original(id)),
+    updatedAt: "2026-09-13T00:00:00.000Z",
+  });
+  assert.equal((await f.brain.snapshot(p)).updatedAt, "2026-09-13T00:00:00.000Z");
 });
 test("disabled memory excludes stored brain from context while inspection remains available", async () => {
   const f = fixture();

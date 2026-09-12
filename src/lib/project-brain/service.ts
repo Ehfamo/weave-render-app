@@ -202,6 +202,7 @@ export class ProjectBrainService {
       candidateLimit: 100,
       updatedAt:
         [
+          project.updatedAt,
           state.updatedAt,
           ...memories.map((r) => r.updatedAt),
           ...recentActivity.map((a) => a.updatedAt),

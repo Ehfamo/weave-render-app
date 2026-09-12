@@ -11,6 +11,21 @@ export const ACTION_IDS = [
   "more",
 ] as const;
 export type ActionId = (typeof ACTION_IDS)[number];
+export type AgentTaskIntent = "research" | "coding" | "browser" | "continue";
+export function classifyAgentTaskIntent(
+  input: string,
+): { intent: AgentTaskIntent; goal: string } | null {
+  const goal = normalize(input);
+  if (/^(research|compare|investigate)\b|^(تحقیق|بررسی رقبا)/.test(goal))
+    return { intent: "research", goal };
+  if (/^(analyze|review|fix|change).*(code|repository)|^(کد|مخزن).*(تحلیل|بررسی)/.test(goal))
+    return { intent: "coding", goal };
+  if (/^(check|inspect|open).*(website|page|url)|^(وب.?سایت|صفحه).*(بررسی|باز)/.test(goal))
+    return { intent: "browser", goal };
+  if (/^(continue my|ادامه).*(campaign|project|کمپین|پروژه)/.test(goal))
+    return { intent: "continue", goal };
+  return null;
+}
 export interface CanonicalAction {
   id: ActionId;
   kind: "navigate" | "search" | "create-project" | "legacy";

@@ -5,7 +5,10 @@ import { routeByCost } from "./cost-router.ts";
 
 /** Production composition boundary: cost/health authorization happens before the canonical gateway. */
 export class CostAwareModelRuntime {
-  constructor(private readonly gateway: Pick<ModelGateway, "execute">) {}
+  private readonly gateway: Pick<ModelGateway, "execute">;
+  constructor(gateway: Pick<ModelGateway, "execute">) {
+    this.gateway = gateway;
+  }
   async execute(
     input: {
       request: ModelRequest;

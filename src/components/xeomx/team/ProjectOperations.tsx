@@ -2,8 +2,15 @@ import { useState } from "react";
 import { Activity, CheckCircle2, Play, Plus, Settings2, Users, Workflow } from "lucide-react";
 import { m } from "@/paraglide/messages.js";
 import type { WorkspaceRole } from "@/lib/collaboration/contracts";
-type Tab = "automations" | "tasks" | "team" | "activity";
-export function ProjectOperations({ role = "viewer" }: { role?: WorkspaceRole }) {
+import { ProductionOperations } from "@/components/xeomx/production/ProductionOperations";
+type Tab = "automations" | "tasks" | "team" | "activity" | "operations";
+export function ProjectOperations({
+  role = "viewer",
+  onApprovalDecision,
+}: {
+  role?: WorkspaceRole;
+  onApprovalDecision?: (decision: "approved" | "rejected") => void;
+}) {
   const [tab, setTab] = useState<Tab>("automations"),
     [creating, setCreating] = useState(false),
     [enabled, setEnabled] = useState(true),
@@ -13,6 +20,7 @@ export function ProjectOperations({ role = "viewer" }: { role?: WorkspaceRole })
     ["tasks", CheckCircle2, m.p4_tasks()],
     ["team", Users, m.p4_team()],
     ["activity", Activity, m.p4_activity()],
+    ["operations", Activity, m.p7_title()],
   ];
   const canEdit = role === "owner" || role === "admin" || role === "editor";
   return (
@@ -132,13 +140,42 @@ export function ProjectOperations({ role = "viewer" }: { role?: WorkspaceRole })
               <p className="font-medium">{m.p4_team()}</p>
               <p className="text-sm text-muted-foreground">{m.p4_enabled()}</p>
             </div>
+          ) : tab === "activity" ? (
+            <div className="space-y-4">
+              <section aria-label={m.p7_approval()} className="rounded-lg border p-4">
+                <p className="font-medium">{m.p7_approval()}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{m.p7_approval_summary()}</p>
+                <p className="mt-2 text-sm">{m.p7_risk()}: EXTERNAL_ACTION</p>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    disabled={!onApprovalDecision || (role !== "owner" && role !== "admin")}
+                    onClick={() => onApprovalDecision?.("approved")}
+                    className="min-h-11 rounded-md bg-primary px-3 text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+                  >
+                    {m.p7_approve()}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!onApprovalDecision || (role !== "owner" && role !== "admin")}
+                    onClick={() => onApprovalDecision?.("rejected")}
+                    className="min-h-11 rounded-md border px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+                  >
+                    {m.p7_reject()}
+                  </button>
+                </div>
+              </section>
+              <ol className="space-y-3">
+                <li className="rounded-lg border p-4 text-sm">
+                  {m.p4_waiting()} · {m.p4_automations()}
+                </li>
+                <li className="rounded-lg border p-4 text-sm">{m.p4_activity()}</li>
+              </ol>
+            </div>
+          ) : role === "owner" || role === "admin" ? (
+            <ProductionOperations />
           ) : (
-            <ol className="space-y-3">
-              <li className="rounded-lg border p-4 text-sm">
-                {m.p4_waiting()} · {m.p4_automations()}
-              </li>
-              <li className="rounded-lg border p-4 text-sm">{m.p4_activity()}</li>
-            </ol>
+            <p role="alert">{m.p7_unavailable()}</p>
           )}
         </section>
       </div>

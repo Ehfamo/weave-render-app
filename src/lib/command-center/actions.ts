@@ -45,6 +45,14 @@ export function businessGoalTarget(input: string) {
     ? "/business-agents"
     : undefined;
 }
+export function marketplaceGoalTarget(input: string) {
+  const goal = normalize(input);
+  return /find.*(agent|workflow|prompt)|install.*(workflow|agent|skill)|purchased.*(asset|library)|publish.*prompt|creator.*earning|بازارچه|نصب.*گردش.?کار|انتشار.*پرامپت|درآمد.*سازنده/.test(
+    goal,
+  )
+    ? "/marketplace"
+    : undefined;
+}
 export interface CanonicalAction {
   id: ActionId;
   kind: "navigate" | "search" | "create-project" | "legacy";

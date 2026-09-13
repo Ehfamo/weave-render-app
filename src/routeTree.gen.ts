@@ -78,6 +78,7 @@ import { Route as AgentsRegistryRouteImport } from './routes/agents.registry'
 import { Route as AgentsObservabilityRouteImport } from './routes/agents.observability'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 import { Route as AuthenticatedProjectOperationsRouteImport } from './routes/_authenticated/project-operations'
+import { Route as AuthenticatedMarketplaceRouteImport } from './routes/_authenticated/marketplace'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCreativeWorkspaceRouteImport } from './routes/_authenticated/creative-workspace'
 import { Route as AuthenticatedBusinessAgentsRouteImport } from './routes/_authenticated/business-agents'
@@ -428,6 +429,12 @@ const AuthenticatedProjectOperationsRoute =
     path: '/project-operations',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedMarketplaceRoute =
+  AuthenticatedMarketplaceRouteImport.update({
+    id: '/marketplace',
+    path: '/marketplace',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -491,6 +498,7 @@ export interface FileRoutesByFullPath {
   '/business-agents': typeof AuthenticatedBusinessAgentsRoute
   '/creative-workspace': typeof AuthenticatedCreativeWorkspaceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/marketplace': typeof AuthenticatedMarketplaceRoute
   '/project-operations': typeof AuthenticatedProjectOperationsRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/agents/observability': typeof AgentsObservabilityRoute
@@ -565,6 +573,7 @@ export interface FileRoutesByTo {
   '/business-agents': typeof AuthenticatedBusinessAgentsRoute
   '/creative-workspace': typeof AuthenticatedCreativeWorkspaceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/marketplace': typeof AuthenticatedMarketplaceRoute
   '/project-operations': typeof AuthenticatedProjectOperationsRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/agents/observability': typeof AgentsObservabilityRoute
@@ -641,6 +650,7 @@ export interface FileRoutesById {
   '/_authenticated/business-agents': typeof AuthenticatedBusinessAgentsRoute
   '/_authenticated/creative-workspace': typeof AuthenticatedCreativeWorkspaceRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/marketplace': typeof AuthenticatedMarketplaceRoute
   '/_authenticated/project-operations': typeof AuthenticatedProjectOperationsRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/agents/observability': typeof AgentsObservabilityRoute
@@ -717,6 +727,7 @@ export interface FileRouteTypes {
     | '/business-agents'
     | '/creative-workspace'
     | '/dashboard'
+    | '/marketplace'
     | '/project-operations'
     | '/saved'
     | '/agents/observability'
@@ -791,6 +802,7 @@ export interface FileRouteTypes {
     | '/business-agents'
     | '/creative-workspace'
     | '/dashboard'
+    | '/marketplace'
     | '/project-operations'
     | '/saved'
     | '/agents/observability'
@@ -866,6 +878,7 @@ export interface FileRouteTypes {
     | '/_authenticated/business-agents'
     | '/_authenticated/creative-workspace'
     | '/_authenticated/dashboard'
+    | '/_authenticated/marketplace'
     | '/_authenticated/project-operations'
     | '/_authenticated/saved'
     | '/agents/observability'
@@ -1450,6 +1463,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjectOperationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/marketplace': {
+      id: '/_authenticated/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof AuthenticatedMarketplaceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -1485,6 +1505,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBusinessAgentsRoute: typeof AuthenticatedBusinessAgentsRoute
   AuthenticatedCreativeWorkspaceRoute: typeof AuthenticatedCreativeWorkspaceRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedMarketplaceRoute: typeof AuthenticatedMarketplaceRoute
   AuthenticatedProjectOperationsRoute: typeof AuthenticatedProjectOperationsRoute
   AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
 }
@@ -1493,6 +1514,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBusinessAgentsRoute: AuthenticatedBusinessAgentsRoute,
   AuthenticatedCreativeWorkspaceRoute: AuthenticatedCreativeWorkspaceRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedMarketplaceRoute: AuthenticatedMarketplaceRoute,
   AuthenticatedProjectOperationsRoute: AuthenticatedProjectOperationsRoute,
   AuthenticatedSavedRoute: AuthenticatedSavedRoute,
 }

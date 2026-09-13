@@ -40,6 +40,7 @@ import {
 
 const signal = (id, latency, quality, health = "healthy", cost = 100) => ({
   model: { providerId: id, modelId: `${id}-model` },
+  capabilities: ["text"],
   enabled: true,
   health,
   latencyMs: latency,

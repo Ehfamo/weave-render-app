@@ -1,0 +1,29 @@
+{
+  "research": {
+    "sources": [{ "id": "workspace-1", "title": "Product brief", "provenance": "workspace" }],
+    "unsupportedClaims": []
+  },
+  "marketing": {
+    "objective": "Launch",
+    "audience": "Creators",
+    "brandVoice": "clear",
+    "channels": ["social"]
+  },
+  "sales": {
+    "leads": [{ "company": "Example Co", "email": null, "phone": null, "confidence": 0.6 }],
+    "action": "draft_only"
+  },
+  "support": {
+    "answer": "Use the documented recovery flow.",
+    "sourceIds": ["workspace-1"],
+    "escalate": true
+  },
+  "data": {
+    "rows": [
+      { "week": 1, "visits": 10 },
+      { "week": 2, "visits": 15 }
+    ],
+    "expectedTotal": 25,
+    "chart": { "type": "line", "x": "week", "y": "visits" }
+  }
+}

@@ -10,7 +10,7 @@ export const AGENT_TASK_STATUSES = [
   "cancelled",
 ] as const;
 export type AgentTaskStatus = (typeof AGENT_TASK_STATUSES)[number];
-export type AgentKind = "research" | "coding" | "browser";
+export type AgentKind = "research" | "coding" | "browser" | `business.${string}`;
 export type AgentCapability =
   | "workspace.search"
   | "project.context"

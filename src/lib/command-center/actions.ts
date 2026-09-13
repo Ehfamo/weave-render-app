@@ -37,6 +37,14 @@ export function p4IntentTarget(intent: AgentTaskIntent) {
   if (intent === "approval") return "/project-operations?tab=activity";
   return undefined;
 }
+export function businessGoalTarget(input: string) {
+  const goal = normalize(input);
+  return /competitor|market|marketing|seo|campaign|lead|sales|support|ticket|knowledge|kpi|report|metric|data|رقیب|بازاریابی|فروش|پشتیبانی|داده|گزارش/.test(
+    goal,
+  )
+    ? "/business-agents"
+    : undefined;
+}
 export interface CanonicalAction {
   id: ActionId;
   kind: "navigate" | "search" | "create-project" | "legacy";

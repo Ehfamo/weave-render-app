@@ -565,5 +565,17 @@
   "p4_priority": "Priority",
   "p4_assignee": "Assignee",
   "p4_history": "Execution history",
-  "p4_advanced": "Advanced controls"
+  "p4_advanced": "Advanced controls",
+  "p5_title": "Business agents",
+  "p5_goal": "What should your team accomplish?",
+  "p5_run": "Run agent",
+  "p5_enabled_packs": "Enabled packs",
+  "p5_recent_runs": "Recent runs",
+  "p5_sources": "Sources",
+  "p5_review": "Human review",
+  "p5_research": "Research",
+  "p5_marketing": "Marketing",
+  "p5_sales": "Sales",
+  "p5_support": "Support",
+  "p5_data": "Data"
 }

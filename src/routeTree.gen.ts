@@ -80,6 +80,7 @@ import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedProjectOperationsRouteImport } from './routes/_authenticated/project-operations'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCreativeWorkspaceRouteImport } from './routes/_authenticated/creative-workspace'
+import { Route as AuthenticatedBusinessAgentsRouteImport } from './routes/_authenticated/business-agents'
 import { Route as OsEnvironmentViewRouteImport } from './routes/os.$environment.$view'
 
 const XeomxAiRoute = XeomxAiRouteImport.update({
@@ -438,6 +439,12 @@ const AuthenticatedCreativeWorkspaceRoute =
     path: '/creative-workspace',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedBusinessAgentsRoute =
+  AuthenticatedBusinessAgentsRouteImport.update({
+    id: '/business-agents',
+    path: '/business-agents',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const OsEnvironmentViewRoute = OsEnvironmentViewRouteImport.update({
   id: '/os/$environment/$view',
   path: '/os/$environment/$view',
@@ -481,6 +488,7 @@ export interface FileRoutesByFullPath {
   '/tools': typeof ToolsRoute
   '/workspace': typeof WorkspaceRoute
   '/xeomx-ai': typeof XeomxAiRoute
+  '/business-agents': typeof AuthenticatedBusinessAgentsRoute
   '/creative-workspace': typeof AuthenticatedCreativeWorkspaceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/project-operations': typeof AuthenticatedProjectOperationsRoute
@@ -554,6 +562,7 @@ export interface FileRoutesByTo {
   '/tools': typeof ToolsRoute
   '/workspace': typeof WorkspaceRoute
   '/xeomx-ai': typeof XeomxAiRoute
+  '/business-agents': typeof AuthenticatedBusinessAgentsRoute
   '/creative-workspace': typeof AuthenticatedCreativeWorkspaceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/project-operations': typeof AuthenticatedProjectOperationsRoute
@@ -629,6 +638,7 @@ export interface FileRoutesById {
   '/tools': typeof ToolsRoute
   '/workspace': typeof WorkspaceRoute
   '/xeomx-ai': typeof XeomxAiRoute
+  '/_authenticated/business-agents': typeof AuthenticatedBusinessAgentsRoute
   '/_authenticated/creative-workspace': typeof AuthenticatedCreativeWorkspaceRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/project-operations': typeof AuthenticatedProjectOperationsRoute
@@ -704,6 +714,7 @@ export interface FileRouteTypes {
     | '/tools'
     | '/workspace'
     | '/xeomx-ai'
+    | '/business-agents'
     | '/creative-workspace'
     | '/dashboard'
     | '/project-operations'
@@ -777,6 +788,7 @@ export interface FileRouteTypes {
     | '/tools'
     | '/workspace'
     | '/xeomx-ai'
+    | '/business-agents'
     | '/creative-workspace'
     | '/dashboard'
     | '/project-operations'
@@ -851,6 +863,7 @@ export interface FileRouteTypes {
     | '/tools'
     | '/workspace'
     | '/xeomx-ai'
+    | '/_authenticated/business-agents'
     | '/_authenticated/creative-workspace'
     | '/_authenticated/dashboard'
     | '/_authenticated/project-operations'
@@ -1451,6 +1464,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCreativeWorkspaceRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/business-agents': {
+      id: '/_authenticated/business-agents'
+      path: '/business-agents'
+      fullPath: '/business-agents'
+      preLoaderRoute: typeof AuthenticatedBusinessAgentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/os/$environment/$view': {
       id: '/os/$environment/$view'
       path: '/os/$environment/$view'
@@ -1462,6 +1482,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBusinessAgentsRoute: typeof AuthenticatedBusinessAgentsRoute
   AuthenticatedCreativeWorkspaceRoute: typeof AuthenticatedCreativeWorkspaceRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProjectOperationsRoute: typeof AuthenticatedProjectOperationsRoute
@@ -1469,6 +1490,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedBusinessAgentsRoute: AuthenticatedBusinessAgentsRoute,
   AuthenticatedCreativeWorkspaceRoute: AuthenticatedCreativeWorkspaceRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProjectOperationsRoute: AuthenticatedProjectOperationsRoute,

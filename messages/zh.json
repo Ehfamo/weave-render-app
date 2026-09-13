@@ -565,5 +565,17 @@
   "p4_priority": "优先级",
   "p4_assignee": "负责人",
   "p4_history": "执行历史",
-  "p4_advanced": "高级设置"
+  "p4_advanced": "高级设置",
+  "p5_title": "业务智能体",
+  "p5_goal": "你的团队需要完成什么？",
+  "p5_run": "运行智能体",
+  "p5_enabled_packs": "已启用套件",
+  "p5_recent_runs": "最近运行",
+  "p5_sources": "来源",
+  "p5_review": "人工审核",
+  "p5_research": "研究",
+  "p5_marketing": "营销",
+  "p5_sales": "销售",
+  "p5_support": "支持",
+  "p5_data": "数据"
 }

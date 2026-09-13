@@ -66,10 +66,17 @@ export class SupabaseP4Store implements AutomationStore, CollaborationStore {
       project_id: v.projectId,
       owner_id: this.actorId,
       name: v.name,
-      status: v.status === "enabled" ? "active" : "disabled",
+      status: v.status === "enabled" ? "active" : v.status === "draft" ? "draft" : "paused",
     });
     fail(error);
-    const { error: e } = await this.client.from("workflow_versions").upsert({
+    const { count, error: countError } = await this.client
+      .from("workflow_versions")
+      .select("id", { count: "exact", head: true })
+      .eq("workflow_id", v.id)
+      .eq("version", v.version);
+    fail(countError);
+    if (count) return;
+    const { error: e } = await this.client.from("workflow_versions").insert({
       workflow_id: v.id,
       created_by: this.actorId,
       version: v.version,
@@ -133,7 +140,7 @@ export class SupabaseP4Store implements AutomationStore, CollaborationStore {
       subject_type: "workflow",
       workflow_version_id: version.id,
       risk_tier: v.status === "waiting_approval" ? "R2" : "R0",
-      action_key: "workflow.execute",
+      action_key: v.status === "waiting_approval" ? "external.write" : "project.read",
       input: { executionId: v.id, eventId: v.eventId, correlationId: v.correlationId },
       credential_refs: [],
       state:

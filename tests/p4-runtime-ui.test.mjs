@@ -28,6 +28,22 @@ test("Supabase adapter derives actor and role from authenticated server context"
     ["user_id", "server-user"],
   ]);
 });
+test("Supabase adapter rejects missing auth and forged collaboration actors", async () => {
+  await assert.rejects(
+    () =>
+      SupabaseP4Store.create({
+        auth: { getUser: async () => ({ data: { user: null }, error: new Error("bad") }) },
+      }),
+    /AUTH_REQUIRED/,
+  );
+  const client = {
+    auth: { getUser: async () => ({ data: { user: { id: "server-user" } }, error: null }) },
+    from: () => ({}),
+  };
+  const store = await SupabaseP4Store.create(client);
+  await assert.rejects(() => store.saveAssignment({ creatorId: "forged" }), /FORBIDDEN/);
+  await assert.rejects(() => store.appendActivity({ actorId: "forged" }), /FORBIDDEN/);
+});
 test("adapter source has no service role secret and maps every P4 durable table", async () => {
   const s = await readFile(
     new URL("../src/lib/automation/runtime.server.ts", import.meta.url),

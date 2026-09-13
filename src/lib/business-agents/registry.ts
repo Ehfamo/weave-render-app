@@ -228,7 +228,8 @@ export class BusinessPackRegistry {
   setEnabled(projectId: string, packId: BusinessPackId, value: boolean) {
     if (!this.packs.has(packId)) throw Error("PACK_NOT_FOUND");
     const set = this.enabled.get(projectId) ?? new Set(BUSINESS_PACK_IDS);
-    value ? set.add(packId) : set.delete(packId);
+    if (value) set.add(packId);
+    else set.delete(packId);
     this.enabled.set(projectId, set);
   }
 }

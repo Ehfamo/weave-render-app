@@ -11,6 +11,10 @@ import { createBusinessAgentRuntime } from "../src/lib/business-agents/runtime.t
 import { BusinessAgentService } from "../src/lib/business-agents/service.ts";
 import { selectBusinessAgent } from "../src/lib/business-agents/routing.ts";
 import { businessGoalTarget } from "../src/lib/command-center/actions.ts";
+import {
+  businessAutomationAction,
+  BusinessPlatformIntegrations,
+} from "../src/lib/business-agents/integrations.ts";
 
 test("five reusable packs register all twenty thin agent definitions", () => {
   assert.deepEqual(
@@ -199,4 +203,75 @@ test("source boundaries forbid direct providers SQL shell and external sends", a
     /from ["'](?:openai|groq|@google)|service_role|child_process|exec\(|SELECT\s|sendEmail|publishPost/i,
   );
   assert.match(source, /TaskOrchestrator/);
+});
+
+test("automation assignments Brain Memory and Creative Workspace use canonical services", async () => {
+  const run = { status: "completed", artifacts: [{ id: "artifact-1" }] };
+  const calls = [];
+  const service = {
+    async run(input) {
+      calls.push(["run", input.projectId]);
+      return run;
+    },
+  };
+  const integration = new BusinessPlatformIntegrations(
+    service,
+    {
+      async complete(projectId, assignmentId, resultId) {
+        calls.push(["complete", projectId, assignmentId, resultId]);
+      },
+    },
+    {
+      async requestGeneration(input) {
+        calls.push(["creative", input.projectId]);
+        return { requestId: input.id };
+      },
+    },
+    {
+      async recordDecision(projectId, id) {
+        calls.push(["brain", projectId, id]);
+      },
+    },
+    {
+      async create(input) {
+        calls.push(["memory", input.scope.projectId]);
+        return { id: "memory" };
+      },
+    },
+  );
+  const context = {
+    id: "r",
+    taskId: "t",
+    userId: "u",
+    projectId: "p",
+    agentId: "campaign",
+    goal: "campaign",
+  };
+  await integration.runAssignment(context, "a");
+  await integration.createCampaignAsset({
+    id: "g",
+    userId: "u",
+    projectId: "p",
+    intent: "image",
+    prompt: { text: "ad" },
+    references: [],
+    characterIds: [],
+    quality: "BALANCED",
+    createdAt: "now",
+  });
+  await integration.retainAcceptedOutcome({
+    projectId: "p",
+    id: "d",
+    text: "Accepted positioning",
+    remember: false,
+  });
+  assert.deepEqual(calls, [
+    ["run", "p"],
+    ["complete", "p", "a", "artifact-1"],
+    ["creative", "p"],
+    ["brain", "p", "d"],
+  ]);
+  const action = businessAutomationAction(service);
+  assert.equal(action.id, "business.run");
+  assert.equal(action.risk, "SAFE_READ");
 });

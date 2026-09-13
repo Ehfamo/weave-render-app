@@ -549,5 +549,21 @@
   "creative_timeline": "خط زمانی",
   "creative_prompt_default": "یک داستان سینمایی برای محصول بساز",
   "creative_play": "پخش پیش‌نمایش",
-  "creative_pause": "توقف پیش‌نمایش"
+  "creative_pause": "توقف پیش‌نمایش",
+  "p4_title": "عملیات پروژه",
+  "p4_automations": "اتوماسیون‌ها",
+  "p4_tasks": "کارها",
+  "p4_team": "تیم",
+  "p4_activity": "فعالیت و تأییدها",
+  "p4_new_workflow": "گردش‌کار جدید",
+  "p4_when": "وقتی",
+  "p4_do": "انجام بده",
+  "p4_create": "ساخت گردش‌کار",
+  "p4_run": "اجرا",
+  "p4_enabled": "فعال",
+  "p4_waiting": "منتظر تأیید",
+  "p4_priority": "اولویت",
+  "p4_assignee": "مسئول",
+  "p4_history": "تاریخچه اجرا",
+  "p4_advanced": "تنظیمات پیشرفته"
 }

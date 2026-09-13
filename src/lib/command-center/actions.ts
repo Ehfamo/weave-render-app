@@ -31,6 +31,12 @@ export function classifyAgentTaskIntent(
     return { intent: "continue", goal };
   return null;
 }
+export function p4IntentTarget(intent: AgentTaskIntent) {
+  if (intent === "automation") return "/project-operations?tab=automations";
+  if (intent === "assignment") return "/project-operations?tab=tasks";
+  if (intent === "approval") return "/project-operations?tab=activity";
+  return undefined;
+}
 export interface CanonicalAction {
   id: ActionId;
   kind: "navigate" | "search" | "create-project" | "legacy";

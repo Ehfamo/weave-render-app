@@ -549,5 +549,21 @@
   "creative_timeline": "टाइमलाइन",
   "creative_prompt_default": "एक सिनेमाई उत्पाद कहानी बनाएँ",
   "creative_play": "पूर्वावलोकन चलाएँ",
-  "creative_pause": "पूर्वावलोकन रोकें"
+  "creative_pause": "पूर्वावलोकन रोकें",
+  "p4_title": "प्रोजेक्ट संचालन",
+  "p4_automations": "ऑटोमेशन",
+  "p4_tasks": "कार्य",
+  "p4_team": "टीम",
+  "p4_activity": "गतिविधि और अनुमोदन",
+  "p4_new_workflow": "नया वर्कफ़्लो",
+  "p4_when": "जब",
+  "p4_do": "तब",
+  "p4_create": "वर्कफ़्लो बनाएँ",
+  "p4_run": "चलाएँ",
+  "p4_enabled": "सक्रिय",
+  "p4_waiting": "अनुमोदन लंबित",
+  "p4_priority": "प्राथमिकता",
+  "p4_assignee": "जिम्मेदार",
+  "p4_history": "निष्पादन इतिहास",
+  "p4_advanced": "उन्नत नियंत्रण"
 }

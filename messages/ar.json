@@ -549,5 +549,21 @@
   "creative_timeline": "المخطط الزمني",
   "creative_prompt_default": "أنشئ قصة سينمائية للمنتج",
   "creative_play": "تشغيل المعاينة",
-  "creative_pause": "إيقاف المعاينة"
+  "creative_pause": "إيقاف المعاينة",
+  "p4_title": "عمليات المشروع",
+  "p4_automations": "الأتمتة",
+  "p4_tasks": "المهام",
+  "p4_team": "الفريق",
+  "p4_activity": "النشاط والموافقات",
+  "p4_new_workflow": "سير عمل جديد",
+  "p4_when": "عندما",
+  "p4_do": "نفّذ",
+  "p4_create": "إنشاء سير العمل",
+  "p4_run": "تشغيل",
+  "p4_enabled": "مفعّل",
+  "p4_waiting": "بانتظار الموافقة",
+  "p4_priority": "الأولوية",
+  "p4_assignee": "المسؤول",
+  "p4_history": "سجل التنفيذ",
+  "p4_advanced": "إعدادات متقدمة"
 }

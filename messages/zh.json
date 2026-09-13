@@ -549,5 +549,21 @@
   "creative_timeline": "时间线",
   "creative_prompt_default": "创作一个电影感产品故事",
   "creative_play": "播放预览",
-  "creative_pause": "暂停预览"
+  "creative_pause": "暂停预览",
+  "p4_title": "项目运营",
+  "p4_automations": "自动化",
+  "p4_tasks": "任务",
+  "p4_team": "团队",
+  "p4_activity": "活动与审批",
+  "p4_new_workflow": "新建工作流",
+  "p4_when": "当",
+  "p4_do": "执行",
+  "p4_create": "创建工作流",
+  "p4_run": "运行",
+  "p4_enabled": "已启用",
+  "p4_waiting": "等待审批",
+  "p4_priority": "优先级",
+  "p4_assignee": "负责人",
+  "p4_history": "执行历史",
+  "p4_advanced": "高级设置"
 }

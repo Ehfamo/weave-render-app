@@ -549,5 +549,21 @@
   "creative_timeline": "Timeline",
   "creative_prompt_default": "Create a cinematic product story",
   "creative_play": "Play preview",
-  "creative_pause": "Pause preview"
+  "creative_pause": "Pause preview",
+  "p4_title": "Project operations",
+  "p4_automations": "Automations",
+  "p4_tasks": "Tasks",
+  "p4_team": "Team",
+  "p4_activity": "Activity & approvals",
+  "p4_new_workflow": "New workflow",
+  "p4_when": "When",
+  "p4_do": "Do",
+  "p4_create": "Create workflow",
+  "p4_run": "Run",
+  "p4_enabled": "Enabled",
+  "p4_waiting": "Waiting approval",
+  "p4_priority": "Priority",
+  "p4_assignee": "Assignee",
+  "p4_history": "Execution history",
+  "p4_advanced": "Advanced controls"
 }

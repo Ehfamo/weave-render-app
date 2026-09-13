@@ -77,6 +77,7 @@ import { Route as AgentsRuntimeRouteImport } from './routes/agents.runtime'
 import { Route as AgentsRegistryRouteImport } from './routes/agents.registry'
 import { Route as AgentsObservabilityRouteImport } from './routes/agents.observability'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
+import { Route as AuthenticatedProjectOperationsRouteImport } from './routes/_authenticated/project-operations'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCreativeWorkspaceRouteImport } from './routes/_authenticated/creative-workspace'
 import { Route as OsEnvironmentViewRouteImport } from './routes/os.$environment.$view'
@@ -420,6 +421,12 @@ const AuthenticatedSavedRoute = AuthenticatedSavedRouteImport.update({
   path: '/saved',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProjectOperationsRoute =
+  AuthenticatedProjectOperationsRouteImport.update({
+    id: '/project-operations',
+    path: '/project-operations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -476,6 +483,7 @@ export interface FileRoutesByFullPath {
   '/xeomx-ai': typeof XeomxAiRoute
   '/creative-workspace': typeof AuthenticatedCreativeWorkspaceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/project-operations': typeof AuthenticatedProjectOperationsRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/agents/observability': typeof AgentsObservabilityRoute
   '/agents/registry': typeof AgentsRegistryRoute
@@ -548,6 +556,7 @@ export interface FileRoutesByTo {
   '/xeomx-ai': typeof XeomxAiRoute
   '/creative-workspace': typeof AuthenticatedCreativeWorkspaceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/project-operations': typeof AuthenticatedProjectOperationsRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/agents/observability': typeof AgentsObservabilityRoute
   '/agents/registry': typeof AgentsRegistryRoute
@@ -622,6 +631,7 @@ export interface FileRoutesById {
   '/xeomx-ai': typeof XeomxAiRoute
   '/_authenticated/creative-workspace': typeof AuthenticatedCreativeWorkspaceRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/project-operations': typeof AuthenticatedProjectOperationsRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/agents/observability': typeof AgentsObservabilityRoute
   '/agents/registry': typeof AgentsRegistryRoute
@@ -696,6 +706,7 @@ export interface FileRouteTypes {
     | '/xeomx-ai'
     | '/creative-workspace'
     | '/dashboard'
+    | '/project-operations'
     | '/saved'
     | '/agents/observability'
     | '/agents/registry'
@@ -768,6 +779,7 @@ export interface FileRouteTypes {
     | '/xeomx-ai'
     | '/creative-workspace'
     | '/dashboard'
+    | '/project-operations'
     | '/saved'
     | '/agents/observability'
     | '/agents/registry'
@@ -841,6 +853,7 @@ export interface FileRouteTypes {
     | '/xeomx-ai'
     | '/_authenticated/creative-workspace'
     | '/_authenticated/dashboard'
+    | '/_authenticated/project-operations'
     | '/_authenticated/saved'
     | '/agents/observability'
     | '/agents/registry'
@@ -1417,6 +1430,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSavedRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/project-operations': {
+      id: '/_authenticated/project-operations'
+      path: '/project-operations'
+      fullPath: '/project-operations'
+      preLoaderRoute: typeof AuthenticatedProjectOperationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -1444,12 +1464,14 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCreativeWorkspaceRoute: typeof AuthenticatedCreativeWorkspaceRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedProjectOperationsRoute: typeof AuthenticatedProjectOperationsRoute
   AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCreativeWorkspaceRoute: AuthenticatedCreativeWorkspaceRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedProjectOperationsRoute: AuthenticatedProjectOperationsRoute,
   AuthenticatedSavedRoute: AuthenticatedSavedRoute,
 }
 

@@ -1,0 +1,55 @@
+{
+  "id": "xeomx-p7-golden",
+  "version": "1.0.0",
+  "cases": [
+    {
+      "id": "general-contract",
+      "vertical": "general",
+      "input": "bounded task",
+      "expected": { "structured": true },
+      "dimensions": ["structure", "contract"]
+    },
+    {
+      "id": "research-provenance",
+      "vertical": "research",
+      "input": "claim",
+      "expected": { "sources": true },
+      "dimensions": ["provenance"]
+    },
+    {
+      "id": "coding-validation",
+      "vertical": "coding",
+      "input": "patch",
+      "expected": { "allowlistedValidation": true },
+      "dimensions": ["code", "security"]
+    },
+    {
+      "id": "creative-continuity",
+      "vertical": "creative",
+      "input": "scene",
+      "expected": { "referenceId": true },
+      "dimensions": ["continuity", "brand"]
+    },
+    {
+      "id": "automation-contract",
+      "vertical": "automation",
+      "input": "workflow",
+      "expected": { "bounded": true },
+      "dimensions": ["contract", "security"]
+    },
+    {
+      "id": "business-sources",
+      "vertical": "business",
+      "input": "report",
+      "expected": { "noUnsupportedClaims": true },
+      "dimensions": ["provenance"]
+    },
+    {
+      "id": "marketplace-policy",
+      "vertical": "marketplace",
+      "input": "package",
+      "expected": { "noArbitraryExecution": true },
+      "dimensions": ["security", "contract"]
+    }
+  ]
+}

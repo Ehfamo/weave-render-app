@@ -181,7 +181,7 @@ test("single business-agent UI is localized responsive and RTL-safe", async () =
   const keys = Object.keys(locales[0])
     .filter((key) => key.startsWith("p5_"))
     .sort();
-  assert.equal(keys.length, 12);
+  assert.equal(keys.length, 14);
   for (const locale of locales)
     assert.deepEqual(
       Object.keys(locale)

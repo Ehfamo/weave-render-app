@@ -53,10 +53,12 @@ export function BusinessAgentsWorkspace() {
               <article key={id} className="rounded-lg border p-4">
                 <div className="flex items-center justify-between">
                   <Icon className="size-5" aria-hidden="true" />
-                  <Check className="size-4 text-emerald-500" aria-label="enabled" />
+                  <Check className="size-4 text-emerald-500" aria-label={m.p5_enabled()} />
                 </div>
                 <h3 className="mt-3 font-medium">{label()}</h3>
-                <p className="text-sm text-muted-foreground">{count} capabilities</p>
+                <p className="text-sm text-muted-foreground">
+                  {count} {m.p5_capabilities()}
+                </p>
               </article>
             ))}
           </div>

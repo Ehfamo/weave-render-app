@@ -577,5 +577,7 @@
   "p5_marketing": "营销",
   "p5_sales": "销售",
   "p5_support": "支持",
-  "p5_data": "数据"
+  "p5_data": "数据",
+  "p5_capabilities": "项能力",
+  "p5_enabled": "已启用"
 }

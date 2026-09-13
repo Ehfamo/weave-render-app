@@ -577,5 +577,7 @@
   "p5_marketing": "Marketing",
   "p5_sales": "Sales",
   "p5_support": "Support",
-  "p5_data": "Data"
+  "p5_data": "Data",
+  "p5_capabilities": "capabilities",
+  "p5_enabled": "Enabled"
 }

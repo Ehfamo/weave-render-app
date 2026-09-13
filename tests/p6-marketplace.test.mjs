@@ -337,3 +337,36 @@ test("marketplace source has no arbitrary execution payment payout or private se
   assert.match(source, /MARKETPLACE_APPROVAL_REQUIRED/);
   assert.match(source, /PROJECT_ACCESS_DENIED/);
 });
+
+test("moderation can suspend listings and reviews expose an abuse-report boundary", () => {
+  const actor = {
+    userId: "creator",
+    moderator: true,
+    async canUseProject() {
+      return true;
+    },
+  };
+  const service = new MarketplaceService(actor),
+    item = manifest();
+  service.createDraft(item);
+  service.validate(item.packageId, item.version);
+  service.moderate(item.packageId, item.version, "approved", "ok");
+  const listing = service.publish(item.packageId, item.version, {
+    category: "x",
+    tags: [],
+    price: { kind: "FREE", amount: 0, currency: "CREDITS" },
+  });
+  actor.userId = "buyer";
+  actor.moderator = false;
+  service.acquire(listing.id, "review-report");
+  const review = service.review(listing.id, 4, "Useful").review;
+  actor.userId = "reporter";
+  assert.equal(service.reportReview(review.id, "misleading").status, "reported");
+  actor.userId = "moderator";
+  actor.moderator = true;
+  assert.equal(
+    service.moderateListing(listing.id, "suspended", "reported abuse").decision,
+    "suspended",
+  );
+  assert.equal(service.discover({ query: "prompt" }).length, 0);
+});

@@ -12,7 +12,7 @@ Starting source head: `99b0f89a90e65740e5703a7f9848024894dbb3ad`.
 - Prices use integer minor units or credits. Acquisition uses server-owned listing prices, idempotency, balance checks, entitlement creation, configurable basis-point commission, and an auditable creator ledger.
 - Refunds revoke entitlement and append a reversing ledger entry. Live payouts remain unavailable.
 - Installation requires an active entitlement, pinned version, valid compatibility/integrity/dependencies, project authorization, a canonical object adapter, and existing runtime approval for declared risky permissions.
-- Reviews require acquisition, reject creator self-review, isolate authorship, allow one active updated review, and derive aggregates server-side.
+- Reviews require acquisition, reject creator self-review, isolate authorship, allow one active updated review, derive aggregates server-side, and expose an abuse-report/moderation boundary.
 - One responsive Marketplace surface contains discovery, listing detail, creator lifecycle/earnings, and purchased library views.
 - Command Center marketplace goals route to the canonical surface. All P6 labels have exact parity in English, Persian, Arabic, Chinese, and Hindi with RTL-safe composition.
 
@@ -20,14 +20,14 @@ No arbitrary code, shell, SQL, filesystem, unrestricted network, role escalation
 
 ## Validation
 
-| Gate | Result |
-| --- | --- |
-| P6 focused/security/commerce/UI | 12/12 PASS |
-| Full suite | 246/246 PASS, zero skipped |
-| P0-P5 regression | 234/234 PASS |
-| Typecheck | PASS |
-| ESLint | PASS, 0 errors (9 pre-existing Fast Refresh warnings) |
-| Build | PASS |
-| Source diff check | PASS |
+| Gate                            | Result                                                |
+| ------------------------------- | ----------------------------------------------------- |
+| P6 focused/security/commerce/UI | 13/13 PASS                                            |
+| Full suite                      | 247/247 PASS, zero skipped                            |
+| P0-P5 regression                | 234/234 PASS                                          |
+| Typecheck                       | PASS                                                  |
+| ESLint                          | PASS, 0 errors (9 pre-existing Fast Refresh warnings) |
+| Build                           | PASS                                                  |
+| Source diff check               | PASS                                                  |
 
 External statuses remain `LIVE_PAYMENTS=NOT_CONFIGURED`, `LIVE_PAYOUTS=NOT_CONFIGURED`, and `RENDERED_BROWSER_QA=DEFERRED_EXTERNAL`.

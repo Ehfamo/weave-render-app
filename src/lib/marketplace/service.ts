@@ -154,6 +154,24 @@ export class MarketplaceService {
     this.decisions.push(record);
     return structuredClone(record);
   }
+  moderateListing(listingId: string, decision: "suspended" | "deprecated", reason: string) {
+    if (!this.actor.moderator) throw Error("MODERATION_FORBIDDEN");
+    const listing = this.listings.get(listingId);
+    if (!listing) throw Error("LISTING_UNAVAILABLE");
+    listing.state = decision;
+    const version = this.needVersion(listing.packageId, listing.version);
+    version.state = "deprecated";
+    const record: MarketplaceModerationDecision = {
+      id: `moderation:${version.id}:${this.decisions.length}`,
+      versionId: version.id,
+      actorId: this.actor.userId,
+      decision,
+      reason: reason.slice(0, 500),
+      createdAt: this.now(),
+    };
+    this.decisions.push(record);
+    return structuredClone(record);
+  }
   publish(
     packageId: string,
     version: string,
@@ -349,6 +367,13 @@ export class MarketplaceService {
         average: listing.ratingCount ? listing.ratingTotal / listing.ratingCount : 0,
       },
     };
+  }
+  reportReview(reviewId: string, reason: string) {
+    const review = this.reviews.get(reviewId);
+    if (!review || review.authorId === this.actor.userId || !reason.trim() || reason.length > 500)
+      throw Error("INVALID_REVIEW_REPORT");
+    review.status = "reported";
+    return { reviewId, reason: reason.trim(), status: "reported" as const };
   }
   refund(
     acquisitionId: string,

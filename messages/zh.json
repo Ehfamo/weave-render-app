@@ -716,5 +716,9 @@
   "p8_commission": "平台佣金",
   "p8_creator_earning": "创作者收益",
   "p8_payout_status": "付款状态",
-  "p8_not_configured": "未配置"
+  "p8_not_configured": "未配置",
+  "p9_routing_details": "路由详情",
+  "p9_auto_routing_summary": "代理、工具、模型和质量模式会自动选择。您可以覆盖允许的选项。",
+  "p9_context_provenance": "结果会显示使用过的上下文。",
+  "p9_approval_boundary": "外部及后果性操作始终需要批准。"
 }

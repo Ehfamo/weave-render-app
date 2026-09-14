@@ -125,6 +125,12 @@ export function HomeExperience() {
                   </select>
                 </label>
               </div>
+              <div className="mt-3 rounded-lg bg-muted/45 p-3 text-xs text-muted-foreground">
+                <p className="font-medium text-foreground">{m.p9_routing_details()}</p>
+                <p className="mt-1">{m.p9_auto_routing_summary()}</p>
+                <p className="mt-1">{m.p9_context_provenance()}</p>
+                <p className="mt-1">{m.p9_approval_boundary()}</p>
+              </div>
             </details>
           </form>
         </section>

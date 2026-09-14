@@ -4,3 +4,4 @@ export * from "./planner.ts";
 export * from "./quality.ts";
 export * from "./personalization.ts";
 export * from "./marketplace.ts";
+export * from "./trace.ts";

@@ -716,5 +716,9 @@
   "p8_commission": "Platform commission",
   "p8_creator_earning": "Creator earning",
   "p8_payout_status": "Payout status",
-  "p8_not_configured": "Not configured"
+  "p8_not_configured": "Not configured",
+  "p9_routing_details": "Routing details",
+  "p9_auto_routing_summary": "Agent, tools, model and quality are selected automatically. You can override permitted choices.",
+  "p9_context_provenance": "Used from context is shown with the result.",
+  "p9_approval_boundary": "External and consequential actions always require approval."
 }

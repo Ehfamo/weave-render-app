@@ -19,6 +19,8 @@ import {
   recommendBundle,
   summarizeVerifiedReviews,
 } from "../src/lib/intelligence/marketplace.ts";
+import { createExecutionTrace, toIntelligenceMetrics } from "../src/lib/intelligence/trace.ts";
+import { readFile } from "node:fs/promises";
 
 const baseIntent = (goal, extra = {}) => ({
   id: "brief-1",
@@ -567,4 +569,60 @@ test("bundles disclose prices and require acquisition approval", () => {
   assert.equal(bundle.totalKnownAmount, 5);
   assert.equal(bundle.requiresAcquisitionApproval, true);
   assert.equal(bundle.optional, true);
+});
+
+test("trace records bounded rationale IDs without goal or private context content", () => {
+  const intent = createExecutionIntent(
+    baseIntent("Research secret competitors", {
+      context: [
+        {
+          id: "brand-1",
+          ownerId: "u1",
+          projectId: "p1",
+          kind: "brand",
+          value: "private content",
+          relevant: true,
+        },
+      ],
+    }),
+  );
+  const plan = planCapabilities(intent.brief, intent.interpretation.capabilities, inventory);
+  const quality = {
+    decision: "ACCEPT",
+    findings: [{ evaluatorId: "source", status: "PASS", code: "CITED", repairable: false }],
+    repairCount: 0,
+    confidence: "VERIFIED",
+    output: {},
+  };
+  const trace = createExecutionTrace({
+    brief: intent.brief,
+    intentKind: intent.interpretation.kind,
+    plan,
+    quality,
+    finalState: "delivered",
+  });
+  assert.deepEqual(trace.contextReferenceIds, ["brand-1"]);
+  assert.doesNotMatch(JSON.stringify(trace), /private content|secret competitors/);
+  const metrics = toIntelligenceMetrics(intent.interpretation.kind, false, plan, quality);
+  assert.equal(metrics.repairCount, 0);
+  assert.ok(metrics.selectedAgentIds.includes("research"));
+});
+
+test("P9 advanced routing UX stays behind disclosure with five-locale parity", async () => {
+  const home = await readFile(
+    new URL("../src/components/xeomx/os/HomeExperience.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.ok(home.indexOf("<details") < home.indexOf("p9_routing_details"));
+  assert.doesNotMatch(home, /providerId|modelId|requestedAgent/);
+  const locales = await Promise.all(
+    ["en", "fa", "ar", "zh", "hi"].map(async (locale) =>
+      JSON.parse(await readFile(new URL(`../messages/${locale}.json`, import.meta.url), "utf8")),
+    ),
+  );
+  const keys = Object.keys(locales[0]).sort();
+  for (const locale of locales) {
+    assert.deepEqual(Object.keys(locale).sort(), keys);
+    assert.equal(Object.keys(locale).filter((key) => key.startsWith("p9_")).length, 4);
+  }
 });

@@ -716,5 +716,9 @@
   "p8_commission": "عمولة المنصة",
   "p8_creator_earning": "ربح المنشئ",
   "p8_payout_status": "حالة الدفع",
-  "p8_not_configured": "غير مهيأ"
+  "p8_not_configured": "غير مهيأ",
+  "p9_routing_details": "تفاصيل التوجيه",
+  "p9_auto_routing_summary": "يتم اختيار الوكيل والأدوات والنموذج والجودة تلقائياً. يمكنك تجاوز الخيارات المسموح بها.",
+  "p9_context_provenance": "تظهر عناصر السياق المستخدمة مع النتيجة.",
+  "p9_approval_boundary": "تتطلب الإجراءات الخارجية وذات العواقب موافقة دائماً."
 }

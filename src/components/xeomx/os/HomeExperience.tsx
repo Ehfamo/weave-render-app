@@ -1,437 +1,199 @@
-import { Link } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useRef, useMemo, useState } from "react";
-import { ArrowRight, Flame, Play } from "lucide-react";
-import { motion } from "motion/react";
-import { CATEGORIES, PROMPTS } from "@/lib/prompts";
-import { CORE_SECTIONS, EXPLORE_SECTIONS } from "@/lib/explore-sections";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { ArrowRight, FolderOpen, History, Send } from "lucide-react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Header } from "@/components/xeomx/Header";
 import { m } from "@/paraglide/messages.js";
-import { TickerMarquee } from "@/components/xeomx/Marquee";
-// Lazy-load below-the-fold interactive block to free the main thread during hydration.
-const ConnectSection = lazy(() =>
-  import("@/components/xeomx/ConnectSection").then((m) => ({ default: m.ConnectSection })),
-);
-const HomeDiscoverySection = lazy(() =>
-  import("@/components/xeomx/os/HomeDiscoverySection").then((module) => ({
-    default: module.HomeDiscoverySection,
+
+const continuations = ["Product launch plan", "Website copy refresh", "Market research brief"];
+const projects = ["Brand refresh", "Q2 campaign", "Customer research"];
+const MarketplaceHomeCta = lazy(() =>
+  import("@/components/xeomx/os/MarketplaceHomeCta").then((module) => ({
+    default: module.MarketplaceHomeCta,
   })),
 );
-import { Logo } from "@/components/xeomx/Logo";
-import { HeroBackground } from "@/components/xeomx/HeroBackground";
-import { DemoDataBadge } from "@/components/xeomx/status/DemoDataBadge";
-
-const CATEGORY_LABELS: Record<string, () => string> = {
-  All: () => m.cat_all(),
-  Portrait: () => m.cat_portrait(),
-  Fashion: () => m.cat_fashion(),
-  Atmosphere: () => m.cat_atmosphere(),
-  "Sci-Fi": () => m.cat_scifi(),
-  Texture: () => m.cat_texture(),
-};
 
 export function HomeExperience() {
-  const discoveryRef = useRef<HTMLDivElement>(null);
-  const [discoveryVisible, setDiscoveryVisible] = useState(false);
+  const navigate = useNavigate();
+  const [goal, setGoal] = useState("");
+  const marketRef = useRef<HTMLDivElement>(null);
+  const [marketVisible, setMarketVisible] = useState(false);
   useEffect(() => {
-    if (!("IntersectionObserver" in window)) {
-      setDiscoveryVisible(true);
+    const node = marketRef.current;
+    if (!node || !("IntersectionObserver" in window)) {
+      setMarketVisible(true);
       return;
     }
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries.some((entry) => entry.isIntersecting)) {
-          setDiscoveryVisible(true);
+          setMarketVisible(true);
           observer.disconnect();
         }
       },
-      { rootMargin: "300px" },
+      { rootMargin: "240px" },
     );
-    if (discoveryRef.current) observer.observe(discoveryRef.current);
+    observer.observe(node);
     return () => observer.disconnect();
   }, []);
-  const [query, setQuery] = useState("");
-  const [cat, setCat] = useState("All");
-
-  const heroItemVariants = {
-    hidden: { opacity: 0, y: 12 },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const },
-    },
+  const submit = () => {
+    const value = goal.trim();
+    if (value.length >= 2) navigate({ to: "/xeomx-ai", search: { goal: value } });
   };
-
-  const filtered = useMemo(() => {
-    return PROMPTS.filter((p) => {
-      if (cat !== "All" && p.category !== cat) return false;
-      if (!query) return true;
-      const q = query.toLowerCase();
-      return (
-        p.title.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q) ||
-        p.author.toLowerCase().includes(q)
-      );
-    });
-  }, [query, cat]);
-
-  const featured = PROMPTS[0];
-  const isFiltering = query.length > 0 || cat !== "All";
-
-  const tickerItems = PROMPTS.slice(0, 7).map((prompt) => prompt.title);
-
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Header query={query} onSearch={setQuery} />
-
-      {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0">
-          <HeroBackground />
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/30" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
-        </div>
-
-        <div
-          className="relative mx-auto flex max-w-[1400px] flex-col lg:flex-row lg:items-end"
-          style={{
-            gap: "var(--space-6)",
-            paddingInline: "var(--space-4)",
-            paddingTop: "var(--space-8)",
-            paddingBottom: "var(--space-8)",
-          }}
-        >
-          <motion.div
-            className="max-w-2xl"
-            initial="hidden"
-            animate="show"
-            variants={{
-              hidden: {},
-              show: { transition: { staggerChildren: 0.05, delayChildren: 0.05 } },
+    <div className="min-h-screen bg-background text-foreground" dir="auto">
+      <Header />
+      <main className="mx-auto w-full max-w-6xl px-4 pb-16 pt-10 sm:px-6 sm:pt-16">
+        <section aria-labelledby="goal-title" className="mx-auto max-w-4xl text-center">
+          <h1
+            id="goal-title"
+            className="text-balance text-3xl font-semibold tracking-tight sm:text-5xl"
+          >
+            {m.p8_goal_title()}
+          </h1>
+          <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">{m.p8_goal_subtitle()}</p>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              submit();
             }}
+            className="mt-8 rounded-2xl border bg-background p-2 text-start shadow-sm focus-within:ring-2 focus-within:ring-primary/25"
           >
-            <motion.span
-              variants={heroItemVariants}
-              className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 uppercase tracking-[0.28em] text-gold"
-              style={{ fontSize: "var(--font-size-micro)" }}
-            >
-              <Flame className="h-3 w-3" /> {m.hero_eyebrow()}
-            </motion.span>
-            <motion.h1
-              variants={heroItemVariants}
-              className="font-display font-bold leading-[0.95] tracking-tight"
-              style={{
-                marginTop: "var(--space-4)",
-                fontSize: "clamp(2.5rem, 6vw, var(--font-size-display))",
-              }}
-            >
-              {m.hero_title_line_1()}
-              <br />
-              {m.hero_title_line_2()}
-            </motion.h1>
-            <motion.p
-              variants={heroItemVariants}
-              className="max-w-xl text-muted-foreground"
-              style={{ marginTop: "var(--space-4)", fontSize: "var(--font-size-body-lg)" }}
-            >
-              {featured.title} — {featured.author}. {m.hero_subtitle()}
-            </motion.p>
-            <motion.div
-              variants={heroItemVariants}
-              className="flex flex-wrap items-center"
-              style={{ marginTop: "var(--space-5)", gap: "var(--space-3)" }}
-            >
-              <Link
-                to="/feed"
-                className="group inline-flex items-center gap-2 text-sm font-medium text-white transition hover:opacity-95"
-                style={{
-                  backgroundColor: "var(--action-primary)",
-                  borderRadius: "var(--radius-sm)",
-                  paddingInline: "var(--space-5)",
-                  paddingBlock: "var(--space-3)",
-                  transitionDuration: "var(--motion-duration-fast)",
-                  transitionTimingFunction: "var(--motion-ease)",
-                }}
-              >
-                <Play className="h-4 w-4 fill-white" /> {m.hero_cta_feed()}
-              </Link>
-              <Link
-                to="/collections"
-                className="inline-flex items-center gap-2 text-sm font-medium text-foreground backdrop-blur transition hover:border-gold/40"
-                style={{
-                  border: "1px solid var(--border-default)",
-                  backgroundColor: "var(--surface-glass)",
-                  borderRadius: "var(--radius-sm)",
-                  paddingInline: "var(--space-5)",
-                  paddingBlock: "var(--space-3)",
-                  transitionDuration: "var(--motion-duration-fast)",
-                  transitionTimingFunction: "var(--motion-ease)",
-                }}
-              >
-                {m.hero_cta_collections()} <ArrowRight className="h-4 w-4" />
-              </Link>
-            </motion.div>
-
-            <motion.dl
-              variants={heroItemVariants}
-              className="relative grid max-w-md grid-cols-3 text-start"
-              style={{
-                marginTop: "var(--space-7)",
-                gap: "var(--space-5)",
-                paddingTop: "var(--space-5)",
-                borderTop: "1px solid var(--border-subtle)",
-              }}
-            >
-              <DemoDataBadge variant="sample" className="absolute -top-3 start-0" />
-              {[
-                ["12,480", m.hero_stat_prompts()],
-                ["1.4M", m.hero_stat_renders()],
-                ["Tier 01", m.hero_stat_drop()],
-              ].map(([v, l]) => (
-                <div key={l}>
-                  <dt className="font-display text-2xl font-semibold tracking-tight">{v}</dt>
-                  <dd className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                    {l}
-                  </dd>
-                </div>
-              ))}
-            </motion.dl>
-          </motion.div>
-
-          {/* Featured poster */}
-          <Link
-            to="/prompt/$id"
-            params={{ id: featured.id }}
-            className="group relative ms-auto hidden w-[340px] shrink-0 overflow-hidden rounded-3xl border border-border shadow-[var(--shadow-card)] lg:block"
-          >
-            <img
-              src={featured.cover}
-              alt={featured.title}
-              width={340}
-              height={453}
-              loading="lazy"
-              decoding="async"
-              className="aspect-[3/4] w-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div className="absolute inset-x-0 bottom-0 p-5">
-              <span
-                className="rounded-full px-2.5 py-1 text-[11px] font-medium"
-                style={{ background: "var(--gradient-gold)", color: "oklch(0.18 0.02 60)" }}
-              >
-                Premium
-              </span>
-              <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight">
-                {featured.title}
-              </h2>
-              <p className="text-xs text-muted-foreground">
-                {featured.author} · {featured.views} views
-              </p>
-            </div>
-          </Link>
-        </div>
-      </section>
-
-      {/* LIVE TICKER */}
-      <TickerMarquee items={tickerItems} />
-
-      {/* CATEGORY FILTER */}
-      <div className="sticky top-[57px] z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl">
-        <div className="scrollbar-hidden mx-auto flex max-w-[1400px] gap-2 overflow-x-auto px-4 py-3 sm:px-8">
-          {CATEGORIES.map((c) => {
-            const active = cat === c;
-            const label = CATEGORY_LABELS[c]?.() ?? c;
-            return (
+            <label htmlFor="universal-goal" className="sr-only">
+              {m.p8_goal_title()}
+            </label>
+            <div className="flex items-end gap-2">
+              <textarea
+                id="universal-goal"
+                rows={2}
+                value={goal}
+                onChange={(event) => setGoal(event.target.value)}
+                placeholder={m.p8_goal_placeholder()}
+                className="min-h-20 min-w-0 flex-1 resize-none bg-transparent p-3 text-base outline-none sm:text-lg"
+              />
               <button
-                key={c}
-                onClick={() => setCat(c)}
-                className={`shrink-0 rounded-full border px-4 py-2 text-xs font-medium tracking-wide transition ${
-                  active
-                    ? "border-transparent text-white"
-                    : "border-border bg-surface/40 text-muted-foreground hover:border-magenta/40 hover:text-foreground"
-                }`}
-                style={
-                  active
-                    ? { background: "var(--gradient-magenta)", boxShadow: "var(--shadow-glow)" }
-                    : undefined
-                }
+                type="submit"
+                aria-label={m.p8_start()}
+                disabled={goal.trim().length < 2}
+                className="grid min-h-11 min-w-11 place-items-center rounded-xl bg-primary text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40"
               >
-                {label}
+                <Send className="size-5 rtl:rotate-180" />
               </button>
-            );
-          })}
-          <span className="ms-auto hidden shrink-0 self-center text-[11px] uppercase tracking-[0.22em] text-muted-foreground sm:inline">
-            {m.prompts_count({ count: String(filtered.length), total: String(PROMPTS.length) })}
-          </span>
-        </div>
-      </div>
-
-      <main className="mx-auto max-w-[1400px] space-y-16 py-12" style={{ contain: "content" }}>
-        <div ref={discoveryRef} className="min-h-[400px]">
-          {discoveryVisible || isFiltering ? (
-            <Suspense fallback={<p role="status">{m.common_loading()}</p>}>
-              <HomeDiscoverySection filtered={filtered} isFiltering={isFiltering} />
+            </div>
+            <div className="border-t px-3 py-2">
+              <span className="text-xs font-medium text-muted-foreground">{m.p8_using()}</span>
+              <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                <button type="button" className="min-h-11 rounded-lg border px-3">
+                  {m.p8_project()}: {m.p8_general()}
+                </button>
+                <button type="button" className="min-h-11 rounded-lg border px-3">
+                  {m.p8_character()}: {m.p8_default()}
+                </button>
+                <button type="button" className="min-h-11 rounded-lg border px-3">
+                  {m.p8_format()}: {m.p8_auto()}
+                </button>
+                <button
+                  type="button"
+                  className="min-h-11 px-2 text-primary underline-offset-4 hover:underline"
+                >
+                  {m.p8_edit()}
+                </button>
+              </div>
+            </div>
+            <details className="border-t px-3 py-3">
+              <summary className="cursor-pointer text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                {m.p8_more_control()}
+              </summary>
+              <div className="mt-3 grid gap-3 text-sm sm:grid-cols-3">
+                <label>
+                  {m.p8_quality()}
+                  <select className="mt-1 min-h-11 w-full rounded-lg border bg-background px-3">
+                    <option>{m.p8_balanced()}</option>
+                  </select>
+                </label>
+                <label>
+                  {m.p8_budget()}
+                  <input
+                    className="mt-1 min-h-11 w-full rounded-lg border px-3"
+                    inputMode="numeric"
+                    placeholder={m.p8_automatic()}
+                  />
+                </label>
+                <label>
+                  {m.p8_output()}
+                  <select className="mt-1 min-h-11 w-full rounded-lg border bg-background px-3">
+                    <option>{m.p8_auto()}</option>
+                  </select>
+                </label>
+              </div>
+            </details>
+          </form>
+        </section>
+        <section aria-labelledby="continue-title" className="mt-12">
+          <div className="flex items-center justify-between">
+            <h2 id="continue-title" className="text-xl font-semibold">
+              {m.p8_continue()}
+            </h2>
+            <Link to="/dashboard" className="min-h-11 py-3 text-sm text-primary">
+              {m.p8_view_all()}
+            </Link>
+          </div>
+          <div className="mt-3 grid gap-3 md:grid-cols-3">
+            {continuations.map((item) => (
+              <Link
+                key={item}
+                to="/xeomx-ai"
+                className="flex min-h-20 items-center gap-3 rounded-xl border p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <History className="size-5 text-primary" />
+                <span className="min-w-0 flex-1 truncate font-medium">{item}</span>
+                <ArrowRight className="size-4 rtl:rotate-180" />
+              </Link>
+            ))}
+          </div>
+        </section>
+        <section aria-labelledby="projects-title" className="mt-10">
+          <div className="flex items-center justify-between">
+            <h2 id="projects-title" className="text-xl font-semibold">
+              {m.p8_recent_projects()}
+            </h2>
+            <Link to="/dashboard" className="min-h-11 py-3 text-sm text-primary">
+              {m.p8_view_all()}
+            </Link>
+          </div>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {projects.map((item) => (
+              <Link
+                key={item}
+                to="/workspace"
+                className="flex min-h-20 items-center gap-3 rounded-xl border p-4"
+              >
+                <FolderOpen className="size-5 text-primary" />
+                <span className="font-medium">{item}</span>
+              </Link>
+            ))}
+            <button
+              type="button"
+              onClick={() => document.getElementById("universal-goal")?.focus()}
+              className="min-h-20 rounded-xl border border-dashed p-4 text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {m.p8_new_project()}
+            </button>
+          </div>
+        </section>
+        <div ref={marketRef}>
+          {marketVisible ? (
+            <Suspense
+              fallback={
+                <div role="status" className="mt-10 min-h-24 rounded-2xl border p-5">
+                  {m.common_loading()}
+                </div>
+              }
+            >
+              <MarketplaceHomeCta />
             </Suspense>
-          ) : (
-            <p role="status">{m.common_loading()}</p>
-          )}
+          ) : null}
         </div>
       </main>
-
-      {!isFiltering && (
-        <Suspense fallback={<div style={{ minHeight: 240 }} aria-hidden />}>
-          <div style={{ contain: "content" }}>
-            <ConnectSection />
-          </div>
-        </Suspense>
-      )}
-
-      <footer
-        className="mt-16 border-t border-border/60 bg-surface/30"
-        style={{ contain: "content" }}
-      >
-        <div className="mx-auto max-w-[1400px] px-4 py-12 sm:px-8">
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            <div>
-              <Logo variant="full" size={28} ariaLabel="XEOMX" />
-              <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-                {m.footer_tagline()}
-              </p>
-            </div>
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-                {m.footer_platform()}
-              </h3>
-              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link to="/" className="transition hover:text-foreground">
-                    {m.nav_discover()}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/feed" className="transition hover:text-foreground">
-                    {m.nav_feed()}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/collections" className="transition hover:text-foreground">
-                    {m.nav_collections()}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/creators" className="transition hover:text-foreground">
-                    {m.nav_creators()}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/explore" className="transition hover:text-foreground">
-                    {m.nav_explore()}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-                {m.footer_coming_soon()}
-              </h3>
-              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link
-                    to="/explore/$slug"
-                    params={{ slug: "studio-canvas" }}
-                    className="transition hover:text-foreground"
-                  >
-                    Studio Canvas
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/explore/$slug"
-                    params={{ slug: "agent-store" }}
-                    className="transition hover:text-foreground"
-                  >
-                    Agent Store
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/explore/$slug"
-                    params={{ slug: "ai-compare" }}
-                    className="transition hover:text-foreground"
-                  >
-                    AI Compare Arena
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/explore/$slug"
-                    params={{ slug: "academy" }}
-                    className="transition hover:text-foreground"
-                  >
-                    Academy
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/explore/$slug"
-                    params={{ slug: "founders" }}
-                    className="transition hover:text-foreground"
-                  >
-                    Founders Access
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-                {m.footer_legal()}
-              </h3>
-              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link to="/terms" className="transition hover:text-foreground">
-                    {m.footer_terms()}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/privacy" className="transition hover:text-foreground">
-                    {m.footer_privacy()}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/cookies" className="transition hover:text-foreground">
-                    {m.footer_cookie()}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/refund-policy" className="transition hover:text-foreground">
-                    {m.footer_refund()}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/contact" className="transition hover:text-foreground">
-                    Contact
-                  </Link>
-                </li>
-                <li>
-                  <a href="mailto:hello@xeomx.com" className="transition hover:text-foreground">
-                    hello@xeomx.com
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border/60 pt-6 sm:flex-row">
-            <p className="text-xs text-muted-foreground">{m.footer_rights()}</p>
-            <p className="text-xs text-muted-foreground">
-              {m.footer_built()} ·{" "}
-              <span className="text-gradient-gold">
-                {m.footer_sections({
-                  count: String(CORE_SECTIONS.length + EXPLORE_SECTIONS.length),
-                })}
-              </span>{" "}
-              · {m.footer_powered()}
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

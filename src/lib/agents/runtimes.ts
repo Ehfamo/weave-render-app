@@ -29,7 +29,11 @@ export const researchAgent: AgentRuntime = {
           id: "research-synthesis",
           capability: "model.reason",
           toolId: "model.reason",
-          input: { task: "research", prompt: context.task.goal },
+          input: {
+            task: "research",
+            prompt: context.task.goal,
+            mode: context.task.routingMode ?? "BALANCED",
+          },
         },
       ],
     };
@@ -68,7 +72,11 @@ export const codingAgent: AgentRuntime = {
           id: "code-proposal",
           capability: "code.propose",
           toolId: "model.reason",
-          input: { task: "code-proposal", prompt: context.task.goal },
+          input: {
+            task: "code-proposal",
+            prompt: context.task.goal,
+            mode: context.task.routingMode ?? "BALANCED",
+          },
         },
       ],
     };

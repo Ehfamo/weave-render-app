@@ -13,10 +13,11 @@ export interface ValidationPort {
   readonly allowedCommandIds: readonly string[];
   execute(commandId: string, signal?: AbortSignal): Promise<unknown>;
 }
+type ModelGatewayPort = Pick<ModelGateway, "execute">;
 export function createCanonicalTools(deps: {
   search: GlobalSearchService;
   brain: ProjectBrainService;
-  gateway: ModelGateway;
+  gateway: ModelGatewayPort;
   browser?: BrowserPort;
   allowedOrigins?: readonly string[];
   codeReader?: (query: string) => Promise<unknown>;
@@ -63,7 +64,8 @@ export function createCanonicalTools(deps: {
         record(v) &&
         typeof v.prompt === "string" &&
         v.prompt.length <= 100_000 &&
-        typeof v.task === "string",
+        typeof v.task === "string" &&
+        (v.mode === undefined || ["FAST", "BALANCED", "BEST"].includes(String(v.mode))),
       execute: async (v, signal) => {
         const x = v as Record<string, string>;
         const r = await deps.gateway.execute(
@@ -71,7 +73,8 @@ export function createCanonicalTools(deps: {
             requestId: crypto.randomUUID(),
             task: x.task,
             input: x.prompt,
-            mode: "BALANCED",
+            mode:
+              x.mode === "FAST" || x.mode === "BEST" || x.mode === "BALANCED" ? x.mode : "BALANCED",
             capability: "text",
             maxOutputTokens: 4096,
           },

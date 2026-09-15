@@ -21,6 +21,7 @@ export interface OrchestratorLimits {
   maxContextCharacters: number;
   timeoutMs: number;
 }
+type ModelGatewayPort = Pick<ModelGateway, "execute">;
 const DEFAULT_LIMITS: OrchestratorLimits = {
   maxSteps: 8,
   maxToolCalls: 8,
@@ -37,7 +38,7 @@ export class TaskOrchestrator {
     approvals: ApprovalStore;
     durableApprovals?: DurableApprovalAuthority;
     brain: ProjectBrainService;
-    gateway: ModelGateway;
+    gateway: ModelGatewayPort;
     now?: () => string;
     id?: () => string;
   };
@@ -47,7 +48,7 @@ export class TaskOrchestrator {
       approvals: ApprovalStore;
       durableApprovals?: DurableApprovalAuthority;
       brain: ProjectBrainService;
-      gateway: ModelGateway;
+      gateway: ModelGatewayPort;
       now?: () => string;
       id?: () => string;
     },

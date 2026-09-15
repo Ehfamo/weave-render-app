@@ -2,6 +2,8 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, FolderOpen, History, Send } from "lucide-react";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Header } from "@/components/xeomx/Header";
+import { createPendingGoal, savePendingGoal } from "@/lib/core-execution/handoff";
+import type { RoutingMode } from "@/lib/model-gateway/contracts";
 import { m } from "@/paraglide/messages.js";
 
 const continuations = ["Product launch plan", "Website copy refresh", "Market research brief"];
@@ -15,6 +17,7 @@ const MarketplaceHomeCta = lazy(() =>
 export function HomeExperience() {
   const navigate = useNavigate();
   const [goal, setGoal] = useState("");
+  const [quality, setQuality] = useState<RoutingMode>("BALANCED");
   const marketRef = useRef<HTMLDivElement>(null);
   const [marketVisible, setMarketVisible] = useState(false);
   useEffect(() => {
@@ -37,7 +40,10 @@ export function HomeExperience() {
   }, []);
   const submit = () => {
     const value = goal.trim();
-    if (value.length >= 2) navigate({ to: "/xeomx-ai", search: { goal: value } });
+    if (value.length >= 2) {
+      savePendingGoal(window.localStorage, createPendingGoal(value, quality));
+      navigate({ to: "/xeomx-ai" });
+    }
   };
   return (
     <div className="min-h-screen bg-background text-foreground" dir="auto">
@@ -81,50 +87,54 @@ export function HomeExperience() {
             </div>
             <div className="border-t px-3 py-2">
               <span className="text-xs font-medium text-muted-foreground">{m.p8_using()}</span>
-              <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                <button type="button" className="min-h-11 rounded-lg border px-3">
-                  {m.p8_project()}: {m.p8_general()}
-                </button>
-                <button type="button" className="min-h-11 rounded-lg border px-3">
-                  {m.p8_character()}: {m.p8_default()}
-                </button>
-                <button type="button" className="min-h-11 rounded-lg border px-3">
-                  {m.p8_format()}: {m.p8_auto()}
-                </button>
-                <button
-                  type="button"
-                  className="min-h-11 px-2 text-primary underline-offset-4 hover:underline"
+              <div
+                className="mt-2 flex flex-wrap gap-2 text-xs"
+                aria-label={m.fi1_context_unavailable()}
+              >
+                <span
+                  aria-disabled="true"
+                  className="inline-flex min-h-11 items-center rounded-lg border px-3 text-muted-foreground"
                 >
-                  {m.p8_edit()}
-                </button>
+                  {m.p8_project()}: {m.p8_general()}
+                </span>
+                <span
+                  aria-disabled="true"
+                  className="inline-flex min-h-11 items-center rounded-lg border px-3 text-muted-foreground"
+                >
+                  {m.p8_character()}: {m.p8_default()}
+                </span>
+                <span
+                  aria-disabled="true"
+                  className="inline-flex min-h-11 items-center rounded-lg border px-3 text-muted-foreground"
+                >
+                  {m.p8_format()}: {m.p8_auto()}
+                </span>
+                <span className="inline-flex min-h-11 items-center px-2 text-muted-foreground">
+                  {m.p8_edit()}: {m.fi1_available_later()}
+                </span>
               </div>
             </div>
             <details className="border-t px-3 py-3">
               <summary className="cursor-pointer text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 {m.p8_more_control()}
               </summary>
-              <div className="mt-3 grid gap-3 text-sm sm:grid-cols-3">
+              <div className="mt-3 grid gap-3 text-sm sm:grid-cols-1">
                 <label>
                   {m.p8_quality()}
-                  <select className="mt-1 min-h-11 w-full rounded-lg border bg-background px-3">
-                    <option>{m.p8_balanced()}</option>
-                  </select>
-                </label>
-                <label>
-                  {m.p8_budget()}
-                  <input
-                    className="mt-1 min-h-11 w-full rounded-lg border px-3"
-                    inputMode="numeric"
-                    placeholder={m.p8_automatic()}
-                  />
-                </label>
-                <label>
-                  {m.p8_output()}
-                  <select className="mt-1 min-h-11 w-full rounded-lg border bg-background px-3">
-                    <option>{m.p8_auto()}</option>
+                  <select
+                    value={quality}
+                    onChange={(event) => setQuality(event.target.value as RoutingMode)}
+                    className="mt-1 min-h-11 w-full rounded-lg border bg-background px-3"
+                  >
+                    <option value="FAST">{m.fi1_quality_fast()}</option>
+                    <option value="BALANCED">{m.p8_balanced()}</option>
+                    <option value="BEST">{m.fi1_quality_best()}</option>
                   </select>
                 </label>
               </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                {m.p8_budget()} / {m.p8_output()}: {m.fi1_automatic_enforced()}
+              </p>
               <div className="mt-3 rounded-lg bg-muted/45 p-3 text-xs text-muted-foreground">
                 <p className="font-medium text-foreground">{m.p9_routing_details()}</p>
                 <p className="mt-1">{m.p9_auto_routing_summary()}</p>

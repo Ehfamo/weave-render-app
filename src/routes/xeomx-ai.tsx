@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ProductEnvironmentPage } from "@/components/xeomx/product/ProductEnvironmentPage";
+import { XeomxAiWorkspace } from "@/components/xeomx/ai/XeomxAiWorkspace";
 export const Route = createFileRoute("/xeomx-ai")({ component: Page });
 function Page() {
-  return <ProductEnvironmentPage environmentId="ai" viewKey="chat" />;
+  // ProductEnvironmentPage remains the preview boundary for non-executable product surfaces.
+  return <XeomxAiWorkspace />;
 }

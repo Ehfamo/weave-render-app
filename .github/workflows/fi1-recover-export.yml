@@ -22,11 +22,15 @@ jobs:
           git fetch origin preservation/xeomx-fi1-recovery-20260915
           git show origin/preservation/xeomx-fi1-recovery-20260915:artifacts/fi1-preservation/XEOMX_FI1_INCREMENTAL_EXACT_20260915.bundle > /tmp/XEOMX_FI1_INCREMENTAL_EXACT_20260915.bundle
 
-      - name: Verify exact bundle
+      - name: Inspect and verify exact bundle
         run: |
-          test "$(sha256sum /tmp/XEOMX_FI1_INCREMENTAL_EXACT_20260915.bundle | awk '{print $1}')" = "e24d6f647005e01333d93ffecd22c75691d89cf9e35c9346f8f5d2382e0edb50"
+          ACTUAL_SHA="$(sha256sum /tmp/XEOMX_FI1_INCREMENTAL_EXACT_20260915.bundle | awk '{print $1}')"
+          echo "ACTUAL_SHA256=${ACTUAL_SHA}"
+          echo "EXPECTED_SHA256=e24d6f647005e01333d93ffecd22c75691d89cf9e35c9346f8f5d2382e0edb50"
           git bundle verify /tmp/XEOMX_FI1_INCREMENTAL_EXACT_20260915.bundle
+          git bundle list-heads /tmp/XEOMX_FI1_INCREMENTAL_EXACT_20260915.bundle
           git cat-file -e e14edacdcbb9705298a4865ca5d38e3f746ef202^{commit}
+          test "${ACTUAL_SHA}" = "e24d6f647005e01333d93ffecd22c75691d89cf9e35c9346f8f5d2382e0edb50"
 
       - name: Recover FI1 exact branch
         run: |

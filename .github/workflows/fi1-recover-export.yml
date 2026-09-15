@@ -1,0 +1,55 @@
+name: XEOMX FI1 Exact Recovery Export
+
+on:
+  push:
+    branches:
+      - recovery/xeomx-fi1-export-20260915
+
+permissions:
+  contents: write
+
+jobs:
+  recover-fi1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout recovery branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch preservation source
+        run: |
+          git fetch origin preservation/xeomx-fi1-recovery-20260915
+          git show origin/preservation/xeomx-fi1-recovery-20260915:artifacts/fi1-preservation/XEOMX_FI1_INCREMENTAL_EXACT_20260915.bundle > /tmp/XEOMX_FI1_INCREMENTAL_EXACT_20260915.bundle
+
+      - name: Verify exact bundle
+        run: |
+          test "$(sha256sum /tmp/XEOMX_FI1_INCREMENTAL_EXACT_20260915.bundle | awk '{print $1}')" = "e24d6f647005e01333d93ffecd22c75691d89cf9e35c9346f8f5d2382e0edb50"
+          git bundle verify /tmp/XEOMX_FI1_INCREMENTAL_EXACT_20260915.bundle
+          git cat-file -e e14edacdcbb9705298a4865ca5d38e3f746ef202^{commit}
+
+      - name: Recover FI1 exact branch
+        run: |
+          git fetch /tmp/XEOMX_FI1_INCREMENTAL_EXACT_20260915.bundle refs/heads/feature/xeomx-fi1-core-execution-20260914:refs/remotes/bundle/fi1
+          test "$(git rev-parse refs/remotes/bundle/fi1)" = "dcafa525ebae0cf126e7470be3ca9de8065274aa"
+          git checkout -B feature/xeomx-fi1-core-execution-20260914 refs/remotes/bundle/fi1
+          test "$(git rev-parse HEAD)" = "dcafa525ebae0cf126e7470be3ca9de8065274aa"
+
+      - name: Persist exact FI1 remote branch
+        run: |
+          git push origin HEAD:refs/heads/feature/xeomx-fi1-core-execution-20260914
+
+      - name: Export exact FI1 workspace
+        run: |
+          git archive --format=tar.gz -o /tmp/XEOMX_FI1_EXACT_WORKSPACE_20260915.tar.gz HEAD
+          sha256sum /tmp/XEOMX_FI1_EXACT_WORKSPACE_20260915.tar.gz > /tmp/XEOMX_FI1_EXACT_WORKSPACE_20260915.tar.gz.sha256
+
+      - name: Upload exact FI1 workspace
+        uses: actions/upload-artifact@v4
+        with:
+          name: XEOMX_FI1_EXACT_WORKSPACE_20260915
+          path: |
+            /tmp/XEOMX_FI1_EXACT_WORKSPACE_20260915.tar.gz
+            /tmp/XEOMX_FI1_EXACT_WORKSPACE_20260915.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 7

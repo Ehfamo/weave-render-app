@@ -24,12 +24,14 @@ export interface CoreExecutionRequest {
   goal: string;
   idempotencyKey: string;
   projectId?: string;
+  conversationId?: string;
   quality?: RoutingMode;
   locale?: string;
 }
 
 export interface CoreExecutionResult {
   executionId: string;
+  conversationId?: string;
   state: CoreExecutionState;
   goal: string;
   output?: string;

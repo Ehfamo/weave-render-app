@@ -42,7 +42,7 @@ export const executeGoalFn = createServerFn({ method: "POST" })
       return requests.run(key, hash, () =>
         import("./runtime.server.ts")
           .then(({ executeCoreRequest }) =>
-            executeCoreRequest({ token, userId: context.userId, request: input }),
+            executeCoreRequest({ token, userId: context.userId, request: input, client: context.supabase }),
           )
           .catch(() => safeFailure(input.goal)),
       );

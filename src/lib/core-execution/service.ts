@@ -11,6 +11,9 @@ import {
 } from "../intelligence/quality.ts";
 import { createExecutionTrace } from "../intelligence/trace.ts";
 import type { JsonValue } from "../model-gateway/contracts.ts";
+import { createHash } from "node:crypto";
+import type { ProjectsService } from "../projects/service.ts";
+import type { ProjectContext } from "../project-brain/contracts.ts";
 import type {
   CoreExecutionRequest,
   CoreExecutionResponse,
@@ -28,19 +31,24 @@ export interface CoreExecutionDependencies {
   repair?(value: string, findings: readonly unknown[], signal: AbortSignal): Promise<string>;
   now?: () => string;
   id?: () => string;
+  projects?: ProjectsService;
 }
 
 export function validateCoreExecutionRequest(value: unknown): CoreExecutionRequest {
   if (!value || typeof value !== "object" || Array.isArray(value))
     throw new Error("INVALID_REQUEST");
   const input = value as Record<string, unknown>;
-  const allowed = new Set(["goal", "idempotencyKey", "projectId", "quality", "locale"]);
+  const allowed = new Set(["goal", "idempotencyKey", "projectId", "conversationId", "quality", "locale"]);
   if (Object.keys(input).some((key) => !allowed.has(key))) throw new Error("INVALID_REQUEST");
   if (typeof input.goal !== "string") throw new Error("INVALID_REQUEST");
   const goal = input.goal.trim();
   if (goal.length < 2 || goal.length > 50_000) throw new Error("INVALID_REQUEST");
   if (typeof input.idempotencyKey !== "string" || !IDEMPOTENCY_PATTERN.test(input.idempotencyKey))
     throw new Error("INVALID_REQUEST");
+  if (
+    input.conversationId !== undefined &&
+    (!input.projectId || typeof input.conversationId !== "string" || !UUID_PATTERN.test(input.conversationId))
+  ) throw new Error("INVALID_REQUEST");
   if (
     input.projectId !== undefined &&
     (typeof input.projectId !== "string" || !UUID_PATTERN.test(input.projectId))
@@ -57,6 +65,7 @@ export function validateCoreExecutionRequest(value: unknown): CoreExecutionReque
     goal,
     idempotencyKey: input.idempotencyKey,
     ...(input.projectId ? { projectId: input.projectId } : {}),
+    ...(input.conversationId ? { conversationId: input.conversationId as string } : {}),
     ...(input.quality ? { quality: input.quality as CoreExecutionRequest["quality"] } : {}),
     ...(input.locale ? { locale: input.locale } : {}),
   };
@@ -96,6 +105,37 @@ export async function runCoreExecution(
 ): Promise<CoreExecutionResponse> {
   const input = validateCoreExecutionRequest(raw);
   if (!UUID_PATTERN.test(actorId)) throw new Error("UNAUTHENTICATED");
+  if (!input.projectId) return executePreparedCore(actorId, input, deps, signal);
+  const executionId = deps.id?.() ?? crypto.randomUUID();
+  if (!deps.projects || deps.projects.persistence.userId !== actorId)
+    return failure(executionId, input.goal, "FAILED", "PROJECT_ACCESS_DENIED", "RETURN_TO_GOAL");
+  let conversationId: string | undefined;
+  try {
+    // Authorization and bounded context precede planning and all provider work.
+    const context = await deps.projects.context(input.projectId, input.conversationId);
+    const submission = await deps.projects.persistence.begin({ ...input, executionId,
+      requestHash: createHash("sha256").update(JSON.stringify(input)).digest("hex") });
+    if (!submission.created) return submission.response ?? failure(executionId, input.goal,
+      "FAILED", "EXECUTION_IN_PROGRESS", "RETURN_TO_GOAL");
+    conversationId = submission.conversationId;
+    const response = await executePreparedCore(actorId, input, { ...deps, id: () => executionId }, signal, context);
+    response.data.conversationId = conversationId;
+    await deps.projects.persistence.finish(conversationId, response);
+    return response;
+  } catch {
+    const response = failure(executionId, input.goal, "FAILED", "PROJECT_EXECUTION_UNAVAILABLE", "RETURN_TO_GOAL");
+    // If storage failed after provider execution, never return a false persisted success.
+    if (conversationId) response.data.conversationId = conversationId;
+    return response;
+  }
+}
+
+async function executePreparedCore(
+  actorId: string, raw: unknown, deps: CoreExecutionDependencies, signal?: AbortSignal,
+  projectContext?: ProjectContext,
+): Promise<CoreExecutionResponse> {
+  const input = validateCoreExecutionRequest(raw);
+  if (!UUID_PATTERN.test(actorId)) throw new Error("UNAUTHENTICATED");
   const executionId = deps.id?.() ?? crypto.randomUUID();
   const projectId = input.projectId ?? actorId;
   const intent = createExecutionIntent({
@@ -105,6 +145,12 @@ export async function runCoreExecution(
     goal: input.goal,
     locale: input.locale,
     explicitQuality: input.quality,
+    ...(projectContext ? {
+      context: [{ id: `brain-${projectId}`, ownerId: actorId, projectId, kind: "project",
+        value: projectContext.text, relevant: true }],
+      selectedReferences: projectContext.referenceResultId
+        ? [{ id: projectContext.referenceResultId, kind: "result" as const }] : [],
+    } : {}),
   });
   if (intent.clarification.blocks)
     return failure(executionId, input.goal, "FAILED", "MISSING_CRITICAL_CONTEXT", "RETURN_TO_GOAL");
@@ -157,6 +203,7 @@ export async function runCoreExecution(
     id: executionId,
     userId: actorId,
     projectId,
+    ...(input.conversationId ? { conversationId: input.conversationId } : {}),
     goal: input.goal,
     ...(selectedAgent ? { requestedAgent: selectedAgent } : {}),
     routingMode: intent.brief.quality,

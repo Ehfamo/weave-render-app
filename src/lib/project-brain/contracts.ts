@@ -45,6 +45,11 @@ export interface ProjectDomain {
   getAuthorizedProject(id: string): Promise<ProjectIdentity | null>;
   recentConversations(id: string): Promise<ProjectActivity[]>;
   authorizeConversation(projectId: string, conversationId: string): Promise<boolean>;
+  readBrain?(projectId: string): Promise<unknown>;
+  writeBrain?(projectId: string, next: BrainEntry[], expected: BrainEntry[]): Promise<void>;
+  recentMessages?(projectId: string, conversationId: string): Promise<{
+    id: string; role: string; content: string;
+  }[]>;
 }
 export interface ProjectSummary {
   text: string;
@@ -70,6 +75,7 @@ export interface ProjectContext {
   truncated: boolean;
   sourceCount: number;
   updatedAt: string;
+  referenceResultId?: string;
 }
 /** Optional future integration; generated output is never authoritative stored state. */
 export interface ProjectSummaryAdapter {

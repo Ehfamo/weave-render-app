@@ -130,24 +130,19 @@ export class TaskOrchestrator {
     options.signal?.addEventListener("abort", () => controller.abort(), { once: true });
     try {
       setStatus("planning");
-      const snapshot = await this.deps.brain.snapshot(task.projectId, task.conversationId);
-      const raw = [
-        snapshot.summary.text,
-        ...snapshot.instructions.map((x) => x.text),
-        ...snapshot.decisions.map((x) => x.text),
-        ...snapshot.constraints.map((x) => x.text),
-        ...snapshot.memories.map((x) => x.content),
-      ].join("\n");
-      const bounded = raw.slice(0, this.limits.maxContextCharacters);
+      const bounded = await this.deps.brain.buildContext(task.projectId, {
+        conversationId: task.conversationId, maxCharacters: Math.min(32000, this.limits.maxContextCharacters),
+      });
+      const sections = (JSON.parse(bounded.text) as { sections: { kind: string; text: string }[] }).sections;
+      const of = (kind: string) => sections.filter((s) => s.kind === kind).map((s) => s.text);
       const context: AgentContext = {
         task,
-        projectSummary: snapshot.summary.text,
-        instructions: snapshot.instructions.map((x) => x.text),
-        decisions: snapshot.decisions.map((x) => x.text),
-        constraints: snapshot.constraints.map((x) => x.text),
-        memories: snapshot.memories.map((x) => ({ id: x.id, type: x.type, content: x.content })),
-        maxCharacters: this.limits.maxContextCharacters,
-        truncated: bounded.length < raw.length,
+        projectSummary: of("goal")[0] ?? of("identity")[0] ?? "",
+        instructions: of("instruction"), decisions: of("decision"), constraints: of("constraint"),
+        memories: sections.filter((s) => s.kind.endsWith("Memory"))
+          .map((s, i) => ({ id: String(i), type: s.kind, content: s.text })),
+        maxCharacters: bounded.maxCharacters, truncated: bounded.truncated,
+        boundedContext: bounded.text,
       };
       const plan = await agent.plan(context);
       if (plan.steps.length > this.limits.maxSteps) throw new Error("STEP_LIMIT_EXCEEDED");

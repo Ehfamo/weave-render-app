@@ -19,6 +19,8 @@ import type { ProviderSignal } from "../production/contracts.ts";
 import { ProjectBrainService } from "../project-brain/service.ts";
 import { createProjectBrainService } from "../project-brain/runtime.server.ts";
 import { createSearchService } from "../global-search/runtime.server.ts";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { projectsForClient } from "../projects/runtime.server.ts";
 import type { CoreExecutionRequest } from "./contracts.ts";
 import { runCoreExecution, type CoreExecutionDependencies } from "./service.ts";
 
@@ -108,11 +110,13 @@ export async function createCoreExecutionDependencies(input: {
   token: string;
   userId: string;
   request: CoreExecutionRequest;
+  client?: SupabaseClient;
 }): Promise<CoreExecutionDependencies> {
   const projectId = input.request.projectId ?? input.userId;
+  const projects = input.request.projectId && input.client ? projectsForClient(input.userId, input.client) : undefined;
   const contextual = input.request.projectId
     ? {
-        brain: await createProjectBrainService(input.token),
+        brain: projects?.brain ?? await createProjectBrainService(input.token),
         search: await createSearchService(input.token),
       }
     : ephemeralServices(input.userId, projectId);
@@ -146,6 +150,7 @@ export async function createCoreExecutionDependencies(input: {
   return {
     registry,
     inventory,
+    projects,
     executeTask: (task, signal) => orchestrator.execute(task, { signal }),
   };
 }
@@ -155,6 +160,7 @@ export async function executeCoreRequest(input: {
   userId: string;
   request: CoreExecutionRequest;
   signal?: AbortSignal;
+  client?: SupabaseClient;
 }) {
   const deps = await createCoreExecutionDependencies(input);
   return runCoreExecution(input.userId, input.request, deps, input.signal);

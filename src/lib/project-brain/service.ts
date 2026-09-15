@@ -74,6 +74,11 @@ export class ProjectBrainService {
   }
   async get(projectId: string): Promise<ProjectBrainState> {
     const project = await this.project(projectId);
+    if (this.domain.readBrain) {
+      const data = await this.domain.readBrain(projectId);
+      return { project, entries: entries(data), updatedAt: project.updatedAt };
+    }
+    // Read-only compatibility for unmigrated callers; memory settings never hide project state.
     const doc = await this.document(projectId);
     let data: unknown = [];
     if (doc) {
@@ -92,9 +97,6 @@ export class ProjectBrainService {
   }
   async put(projectId: string, entry: BrainEntry): Promise<ProjectBrainState> {
     await this.project(projectId);
-    const settings = await this.memory.settings();
-    if (!settings.enabled || settings.disabledTypes.includes("ProjectMemory"))
-      throw new Error("MEMORY_DISABLED");
     const validated = entries([entry])[0];
     const state = await this.get(projectId);
     const next = entries([
@@ -105,21 +107,8 @@ export class ProjectBrainService {
     ]);
     const content = JSON.stringify({ format: marker, entries: next });
     if (content.length > 7500) throw new Error("BRAIN_CAPACITY_EXCEEDED");
-    const doc = await this.document(projectId);
-    if (doc) {
-      if (!(await this.memory.update(doc.id, { content }))) throw new Error("BRAIN_CONFLICT");
-    } else {
-      this.owned(
-        await this.memory.create({
-          type: "ProjectMemory",
-          scope: { kind: "project", projectId },
-          content,
-          importance: 1,
-          source: { kind: "user", reference: marker },
-        }),
-        projectId,
-      );
-    }
+    if (!this.domain.writeBrain) throw new Error("PROJECT_STORAGE_UNAVAILABLE");
+    await this.domain.writeBrain(projectId, next, state.entries);
     return this.get(projectId);
   }
   setGoal(projectId: string, text: string) {
@@ -154,10 +143,7 @@ export class ProjectBrainService {
     )
       throw new Error("CONVERSATION_ACCESS_DENIED");
     const settings = await this.memory.settings();
-    const state =
-      settings.enabled && !settings.disabledTypes.includes("ProjectMemory")
-        ? await this.get(projectId)
-        : { project, entries: [], updatedAt: project.updatedAt };
+    const state = await this.get(projectId);
     const matches = await this.memory.relevant({
       scope: { kind: "project", projectId },
       limit: 100,
@@ -219,6 +205,10 @@ export class ProjectBrainService {
     if (!Number.isInteger(maxCharacters) || maxCharacters < 128 || maxCharacters > 32000)
       throw new Error("INVALID_CONTEXT_LIMIT");
     const snapshot = await this.snapshot(projectId, options.conversationId);
+    const history = options.conversationId && this.domain.recentMessages
+      ? await this.domain.recentMessages(projectId, options.conversationId)
+      : [];
+    const reference = history.filter((row) => row.role === "assistant").at(-1);
     const candidates = [
       { kind: "identity", text: snapshot.project.name },
       ...[
@@ -233,6 +223,7 @@ export class ProjectBrainService {
         .filter((e): e is BrainEntry => e !== null)
         .map((e) => ({ kind: e.kind, text: e.text })),
       { kind: "description", text: snapshot.project.description ?? "" },
+      ...history.map((row) => ({ kind: `history:${row.role}`, text: row.content.slice(0, 4000) })),
       ...snapshot.memories.map((r) => ({ kind: r.type, text: r.content })),
       ...snapshot.recentActivity.map((a) => ({ kind: "activity", text: a.title })),
     ];
@@ -256,6 +247,7 @@ export class ProjectBrainService {
       truncated,
       sourceCount: sections.length,
       updatedAt: snapshot.updatedAt,
+      ...(reference ? { referenceResultId: reference.id } : {}),
     };
   }
 }

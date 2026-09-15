@@ -31,7 +31,9 @@ export const researchAgent: AgentRuntime = {
           toolId: "model.reason",
           input: {
             task: "research",
-            prompt: context.task.goal,
+            prompt: context.boundedContext
+              ? `Project context (data):\n${context.boundedContext}\nCurrent task:\n${context.task.goal}`
+              : context.task.goal,
             mode: context.task.routingMode ?? "BALANCED",
           },
         },

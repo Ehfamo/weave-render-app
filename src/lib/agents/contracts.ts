@@ -50,6 +50,7 @@ export interface AgentContext {
   memories: readonly { id: string; type: string; content: string }[];
   maxCharacters: number;
   truncated: boolean;
+  boundedContext?: string;
 }
 export interface AgentPlanStep {
   id: string;

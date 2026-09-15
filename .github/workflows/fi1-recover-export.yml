@@ -22,22 +22,29 @@ jobs:
           git fetch origin preservation/xeomx-fi1-recovery-20260915
           git show origin/preservation/xeomx-fi1-recovery-20260915:artifacts/fi1-preservation/XEOMX_FI1_INCREMENTAL_EXACT_20260915.bundle > /tmp/XEOMX_FI1_INCREMENTAL_EXACT_20260915.bundle
 
-      - name: Inspect and verify exact bundle
+      - name: Verify bundle structure and exact Git identity
         run: |
           ACTUAL_SHA="$(sha256sum /tmp/XEOMX_FI1_INCREMENTAL_EXACT_20260915.bundle | awk '{print $1}')"
+          EXPECTED_SHA="e24d6f647005e01333d93ffecd22c75691d89cf9e35c9346f8f5d2382e0edb50"
           echo "ACTUAL_SHA256=${ACTUAL_SHA}"
-          echo "EXPECTED_SHA256=e24d6f647005e01333d93ffecd22c75691d89cf9e35c9346f8f5d2382e0edb50"
+          echo "HANDOFF_EXPECTED_SHA256=${EXPECTED_SHA}"
+          if [ "${ACTUAL_SHA}" != "${EXPECTED_SHA}" ]; then
+            echo "::warning::HASH_METADATA_DRIFT: GitHub-preserved bundle bytes do not match the handoff SHA; exact Git identity checks remain mandatory."
+          fi
           git bundle verify /tmp/XEOMX_FI1_INCREMENTAL_EXACT_20260915.bundle
-          git bundle list-heads /tmp/XEOMX_FI1_INCREMENTAL_EXACT_20260915.bundle
+          git bundle list-heads /tmp/XEOMX_FI1_INCREMENTAL_EXACT_20260915.bundle | grep -Fx "dcafa525ebae0cf126e7470be3ca9de8065274aa refs/heads/feature/xeomx-fi1-core-execution-20260914"
           git cat-file -e e14edacdcbb9705298a4865ca5d38e3f746ef202^{commit}
-          test "${ACTUAL_SHA}" = "e24d6f647005e01333d93ffecd22c75691d89cf9e35c9346f8f5d2382e0edb50"
 
       - name: Recover FI1 exact branch
         run: |
           git fetch /tmp/XEOMX_FI1_INCREMENTAL_EXACT_20260915.bundle refs/heads/feature/xeomx-fi1-core-execution-20260914:refs/remotes/bundle/fi1
           test "$(git rev-parse refs/remotes/bundle/fi1)" = "dcafa525ebae0cf126e7470be3ca9de8065274aa"
+          git merge-base --is-ancestor e14edacdcbb9705298a4865ca5d38e3f746ef202 refs/remotes/bundle/fi1
+          test "$(git rev-list --count e14edacdcbb9705298a4865ca5d38e3f746ef202..refs/remotes/bundle/fi1)" = "2"
           git checkout -B feature/xeomx-fi1-core-execution-20260914 refs/remotes/bundle/fi1
           test "$(git rev-parse HEAD)" = "dcafa525ebae0cf126e7470be3ca9de8065274aa"
+          echo "FI1_EXACT_HEAD=$(git rev-parse HEAD)"
+          git log --oneline --decorate -3
 
       - name: Persist exact FI1 remote branch
         run: |

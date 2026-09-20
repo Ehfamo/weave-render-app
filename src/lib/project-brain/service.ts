@@ -205,9 +205,10 @@ export class ProjectBrainService {
     if (!Number.isInteger(maxCharacters) || maxCharacters < 128 || maxCharacters > 32000)
       throw new Error("INVALID_CONTEXT_LIMIT");
     const snapshot = await this.snapshot(projectId, options.conversationId);
-    const history = options.conversationId && this.domain.recentMessages
-      ? await this.domain.recentMessages(projectId, options.conversationId)
-      : [];
+    const history =
+      options.conversationId && this.domain.recentMessages
+        ? await this.domain.recentMessages(projectId, options.conversationId)
+        : [];
     const reference = history.filter((row) => row.role === "assistant").at(-1);
     const candidates = [
       { kind: "identity", text: snapshot.project.name },
@@ -223,7 +224,11 @@ export class ProjectBrainService {
         .filter((e): e is BrainEntry => e !== null)
         .map((e) => ({ kind: e.kind, text: e.text })),
       { kind: "description", text: snapshot.project.description ?? "" },
-      ...history.map((row) => ({ kind: `history:${row.role}`, text: row.content.slice(0, 4000), id: row.id })),
+      ...history.map((row) => ({
+        kind: `history:${row.role}`,
+        text: row.content.slice(0, 4000),
+        id: row.id,
+      })),
       ...snapshot.memories.map((r) => ({ kind: r.type, text: r.content })),
       ...snapshot.recentActivity.map((a) => ({ kind: "activity", text: a.title })),
     ];

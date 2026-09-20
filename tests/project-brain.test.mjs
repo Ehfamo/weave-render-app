@@ -101,10 +101,19 @@ test("instructions decisions constraints entities and open items support updates
   assert.equal(s.openItems.length, 0);
 });
 test("shared authorized project state retains private memory ownership and project isolation", async () => {
-  const rows = new Map(), projects = new Map(), a = fixture(u, rows, projects), b = fixture(v, rows, projects);
+  const rows = new Map(),
+    projects = new Map(),
+    a = fixture(u, rows, projects),
+    b = fixture(v, rows, projects);
   await a.brain.setGoal(p, "Shared project goal");
   await a.brain.setGoal(p2, "Other project");
-  await a.memory.create({type:"ProjectMemory",scope:{kind:"project",projectId:p},content:"Private A",importance:1,source:{kind:"user"}});
+  await a.memory.create({
+    type: "ProjectMemory",
+    scope: { kind: "project", projectId: p },
+    content: "Private A",
+    importance: 1,
+    source: { kind: "user" },
+  });
   assert.equal((await a.brain.snapshot(p)).goal.text, "Shared project goal");
   assert.equal((await b.brain.snapshot(p)).goal.text, "Shared project goal");
   assert.equal((await b.brain.snapshot(p)).memories.length, 0);
@@ -180,7 +189,13 @@ test("snapshots and bounded context are deterministic and need no model credenti
 test("Memory OFF and disabled project-memory type preserve durable Project Brain", async () => {
   const f = fixture();
   await f.brain.setGoal(p, "Durable project goal");
-  await f.memory.create({type:"ProjectMemory",scope:{kind:"project",projectId:p},content:"Optional memory",importance:1,source:{kind:"user"}});
+  await f.memory.create({
+    type: "ProjectMemory",
+    scope: { kind: "project", projectId: p },
+    content: "Optional memory",
+    importance: 1,
+    source: { kind: "user" },
+  });
   await f.memory.setSettings({ enabled: false, disabledTypes: [] });
   assert.equal((await f.brain.get(p)).entries.length, 1);
   assert.equal((await f.brain.snapshot(p)).goal.text, "Durable project goal");
@@ -191,7 +206,7 @@ test("Memory OFF and disabled project-memory type preserve durable Project Brain
   assert.equal((await f.brain.snapshot(p)).goal.text, "Updated while Memory OFF");
   assert.equal((await f.brain.snapshot(p)).memories.length, 0);
   await f.brain.setGoal(p, "Still independent");
-  assert.equal((await f.brain.snapshot(p)).goal.text,"Still independent");
+  assert.equal((await f.brain.snapshot(p)).goal.text, "Still independent");
 });
 test("invalid entries and capacity fail without discarding canonical state", async () => {
   const f = fixture();
@@ -223,7 +238,13 @@ test("native domain requires explicit membership and rejects mismatched project/
 test("corrupt or conflicting legacy brain documents fail closed without rewriting memory", async () => {
   const f = fixture();
   delete f.domain.readBrain;
-  await f.memory.create({type:"ProjectMemory",scope:{kind:"project",projectId:p},content:JSON.stringify({format:"xeomx.project-brain.v1",entries:[]}),importance:1,source:{kind:"user",reference:"xeomx.project-brain.v1"}});
+  await f.memory.create({
+    type: "ProjectMemory",
+    scope: { kind: "project", projectId: p },
+    content: JSON.stringify({ format: "xeomx.project-brain.v1", entries: [] }),
+    importance: 1,
+    source: { kind: "user", reference: "xeomx.project-brain.v1" },
+  });
   const r = [...f.rows.values()][0];
   f.rows.set(c, { ...r, id: c });
   await assert.rejects(f.brain.get(p), /BRAIN_CONFLICT/);

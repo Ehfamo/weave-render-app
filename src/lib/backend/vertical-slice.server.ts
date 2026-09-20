@@ -328,7 +328,10 @@ export async function loadProjectSnapshot(
   return {
     project: projectSummary(project.data),
     conversations: (conversations.data ?? []).map(conversationSummary),
-    messages: (options.recentMessages ? [...(messages.data ?? [])].reverse() : (messages.data ?? [])).map(messageSummary),
+    messages: (options.recentMessages
+      ? [...(messages.data ?? [])].reverse()
+      : (messages.data ?? [])
+    ).map(messageSummary),
     jobs: (jobs.data ?? []).map(jobSummary),
     assets: (assets.data ?? []).map(assetSummary),
     usageEvents: (usage.data ?? []).map(usageSummary),

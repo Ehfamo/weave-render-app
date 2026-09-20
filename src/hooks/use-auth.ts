@@ -18,13 +18,21 @@ export function useAuth() {
       setLoading(false);
     });
     const initialRevision = revision;
-    void supabase.auth.getSession().then(({ data }) => {
-      if (!mounted || revision !== initialRevision) return;
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      setLoading(false);
-    }).catch(() => { if (mounted) setLoading(false); });
-    return () => { mounted = false; sub.subscription.unsubscribe(); };
+    void supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (!mounted || revision !== initialRevision) return;
+        setSession(data.session);
+        setUser(data.session?.user ?? null);
+        setLoading(false);
+      })
+      .catch(() => {
+        if (mounted) setLoading(false);
+      });
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   return { session, user, loading };

@@ -50,7 +50,9 @@ function SettingsPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
-      <Link to="/memory" className="mx-auto block max-w-6xl px-4 py-3 text-primary underline">{m.fi2_memory()}</Link>
+      <Link to="/memory" className="mx-auto block max-w-6xl px-4 py-3 text-primary underline">
+        {m.fi2_memory()}
+      </Link>
       <div
         className="mx-auto max-w-[1200px]"
         style={{ paddingInline: "var(--space-4)", paddingBlock: "var(--space-8)" }}

@@ -131,17 +131,23 @@ export class TaskOrchestrator {
     try {
       setStatus("planning");
       const bounded = await this.deps.brain.buildContext(task.projectId, {
-        conversationId: task.conversationId, maxCharacters: Math.min(32000, this.limits.maxContextCharacters),
+        conversationId: task.conversationId,
+        maxCharacters: Math.min(32000, this.limits.maxContextCharacters),
       });
-      const sections = (JSON.parse(bounded.text) as { sections: { kind: string; text: string }[] }).sections;
+      const sections = (JSON.parse(bounded.text) as { sections: { kind: string; text: string }[] })
+        .sections;
       const of = (kind: string) => sections.filter((s) => s.kind === kind).map((s) => s.text);
       const context: AgentContext = {
         task,
         projectSummary: of("goal")[0] ?? of("identity")[0] ?? "",
-        instructions: of("instruction"), decisions: of("decision"), constraints: of("constraint"),
-        memories: sections.filter((s) => s.kind.endsWith("Memory"))
+        instructions: of("instruction"),
+        decisions: of("decision"),
+        constraints: of("constraint"),
+        memories: sections
+          .filter((s) => s.kind.endsWith("Memory"))
           .map((s, i) => ({ id: String(i), type: s.kind, content: s.text })),
-        maxCharacters: bounded.maxCharacters, truncated: bounded.truncated,
+        maxCharacters: bounded.maxCharacters,
+        truncated: bounded.truncated,
         boundedContext: bounded.text,
       };
       const plan = await agent.plan(context);

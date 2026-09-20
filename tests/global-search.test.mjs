@@ -39,7 +39,12 @@ test("all six source types participate in unified lexical search and safe target
   assert.equal(page.results.length, 6);
   assert.equal(new Set(page.results.map((r) => r.type)).size, 6);
   for (const r of page.results) {
-    assert.ok(r.target === (r.type === "project" ? `/projects/${r.id}` : `/workspace?type=${r.type}&id=${r.id}&projectId=${project}`));
+    assert.ok(
+      r.target ===
+        (r.type === "project"
+          ? `/projects/${r.id}`
+          : `/workspace?type=${r.type}&id=${r.id}&projectId=${project}`),
+    );
     assert.equal(r.ownerId, undefined);
     assert.equal(r.source.method, "lexical");
   }

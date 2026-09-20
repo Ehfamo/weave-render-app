@@ -5,7 +5,10 @@ import { NativeMemoryAdapter } from "../memory/native-adapter.ts";
 import { createProjectBrainService } from "../project-brain/runtime.server.ts";
 import { nativeSources } from "./sources.ts";
 import { GlobalSearchService } from "./service.ts";
-export async function createSearchService(token: string, executionScope?: { projectId: string; conversationId?: string }) {
+export async function createSearchService(
+  token: string,
+  executionScope?: { projectId: string; conversationId?: string },
+) {
   const url = process.env.SUPABASE_URL,
     key = process.env.SUPABASE_PUBLISHABLE_KEY;
   if (!token || !url || !key) throw new Error("SEARCH_AUTH_REQUIRED");
@@ -43,7 +46,8 @@ export async function createSearchService(token: string, executionScope?: { proj
             conversation: "id,project_id,title,created_at,updated_at",
             prompt: "id,author_id,title,description,created_at,updated_at",
             asset: "id,owner_id,project_id,kind,mime_type,metadata,created_at,updated_at",
-            generation: "id,user_id,project_id,conversation_id,capability,status,created_at,updated_at",
+            generation:
+              "id,user_id,project_id,conversation_id,capability,status,created_at,updated_at",
           }[type];
           let q = client.from(table).select(fields);
           if (projectId) {

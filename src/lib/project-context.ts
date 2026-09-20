@@ -44,8 +44,12 @@ export function recordProjectHandoff(
 }
 
 /** The snapshot is returned by an authorized server load, never inferred from a URL. */
-export function bindAuthorizedProject(snapshot: {project: {id: string}}, authorizedFor: string, currentActor: string | null): ProjectContext {
+export function bindAuthorizedProject(
+  snapshot: { project: { id: string } },
+  authorizedFor: string,
+  currentActor: string | null,
+): ProjectContext {
   if (!currentActor || authorizedFor !== currentActor) return createEmptyProjectContext();
   uuid(authorizedFor);
-  return {...createEmptyProjectContext(), projectId: uuid(snapshot.project.id)};
+  return { ...createEmptyProjectContext(), projectId: uuid(snapshot.project.id) };
 }

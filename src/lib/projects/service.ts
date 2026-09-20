@@ -17,11 +17,17 @@ export interface ProjectPersistence {
   authorize(projectId: string, write?: boolean): Promise<void>;
   list(): Promise<ProjectSummary[]>;
   create(input: { name: string; description?: string }): Promise<ProjectSummary>;
-  load(projectId: string): Promise<{ project: ProjectSummary; assets: readonly AssetSummary[]; messages?: readonly ProjectMessage[] }>;
+  load(projectId: string): Promise<{
+    project: ProjectSummary;
+    assets: readonly AssetSummary[];
+    messages?: readonly ProjectMessage[];
+  }>;
   rename(projectId: string, name: string): Promise<void>;
   activity(projectId: string): Promise<ProjectActivity[]>;
   begin(input: CoreExecutionRequest & { executionId: string; requestHash: string }): Promise<{
-    conversationId: string; created: boolean; response?: CoreExecutionResponse;
+    conversationId: string;
+    created: boolean;
+    response?: CoreExecutionResponse;
   }>;
   finish(conversationId: string, response: CoreExecutionResponse): Promise<void>;
 }
@@ -51,20 +57,35 @@ export class ProjectsService {
   }
   async home() {
     const rows = await this.persistence.list();
-    const projects = await Promise.all(rows.map(async (project) => {
-      await this.authorize(project.id);
-      const [brain, activity] = await Promise.all([
-        this.brain.get(project.id), this.persistence.activity(project.id),
-      ]);
-      if (activity.some((row) => row.projectId !== project.id)) throw new Error("PROJECT_ACCESS_DENIED");
-      return { ...project, goal: brain.entries.find((e) => e.kind === "goal")?.text ?? null,
-        activity: activity.slice(0, 3), target: projectTarget(project.id) };
-    }));
+    const projects = await Promise.all(
+      rows.map(async (project) => {
+        await this.authorize(project.id);
+        const [brain, activity] = await Promise.all([
+          this.brain.get(project.id),
+          this.persistence.activity(project.id),
+        ]);
+        if (activity.some((row) => row.projectId !== project.id))
+          throw new Error("PROJECT_ACCESS_DENIED");
+        return {
+          ...project,
+          goal: brain.entries.find((e) => e.kind === "goal")?.text ?? null,
+          activity: activity.slice(0, 3),
+          target: projectTarget(project.id),
+        };
+      }),
+    );
     return {
       projects,
-      continuations: projects.flatMap((project) => project.activity.map((activity) => ({
-        ...activity, projectName: project.name, target: project.target,
-      }))).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, 6),
+      continuations: projects
+        .flatMap((project) =>
+          project.activity.map((activity) => ({
+            ...activity,
+            projectName: project.name,
+            target: project.target,
+          })),
+        )
+        .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+        .slice(0, 6),
     };
   }
   async create(input: { name: string; goal?: string }) {
@@ -74,25 +95,38 @@ export class ProjectsService {
     await this.authorize(project.id, true);
     // Creation and goal setup are separately acknowledged; never duplicate a project on goal failure.
     if (goal) {
-      try { await this.brain.setGoal(project.id, goal); }
-      catch { return { project, goalSaved: false }; }
+      try {
+        await this.brain.setGoal(project.id, goal);
+      } catch {
+        return { project, goalSaved: false };
+      }
     }
     return { project, goalSaved: true };
   }
   async open(projectId: string, conversationId?: string) {
     await this.authorize(projectId);
     const [snapshot, brain, activity] = await Promise.all([
-      this.persistence.load(projectId), this.brain.snapshot(projectId, conversationId), this.persistence.activity(projectId),
+      this.persistence.load(projectId),
+      this.brain.snapshot(projectId, conversationId),
+      this.persistence.activity(projectId),
     ]);
     if (snapshot.project.id !== projectId || activity.some((a) => a.projectId !== projectId))
       throw new Error("PROJECT_ACCESS_DENIED");
     const ownedConversations = new Set(activity.map((a) => a.id));
-    return { project: snapshot.project, assets: snapshot.assets, brain, activity,
-      messages: (snapshot.messages ?? []).filter((row) => ownedConversations.has(row.conversationId)) };
+    return {
+      project: snapshot.project,
+      assets: snapshot.assets,
+      brain,
+      activity,
+      messages: (snapshot.messages ?? []).filter((row) =>
+        ownedConversations.has(row.conversationId),
+      ),
+    };
   }
   async edit(projectId: string, input: { name?: string; goal?: string }) {
     await this.authorize(projectId, true);
-    if (input.name !== undefined) await this.persistence.rename(projectId, shortText(input.name, 120));
+    if (input.name !== undefined)
+      await this.persistence.rename(projectId, shortText(input.name, 120));
     if (input.goal !== undefined) await this.brain.setGoal(projectId, shortText(input.goal, 1500));
     return this.open(projectId);
   }
@@ -100,23 +134,37 @@ export class ProjectsService {
     await this.authorize(projectId, true);
     return this.brain.buildContext(projectId, { conversationId, maxCharacters: 12000 });
   }
-  async memoryControl(value: unknown): Promise<{ settings: MemorySettings; memories: Awaited<ReturnType<MemoryService["list"]>> }> {
+  async memoryControl(
+    value: unknown,
+  ): Promise<{ settings: MemorySettings; memories: Awaited<ReturnType<MemoryService["list"]>> }> {
     const input = object(value);
     const allowed = ["action", "scope", "id", "patch", "settings"];
-    if (Object.keys(input).some((key) => !allowed.includes(key))) throw new Error("INVALID_MEMORY_INPUT");
+    if (Object.keys(input).some((key) => !allowed.includes(key)))
+      throw new Error("INVALID_MEMORY_INPUT");
     const scope = scopeSchema.parse(input.scope);
     if (scope.kind !== "user") await this.authorize(scope.projectId);
-    if (scope.kind === "conversation") await this.brain.snapshot(scope.projectId, scope.conversationId);
+    if (scope.kind === "conversation")
+      await this.brain.snapshot(scope.projectId, scope.conversationId);
     if (input.action === "list") {
-      const [settings, memories] = await Promise.all([this.memory.settings(), this.memory.list({ scope, limit: 100 })]);
-      return { settings, memories: memories.filter((r) => r.source.reference !== "xeomx.project-brain.v1") };
+      const [settings, memories] = await Promise.all([
+        this.memory.settings(),
+        this.memory.list({ scope, limit: 100 }),
+      ]);
+      return {
+        settings,
+        memories: memories.filter((r) => r.source.reference !== "xeomx.project-brain.v1"),
+      };
     }
     if (input.action === "settings") {
       await this.memory.setSettings(input.settings as MemorySettings);
     } else {
       const id = uuid(input.id);
       const record = await this.memory.get(id);
-      if (!record || !sameScope(record.scope, scope) || record.source.reference === "xeomx.project-brain.v1")
+      if (
+        !record ||
+        !sameScope(record.scope, scope) ||
+        record.source.reference === "xeomx.project-brain.v1"
+      )
         throw new Error("MEMORY_ACCESS_DENIED");
       if (input.action === "edit") await this.memory.update(id, input.patch as MemoryPatch);
       else if (input.action === "archive") await this.memory.archive(id);
@@ -124,7 +172,8 @@ export class ProjectsService {
       else throw new Error("INVALID_MEMORY_INPUT");
     }
     return this.memoryControl({ action: "list", scope }) as Promise<{
-      settings: MemorySettings; memories: Awaited<ReturnType<MemoryService["list"]>>;
+      settings: MemorySettings;
+      memories: Awaited<ReturnType<MemoryService["list"]>>;
     }>;
   }
 }

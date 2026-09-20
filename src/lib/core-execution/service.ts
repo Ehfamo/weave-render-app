@@ -38,7 +38,14 @@ export function validateCoreExecutionRequest(value: unknown): CoreExecutionReque
   if (!value || typeof value !== "object" || Array.isArray(value))
     throw new Error("INVALID_REQUEST");
   const input = value as Record<string, unknown>;
-  const allowed = new Set(["goal", "idempotencyKey", "projectId", "conversationId", "quality", "locale"]);
+  const allowed = new Set([
+    "goal",
+    "idempotencyKey",
+    "projectId",
+    "conversationId",
+    "quality",
+    "locale",
+  ]);
   if (Object.keys(input).some((key) => !allowed.has(key))) throw new Error("INVALID_REQUEST");
   if (typeof input.goal !== "string") throw new Error("INVALID_REQUEST");
   const goal = input.goal.trim();
@@ -47,8 +54,11 @@ export function validateCoreExecutionRequest(value: unknown): CoreExecutionReque
     throw new Error("INVALID_REQUEST");
   if (
     input.conversationId !== undefined &&
-    (!input.projectId || typeof input.conversationId !== "string" || !UUID_PATTERN.test(input.conversationId))
-  ) throw new Error("INVALID_REQUEST");
+    (!input.projectId ||
+      typeof input.conversationId !== "string" ||
+      !UUID_PATTERN.test(input.conversationId))
+  )
+    throw new Error("INVALID_REQUEST");
   if (
     input.projectId !== undefined &&
     (typeof input.projectId !== "string" || !UUID_PATTERN.test(input.projectId))
@@ -113,17 +123,35 @@ export async function runCoreExecution(
   try {
     // Authorization and bounded context precede planning and all provider work.
     const context = await deps.projects.context(input.projectId, input.conversationId);
-    const submission = await deps.projects.persistence.begin({ ...input, executionId,
-      requestHash: createHash("sha256").update(JSON.stringify(input)).digest("hex") });
-    if (!submission.created) return submission.response ?? failure(executionId, input.goal,
-      "FAILED", "EXECUTION_IN_PROGRESS", "RETURN_TO_GOAL");
+    const submission = await deps.projects.persistence.begin({
+      ...input,
+      executionId,
+      requestHash: createHash("sha256").update(JSON.stringify(input)).digest("hex"),
+    });
+    if (!submission.created)
+      return (
+        submission.response ??
+        failure(executionId, input.goal, "FAILED", "EXECUTION_IN_PROGRESS", "RETURN_TO_GOAL")
+      );
     conversationId = submission.conversationId;
-    const response = await executePreparedCore(actorId, input, { ...deps, id: () => executionId }, signal, context);
+    const response = await executePreparedCore(
+      actorId,
+      input,
+      { ...deps, id: () => executionId },
+      signal,
+      context,
+    );
     response.data.conversationId = conversationId;
     await deps.projects.persistence.finish(conversationId, response);
     return response;
   } catch {
-    const response = failure(executionId, input.goal, "FAILED", "PROJECT_EXECUTION_UNAVAILABLE", "RETURN_TO_GOAL");
+    const response = failure(
+      executionId,
+      input.goal,
+      "FAILED",
+      "PROJECT_EXECUTION_UNAVAILABLE",
+      "RETURN_TO_GOAL",
+    );
     // If storage failed after provider execution, never return a false persisted success.
     if (conversationId) response.data.conversationId = conversationId;
     return response;
@@ -131,7 +159,10 @@ export async function runCoreExecution(
 }
 
 async function executePreparedCore(
-  actorId: string, raw: unknown, deps: CoreExecutionDependencies, signal?: AbortSignal,
+  actorId: string,
+  raw: unknown,
+  deps: CoreExecutionDependencies,
+  signal?: AbortSignal,
   projectContext?: ProjectContext,
 ): Promise<CoreExecutionResponse> {
   const input = validateCoreExecutionRequest(raw);
@@ -145,12 +176,23 @@ async function executePreparedCore(
     goal: input.goal,
     locale: input.locale,
     explicitQuality: input.quality,
-    ...(projectContext ? {
-      context: [{ id: `brain-${projectId}`, ownerId: actorId, projectId, kind: "project",
-        value: projectContext.text, relevant: true }],
-      selectedReferences: projectContext.referenceResultId
-        ? [{ id: projectContext.referenceResultId, kind: "result" as const }] : [],
-    } : {}),
+    ...(projectContext
+      ? {
+          context: [
+            {
+              id: `brain-${projectId}`,
+              ownerId: actorId,
+              projectId,
+              kind: "project",
+              value: projectContext.text,
+              relevant: true,
+            },
+          ],
+          selectedReferences: projectContext.referenceResultId
+            ? [{ id: projectContext.referenceResultId, kind: "result" as const }]
+            : [],
+        }
+      : {}),
   });
   if (intent.clarification.blocks)
     return failure(executionId, input.goal, "FAILED", "MISSING_CRITICAL_CONTEXT", "RETURN_TO_GOAL");

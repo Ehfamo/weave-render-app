@@ -47,9 +47,16 @@ export interface ProjectDomain {
   authorizeConversation(projectId: string, conversationId: string): Promise<boolean>;
   readBrain?(projectId: string): Promise<unknown>;
   writeBrain?(projectId: string, next: BrainEntry[], expected: BrainEntry[]): Promise<void>;
-  recentMessages?(projectId: string, conversationId: string): Promise<{
-    id: string; role: string; content: string;
-  }[]>;
+  recentMessages?(
+    projectId: string,
+    conversationId: string,
+  ): Promise<
+    {
+      id: string;
+      role: string;
+      content: string;
+    }[]
+  >;
 }
 export interface ProjectSummary {
   text: string;

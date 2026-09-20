@@ -113,11 +113,17 @@ export async function createCoreExecutionDependencies(input: {
   client?: SupabaseClient;
 }): Promise<CoreExecutionDependencies> {
   const projectId = input.request.projectId ?? input.userId;
-  const projects = input.request.projectId && input.client ? projectsForClient(input.userId, input.client) : undefined;
+  const projects =
+    input.request.projectId && input.client
+      ? projectsForClient(input.userId, input.client)
+      : undefined;
   const contextual = input.request.projectId
     ? {
-        brain: projects?.brain ?? await createProjectBrainService(input.token),
-        search: await createSearchService(input.token, { projectId, conversationId: input.request.conversationId }),
+        brain: projects?.brain ?? (await createProjectBrainService(input.token)),
+        search: await createSearchService(input.token, {
+          projectId,
+          conversationId: input.request.conversationId,
+        }),
       }
     : ephemeralServices(input.userId, projectId);
   const model = createModelGatewayRuntime();

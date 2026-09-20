@@ -50,11 +50,21 @@ export function savePendingGoal(storage: HandoffStorage, pending: PendingGoal): 
 }
 
 /** Remove before returning so route remounts and auth callbacks cannot execute twice. */
-export function consumePendingGoal(storage: HandoffStorage, now = Date.now(), actorId?: string, scope?: { projectId?: string; createProject?: boolean }): PendingGoal | null {
+export function consumePendingGoal(
+  storage: HandoffStorage,
+  now = Date.now(),
+  actorId?: string,
+  scope?: { projectId?: string; createProject?: boolean },
+): PendingGoal | null {
   const raw = storage.getItem(PENDING_GOAL_KEY);
   if (raw && scope) {
-    try { const value=JSON.parse(raw); if (value.projectId!==scope.projectId || !!value.createProject!==!!scope.createProject) return null; }
-    catch { /* Invalid storage is removed below. */ }
+    try {
+      const value = JSON.parse(raw);
+      if (value.projectId !== scope.projectId || !!value.createProject !== !!scope.createProject)
+        return null;
+    } catch {
+      /* Invalid storage is removed below. */
+    }
   }
   storage.removeItem(PENDING_GOAL_KEY);
   if (!raw) return null;
@@ -77,8 +87,14 @@ export function consumePendingGoal(storage: HandoffStorage, now = Date.now(), ac
     if (value.createProject !== undefined && typeof value.createProject !== "boolean") return null;
     if (value.createProject && value.projectId) return null;
     if (value.ownerId && value.ownerId !== actorId) return null;
-    const uuidPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    if ([value.projectId,value.conversationId,value.ownerId].some((id)=>id!==undefined && (typeof id!=="string" || !uuidPattern.test(id)))) return null;
+    const uuidPattern =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (
+      [value.projectId, value.conversationId, value.ownerId].some(
+        (id) => id !== undefined && (typeof id !== "string" || !uuidPattern.test(id)),
+      )
+    )
+      return null;
     if (value.conversationId && !value.projectId) return null;
     return value as PendingGoal;
   } catch {

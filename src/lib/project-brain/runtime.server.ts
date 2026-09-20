@@ -42,7 +42,8 @@ export function projectBrainForClient(userId: string, client: SupabaseClient) {
         let q = client
           .from("conversations")
           .select("id,project_id,title,updated_at")
-          .eq("project_id", id).eq("created_by", userId);
+          .eq("project_id", id)
+          .eq("created_by", userId);
         if (cid) q = q.eq("id", cid);
         return q
           .order("updated_at", { ascending: false })
@@ -52,18 +53,34 @@ export function projectBrainForClient(userId: string, client: SupabaseClient) {
   });
   domain.readBrain = async (id) => {
     await domain.getAuthorizedProject(id);
-    const row = await safe(() => client.from("projects").select("brain_entries").eq("id", id).single());
+    const row = await safe(() =>
+      client.from("projects").select("brain_entries").eq("id", id).single(),
+    );
     return (row as { brain_entries: unknown }).brain_entries;
   };
   domain.writeBrain = async (id, next, expected) => {
     await domain.getAuthorizedProject(id);
-    await safe(() => client.rpc("xeomx_put_project_brain", { p_project_id: id, p_entries: next, p_expected: expected }));
+    await safe(() =>
+      client.rpc("xeomx_put_project_brain", {
+        p_project_id: id,
+        p_entries: next,
+        p_expected: expected,
+      }),
+    );
   };
   domain.recentMessages = async (id, cid) => {
-    if (!(await domain.authorizeConversation(id, cid))) throw new Error("CONVERSATION_ACCESS_DENIED");
-    const rows = await safe(() => client.from("messages").select("id,role,content")
-      .eq("project_id", id).eq("conversation_id", cid).in("role", ["user", "assistant"])
-      .order("created_at", { ascending: false }).limit(4));
+    if (!(await domain.authorizeConversation(id, cid)))
+      throw new Error("CONVERSATION_ACCESS_DENIED");
+    const rows = await safe(() =>
+      client
+        .from("messages")
+        .select("id,role,content")
+        .eq("project_id", id)
+        .eq("conversation_id", cid)
+        .in("role", ["user", "assistant"])
+        .order("created_at", { ascending: false })
+        .limit(4),
+    );
     return (rows as { id: string; role: string; content: string }[]).reverse();
   };
   return new ProjectBrainService(

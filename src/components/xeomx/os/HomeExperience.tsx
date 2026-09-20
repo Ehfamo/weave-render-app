@@ -42,7 +42,11 @@ export function HomeExperience() {
   const submit = () => {
     const value = goal.trim();
     if (value.length >= 2) {
-      savePendingGoal(window.localStorage, { ...createPendingGoal(value, quality), ...(durable ? { createProject: true } : {}), ...(recent.user ? { ownerId: recent.user.id } : {}) });
+      savePendingGoal(window.localStorage, {
+        ...createPendingGoal(value, quality),
+        ...(durable ? { createProject: true } : {}),
+        ...(recent.user ? { ownerId: recent.user.id } : {}),
+      });
       if (durable) navigate({ to: "/projects" });
       else navigate({ to: "/xeomx-ai" });
     }
@@ -116,7 +120,14 @@ export function HomeExperience() {
                 </span>
               </div>
             </div>
-            <label className="flex min-h-11 items-center gap-2 px-3"><input type="checkbox" checked={durable} onChange={(e)=>setDurable(e.target.checked)}/>{m.fi2_durable_goal()}</label>
+            <label className="flex min-h-11 items-center gap-2 px-3">
+              <input
+                type="checkbox"
+                checked={durable}
+                onChange={(e) => setDurable(e.target.checked)}
+              />
+              {m.fi2_durable_goal()}
+            </label>
             <details className="border-t px-3 py-3">
               <summary className="cursor-pointer text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 {m.p8_more_control()}
@@ -147,21 +158,75 @@ export function HomeExperience() {
             </details>
           </form>
         </section>
-        {recent.loading ? <p role="status" className="mt-10">{m.common_loading()}</p> : null}
-        {recent.isError ? <p role="alert" className="mt-10">{m.fi2_error()} <button onClick={()=>void recent.refetch()} className="min-h-11 underline">{m.common_retry()}</button></p> : null}
+        {recent.loading ? (
+          <p role="status" className="mt-10">
+            {m.common_loading()}
+          </p>
+        ) : null}
+        {recent.isError ? (
+          <p role="alert" className="mt-10">
+            {m.fi2_error()}{" "}
+            <button onClick={() => void recent.refetch()} className="min-h-11 underline">
+              {m.common_retry()}
+            </button>
+          </p>
+        ) : null}
         <section aria-labelledby="continue-title" className="mt-12">
-          <h2 id="continue-title" className="text-xl font-semibold">{m.p8_continue()}</h2>
-          {!recent.loading && !recent.data?.continuations.length ? <p className="mt-3 text-muted-foreground">{m.fi2_empty_activity()}</p> : null}
-          <div className="mt-3 grid gap-3 md:grid-cols-3">{recent.data?.continuations.map(item=><Link key={item.id} to="/projects/$projectId" params={{projectId:item.projectId}} search={{conversationId:item.id}}
-            className="flex min-h-20 items-center gap-3 rounded-xl border p-4 focus-visible:ring-2 focus-visible:ring-ring">
-            <History className="size-5 text-primary"/><span className="min-w-0 flex-1"><span className="block truncate font-medium">{item.projectName}</span><span className="block truncate text-sm">{item.title}</span></span><ArrowRight className="size-4 rtl:rotate-180"/>
-          </Link>)}</div>
+          <h2 id="continue-title" className="text-xl font-semibold">
+            {m.p8_continue()}
+          </h2>
+          {!recent.loading && !recent.data?.continuations.length ? (
+            <p className="mt-3 text-muted-foreground">{m.fi2_empty_activity()}</p>
+          ) : null}
+          <div className="mt-3 grid gap-3 md:grid-cols-3">
+            {recent.data?.continuations.map((item) => (
+              <Link
+                key={item.id}
+                to="/projects/$projectId"
+                params={{ projectId: item.projectId }}
+                search={{ conversationId: item.id }}
+                className="flex min-h-20 items-center gap-3 rounded-xl border p-4 focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <History className="size-5 text-primary" />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-medium">{item.projectName}</span>
+                  <span className="block truncate text-sm">{item.title}</span>
+                </span>
+                <ArrowRight className="size-4 rtl:rotate-180" />
+              </Link>
+            ))}
+          </div>
         </section>
         <section aria-labelledby="projects-title" className="mt-10">
-          <div className="flex items-center justify-between"><h2 id="projects-title" className="text-xl font-semibold">{m.p8_recent_projects()}</h2><Link to="/projects" className="min-h-11 py-3 text-primary">{m.p8_view_all()}</Link></div>
-          {!recent.loading && !recent.data?.projects.length ? <p className="mt-3 text-muted-foreground">{m.fi2_empty_projects()}</p>:null}
-          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{recent.data?.projects.slice(0,3).map(item=><Link key={item.id} to="/projects/$projectId" params={{projectId:item.id}} className="flex min-h-20 items-center gap-3 rounded-xl border p-4 focus-visible:ring-2"><FolderOpen className="size-5 text-primary"/><span className="font-medium">{item.name}</span></Link>)}
-            <Link to="/projects" className="flex min-h-20 items-center justify-center rounded-xl border border-dashed p-4 text-primary focus-visible:ring-2">{m.p8_new_project()}</Link>
+          <div className="flex items-center justify-between">
+            <h2 id="projects-title" className="text-xl font-semibold">
+              {m.p8_recent_projects()}
+            </h2>
+            <Link to="/projects" className="min-h-11 py-3 text-primary">
+              {m.p8_view_all()}
+            </Link>
+          </div>
+          {!recent.loading && !recent.data?.projects.length ? (
+            <p className="mt-3 text-muted-foreground">{m.fi2_empty_projects()}</p>
+          ) : null}
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {recent.data?.projects.slice(0, 3).map((item) => (
+              <Link
+                key={item.id}
+                to="/projects/$projectId"
+                params={{ projectId: item.id }}
+                className="flex min-h-20 items-center gap-3 rounded-xl border p-4 focus-visible:ring-2"
+              >
+                <FolderOpen className="size-5 text-primary" />
+                <span className="font-medium">{item.name}</span>
+              </Link>
+            ))}
+            <Link
+              to="/projects"
+              className="flex min-h-20 items-center justify-center rounded-xl border border-dashed p-4 text-primary focus-visible:ring-2"
+            >
+              {m.p8_new_project()}
+            </Link>
           </div>
         </section>
         <div ref={marketRef}>

@@ -1,0 +1,53 @@
+name: FI2 exact history import
+
+on:
+  push:
+    branches:
+      - preservation/xeomx-fi2-final-20260920
+    paths:
+      - ".github/workflows/fi2-import-exact-history.yml"
+      - "artifacts/fi2-preservation/**"
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout FI2 preservation source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct and verify exact FI2 bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          BUNDLE=/tmp/XEOMX_FI2_FINAL_CLOSURE_20260920.bundle
+          cat artifacts/fi2-preservation/chunks/part-*.b64 | base64 -d > "$BUNDLE"
+          echo "5a460755d9b02a4fe6bdd871026661a38bdef9c9b79ee69c71b06a393af9755c  $BUNDLE" | sha256sum -c -
+          git bundle verify "$BUNDLE"
+          git bundle list-heads "$BUNDLE" | grep '^9b6f077baf2a4bf72edaf22ed71da4492d33c18e refs/heads/feature/xeomx-fi2-projects-memory-continuity-20260915$'
+
+      - name: Import exact FI2 history
+        shell: bash
+        run: |
+          set -euo pipefail
+          BUNDLE=/tmp/XEOMX_FI2_FINAL_CLOSURE_20260920.bundle
+          TARGET=refs/heads/feature/xeomx-fi2-projects-memory-continuity-20260915
+          FINAL=9b6f077baf2a4bf72edaf22ed71da4492d33c18e
+          BASE=dcafa525ebae0cf126e7470be3ca9de8065274aa
+          git fetch "$BUNDLE" "$TARGET:refs/remotes/bundle/fi2"
+          test "$(git rev-parse refs/remotes/bundle/fi2)" = "$FINAL"
+          git merge-base --is-ancestor "$BASE" "$FINAL"
+          git push origin "$FINAL:$TARGET"
+
+      - name: Verify remote FI2 head
+        shell: bash
+        run: |
+          set -euo pipefail
+          FINAL=9b6f077baf2a4bf72edaf22ed71da4492d33c18e
+          REMOTE="$(git ls-remote origin refs/heads/feature/xeomx-fi2-projects-memory-continuity-20260915 | awk '{print $1}')"
+          test "$REMOTE" = "$FINAL"
+          echo "FI2 exact history is canonical on GitHub: $REMOTE"

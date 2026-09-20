@@ -51,3 +51,5 @@ jobs:
           REMOTE="$(git ls-remote origin refs/heads/feature/xeomx-fi2-projects-memory-continuity-20260915 | awk '{print $1}')"
           test "$REMOTE" = "$FINAL"
           echo "FI2 exact history is canonical on GitHub: $REMOTE"
+
+# FI2 preservation payload complete; trigger exact import after all seven chunks.

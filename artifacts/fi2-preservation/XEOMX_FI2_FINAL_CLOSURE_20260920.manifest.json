@@ -1,0 +1,52 @@
+{
+  "status": "FI2_PASS",
+  "repository": "Ehfamo/weave-render-app",
+  "source_head": "dcafa525ebae0cf126e7470be3ca9de8065274aa",
+  "preserved_candidate_head": "8c555d9f375fdd5477e0e2365fc1e366abb41546",
+  "branch": "feature/xeomx-fi2-projects-memory-continuity-20260915",
+  "validated_source_head": "c65f2c5978cab42d0533c16234aa276294a0e5ea",
+  "validated_source_tree": "4e6a0b76fd82e839063efe35a123316c603f0cf3",
+  "final_head": "9b6f077baf2a4bf72edaf22ed71da4492d33c18e",
+  "remote_head": "dcafa525ebae0cf126e7470be3ca9de8065274aa",
+  "push_status": "NOT_ATTEMPTED_PREVIOUSLY_BLOCKED_BY_CREDENTIAL",
+  "ancestry": "PASS",
+  "bundle_file": "XEOMX_FI2_FINAL_CLOSURE_20260920.bundle",
+  "bundle_sha256": "5a460755d9b02a4fe6bdd871026661a38bdef9c9b79ee69c71b06a393af9755c",
+  "bundle_verify": "PASS",
+  "bundle_head": "9b6f077baf2a4bf72edaf22ed71da4492d33c18e",
+  "bundle_prerequisite": "dcafa525ebae0cf126e7470be3ca9de8065274aa",
+  "evidence_file": "docs/FI2_PROJECTS_MEMORY_CONTINUITY_EVIDENCE.md",
+  "evidence_blob": "9be8de037dc28db7886c51d626206f12bd12e129",
+  "commits_created": [
+    "c65f2c5978cab42d0533c16234aa276294a0e5ea",
+    "9b6f077baf2a4bf72edaf22ed71da4492d33c18e"
+  ],
+  "validation": [
+    {"gate":"fi2-focused","exit":0,"counts":["ℹ tests 18","ℹ pass 18","ℹ fail 0","ℹ skipped 0"]},
+    {"gate":"project-brain","exit":0,"counts":["ℹ tests 12","ℹ pass 12","ℹ fail 0","ℹ skipped 0"]},
+    {"gate":"memory","exit":0,"counts":["ℹ tests 8","ℹ pass 8","ℹ fail 0","ℹ skipped 0"]},
+    {"gate":"postgres","exit":0,"counts":["ℹ tests 6","ℹ pass 6","ℹ fail 0","ℹ skipped 0"]},
+    {"gate":"fi1","exit":0,"counts":["ℹ tests 13","ℹ pass 13","ℹ fail 0","ℹ skipped 0"]},
+    {"gate":"search-command","exit":0,"counts":["ℹ tests 14","ℹ pass 14","ℹ fail 0","ℹ skipped 0"]},
+    {"gate":"full","exit":0,"counts":["ℹ tests 340","ℹ pass 340","ℹ fail 0","ℹ skipped 0"]},
+    {"gate":"typecheck","exit":0,"counts":[]},
+    {"gate":"lint","exit":0,"counts":[]},
+    {"gate":"build","exit":0,"counts":[]},
+    {"gate":"smoke","exit":0,"counts":["ℹ tests 1","ℹ pass 1","ℹ fail 0","ℹ skipped 0"]},
+    {"gate":"diff-check","exit":0,"counts":[]}
+  ],
+  "secret_review": {"result":"PASS","files_reviewed":53,"findings":0},
+  "production_modified": false,
+  "main_modified": false,
+  "FI3_started": false,
+  "created_at": "2026-09-20T09:55:57.030083+00:00",
+  "preservation": {
+    "branch": "preservation/xeomx-fi2-final-20260920",
+    "encoding": "base64-chunks",
+    "chunk_glob": "artifacts/fi2-preservation/chunks/part-*.b64",
+    "chunk_count": 7,
+    "base64_length": 106376,
+    "raw_bundle_bytes": 79780,
+    "reconstruct": "cat artifacts/fi2-preservation/chunks/part-*.b64 | base64 -d > XEOMX_FI2_FINAL_CLOSURE_20260920.bundle"
+  }
+}

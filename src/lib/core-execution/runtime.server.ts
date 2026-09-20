@@ -117,7 +117,7 @@ export async function createCoreExecutionDependencies(input: {
   const contextual = input.request.projectId
     ? {
         brain: projects?.brain ?? await createProjectBrainService(input.token),
-        search: await createSearchService(input.token),
+        search: await createSearchService(input.token, { projectId, conversationId: input.request.conversationId }),
       }
     : ephemeralServices(input.userId, projectId);
   const model = createModelGatewayRuntime();

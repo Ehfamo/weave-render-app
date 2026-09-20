@@ -78,11 +78,14 @@ import { Route as AgentsRegistryRouteImport } from './routes/agents.registry'
 import { Route as AgentsObservabilityRouteImport } from './routes/agents.observability'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 import { Route as AuthenticatedProjectOperationsRouteImport } from './routes/_authenticated/project-operations'
+import { Route as AuthenticatedMemoryRouteImport } from './routes/_authenticated/memory'
 import { Route as AuthenticatedMarketplaceRouteImport } from './routes/_authenticated/marketplace'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCreativeWorkspaceRouteImport } from './routes/_authenticated/creative-workspace'
 import { Route as AuthenticatedBusinessAgentsRouteImport } from './routes/_authenticated/business-agents'
+import { Route as AuthenticatedProjectsIndexRouteImport } from './routes/_authenticated/projects/index'
 import { Route as OsEnvironmentViewRouteImport } from './routes/os.$environment.$view'
+import { Route as AuthenticatedProjectsProjectIdRouteImport } from './routes/_authenticated/projects/$projectId'
 
 const XeomxAiRoute = XeomxAiRouteImport.update({
   id: '/xeomx-ai',
@@ -429,6 +432,11 @@ const AuthenticatedProjectOperationsRoute =
     path: '/project-operations',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedMemoryRoute = AuthenticatedMemoryRouteImport.update({
+  id: '/memory',
+  path: '/memory',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMarketplaceRoute =
   AuthenticatedMarketplaceRouteImport.update({
     id: '/marketplace',
@@ -452,11 +460,23 @@ const AuthenticatedBusinessAgentsRoute =
     path: '/business-agents',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProjectsIndexRoute =
+  AuthenticatedProjectsIndexRouteImport.update({
+    id: '/projects/',
+    path: '/projects/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const OsEnvironmentViewRoute = OsEnvironmentViewRouteImport.update({
   id: '/os/$environment/$view',
   path: '/os/$environment/$view',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedProjectsProjectIdRoute =
+  AuthenticatedProjectsProjectIdRouteImport.update({
+    id: '/projects/$projectId',
+    path: '/projects/$projectId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -499,6 +519,7 @@ export interface FileRoutesByFullPath {
   '/creative-workspace': typeof AuthenticatedCreativeWorkspaceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/marketplace': typeof AuthenticatedMarketplaceRoute
+  '/memory': typeof AuthenticatedMemoryRoute
   '/project-operations': typeof AuthenticatedProjectOperationsRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/agents/observability': typeof AgentsObservabilityRoute
@@ -531,7 +552,9 @@ export interface FileRoutesByFullPath {
   '/security/evidence': typeof SecurityEvidenceRoute
   '/security/lab': typeof SecurityLabRoute
   '/security/supply-chain': typeof SecuritySupplyChainRoute
+  '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/os/$environment/$view': typeof OsEnvironmentViewRoute
+  '/projects/': typeof AuthenticatedProjectsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -574,6 +597,7 @@ export interface FileRoutesByTo {
   '/creative-workspace': typeof AuthenticatedCreativeWorkspaceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/marketplace': typeof AuthenticatedMarketplaceRoute
+  '/memory': typeof AuthenticatedMemoryRoute
   '/project-operations': typeof AuthenticatedProjectOperationsRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/agents/observability': typeof AgentsObservabilityRoute
@@ -606,7 +630,9 @@ export interface FileRoutesByTo {
   '/security/evidence': typeof SecurityEvidenceRoute
   '/security/lab': typeof SecurityLabRoute
   '/security/supply-chain': typeof SecuritySupplyChainRoute
+  '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/os/$environment/$view': typeof OsEnvironmentViewRoute
+  '/projects': typeof AuthenticatedProjectsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -651,6 +677,7 @@ export interface FileRoutesById {
   '/_authenticated/creative-workspace': typeof AuthenticatedCreativeWorkspaceRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/marketplace': typeof AuthenticatedMarketplaceRoute
+  '/_authenticated/memory': typeof AuthenticatedMemoryRoute
   '/_authenticated/project-operations': typeof AuthenticatedProjectOperationsRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/agents/observability': typeof AgentsObservabilityRoute
@@ -683,7 +710,9 @@ export interface FileRoutesById {
   '/security/evidence': typeof SecurityEvidenceRoute
   '/security/lab': typeof SecurityLabRoute
   '/security/supply-chain': typeof SecuritySupplyChainRoute
+  '/_authenticated/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/os/$environment/$view': typeof OsEnvironmentViewRoute
+  '/_authenticated/projects/': typeof AuthenticatedProjectsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -728,6 +757,7 @@ export interface FileRouteTypes {
     | '/creative-workspace'
     | '/dashboard'
     | '/marketplace'
+    | '/memory'
     | '/project-operations'
     | '/saved'
     | '/agents/observability'
@@ -760,7 +790,9 @@ export interface FileRouteTypes {
     | '/security/evidence'
     | '/security/lab'
     | '/security/supply-chain'
+    | '/projects/$projectId'
     | '/os/$environment/$view'
+    | '/projects/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -803,6 +835,7 @@ export interface FileRouteTypes {
     | '/creative-workspace'
     | '/dashboard'
     | '/marketplace'
+    | '/memory'
     | '/project-operations'
     | '/saved'
     | '/agents/observability'
@@ -835,7 +868,9 @@ export interface FileRouteTypes {
     | '/security/evidence'
     | '/security/lab'
     | '/security/supply-chain'
+    | '/projects/$projectId'
     | '/os/$environment/$view'
+    | '/projects'
   id:
     | '__root__'
     | '/'
@@ -879,6 +914,7 @@ export interface FileRouteTypes {
     | '/_authenticated/creative-workspace'
     | '/_authenticated/dashboard'
     | '/_authenticated/marketplace'
+    | '/_authenticated/memory'
     | '/_authenticated/project-operations'
     | '/_authenticated/saved'
     | '/agents/observability'
@@ -911,7 +947,9 @@ export interface FileRouteTypes {
     | '/security/evidence'
     | '/security/lab'
     | '/security/supply-chain'
+    | '/_authenticated/projects/$projectId'
     | '/os/$environment/$view'
+    | '/_authenticated/projects/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1463,6 +1501,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjectOperationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/memory': {
+      id: '/_authenticated/memory'
+      path: '/memory'
+      fullPath: '/memory'
+      preLoaderRoute: typeof AuthenticatedMemoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/marketplace': {
       id: '/_authenticated/marketplace'
       path: '/marketplace'
@@ -1491,12 +1536,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBusinessAgentsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/projects/': {
+      id: '/_authenticated/projects/'
+      path: '/projects'
+      fullPath: '/projects/'
+      preLoaderRoute: typeof AuthenticatedProjectsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/os/$environment/$view': {
       id: '/os/$environment/$view'
       path: '/os/$environment/$view'
       fullPath: '/os/$environment/$view'
       preLoaderRoute: typeof OsEnvironmentViewRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/projects/$projectId': {
+      id: '/_authenticated/projects/$projectId'
+      path: '/projects/$projectId'
+      fullPath: '/projects/$projectId'
+      preLoaderRoute: typeof AuthenticatedProjectsProjectIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
@@ -1506,8 +1565,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCreativeWorkspaceRoute: typeof AuthenticatedCreativeWorkspaceRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedMarketplaceRoute: typeof AuthenticatedMarketplaceRoute
+  AuthenticatedMemoryRoute: typeof AuthenticatedMemoryRoute
   AuthenticatedProjectOperationsRoute: typeof AuthenticatedProjectOperationsRoute
   AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
+  AuthenticatedProjectsProjectIdRoute: typeof AuthenticatedProjectsProjectIdRoute
+  AuthenticatedProjectsIndexRoute: typeof AuthenticatedProjectsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -1515,8 +1577,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCreativeWorkspaceRoute: AuthenticatedCreativeWorkspaceRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedMarketplaceRoute: AuthenticatedMarketplaceRoute,
+  AuthenticatedMemoryRoute: AuthenticatedMemoryRoute,
   AuthenticatedProjectOperationsRoute: AuthenticatedProjectOperationsRoute,
   AuthenticatedSavedRoute: AuthenticatedSavedRoute,
+  AuthenticatedProjectsProjectIdRoute: AuthenticatedProjectsProjectIdRoute,
+  AuthenticatedProjectsIndexRoute: AuthenticatedProjectsIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

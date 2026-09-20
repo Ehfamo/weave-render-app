@@ -22,7 +22,7 @@ export function projectsForClient(userId: string, client: SupabaseClient) {
     },
     list: () => listProjects(client),
     create: (input) => createProject(client, input),
-    load: (id) => loadProjectSnapshot(client, id),
+    load: (id) => loadProjectSnapshot(client, id, { recentMessages: true }),
     async rename(id, name) {
       const { project } = await loadProjectSnapshot(client, id);
       await updateProject(client, { projectId: id, name, description: project.description ?? undefined,

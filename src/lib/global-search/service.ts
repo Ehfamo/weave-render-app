@@ -54,6 +54,7 @@ export function validateQuery(value: unknown): GlobalSearchQuery {
   };
 }
 export function targetFor(c: Pick<SearchCandidate, "type" | "id" | "projectId">) {
+  if (c.type === "project") return `/projects/${uuid(c.id)}`;
   const params = new URLSearchParams({ type: c.type, id: c.id });
   if (c.projectId) params.set("projectId", c.projectId);
   return `/workspace?${params}`;

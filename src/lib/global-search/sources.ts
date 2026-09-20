@@ -19,11 +19,21 @@ export function nativeSources(
   memory: MemoryService,
   brain: ProjectBrainService,
   access: SearchAccess,
+  executionScope?: { projectId: string; conversationId?: string },
 ): GlobalSearchSource[] {
   const rows = async (type: Exclude<GlobalSearchResultType, "memory">, projectId?: string) => {
+    if (executionScope && projectId !== executionScope.projectId) return [];
     const value = await reads.rows(type, projectId);
     if (!Array.isArray(value) || value.length > 100) throw new Error("INVALID_SOURCE_ROWS");
-    return value.map(object);
+    const records = value.map(object);
+    if (!executionScope) return records;
+    return records.filter((row) => {
+      if (type === "project") return row.id === executionScope.projectId;
+      if (row.project_id !== executionScope.projectId) return false;
+      if (type === "conversation") return row.id === executionScope.conversationId;
+      if (type === "generation") return row.conversation_id === executionScope.conversationId;
+      return true;
+    });
   };
   const native: GlobalSearchSource[] = [
     "project",

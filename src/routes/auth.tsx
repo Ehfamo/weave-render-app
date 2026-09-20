@@ -1,3 +1,4 @@
+import { sanitizeNext } from "@/lib/auth-navigation";
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Loader2, Mail, Apple, Github, ArrowLeft, MessageSquare } from "lucide-react";
@@ -59,20 +60,8 @@ export const Route = createFileRoute("/auth")({
 
 type View = "root" | "password";
 
-function sanitizeNext(next: string | undefined): string {
-  if (!next) {
-    return "/dashboard";
-  }
-
-  if (!next.startsWith("/") || next.startsWith("//")) {
-    return "/dashboard";
-  }
-
-  return next;
-}
-
 function createRedirectUrl(destination: string): string {
-  const query = destination !== "/dashboard" ? `?next=${encodeURIComponent(destination)}` : "";
+  const query = destination !== "/" ? `?next=${encodeURIComponent(destination)}` : "";
 
   return `${window.location.origin}/auth${query}`;
 }

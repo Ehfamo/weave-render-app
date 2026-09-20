@@ -2,32 +2,35 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
 import {
   createEmptyProjectContext,
+  bindAuthorizedProject,
   recordProjectHandoff,
   type ProjectLocation,
 } from "@/lib/project-context";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 
 function useContextState() {
-  const [context, setContext] = useState(createEmptyProjectContext);
-  const rememberHandoff = useCallback(
-    (location: ProjectLocation) => setContext((current) => recordProjectHandoff(current, location)),
-    [],
-  );
-  useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT" || event === "SIGNED_IN") setContext(createEmptyProjectContext());
-    });
-    return () => data.subscription.unsubscribe();
+  const { user } = useAuth();
+  const [bound, setBound] = useState(() => ({actorId: null as string | null, context: createEmptyProjectContext()}));
+  const context = useMemo(() => bound.actorId === (user?.id ?? null) ? bound.context : createEmptyProjectContext(), [bound,user?.id]);
+  const rememberHandoff = useCallback((location: ProjectLocation) => {
+    setBound((current) => ({actorId:user?.id??null,context:recordProjectHandoff(current.actorId === (user?.id??null) ? current.context : createEmptyProjectContext(),location)}));
+  }, [user?.id]);
+  const bindProject = useCallback((projectId: string, actorId: string) => {
+    const next = bindAuthorizedProject({project:{id:projectId}},actorId,user?.id??null);
+    setBound((current) => current.actorId === actorId && current.context.projectId === next.projectId ? current : {actorId: user?.id??null,context:next});
+  }, [user?.id]);
+  const clearProject = useCallback((projectId: string) => {
+    setBound((current) => current.context.projectId === projectId ? {actorId: null,context:createEmptyProjectContext()} : current);
   }, []);
-  return useMemo(() => ({ context, rememberHandoff }), [context, rememberHandoff]);
+  return useMemo(() => ({ context, rememberHandoff, bindProject, clearProject }), [context, rememberHandoff, bindProject, clearProject]);
 }
+
 const Context = createContext<ReturnType<typeof useContextState> | null>(null);
 export function ProjectContextProvider({ children }: { children: ReactNode }) {
   return <Context.Provider value={useContextState()}>{children}</Context.Provider>;

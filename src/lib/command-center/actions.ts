@@ -64,7 +64,7 @@ export const ACTIONS: CanonicalAction[] = [
   { id: "search", kind: "search" },
   { id: "create", kind: "navigate", target: "/creative-workspace" },
   { id: "chat", kind: "navigate", target: "/xeomx-ai" },
-  { id: "memory", kind: "navigate", target: "/workspace?type=memory" },
+  { id: "memory", kind: "navigate", target: "/memory" },
   { id: "generations", kind: "navigate", target: "/workspace?type=generation" },
   { id: "settings", kind: "navigate", target: "/settings" },
   { id: "more", kind: "legacy" },

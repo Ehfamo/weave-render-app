@@ -238,6 +238,7 @@ export async function cancelGenerationJob(client: unknown, jobId: string): Promi
 export async function loadProjectSnapshot(
   client: unknown,
   projectId: string,
+  options: { recentMessages?: boolean } = {},
 ): Promise<ProjectSnapshot> {
   const db = request7Client(client);
   const projectRequest = db
@@ -261,7 +262,7 @@ export async function loadProjectSnapshot(
       "id,project_id,conversation_id,author_id,role,content,provider,model,metadata,generation_job_id,created_at",
     )
     .eq("project_id", projectId)
-    .order("created_at", { ascending: true })
+    .order("created_at", { ascending: !options.recentMessages })
     .limit(500);
   const jobsRequest = db
     .from("generation_jobs")
@@ -327,7 +328,7 @@ export async function loadProjectSnapshot(
   return {
     project: projectSummary(project.data),
     conversations: (conversations.data ?? []).map(conversationSummary),
-    messages: (messages.data ?? []).map(messageSummary),
+    messages: (options.recentMessages ? [...(messages.data ?? [])].reverse() : (messages.data ?? [])).map(messageSummary),
     jobs: (jobs.data ?? []).map(jobSummary),
     assets: (assets.data ?? []).map(assetSummary),
     usageEvents: (usage.data ?? []).map(usageSummary),

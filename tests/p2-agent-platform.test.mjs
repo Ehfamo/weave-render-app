@@ -18,6 +18,7 @@ const task = (goal = "Research competitors") => ({
   createdAt: "2026-09-12T00:00:00.000Z",
 });
 const brain = {
+  buildContext: async () => ({projectId,text:JSON.stringify({projectId,sections:[{kind:"instruction",text:"No deploy"},{kind:"constraint",text:"bounded"}]}),maxCharacters:12000,sourceCount:2,truncated:false,updatedAt:"2026-09-12T00:00:00Z"}),
   snapshot: async () => ({
     summary: { text: "XEOMX", method: "deterministic" },
     instructions: [{ text: "No deploy" }],

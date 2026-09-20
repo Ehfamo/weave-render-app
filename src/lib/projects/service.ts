@@ -2,7 +2,7 @@ import { object, scopeSchema, sameScope, uuid } from "../memory/service.ts";
 import type { MemoryService } from "../memory/service.ts";
 import type { MemoryScope, MemoryPatch, MemorySettings } from "../memory/contracts.ts";
 import type { ProjectBrainService } from "../project-brain/service.ts";
-import type { ProjectSummary, AssetSummary } from "../backend/vertical-slice.ts";
+import type { ProjectSummary, AssetSummary, ProjectMessage } from "../backend/vertical-slice.ts";
 import type { CoreExecutionRequest, CoreExecutionResponse } from "../core-execution/contracts.ts";
 
 export interface ProjectActivity {
@@ -17,7 +17,7 @@ export interface ProjectPersistence {
   authorize(projectId: string, write?: boolean): Promise<void>;
   list(): Promise<ProjectSummary[]>;
   create(input: { name: string; description?: string }): Promise<ProjectSummary>;
-  load(projectId: string): Promise<{ project: ProjectSummary; assets: readonly AssetSummary[] }>;
+  load(projectId: string): Promise<{ project: ProjectSummary; assets: readonly AssetSummary[]; messages?: readonly ProjectMessage[] }>;
   rename(projectId: string, name: string): Promise<void>;
   activity(projectId: string): Promise<ProjectActivity[]>;
   begin(input: CoreExecutionRequest & { executionId: string; requestHash: string }): Promise<{
@@ -79,14 +79,16 @@ export class ProjectsService {
     }
     return { project, goalSaved: true };
   }
-  async open(projectId: string) {
+  async open(projectId: string, conversationId?: string) {
     await this.authorize(projectId);
     const [snapshot, brain, activity] = await Promise.all([
-      this.persistence.load(projectId), this.brain.snapshot(projectId), this.persistence.activity(projectId),
+      this.persistence.load(projectId), this.brain.snapshot(projectId, conversationId), this.persistence.activity(projectId),
     ]);
     if (snapshot.project.id !== projectId || activity.some((a) => a.projectId !== projectId))
       throw new Error("PROJECT_ACCESS_DENIED");
-    return { project: snapshot.project, assets: snapshot.assets, brain, activity };
+    const ownedConversations = new Set(activity.map((a) => a.id));
+    return { project: snapshot.project, assets: snapshot.assets, brain, activity,
+      messages: (snapshot.messages ?? []).filter((row) => ownedConversations.has(row.conversationId)) };
   }
   async edit(projectId: string, input: { name?: string; goal?: string }) {
     await this.authorize(projectId, true);
@@ -98,7 +100,7 @@ export class ProjectsService {
     await this.authorize(projectId, true);
     return this.brain.buildContext(projectId, { conversationId, maxCharacters: 12000 });
   }
-  async memoryControl(value: unknown) {
+  async memoryControl(value: unknown): Promise<{ settings: MemorySettings; memories: Awaited<ReturnType<MemoryService["list"]>> }> {
     const input = object(value);
     const allowed = ["action", "scope", "id", "patch", "settings"];
     if (Object.keys(input).some((key) => !allowed.includes(key))) throw new Error("INVALID_MEMORY_INPUT");

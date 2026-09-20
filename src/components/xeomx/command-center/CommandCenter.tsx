@@ -90,7 +90,7 @@ export function CommandCenter({
             data: { name: text.trim().slice(0, 120) || labels.newProject },
           });
           if (!r.ok) throw new Error("ACTION_FAILED");
-          return `/workspace?projectId=${encodeURIComponent(r.data.id)}`;
+          return `/projects/${encodeURIComponent(r.data.id)}`;
         },
       });
     } catch {

@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import { m } from "@/paraglide/messages.js";
 
 const links = [
-  ["/dashboard", () => m.p8_projects()],
+  ["/projects", () => m.p8_projects()],
   ["/marketplace", () => m.p8_marketplace()],
 ] as const;
 export function Header(_: { onSearch?: (value: string) => void; query?: string }) {

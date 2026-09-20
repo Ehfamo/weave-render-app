@@ -223,20 +223,22 @@ export class ProjectBrainService {
         .filter((e): e is BrainEntry => e !== null)
         .map((e) => ({ kind: e.kind, text: e.text })),
       { kind: "description", text: snapshot.project.description ?? "" },
-      ...history.map((row) => ({ kind: `history:${row.role}`, text: row.content.slice(0, 4000) })),
+      ...history.map((row) => ({ kind: `history:${row.role}`, text: row.content.slice(0, 4000), id: row.id })),
       ...snapshot.memories.map((r) => ({ kind: r.type, text: r.content })),
       ...snapshot.recentActivity.map((a) => ({ kind: "activity", text: a.title })),
     ];
     const sections: { kind: string; text: string }[] = [];
     const encode = () => JSON.stringify({ projectId, sections });
-    let truncated = false;
+    let truncated = history.some((row) => row.content.length > 4000);
+    let referenceIncluded = false;
     for (const candidate of candidates) {
-      sections.push(candidate);
+      sections.push({ kind: candidate.kind, text: candidate.text });
       if (encode().length > maxCharacters) {
         sections.pop();
         truncated = true;
         break;
       }
+      if ("id" in candidate && candidate.id === reference?.id) referenceIncluded = true;
     }
     // Whole sections preserve valid structured JSON. Budget applies to serialized text,
     // including escapes; no full snapshot is attached to accidentally bypass this bound.
@@ -247,7 +249,7 @@ export class ProjectBrainService {
       truncated,
       sourceCount: sections.length,
       updatedAt: snapshot.updatedAt,
-      ...(reference ? { referenceResultId: reference.id } : {}),
+      ...(reference && referenceIncluded ? { referenceResultId: reference.id } : {}),
     };
   }
 }

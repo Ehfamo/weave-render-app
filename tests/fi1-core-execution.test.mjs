@@ -119,7 +119,7 @@ test("pending goal survives auth storage, expires, and is consumed exactly once"
 test("auth handoff returns only to the fixed XEOMX workspace", async () => {
   const workspace = await read("src/components/xeomx/ai/XeomxAiWorkspace.tsx");
   assert.match(workspace, /to: "\/auth", search: \{ next: "\/xeomx-ai" \}/);
-  assert.match(workspace, /consumePendingGoal\(window\.localStorage\)/);
+  assert.match(workspace, /consumePendingGoal\(\s*window\.localStorage,\s*Date\.now\(\),\s*user\.id,\s*\{\s*projectId\s*\}/);
 });
 
 test("server validation rejects unknown fields, invalid IDs, and capability injection", () => {

@@ -33,13 +33,13 @@ function service(rows) {
 }
 test("all six source types participate in unified lexical search and safe targets", async () => {
   const rows = ["project", "conversation", "memory", "prompt", "asset", "generation"].map((t, i) =>
-    row(t, String(i)),
+    row(t, t === "project" ? project : String(i)),
   );
   const page = await service(rows).search({ text: "shoe" });
   assert.equal(page.results.length, 6);
   assert.equal(new Set(page.results.map((r) => r.type)).size, 6);
   for (const r of page.results) {
-    assert.ok(r.target.startsWith("/workspace?"));
+    assert.ok(r.target === (r.type === "project" ? `/projects/${r.id}` : `/workspace?type=${r.type}&id=${r.id}&projectId=${project}`));
     assert.equal(r.ownerId, undefined);
     assert.equal(r.source.method, "lexical");
   }

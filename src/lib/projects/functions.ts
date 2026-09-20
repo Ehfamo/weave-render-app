@@ -16,8 +16,8 @@ async function safely<T>(work: () => Promise<T>): Promise<{ ok: true; data: T } 
 export const projectsHomeFn = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth])
   .handler(({ context }) => safely(async () => (await service(context)).home()));
 export const projectWorkspaceFn = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth])
-  .validator((value: unknown) => uuid(object(value).projectId))
-  .handler(({ context, data }) => safely(async () => (await service(context)).open(data)));
+  .validator((value: unknown) => { const v=object(value); return {projectId:uuid(v.projectId),conversationId:v.conversationId?uuid(v.conversationId):undefined}; })
+  .handler(({ context, data }) => safely(async () => (await service(context)).open(data.projectId,data.conversationId)));
 export const createDurableProjectFn = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
   .validator((value: unknown) => { const v = object(value); return { name: v.name as string, goal: v.goal as string | undefined }; })
   .handler(({ context, data }) => safely(async () => (await service(context)).create(data)));

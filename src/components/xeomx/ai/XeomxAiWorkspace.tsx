@@ -21,46 +21,64 @@ import {
 import { m } from "@/paraglide/messages.js";
 
 const active = new Map<string, Promise<CoreExecutionResponse>>();
-function executeOnce(pending: PendingGoal) {
-  const existing = active.get(pending.idempotencyKey);
+function executeOnce(pending: PendingGoal, actorId: string, projectId?: string, conversationId?: string) {
+  const key = `${actorId}:${projectId??"session"}:${pending.idempotencyKey}`;
+  const existing = active.get(key);
   if (existing) return existing;
   const request = executeGoalFn({
     data: {
       goal: pending.goal,
+      ...(projectId ? { projectId, ...(conversationId ? { conversationId } : {}) } : {}),
       idempotencyKey: pending.idempotencyKey,
       quality: pending.quality,
       locale: document.documentElement.lang || "en",
     },
-  }).finally(() => active.delete(pending.idempotencyKey));
-  active.set(pending.idempotencyKey, request);
+  }).finally(() => active.delete(key));
+  active.set(key, request);
   return request;
 }
 
-export function XeomxAiWorkspace() {
+export function XeomxAiWorkspace({ embedded = false, projectId, conversationId, onPersisted }: {
+  embedded?: boolean; projectId?: string; conversationId?: string; onPersisted?: (id: string) => Promise<void>;
+} = {}) {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [goal, setGoal] = useState("");
   const [response, setResponse] = useState<CoreExecutionResponse | null>(null);
   const [phase, setPhase] = useState<"IDLE" | "PREPARING" | "RUNNING">("IDLE");
   const mounted = useRef(true);
+  const inFlight = useRef(false);
+  const lastPending = useRef<PendingGoal | null>(null);
+  const currentActor = useRef(user?.id);
+  currentActor.current = user?.id;
+  useEffect(() => { setResponse(null); setGoal(""); }, [user?.id]);
 
   useEffect(
-    () => () => {
-      mounted.current = false;
-    },
+    () => { mounted.current = true; return () => { mounted.current = false; }; },
     [],
   );
 
   const run = useCallback(async (pending: PendingGoal) => {
+    if (!user || inFlight.current) return;
+    const actorId = user.id;
+    inFlight.current = true;
+    lastPending.current = pending;
     setGoal(pending.goal);
     setPhase("PREPARING");
     setResponse(null);
-    const result = await executeOnce(pending);
-    if (mounted.current) {
-      setResponse(result);
-      setPhase("IDLE");
-    }
-  }, []);
+    try {
+      const result = await executeOnce(pending, actorId, projectId, conversationId);
+      if (mounted.current && currentActor.current === actorId) {
+        setResponse(result);
+        if (result.data.conversationId) await onPersisted?.(result.data.conversationId);
+      }
+    } catch {
+      if (mounted.current && currentActor.current === actorId) setResponse({ ok: false, data: {
+        executionId: pending.idempotencyKey, state: "FAILED", goal: pending.goal, errorCode: "REQUEST_FAILED",
+        quality: { confidence: "NOT_INDEPENDENTLY_VERIFIED", findings: [], repairCount: 0 }, nextAction: "RETRY",
+      } });
+    } finally { inFlight.current = false; if (mounted.current && currentActor.current === actorId) setPhase("IDLE"); }
+  }, [projectId, conversationId, onPersisted, user]);
 
   useEffect(() => {
     if (loading) return;
@@ -68,9 +86,9 @@ export function XeomxAiWorkspace() {
       navigate({ to: "/auth", search: { next: "/xeomx-ai" }, replace: true });
       return;
     }
-    const pending = consumePendingGoal(window.localStorage);
+    const pending = consumePendingGoal(window.localStorage, Date.now(), user.id, { projectId });
     if (pending) void run(pending);
-  }, [loading, navigate, run, user]);
+  }, [loading, navigate, run, user, projectId]);
 
   function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -78,15 +96,16 @@ export function XeomxAiWorkspace() {
     if (value.length >= 2) void run(createPendingGoal(value, undefined));
   }
 
+  const Title = embedded ? "h2" : "h1";
   const result = response?.data;
   const busy = loading || phase !== "IDLE";
   return (
-    <div className="min-h-screen bg-background text-foreground" dir="auto">
-      <Header />
-      <main className="mx-auto w-full max-w-4xl px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
+    <div className={embedded ? "bg-background text-foreground" : "min-h-screen bg-background text-foreground"} dir="auto">
+      {embedded ? null : <Header />}
+      <div className={embedded ? "space-y-4" : "mx-auto w-full max-w-4xl px-4 pb-16 pt-8 sm:px-6 sm:pt-12"}>
         <header>
           <p className="text-sm font-medium text-primary">XEOMX AI</p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight">{m.fi1_workspace_title()}</h1>
+          <Title className="mt-1 text-3xl font-semibold tracking-tight">{embedded ? m.p8_continue() : m.fi1_workspace_title()}</Title>
           <p className="mt-2 text-muted-foreground">{m.fi1_workspace_subtitle()}</p>
         </header>
 
@@ -218,7 +237,7 @@ export function XeomxAiWorkspace() {
               type="button"
               onClick={() => {
                 if (response?.ok) setGoal("");
-                else void run(createPendingGoal(result.goal, undefined));
+                else void run(["REQUEST_FAILED","PROJECT_EXECUTION_UNAVAILABLE","EXECUTION_IN_PROGRESS"].includes(result.errorCode??"") && lastPending.current ? lastPending.current : createPendingGoal(result.goal, undefined));
               }}
               className="inline-flex min-h-11 items-center gap-2 rounded-xl border px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
@@ -226,7 +245,7 @@ export function XeomxAiWorkspace() {
             </button>
           </section>
         ) : null}
-      </main>
+      </div>
     </div>
   );
 }

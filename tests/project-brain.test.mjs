@@ -11,7 +11,7 @@ const p = "00000000-0000-4000-8000-000000000003",
 const c = "00000000-0000-4000-8000-000000000005",
   c2 = "00000000-0000-4000-8000-000000000006";
 const timestamp = "2026-09-12T00:00:00.000Z";
-function fixture(userId = u, rows = new Map()) {
+function fixture(userId = u, rows = new Map(), projects = new Map()) {
   let settings = { enabled: true, disabledTypes: [] },
     member = true;
   const adapter = {
@@ -47,6 +47,11 @@ function fixture(userId = u, rows = new Map()) {
   const memory = new MemoryService(adapter);
   const domain = {
     userId,
+    readBrain: async (id) => structuredClone(projects.get(id) ?? []),
+    writeBrain: async (id, next, expected) => {
+      assert.deepEqual(projects.get(id) ?? [], expected);
+      projects.set(id, structuredClone(next));
+    },
     getAuthorizedProject: async (id) =>
       member && [p, p2].includes(id)
         ? { id, name: "Project", description: "Test", updatedAt: timestamp }
@@ -61,17 +66,18 @@ function fixture(userId = u, rows = new Map()) {
     memory,
     domain,
     rows,
+    projects,
     revoke: () => {
       member = false;
     },
   };
 }
-test("goal is persisted through MemoryService and reconstructed by a new service", async () => {
+test("goal is persisted through canonical project data and reconstructed by a new service", async () => {
   const f = fixture();
   await f.brain.setGoal(p, "Finish film");
   await f.brain.setGoal(p, "Finish episode");
-  assert.equal(f.rows.size, 1);
-  assert.equal([...f.rows.values()][0].type, "ProjectMemory");
+  assert.equal(f.rows.size, 0);
+  assert.equal(f.projects.get(p).length, 1);
   const next = new ProjectBrainService(f.memory, f.domain);
   assert.equal((await next.snapshot(p)).goal.text, "Finish episode");
 });
@@ -94,15 +100,15 @@ test("instructions decisions constraints entities and open items support updates
   s = await brain.snapshot(p);
   assert.equal(s.openItems.length, 0);
 });
-test("user and project isolation preserve independent private brains", async () => {
-  const rows = new Map(),
-    a = fixture(u, rows),
-    b = fixture(v, rows);
-  await a.brain.setGoal(p, "Private A");
-  await b.brain.setGoal(p, "Private B");
+test("shared authorized project state retains private memory ownership and project isolation", async () => {
+  const rows = new Map(), projects = new Map(), a = fixture(u, rows, projects), b = fixture(v, rows, projects);
+  await a.brain.setGoal(p, "Shared project goal");
   await a.brain.setGoal(p2, "Other project");
-  assert.equal((await a.brain.snapshot(p)).goal.text, "Private A");
-  assert.equal((await b.brain.snapshot(p)).goal.text, "Private B");
+  await a.memory.create({type:"ProjectMemory",scope:{kind:"project",projectId:p},content:"Private A",importance:1,source:{kind:"user"}});
+  assert.equal((await a.brain.snapshot(p)).goal.text, "Shared project goal");
+  assert.equal((await b.brain.snapshot(p)).goal.text, "Shared project goal");
+  assert.equal((await b.brain.snapshot(p)).memories.length, 0);
+  assert.equal((await a.brain.snapshot(p)).memories[0].content, "Private A");
   assert.equal((await a.brain.snapshot(p2)).goal.text, "Other project");
 });
 test("membership revocation denies reads writes and context construction", async () => {
@@ -171,17 +177,21 @@ test("snapshots and bounded context are deterministic and need no model credenti
   });
   assert.equal((await f.brain.snapshot(p)).updatedAt, "2026-09-13T00:00:00.000Z");
 });
-test("disabled memory excludes stored brain from context while inspection remains available", async () => {
+test("Memory OFF and disabled project-memory type preserve durable Project Brain", async () => {
   const f = fixture();
-  await f.brain.setGoal(p, "Private secret");
+  await f.brain.setGoal(p, "Durable project goal");
+  await f.memory.create({type:"ProjectMemory",scope:{kind:"project",projectId:p},content:"Optional memory",importance:1,source:{kind:"user"}});
   await f.memory.setSettings({ enabled: false, disabledTypes: [] });
   assert.equal((await f.brain.get(p)).entries.length, 1);
-  assert.equal((await f.brain.snapshot(p)).goal, null);
-  assert.ok(!(await f.brain.buildContext(p)).text.includes("Private secret"));
-  await assert.rejects(f.brain.setGoal(p, "New"), /MEMORY_DISABLED/);
+  assert.equal((await f.brain.snapshot(p)).goal.text, "Durable project goal");
+  assert.ok((await f.brain.buildContext(p)).text.includes("Durable project goal"));
+  assert.equal((await f.brain.snapshot(p)).memories.length, 0);
+  await f.brain.setGoal(p, "Updated while Memory OFF");
   await f.memory.setSettings({ enabled: true, disabledTypes: ["ProjectMemory"] });
-  assert.equal((await f.brain.snapshot(p)).goal, null);
-  await assert.rejects(f.brain.setGoal(p, "New"), /MEMORY_DISABLED/);
+  assert.equal((await f.brain.snapshot(p)).goal.text, "Updated while Memory OFF");
+  assert.equal((await f.brain.snapshot(p)).memories.length, 0);
+  await f.brain.setGoal(p, "Still independent");
+  assert.equal((await f.brain.snapshot(p)).goal.text,"Still independent");
 });
 test("invalid entries and capacity fail without discarding canonical state", async () => {
   const f = fixture();
@@ -210,9 +220,10 @@ test("native domain requires explicit membership and rejects mismatched project/
   await assert.rejects(d.getAuthorizedProject(p), /ACCESS_DENIED/);
   await assert.rejects(d.authorizeConversation(p, c), /ACCESS_DENIED/);
 });
-test("corrupt or conflicting brain documents fail closed", async () => {
+test("corrupt or conflicting legacy brain documents fail closed without rewriting memory", async () => {
   const f = fixture();
-  await f.brain.setGoal(p, "Goal");
+  delete f.domain.readBrain;
+  await f.memory.create({type:"ProjectMemory",scope:{kind:"project",projectId:p},content:JSON.stringify({format:"xeomx.project-brain.v1",entries:[]}),importance:1,source:{kind:"user",reference:"xeomx.project-brain.v1"}});
   const r = [...f.rows.values()][0];
   f.rows.set(c, { ...r, id: c });
   await assert.rejects(f.brain.get(p), /BRAIN_CONFLICT/);

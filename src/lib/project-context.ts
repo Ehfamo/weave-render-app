@@ -1,3 +1,4 @@
+import { uuid } from "./memory/service.ts";
 /** Opaque navigation references only. This object does not confer authorization. */
 export type ProjectLocation = { environment: string; view: string; at: string };
 
@@ -40,4 +41,11 @@ export function recordProjectHandoff(
     throw new Error("A handoff requires an environment, view and timestamp.");
   }
   return { ...context, lastLocation: { ...location } };
+}
+
+/** The snapshot is returned by an authorized server load, never inferred from a URL. */
+export function bindAuthorizedProject(snapshot: {project: {id: string}}, authorizedFor: string, currentActor: string | null): ProjectContext {
+  if (!currentActor || authorizedFor !== currentActor) return createEmptyProjectContext();
+  uuid(authorizedFor);
+  return {...createEmptyProjectContext(), projectId: uuid(snapshot.project.id)};
 }

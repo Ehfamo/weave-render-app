@@ -1,181 +1,201 @@
 import { useState } from "react";
-import { Activity, CheckCircle2, Play, Plus, Settings2, Users, Workflow } from "lucide-react";
 import { m } from "@/paraglide/messages.js";
-import type { WorkspaceRole } from "@/lib/collaboration/contracts";
-import { ProductionOperations } from "@/components/xeomx/production/ProductionOperations";
-type Tab = "automations" | "tasks" | "team" | "activity" | "operations";
-export function ProjectOperations({
-  role = "viewer",
-  onApprovalDecision,
-}: {
-  role?: WorkspaceRole;
-  onApprovalDecision?: (decision: "approved" | "rejected") => void;
-}) {
-  const [tab, setTab] = useState<Tab>("automations"),
-    [creating, setCreating] = useState(false),
-    [enabled, setEnabled] = useState(true),
-    [ran, setRan] = useState(false);
-  const tabs: [Tab, typeof Workflow, string][] = [
-    ["automations", Workflow, m.p4_automations()],
-    ["tasks", CheckCircle2, m.p4_tasks()],
-    ["team", Users, m.p4_team()],
-    ["activity", Activity, m.p4_activity()],
-    ["operations", Activity, m.p7_title()],
+import { automationControlFn, teamRoleFn } from "@/lib/capability-runtime/functions";
+import {
+  useCapabilityProject,
+  ProjectChooser,
+  JobArtifacts,
+  runtimeButton,
+} from "@/components/xeomx/runtime/CapabilityPanel";
+type Tab = "automations" | "tasks" | "team" | "activity";
+export function ProjectOperations() {
+  const runtime = useCapabilityProject();
+  const [tab, setTab] = useState<Tab>("automations");
+  const [creating, setCreating] = useState(false);
+  const tabs: [Tab, string][] = [
+    ["automations", m.p4_automations()],
+    ["tasks", m.p4_tasks()],
+    ["team", m.p4_team()],
+    ["activity", m.p4_activity()],
   ];
-  const canEdit = role === "owner" || role === "admin" || role === "editor";
+  const canEdit = runtime.data?.role === "owner" || runtime.data?.role === "editor";
   return (
     <main className="min-h-screen bg-background p-4 text-foreground sm:p-6" dir="auto">
-      <header className="mx-auto flex max-w-6xl items-center justify-between border-b pb-4">
+      <header className="mx-auto max-w-6xl space-y-4">
         <h1 className="text-xl font-semibold">{m.p4_title()}</h1>
-        <button
-          disabled={!canEdit}
-          onClick={() => setCreating((x) => !x)}
-          className="flex min-h-11 items-center gap-2 rounded-md bg-primary px-4 text-sm text-primary-foreground"
-        >
-          <Plus className="size-4" />
-          {m.p4_new_workflow()}
-        </button>
+        <ProjectChooser runtime={runtime} />
       </header>
       <div className="mx-auto mt-4 grid max-w-6xl gap-5 md:grid-cols-[13rem_1fr]">
-        <nav aria-label={m.p4_title()} className="flex gap-2 overflow-x-auto md:flex-col">
-          {tabs.map(([id, Icon, label]) => (
+        <nav className="flex gap-2 overflow-x-auto md:flex-col" aria-label={m.p4_title()}>
+          {tabs.map(([id, label]) => (
             <button
-              disabled={!canEdit}
               key={id}
-              onClick={() => setTab(id)}
+              className={runtimeButton}
               aria-current={tab === id ? "page" : undefined}
-              className={`flex min-h-11 shrink-0 items-center gap-2 rounded-md px-3 text-sm ${tab === id ? "bg-muted font-medium" : "hover:bg-muted/60"}`}
+              onClick={() => setTab(id)}
             >
-              <Icon className="size-4" />
               {label}
             </button>
           ))}
         </nav>
         <section className="min-w-0">
-          <h2 className="mb-4 text-lg font-semibold">{tabs.find((x) => x[0] === tab)?.[2]}</h2>
+          <h2 className="mb-4 text-lg font-semibold">{tabs.find((x) => x[0] === tab)?.[1]}</h2>
+          {runtime.failed || runtime.q.isError ? <p role="alert">{m.fi3_unavailable()}</p> : null}
           {tab === "automations" ? (
             <div className="space-y-4">
+              <button
+                className={runtimeButton}
+                disabled={!canEdit}
+                aria-pressed={creating}
+                onClick={() => setCreating((v) => !v)}
+              >
+                {m.p4_new_workflow()}
+              </button>
               {creating ? (
                 <form
+                  className="space-y-3 rounded-lg border p-4"
                   onSubmit={(e) => {
                     e.preventDefault();
-                    setCreating(false);
+                    const form = new FormData(e.currentTarget);
+                    void runtime.act(() =>
+                      automationControlFn({
+                        data: {
+                          projectId: runtime.projectId,
+                          action: "create",
+                          name: String(form.get("name")),
+                          goal: String(form.get("goal")),
+                          approval: form.get("approval") === "on",
+                        },
+                      }),
+                    );
                   }}
-                  className="grid gap-3 rounded-lg border p-4 sm:grid-cols-2"
                 >
-                  <label className="text-sm">
-                    {m.p4_when()}
-                    <select className="mt-1 min-h-11 w-full rounded-md border bg-background px-3">
-                      <option>{m.p4_activity()}</option>
-                      <option>{m.p4_run()}</option>
-                    </select>
+                  <label className="block">
+                    {m.fi2_name()}
+                    <input
+                      name="name"
+                      required
+                      maxLength={120}
+                      className="ms-2 min-h-11 rounded border bg-background px-2"
+                    />
                   </label>
-                  <label className="text-sm">
-                    {m.p4_do()}
-                    <select className="mt-1 min-h-11 w-full rounded-md border bg-background px-3">
-                      <option>{m.p4_tasks()}</option>
-                      <option>{m.p4_run()}</option>
-                    </select>
+                  <label className="block">
+                    {m.fi2_goal()}
+                    <textarea
+                      name="goal"
+                      required
+                      maxLength={4000}
+                      className="mt-2 block w-full rounded border bg-background p-2"
+                    />
                   </label>
-                  <details className="sm:col-span-2">
-                    <summary className="cursor-pointer text-sm">
-                      <Settings2 className="me-2 inline size-4" />
-                      {m.p4_advanced()}
-                    </summary>
-                  </details>
-                  <button className="min-h-11 rounded-md bg-primary px-4 text-sm text-primary-foreground sm:col-span-2">
+                  <label className="flex min-h-11 items-center gap-2">
+                    <input type="checkbox" name="approval" />
+                    {m.p7_approval()}
+                  </label>
+                  <button className={runtimeButton} disabled={runtime.busy}>
                     {m.p4_create()}
                   </button>
                 </form>
               ) : null}
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-4">
-                <div>
-                  <p className="font-medium">{m.p4_automations()}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {ran ? m.p4_history() : m.p4_enabled()}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setEnabled((x) => !x)}
-                    aria-pressed={enabled}
-                    className="min-h-11 rounded-md border px-3 text-sm"
-                  >
-                    {m.p4_enabled()}
-                  </button>
-                  <button
-                    disabled={!enabled || !canEdit}
-                    onClick={() => setRan(true)}
-                    className="flex min-h-11 items-center gap-2 rounded-md bg-primary px-3 text-sm text-primary-foreground disabled:opacity-50"
-                  >
-                    <Play className="size-4" />
-                    {m.p4_run()}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : tab === "tasks" ? (
-            <div className="overflow-x-auto rounded-lg border">
-              <table className="w-full min-w-[34rem] text-start text-sm">
-                <thead>
-                  <tr className="border-b text-muted-foreground">
-                    <th className="p-3 text-start">{m.p4_tasks()}</th>
-                    <th className="p-3 text-start">{m.p4_assignee()}</th>
-                    <th className="p-3 text-start">{m.p4_priority()}</th>
-                    <th className="p-3 text-start">{m.p4_activity()}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="p-3">{m.p4_tasks()}</td>
-                    <td className="p-3">{m.p4_team()}</td>
-                    <td className="p-3">{m.p4_priority()}</td>
-                    <td className="p-3">{m.p4_waiting()}</td>
-                  </tr>
-                </tbody>
-              </table>
+              {runtime.data?.workflows.length ? (
+                runtime.data.workflows.map((w) => (
+                  <article key={w.id} className="rounded-lg border p-4">
+                    <h3>{w.name}</h3>
+                    <p>
+                      {w.status === "draft"
+                        ? m.fi3_draft()
+                        : w.status === "enabled"
+                          ? m.p4_enabled()
+                          : m.fi3_paused()}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        className={runtimeButton}
+                        disabled={runtime.busy || !canEdit}
+                        aria-pressed={w.status === "enabled"}
+                        onClick={() =>
+                          void runtime.act(() =>
+                            automationControlFn({
+                              data: {
+                                projectId: runtime.projectId,
+                                id: w.id,
+                                action: w.status === "enabled" ? "pause" : "enable",
+                              },
+                            }),
+                          )
+                        }
+                      >
+                        {w.status === "enabled" ? m.fi3_pause() : m.p4_enabled()}
+                      </button>
+                      <button
+                        className={runtimeButton}
+                        disabled={runtime.busy || !canEdit || w.status !== "enabled"}
+                        onClick={() =>
+                          void runtime.act(() =>
+                            automationControlFn({
+                              data: { projectId: runtime.projectId, id: w.id, action: "run" },
+                            }),
+                          )
+                        }
+                      >
+                        {m.p4_run()}
+                      </button>
+                    </div>
+                  </article>
+                ))
+              ) : (
+                <p>{m.fi2_empty_activity()}</p>
+              )}
+              <p className="text-sm">{m.fi3_schedule_hint()}</p>
+              <JobArtifacts runtime={runtime} />
             </div>
           ) : tab === "team" ? (
-            <div className="rounded-lg border p-4">
-              <p className="font-medium">{m.p4_team()}</p>
-              <p className="text-sm text-muted-foreground">{m.p4_enabled()}</p>
-            </div>
+            <ul className="space-y-3">
+              {runtime.data?.team.map((member) => (
+                <li key={member.user_id} className="rounded border p-3">
+                  <span>{member.user_id}</span>
+                  <label className="ms-3">
+                    {m.fi3_role()}
+                    <select
+                      className="ms-2 min-h-11 rounded border bg-background px-2"
+                      value={member.role}
+                      disabled={
+                        runtime.busy || runtime.data?.role !== "owner" || member.role === "owner"
+                      }
+                      onChange={(e) =>
+                        void runtime.act(() =>
+                          teamRoleFn({
+                            data: {
+                              projectId: runtime.projectId,
+                              userId: member.user_id,
+                              role: e.target.value as "editor" | "viewer",
+                            },
+                          }),
+                        )
+                      }
+                    >
+                      <option value="owner">{m.fi3_owner()}</option>
+                      <option value="editor">{m.fi3_editor()}</option>
+                      <option value="viewer">{m.fi3_viewer()}</option>
+                    </select>
+                  </label>
+                </li>
+              ))}
+            </ul>
           ) : tab === "activity" ? (
             <div className="space-y-4">
-              <section aria-label={m.p7_approval()} className="rounded-lg border p-4">
-                <p className="font-medium">{m.p7_approval()}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{m.p7_approval_summary()}</p>
-                <p className="mt-2 text-sm">{m.p7_risk()}: EXTERNAL_ACTION</p>
-                <div className="mt-3 grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    disabled={!onApprovalDecision || (role !== "owner" && role !== "admin")}
-                    onClick={() => onApprovalDecision?.("approved")}
-                    className="min-h-11 rounded-md bg-primary px-3 text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
-                  >
-                    {m.p7_approve()}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={!onApprovalDecision || (role !== "owner" && role !== "admin")}
-                    onClick={() => onApprovalDecision?.("rejected")}
-                    className="min-h-11 rounded-md border px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
-                  >
-                    {m.p7_reject()}
-                  </button>
-                </div>
-              </section>
-              <ol className="space-y-3">
-                <li className="rounded-lg border p-4 text-sm">
-                  {m.p4_waiting()} · {m.p4_automations()}
-                </li>
-                <li className="rounded-lg border p-4 text-sm">{m.p4_activity()}</li>
+              <JobArtifacts runtime={runtime} />
+              <ol>
+                {runtime.data?.activity.map((a) => (
+                  <li key={a.id} className="rounded border p-3">
+                    <span>{a.summary}</span>
+                    <time className="ms-3">{a.createdAt}</time>
+                  </li>
+                ))}
               </ol>
             </div>
-          ) : role === "owner" || role === "admin" ? (
-            <ProductionOperations />
           ) : (
-            <p role="alert">{m.p7_unavailable()}</p>
+            <JobArtifacts runtime={runtime} />
           )}
         </section>
       </div>

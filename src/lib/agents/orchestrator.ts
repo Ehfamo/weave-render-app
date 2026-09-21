@@ -4,6 +4,8 @@ import { defaultApprovalPolicy, type ApprovalStore } from "./approval.ts";
 import type { DurableApprovalAuthority } from "./durable-approval.ts";
 import type {
   AgentContext,
+  AgentCheckpoint,
+  AgentCheckpointPort,
   AgentExecution,
   AgentRuntime,
   AgentTask,
@@ -39,6 +41,7 @@ export class TaskOrchestrator {
     durableApprovals?: DurableApprovalAuthority;
     brain: ProjectBrainService;
     gateway: ModelGatewayPort;
+    prepareContext?: (context: AgentContext) => Promise<AgentContext>;
     now?: () => string;
     id?: () => string;
   };
@@ -49,6 +52,7 @@ export class TaskOrchestrator {
       durableApprovals?: DurableApprovalAuthority;
       brain: ProjectBrainService;
       gateway: ModelGatewayPort;
+      prepareContext?: (context: AgentContext) => Promise<AgentContext>;
       now?: () => string;
       id?: () => string;
     },
@@ -80,7 +84,11 @@ export class TaskOrchestrator {
   }
   async execute(
     task: AgentTask,
-    options: { signal?: AbortSignal; resumeApprovalId?: string } = {},
+    options: {
+      signal?: AbortSignal;
+      resumeApprovalId?: string;
+      checkpoint?: AgentCheckpointPort;
+    } = {},
   ): Promise<AgentExecution> {
     const startedAt = this.now(),
       events: AgentTraceEvent[] = [],
@@ -130,14 +138,29 @@ export class TaskOrchestrator {
     options.signal?.addEventListener("abort", () => controller.abort(), { once: true });
     try {
       setStatus("planning");
-      const bounded = await this.deps.brain.buildContext(task.projectId, {
-        conversationId: task.conversationId,
-        maxCharacters: Math.min(32000, this.limits.maxContextCharacters),
-      });
+      const restored = await options.checkpoint?.load();
+      if (
+        restored &&
+        (restored.context.task.id !== task.id ||
+          restored.context.task.projectId !== task.projectId ||
+          restored.context.task.userId !== task.userId)
+      )
+        throw new Error("CHECKPOINT_SCOPE_MISMATCH");
+      if (restored?.inFlight?.consequential) throw new Error("ACTION_OUTCOME_UNKNOWN");
+      const bounded = restored
+        ? {
+            text: restored.context.boundedContext!,
+            maxCharacters: restored.context.maxCharacters,
+            truncated: restored.context.truncated,
+          }
+        : await this.deps.brain.buildContext(task.projectId, {
+            conversationId: task.conversationId,
+            maxCharacters: Math.min(32000, this.limits.maxContextCharacters),
+          });
       const sections = (JSON.parse(bounded.text) as { sections: { kind: string; text: string }[] })
         .sections;
       const of = (kind: string) => sections.filter((s) => s.kind === kind).map((s) => s.text);
-      const context: AgentContext = {
+      let context: AgentContext = restored?.context ?? {
         task,
         projectSummary: of("goal")[0] ?? of("identity")[0] ?? "",
         instructions: of("instruction"),
@@ -150,12 +173,29 @@ export class TaskOrchestrator {
         truncated: bounded.truncated,
         boundedContext: bounded.text,
       };
-      const plan = await agent.plan(context);
+      if (!restored && this.deps.prepareContext) context = await this.deps.prepareContext(context);
+      const plan = restored?.plan ?? (await agent.plan(context));
       if (plan.steps.length > this.limits.maxSteps) throw new Error("STEP_LIMIT_EXCEEDED");
-      const outputs: ToolResult[] = [];
+      const outputs: ToolResult[] = restored?.outputs ?? [];
+      const checkpoint: AgentCheckpoint = restored ?? {
+        context,
+        plan,
+        outputs,
+        completedStepIds: [],
+      };
+      await options.checkpoint?.save(checkpoint);
       let calls = 0;
       setStatus("running");
+      let resumeApprovalId = options.resumeApprovalId;
       for (const planned of plan.steps) {
+        if (checkpoint.completedStepIds.includes(planned.id)) {
+          steps.push({ id: planned.id, toolId: planned.toolId, status: "completed" });
+          continue;
+        }
+        if (await options.checkpoint?.cancelled()) {
+          setStatus("cancelled");
+          return finish({ error: cleanError("CANCELLED") });
+        }
         if (controller.signal.aborted) {
           setStatus(options.signal?.aborted ? "cancelled" : "failed");
           return finish({
@@ -168,10 +208,10 @@ export class TaskOrchestrator {
         const approvalRequired = defaultApprovalPolicy.requiresApproval(tool.risk),
           approvalId = `${task.id}:${planned.id}:${tool.id}`;
         let approved = false;
-        if (approvalRequired && options.resumeApprovalId) {
+        if (approvalRequired && resumeApprovalId) {
           if (!this.deps.durableApprovals) throw new Error("DURABLE_APPROVAL_REQUIRED");
           await this.deps.durableApprovals.authorizeContinuation({
-            approvalId: options.resumeApprovalId,
+            approvalId: resumeApprovalId,
             taskId: task.id,
             executionId: task.id,
             stepId: planned.id,
@@ -179,12 +219,9 @@ export class TaskOrchestrator {
             projectId: task.projectId,
           });
           approved = true;
-          event(
-            "approval",
-            { approvalId: options.resumeApprovalId, decision: "approved" },
-            planned.id,
-          );
+          event("approval", { approvalId: resumeApprovalId, decision: "approved" }, planned.id);
         }
+        if (approved) resumeApprovalId = undefined;
         if (approvalRequired && !approved) {
           if (this.deps.durableApprovals) {
             await this.deps.durableApprovals.request({
@@ -214,6 +251,8 @@ export class TaskOrchestrator {
           setStatus("waiting_approval");
           return finish({});
         }
+        checkpoint.inFlight = { stepId: planned.id, consequential: approvalRequired };
+        await options.checkpoint?.save(checkpoint);
         const step = {
           id: planned.id,
           toolId: tool.id,
@@ -232,7 +271,7 @@ export class TaskOrchestrator {
               signal: controller.signal,
             },
           );
-          if (output.ok || !output.error?.retryable) break;
+          if (output.ok || !output.error?.retryable || approvalRequired) break;
           retries++;
         } while (retries <= this.limits.maxRetries);
         outputs.push(output);
@@ -241,10 +280,21 @@ export class TaskOrchestrator {
           completedAt: this.now(),
           ...(output.error ? { error: output.error } : {}),
         });
+        if (output.ok) {
+          checkpoint.completedStepIds.push(planned.id);
+          delete checkpoint.inFlight;
+          await options.checkpoint?.save(checkpoint);
+        }
         if (!output.ok) {
           setStatus("failed");
-          return finish({ error: output.error });
+          return finish({
+            error: approvalRequired ? cleanError("ACTION_OUTCOME_UNKNOWN") : output.error,
+          });
         }
+      }
+      if (controller.signal.aborted || (await options.checkpoint?.cancelled())) {
+        setStatus("cancelled");
+        return finish({ error: cleanError("CANCELLED") });
       }
       const result = await agent.finish(context, outputs);
       setStatus("completed");
@@ -254,7 +304,12 @@ export class TaskOrchestrator {
       return finish({
         error: cleanError(
           error instanceof Error &&
-            ["STEP_LIMIT_EXCEEDED", "TOOL_CALL_LIMIT_EXCEEDED"].includes(error.message)
+            [
+              "STEP_LIMIT_EXCEEDED",
+              "TOOL_CALL_LIMIT_EXCEEDED",
+              "ACTION_OUTCOME_UNKNOWN",
+              "CHECKPOINT_SCOPE_MISMATCH",
+            ].includes(error.message)
             ? error.message
             : "ORCHESTRATION_FAILED",
         ),

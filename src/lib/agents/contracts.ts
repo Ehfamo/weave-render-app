@@ -10,7 +10,8 @@ export const AGENT_TASK_STATUSES = [
   "cancelled",
 ] as const;
 export type AgentTaskStatus = (typeof AGENT_TASK_STATUSES)[number];
-export type AgentKind = "research" | "coding" | "browser" | `business.${string}`;
+export type AgentKind =
+  "research" | "coding" | "browser" | `business.${string}` | "creative" | "automation";
 export type AgentCapability =
   | "workspace.search"
   | "project.context"
@@ -21,7 +22,9 @@ export type AgentCapability =
   | "code.validate"
   | "browser.navigate"
   | "browser.inspect"
-  | "browser.interact";
+  | "browser.interact"
+  | "creative.generate"
+  | "automation.action";
 export type RiskClass =
   "SAFE_READ" | "LOW_RISK_WRITE" | "EXTERNAL_ACTION" | "DESTRUCTIVE" | "SENSITIVE";
 
@@ -51,6 +54,10 @@ export interface AgentContext {
   maxCharacters: number;
   truncated: boolean;
   boundedContext?: string;
+  intelligence?: {
+    intent: import("../intelligence/contracts.ts").ExecutionIntent;
+    plan: import("../intelligence/contracts.ts").ExecutionPlan;
+  };
 }
 export interface AgentPlanStep {
   id: string;
@@ -177,4 +184,18 @@ export interface AgentRuntime {
   definition: AgentDefinition;
   plan(context: AgentContext): Promise<AgentPlan>;
   finish(context: AgentContext, outputs: readonly ToolResult[]): Promise<AgentResult>;
+}
+
+/** Private server checkpoint; never included in public traces. */
+export interface AgentCheckpoint {
+  context: AgentContext;
+  plan: AgentPlan;
+  outputs: ToolResult[];
+  completedStepIds: string[];
+  inFlight?: { stepId: string; consequential: boolean };
+}
+export interface AgentCheckpointPort {
+  load(): Promise<AgentCheckpoint | null>;
+  save(value: AgentCheckpoint): Promise<void>;
+  cancelled(): Promise<boolean>;
 }

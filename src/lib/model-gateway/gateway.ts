@@ -59,13 +59,16 @@ export function rankModels(
         finiteNonnegative(m.quality) &&
         m.quality <= 1 &&
         finiteNonnegative(m.estimatedLatencyMs) &&
-        finiteNonnegative(m.estimatedCostPer1kTokensUsd),
+        (m.estimatedCostPer1kTokensUsd === undefined ||
+          finiteNonnegative(m.estimatedCostPer1kTokensUsd)),
     )
     .map((m) => ({
       model: m,
       score:
         (weights.latency * m.estimatedLatencyMs) / (m.estimatedLatencyMs + 1000) +
-        (weights.cost * m.estimatedCostPer1kTokensUsd) / (m.estimatedCostPer1kTokensUsd + 1) +
+        (m.estimatedCostPer1kTokensUsd === undefined
+          ? weights.cost
+          : (weights.cost * m.estimatedCostPer1kTokensUsd) / (m.estimatedCostPer1kTokensUsd + 1)) +
         weights.quality * (1 - m.quality),
     }))
     .sort(
@@ -89,7 +92,9 @@ function validRequest(r: ModelRequest): boolean {
     r.input.trim().length > 0 &&
     r.input.length <= 1_000_000 &&
     Object.hasOwn(ROUTING_POLICY, r.mode) &&
-    ["text", "structured", "embedding"].includes(r.capability) &&
+    ["text", "structured", "embedding", "image", "video", "audio", "voice"].includes(
+      r.capability,
+    ) &&
     (r.maxOutputTokens === undefined ||
       (Number.isSafeInteger(r.maxOutputTokens) && r.maxOutputTokens > 0))
   );
@@ -107,10 +112,28 @@ function cleanResult(result: AdapterResult, request: ModelRequest): AdapterResul
     if (!Array.isArray(out.values) || !out.values.length || !out.values.every(Number.isFinite))
       throw new Error("Invalid embedding");
     output = { kind: "embedding" as const, values: [...out.values] };
-  } else {
+  } else if (
+    out.kind === "image" ||
+    out.kind === "video" ||
+    out.kind === "audio" ||
+    out.kind === "voice"
+  ) {
+    const url = new URL(out.url);
+    if (
+      out.url.length > 4000 ||
+      url.protocol !== "https:" ||
+      url.username ||
+      url.password ||
+      !out.mimeType ||
+      out.mimeType.length > 200
+    )
+      throw new Error("Invalid media output");
+    output = { kind: out.kind, url: out.url, mimeType: out.mimeType };
+  } else if (out.kind === "structured") {
     // JSON serialization rejects cycles and isolates adapter-owned references.
     output = { kind: "structured" as const, value: JSON.parse(JSON.stringify(out.value)) };
   }
+  if (!output) throw new Error("Invalid output");
   const usage = result.usage;
   const normalizedUsage: import("./contracts.ts").ModelUsage = {};
   for (const key of ["inputTokens", "outputTokens", "totalTokens"] as const) {

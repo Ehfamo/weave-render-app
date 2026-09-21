@@ -78,7 +78,7 @@ function ephemeralServices(userId: string, projectId: string) {
   return { brain, search };
 }
 
-function providerSignals(
+export function providerSignals(
   snapshot: Awaited<
     ReturnType<ReturnType<typeof createModelGatewayRuntime>["registry"]["snapshot"]>
   >,

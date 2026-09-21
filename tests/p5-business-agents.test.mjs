@@ -160,10 +160,15 @@ test("vertical fixtures reject fabricated facts and calculate only fixture metri
 });
 
 test("single business-agent UI is localized responsive and RTL-safe", async () => {
-  const ui = await readFile(
-    new URL("../src/components/xeomx/business/BusinessAgentsWorkspace.tsx", import.meta.url),
-    "utf8",
-  );
+  // FI3 extracted the shared server-backed execution panel; retain every source UX assertion.
+  const ui = (
+    await Promise.all(
+      [
+        "../src/components/xeomx/business/BusinessAgentsWorkspace.tsx",
+        "../src/components/xeomx/runtime/CapabilityPanel.tsx",
+      ].map((path) => readFile(new URL(path, import.meta.url), "utf8")),
+    )
+  ).join("\n");
   for (const token of [
     'dir="auto"',
     "sm:grid-cols",

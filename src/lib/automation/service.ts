@@ -16,6 +16,7 @@ export interface AutomationStore {
   executions(workflowId: string): Promise<AutomationExecution[]>;
   execution?(id: string): Promise<AutomationExecution | null>;
   seenEvent(workflowId: string, eventId: string): Promise<boolean>;
+  dispatch?(workflow: AutomationWorkflow, event: AutomationEvent): Promise<AutomationResult>;
 }
 export class AutomationService {
   private store: AutomationStore;
@@ -58,6 +59,7 @@ export class AutomationService {
   async setEnabled(id: string, enabled: boolean) {
     const w = await this.need(id);
     w.status = enabled ? "enabled" : "disabled";
+    w.version++;
     w.updatedAt = this.now();
     await this.store.saveWorkflow(w);
     return w;
@@ -77,6 +79,22 @@ export class AutomationService {
     if (w.status !== "enabled") throw Error("WORKFLOW_DISABLED");
     if (event.projectId !== w.projectId || event.sourceWorkflowId === w.id)
       throw Error("AUTOMATION_RECURSION");
+    if (event.kind !== w.trigger.kind) throw Error("INVALID_TRIGGER");
+    const payload =
+      event.payload && typeof event.payload === "object" && !Array.isArray(event.payload)
+        ? event.payload
+        : {};
+    if (
+      !w.conditions.every((c) =>
+        c.operator === "exists"
+          ? c.field in payload
+          : c.operator === "eq"
+            ? payload[c.field] === c.value
+            : payload[c.field] !== c.value,
+      )
+    )
+      throw Error("CONDITIONS_NOT_MET");
+    if (this.store.dispatch) return this.store.dispatch(w, event);
     if (await this.store.seenEvent(w.id, event.id)) throw Error("DUPLICATE_EVENT");
     const x: AutomationExecution = {
         id: `${w.id}:${event.id}`,

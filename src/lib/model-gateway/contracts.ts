@@ -1,6 +1,7 @@
 /** XEOMX-owned boundary. No credentials, SDK objects, identity or persistence authority. */
 export type RoutingMode = "FAST" | "BALANCED" | "BEST";
-export type ModelCapability = "text" | "structured" | "embedding";
+export type ModelCapability =
+  "text" | "structured" | "embedding" | "image" | "video" | "audio" | "voice";
 export interface ModelIdentity {
   providerId: string;
   modelId: string;
@@ -15,7 +16,7 @@ export interface ModelDescriptor {
   /** Comparable XEOMX configuration: quality in [0,1], latency ms, USD per 1K tokens. */
   quality: number;
   estimatedLatencyMs: number;
-  estimatedCostPer1kTokensUsd: number;
+  estimatedCostPer1kTokensUsd?: number;
 }
 export interface ModelRequest {
   requestId: string;
@@ -28,7 +29,8 @@ export interface ModelRequest {
 export type ModelOutput =
   | { kind: "text"; text: string }
   | { kind: "structured"; value: JsonValue }
-  | { kind: "embedding"; values: number[] };
+  | { kind: "embedding"; values: number[] }
+  | { kind: "image" | "video" | "audio" | "voice"; url: string; mimeType: string };
 export type JsonValue =
   null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
 export interface ModelUsage {

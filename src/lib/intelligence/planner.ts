@@ -43,6 +43,16 @@ export interface PlanningInventory {
   budget: CostBudget;
   usage?: { inputTokens: number; outputTokens: number };
   allowedToolIds?: ReadonlySet<string>;
+  capabilityOverrides?: Partial<
+    Record<
+      IntelligenceCapability,
+      {
+        agentId: AgentDefinition["id"];
+        toolCapability: ToolDefinition["capability"];
+        modality: import("../model-gateway/contracts.ts").ModelCapability;
+      }
+    >
+  >;
 }
 
 export function planCapabilities(
@@ -56,14 +66,18 @@ export function planCapabilities(
   const requirements: CapabilityRequirement[] = unique.map((capability) => ({
     capability,
     required: true,
-    modality: MODEL_CAPABILITY(capability),
+    modality: inventory.capabilityOverrides?.[capability]?.modality ?? MODEL_CAPABILITY(capability),
   }));
   const steps: ExecutionPlan["steps"][number][] = requirements.map((requirement, index) => {
-    const preferred = AGENT_CAPABILITY[requirement.capability];
+    const preferred =
+      inventory.capabilityOverrides?.[requirement.capability]?.agentId ??
+      AGENT_CAPABILITY[requirement.capability];
     const agent =
       inventory.agents.find((x) => x.enabled && x.id === preferred) ??
       inventory.agents.find((x) => x.enabled);
-    const neededToolCapability = toolCapability(requirement.capability);
+    const neededToolCapability =
+      inventory.capabilityOverrides?.[requirement.capability]?.toolCapability ??
+      toolCapability(requirement.capability);
     const tools = inventory.tools.filter(
       (x) =>
         x.enabled &&

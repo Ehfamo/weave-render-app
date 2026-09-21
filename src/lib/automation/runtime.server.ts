@@ -59,15 +59,40 @@ export class SupabaseP4Store implements AutomationStore, CollaborationStore {
         }
       : null;
   }
+  async setMemberRole(
+    projectId: string,
+    userId: string,
+    value: import("../collaboration/contracts.ts").WorkspaceRole,
+  ) {
+    if (!["editor", "viewer"].includes(value) || (await this.role(projectId)) !== "owner")
+      throw Error("COLLABORATION_FORBIDDEN");
+    const { error } = await this.client
+      .from("project_members")
+      .update({ role: value })
+      .eq("project_id", projectId)
+      .eq("user_id", userId)
+      .neq("role", "owner");
+    fail(error);
+  }
   async saveWorkflow(v: AutomationWorkflow) {
     if (v.ownerId !== this.actorId) throw Error("AUTOMATION_FORBIDDEN");
-    const { error } = await this.client.from("workflow_definitions").upsert({
-      id: v.id,
-      project_id: v.projectId,
-      owner_id: this.actorId,
+    const { data: existing, error: loadError } = await this.client
+      .from("workflow_definitions")
+      .select("id,owner_id,project_id")
+      .eq("id", v.id)
+      .maybeSingle();
+    fail(loadError);
+    if (existing && (existing.owner_id !== this.actorId || existing.project_id !== v.projectId))
+      throw Error("AUTOMATION_FORBIDDEN");
+    const values = {
       name: v.name,
       status: v.status === "enabled" ? "active" : v.status === "draft" ? "draft" : "paused",
-    });
+    };
+    const { error } = existing
+      ? await this.client.from("workflow_definitions").update(values).eq("id", v.id)
+      : await this.client
+          .from("workflow_definitions")
+          .insert({ id: v.id, project_id: v.projectId, owner_id: this.actorId, ...values });
     fail(error);
     const { count, error: countError } = await this.client
       .from("workflow_versions")

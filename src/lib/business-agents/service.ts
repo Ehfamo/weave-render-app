@@ -1,5 +1,5 @@
 import type { TaskOrchestrator } from "../agents/orchestrator.ts";
-import type { AgentExecution } from "../agents/contracts.ts";
+import type { AgentExecution, AgentCheckpointPort } from "../agents/contracts.ts";
 import type {
   BusinessArtifact,
   BusinessRunContext,
@@ -29,6 +29,11 @@ export class BusinessAgentService {
   async run(
     context: BusinessRunContext,
     requestedAction?: HumanReviewAction,
+    options: {
+      signal?: AbortSignal;
+      resumeApprovalId?: string;
+      checkpoint?: AgentCheckpointPort;
+    } = {},
   ): Promise<BusinessRunResult> {
     if (!(await this.authorization.canUse(context.projectId, context.userId)))
       throw Error("PROJECT_ACCESS_DENIED");
@@ -39,15 +44,18 @@ export class BusinessAgentService {
       this.orchestrator.registerAgent(createBusinessAgentRuntime(definition));
       this.registered.add(runtimeId);
     }
-    const execution: AgentExecution = await this.orchestrator.execute({
-      id: context.taskId,
-      userId: context.userId,
-      projectId: context.projectId,
-      goal: context.goal,
-      requestedAgent: runtimeId,
-      routingMode: context.routingMode,
-      createdAt: new Date().toISOString(),
-    });
+    const execution: AgentExecution = await this.orchestrator.execute(
+      {
+        id: context.taskId,
+        userId: context.userId,
+        projectId: context.projectId,
+        goal: context.goal,
+        requestedAgent: runtimeId,
+        routingMode: context.routingMode,
+        createdAt: new Date().toISOString(),
+      },
+      options,
+    );
     const requiresReview = requestedAction
       ? defaultHumanReviewPolicy.requiresReview(requestedAction)
       : false;
@@ -70,7 +78,7 @@ export class BusinessAgentService {
       pack: definition.pack,
       agentId: definition.id,
       status: requiresReview ? "waiting_approval" : execution.trace.status,
-      artifacts: [artifact],
+      artifacts: execution.trace.status === "completed" ? [artifact] : [],
       sources,
       toolUsage: execution.trace.steps.flatMap((x) => (x.toolId ? [x.toolId] : [])),
       modelRoute: execution.trace.events.find((x) => x.type === "model")?.metadata.route as

@@ -30,7 +30,13 @@ export interface DurableApprovalAdapter {
 export class DurableApprovalAuthority {
   private readonly adapter: DurableApprovalAdapter;
   private readonly now: () => string;
-  constructor(adapter: DurableApprovalAdapter, now = () => new Date().toISOString()) {
+  private readonly allowClaimedTask: boolean;
+  constructor(
+    adapter: DurableApprovalAdapter,
+    now = () => new Date().toISOString(),
+    allowClaimedTask = false,
+  ) {
+    this.allowClaimedTask = allowClaimedTask;
     this.adapter = adapter;
     this.now = now;
   }
@@ -45,7 +51,7 @@ export class DurableApprovalAuthority {
     input: Omit<Parameters<DurableApprovalAdapter["consumeApproved"]>[0], "now">,
   ) {
     const state = await this.adapter.taskState(input.taskId, input.executionId);
-    if (state !== "queued")
+    if (state !== "queued" && !(this.allowClaimedTask && state === "running"))
       throw new Error(state === "cancelled" ? "TASK_CANCELLED" : "TASK_NOT_RESUMABLE");
     const approval = await this.adapter.consumeApproved({ ...input, now: this.now() });
     if (!approval) throw new Error("APPROVAL_INVALID_EXPIRED_OR_CONSUMED");

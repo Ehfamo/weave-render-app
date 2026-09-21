@@ -7,6 +7,7 @@ import { useProjectContext } from "@/components/xeomx/os/ProjectContextProvider"
 import { useAuth } from "@/hooks/use-auth";
 import { editDurableProjectFn, projectWorkspaceFn } from "@/lib/projects/functions";
 import { m } from "@/paraglide/messages.js";
+import { ProjectRuntimeOutputs } from "@/components/xeomx/runtime/ProjectRuntimeOutputs";
 import { getLocale } from "@/paraglide/runtime.js";
 
 export function ProjectWorkspace({
@@ -130,6 +131,18 @@ export function ProjectWorkspace({
                 {failed ? <p role="alert">{m.fi2_error()}</p> : null}
               </form>
             </details>
+            <nav className="flex flex-wrap gap-4" aria-label={m.fi3_capabilities()}>
+              <Link to="/creative-workspace" search={{ projectId }} className="min-h-11 underline">
+                {m.creative_title()}
+              </Link>
+              <Link to="/business-agents" search={{ projectId }} className="min-h-11 underline">
+                {m.p5_title()}
+              </Link>
+              <Link to="/project-operations" search={{ projectId }} className="min-h-11 underline">
+                {m.p4_title()}
+              </Link>
+            </nav>
+            <ProjectRuntimeOutputs projectId={projectId} />
             <XeomxAiWorkspace
               key={`${user?.id}:${projectId}`}
               embedded

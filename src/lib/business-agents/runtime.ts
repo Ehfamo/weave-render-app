@@ -25,6 +25,7 @@ export function createBusinessAgentRuntime(definition: BusinessAgentDefinition):
         `Output schema: ${definition.outputSchema}`,
         ...definition.instructions,
         `Goal: ${context.task.goal}`,
+        `Authorized bounded project context: ${context.boundedContext ?? context.projectSummary}`,
       ].join("\n");
       return {
         objective: context.task.goal,
@@ -33,7 +34,7 @@ export function createBusinessAgentRuntime(definition: BusinessAgentDefinition):
             id: "business-context",
             capability: "workspace.search",
             toolId: "workspace.search",
-            input: { query: context.task.goal, projectId: context.task.projectId },
+            input: { query: context.task.goal.slice(0, 300), projectId: context.task.projectId },
           },
           {
             id: "business-reason",
@@ -42,7 +43,7 @@ export function createBusinessAgentRuntime(definition: BusinessAgentDefinition):
             input: {
               task: definition.id,
               prompt,
-              routingMode: context.task.routingMode ?? "BALANCED",
+              mode: context.task.routingMode ?? "BALANCED",
             },
           },
         ],
@@ -50,6 +51,8 @@ export function createBusinessAgentRuntime(definition: BusinessAgentDefinition):
     },
     async finish(context, outputs): Promise<AgentResult> {
       const values = successful(outputs);
+      if (values.length !== outputs.length || typeof values[1] !== "string" || !values[1].trim())
+        throw Error("BUSINESS_OUTPUT_UNAVAILABLE");
       const search = values[0] as
         { results?: { id: string; title: string; target?: string }[] } | undefined;
       const sources: BusinessSource[] = (search?.results ?? []).map((source) => ({
@@ -57,10 +60,7 @@ export function createBusinessAgentRuntime(definition: BusinessAgentDefinition):
         provenance: "workspace",
       }));
       return {
-        summary:
-          typeof values[1] === "string"
-            ? values[1]
-            : `${definition.name} completed the bounded draft.`,
+        summary: values[1],
         data: {
           agentId: definition.id,
           pack: definition.pack,

@@ -15,6 +15,7 @@ export interface CollaborationStore {
   appendActivity(v: ActivityEntry): Promise<void>;
   activity(projectId: string): Promise<ActivityEntry[]>;
   saveComment(v: CollaborationComment): Promise<void>;
+  setMemberRole?(projectId: string, userId: string, role: WorkspaceRole): Promise<void>;
 }
 export class CollaborationService {
   private store: CollaborationStore;
@@ -65,6 +66,8 @@ export class CollaborationService {
   async changeRole(projectId: string, userId: string, role: WorkspaceRole) {
     await this.auth(projectId, "manage_members");
     if (userId === this.store.actorId && role !== "owner") throw Error("OWNER_ROLE_IMMUTABLE");
+    if (!this.store.setMemberRole) throw Error("ROLE_CHANGE_UNAVAILABLE");
+    await this.store.setMemberRole(projectId, userId, role);
     return role;
   }
 }

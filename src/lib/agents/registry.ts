@@ -61,7 +61,17 @@ export class AgentRegistry {
           await tool.execute(structuredClone(invocation.input), options.signal),
         ),
       };
-    } catch {
+    } catch (error) {
+      const code = error instanceof Error ? error.message : "";
+      if (
+        [
+          "NOT_CONFIGURED",
+          "PROVIDER_UNAVAILABLE",
+          "TOOL_CANCELLED",
+          "ACTION_OUTCOME_UNKNOWN",
+        ].includes(code)
+      )
+        return safeError(code);
       return safeError("TOOL_EXECUTION_FAILED", true);
     }
   }

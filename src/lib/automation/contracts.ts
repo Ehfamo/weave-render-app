@@ -1,5 +1,6 @@
 import type { JsonValue } from "../model-gateway/contracts.ts";
 export type WorkflowStatus =
+  | "queued"
   | "draft"
   | "enabled"
   | "disabled"

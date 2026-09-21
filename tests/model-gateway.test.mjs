@@ -165,10 +165,15 @@ test("invalid requests and cancellation never execute adapters", async () => {
     { input: "" },
     { mode: "a" },
     { maxOutputTokens: -1 },
-    { capability: "video" },
+    { capability: "unsupported-capability" },
   ]) {
     assert.equal((await gateway.execute({ ...request, ...patch })).error.code, "INVALID_REQUEST");
   }
+  // FI3 adds media capabilities; a text-only adapter cannot satisfy a valid video request.
+  assert.equal(
+    (await gateway.execute({ ...request, capability: "video" })).error.code,
+    "PROVIDER_UNAVAILABLE",
+  );
   const controller = new AbortController();
   controller.abort();
   assert.equal((await gateway.execute(request, controller.signal)).error.code, "TIMEOUT");

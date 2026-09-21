@@ -59,3 +59,19 @@ export interface RuntimeStore {
   retry(id: string): Promise<RuntimeJob>;
   artifacts(projectId: string): Promise<RuntimeArtifact[]>;
 }
+
+/** Definition controls eligibility; persisted invocation state supplies failure/approval state. */
+export function automationRuntimeState(workflow: AutomationWorkflow, jobs: RuntimeJob[]) {
+  if (workflow.status !== "enabled") return workflow.status === "draft" ? "draft" : "paused";
+  const latest = jobs
+    .filter(
+      (job) =>
+        job.projectId === workflow.projectId &&
+        job.request.capability.kind === "automation" &&
+        job.request.capability.workflow.id === workflow.id,
+    )
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+  return latest?.state === "failed" || latest?.state === "waiting_approval"
+    ? latest.state
+    : "enabled";
+}

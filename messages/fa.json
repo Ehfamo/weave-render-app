@@ -823,5 +823,6 @@
   "fi3_owner": "مالک",
   "fi3_editor": "ویرایشگر",
   "fi3_viewer": "بیننده",
-  "fi3_capabilities": "قابلیت‌های پروژه"
+  "fi3_capabilities": "قابلیت‌های پروژه",
+  "fi3_recover": "بازیابی اجرای متوقف‌شده"
 }

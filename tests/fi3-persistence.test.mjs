@@ -213,18 +213,103 @@ test("FI3 canonical PostgreSQL job / approval / artifact transactions and isolat
       );
     },
   );
+  await t.test(
+    "persisted automation pause blocks claims; resume and failure are durable",
+    async () => {
+      await actor(a);
+      const workflow = {
+        id: crypto.randomUUID(),
+        projectId: project,
+        ownerId: a,
+        name: "Persisted automation",
+        status: "enabled",
+        version: 1,
+        steps: [],
+      };
+      workflow.id = await scalar(
+        "INSERT INTO public.workflow_definitions(project_id,owner_id,name,status) VALUES ($1,$2,$3,'active') RETURNING id",
+        [project, a, workflow.name],
+      );
+      await db.query(
+        "INSERT INTO public.workflow_versions(workflow_id,created_by,version,definition) VALUES ($1,$2,1,$3)",
+        [workflow.id, a, workflow],
+      );
+      const next = crypto.randomUUID();
+      await actor(a, true);
+      await command(a, "submit", next, {
+        request: {
+          ...request,
+          idempotencyKey: next,
+          task: { ...request.task, id: next },
+          capability: { kind: "automation", workflow, eventId: crypto.randomUUID() },
+        },
+        hash: "b".repeat(64),
+      });
+      await actor(a);
+      await db.query("UPDATE public.workflow_definitions SET status='paused' WHERE id=$1", [
+        workflow.id,
+      ]);
+      await actor(a, true);
+      assert.equal(await command(a, "claim", next, { lease }), null);
+      assert.equal((await command(a, "get", next)).state, "queued");
+      await actor(a);
+      await db.query("UPDATE public.workflow_definitions SET status='active' WHERE id=$1", [
+        workflow.id,
+      ]);
+      await actor(a, true);
+      assert.equal((await command(a, "claim", next, { lease })).state, "running");
+      assert.equal(
+        (
+          await command(a, "finish", next, {
+            lease,
+            execution: { trace: { status: "failed" }, error: { code: "NOT_CONFIGURED" } },
+          })
+        ).failure_code,
+        "NOT_CONFIGURED",
+      );
+      assert.equal((await command(a, "get", next)).state, "failed");
+      assert.equal(
+        await scalar("SELECT count(*)::int FROM public.assets WHERE controlled_run_id=$1", [next]),
+        0,
+      );
+    },
+  );
   await t.test("role mutation is durable and viewer cannot submit or claim execution", async () => {
-    await actor(a);
+    await actor(a, true);
     await db.query(
       "INSERT INTO public.project_members(project_id,user_id,role) VALUES ($1,$2,'editor')",
       [project, b],
     );
-    await db.query(
-      "UPDATE public.project_members SET role='viewer' WHERE project_id=$1 AND user_id=$2",
-      [project, b],
+    await actor(a);
+    await assert.rejects(
+      db.query(
+        "UPDATE public.project_members SET role='viewer' WHERE project_id=$1 AND user_id=$2",
+        [project, b],
+      ),
+      /permission denied/,
+    );
+    assert.equal(
+      await scalar("SELECT public.xeomx_change_project_member_role($1,$2,$3)", [
+        project,
+        b,
+        "viewer",
+      ]),
+      "viewer",
+    );
+    await assert.rejects(
+      scalar("SELECT public.xeomx_change_project_member_role($1,$2,$3)", [project, a, "viewer"]),
+      /COLLABORATION_FORBIDDEN/,
+    );
+    await assert.rejects(
+      scalar("SELECT public.xeomx_change_project_member_role($1,$2,$3)", [project, b, "owner"]),
+      /COLLABORATION_FORBIDDEN/,
     );
     await actor(b);
     assert.equal(await scalar("SELECT public.xeomx_project_role($1)", [project]), "viewer");
+    await assert.rejects(
+      scalar("SELECT public.xeomx_change_project_member_role($1,$2,$3)", [project, b, "editor"]),
+      /COLLABORATION_FORBIDDEN/,
+    );
     await actor(b, true);
     const next = crypto.randomUUID();
     await assert.rejects(

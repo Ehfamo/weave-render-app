@@ -5,6 +5,7 @@ import { BUSINESS_PACKS } from "../src/lib/business-agents/registry.ts";
 import { AutomationService } from "../src/lib/automation/service.ts";
 import { CollaborationService } from "../src/lib/collaboration/service.ts";
 import { CreativeHttpAdapter } from "../src/lib/model-gateway/providers/creative-http.ts";
+import { automationRuntimeState } from "../src/lib/capability-runtime/contracts.ts";
 
 for (const intent of ["image", "video", "audio", "voice"])
   test(`Creative ${intent} traverses canonical orchestrator and Model Gateway with bounded project context`, async () => {
@@ -230,6 +231,25 @@ test("forced approval on safe automation step waits before calling provider", as
   await rt.jobs.submit(r);
   assert.equal((await rt.jobs.run(r.task.id)).state, "waiting_approval");
   assert.equal(h.calls.length, 0);
+  assert.equal(automationRuntimeState(w, [...h.jobs.values()]), "waiting_approval");
+  assert.equal(
+    automationRuntimeState({ ...w, status: "disabled" }, [...h.jobs.values()]),
+    "paused",
+  );
+});
+test("Automation failure state comes from its persisted invocation, not other project jobs", async () => {
+  const h = await fixture();
+  h.provider(false);
+  const w = workflow(h.project, [step("draft", "agent.run", { goal: "Prepare brief" })]);
+  const r = h.request("automation", w),
+    rt = h.runtime(r);
+  await rt.jobs.submit(r);
+  await rt.jobs.run(r.task.id);
+  assert.equal(automationRuntimeState(w, [...h.jobs.values()]), "failed");
+  assert.equal(
+    automationRuntimeState({ ...w, projectId: crypto.randomUUID() }, [...h.jobs.values()]),
+    "enabled",
+  );
 });
 test("Team role changes persist and permissions change on next server operation", async () => {
   const members = new Map([

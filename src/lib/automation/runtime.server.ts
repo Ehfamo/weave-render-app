@@ -66,12 +66,11 @@ export class SupabaseP4Store implements AutomationStore, CollaborationStore {
   ) {
     if (!["editor", "viewer"].includes(value) || (await this.role(projectId)) !== "owner")
       throw Error("COLLABORATION_FORBIDDEN");
-    const { error } = await this.client
-      .from("project_members")
-      .update({ role: value })
-      .eq("project_id", projectId)
-      .eq("user_id", userId)
-      .neq("role", "owner");
+    const { error } = await this.client.rpc("xeomx_change_project_member_role", {
+      p_project: projectId,
+      p_member: userId,
+      p_role: value,
+    });
     fail(error);
   }
   async saveWorkflow(v: AutomationWorkflow) {
@@ -88,12 +87,23 @@ export class SupabaseP4Store implements AutomationStore, CollaborationStore {
       name: v.name,
       status: v.status === "enabled" ? "active" : v.status === "draft" ? "draft" : "paused",
     };
-    const { error } = existing
-      ? await this.client.from("workflow_definitions").update(values).eq("id", v.id)
-      : await this.client
-          .from("workflow_definitions")
-          .insert({ id: v.id, project_id: v.projectId, owner_id: this.actorId, ...values });
-    fail(error);
+    if (existing) {
+      const { error } = await this.client
+        .from("workflow_definitions")
+        .update(values)
+        .eq("id", v.id);
+      fail(error);
+    } else {
+      // Canonical ACL reserves identity generation to PostgreSQL.
+      const { data, error } = await this.client
+        .from("workflow_definitions")
+        .insert({ project_id: v.projectId, owner_id: this.actorId, ...values })
+        .select("id")
+        .single();
+      fail(error);
+      if (!data?.id) throw Error("P4_DATABASE_FAILED");
+      v.id = data.id;
+    }
     const { count, error: countError } = await this.client
       .from("workflow_versions")
       .select("id", { count: "exact", head: true })
@@ -111,6 +121,13 @@ export class SupabaseP4Store implements AutomationStore, CollaborationStore {
     fail(e);
   }
   async workflow(id: string): Promise<AutomationWorkflow | null> {
+    const { data: workflow, error: workflowError } = await this.client
+      .from("workflow_definitions")
+      .select("status")
+      .eq("id", id)
+      .maybeSingle();
+    fail(workflowError);
+    if (!workflow) return null;
     const { data, error } = await this.client
       .from("workflow_versions")
       .select("definition")
@@ -119,20 +136,38 @@ export class SupabaseP4Store implements AutomationStore, CollaborationStore {
       .limit(1)
       .maybeSingle();
     fail(error);
-    return (data?.definition as AutomationWorkflow) ?? null;
+    return data?.definition
+      ? {
+          ...(data.definition as AutomationWorkflow),
+          status:
+            workflow.status === "active"
+              ? "enabled"
+              : workflow.status === "draft"
+                ? "draft"
+                : "disabled",
+        }
+      : null;
   }
   async workflows(projectId: string) {
     const { data, error } = await this.client
       .from("workflow_definitions")
-      .select("id,workflow_versions(definition,version)")
+      .select("id,status,workflow_versions(definition,version)")
       .eq("project_id", projectId);
     fail(error);
     return (data ?? []).flatMap((x: Row) => {
       const versions = x.workflow_versions as Row[] | undefined;
       return versions?.length
         ? [
-            versions.sort((a, b) => Number(b.version) - Number(a.version))[0]
-              .definition as AutomationWorkflow,
+            {
+              ...(versions.sort((a, b) => Number(b.version) - Number(a.version))[0]
+                .definition as AutomationWorkflow),
+              status:
+                x.status === "active"
+                  ? ("enabled" as const)
+                  : x.status === "draft"
+                    ? ("draft" as const)
+                    : ("disabled" as const),
+            },
           ]
         : [];
     });

@@ -4,6 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { object, uuid } from "../memory/service.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { RuntimeRequest } from "./contracts.ts";
+import { automationRuntimeState } from "./contracts.ts";
 import { BUSINESS_PACKS } from "../business-agents/registry.ts";
 
 type Context = { userId: string; supabase: unknown };
@@ -68,7 +69,10 @@ export const capabilityReadFn = createServerFn({ method: "GET" })
       return {
         jobs: jobs.map(publicJob),
         artifacts,
-        workflows,
+        workflows: workflows.map((workflow) => ({
+          ...workflow,
+          runtimeState: automationRuntimeState(workflow, jobs),
+        })),
         role,
         team: team ?? [],
         activity,

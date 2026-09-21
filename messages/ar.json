@@ -823,5 +823,6 @@
   "fi3_owner": "المالك",
   "fi3_editor": "محرر",
   "fi3_viewer": "مشاهد",
-  "fi3_capabilities": "قدرات المشروع"
+  "fi3_capabilities": "قدرات المشروع",
+  "fi3_recover": "استعادة التنفيذ المنقطع"
 }

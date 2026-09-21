@@ -102,11 +102,15 @@ export function ProjectOperations() {
                   <article key={w.id} className="rounded-lg border p-4">
                     <h3>{w.name}</h3>
                     <p>
-                      {w.status === "draft"
-                        ? m.fi3_draft()
-                        : w.status === "enabled"
-                          ? m.p4_enabled()
-                          : m.fi3_paused()}
+                      {w.runtimeState === "waiting_approval"
+                        ? m.p4_waiting()
+                        : w.runtimeState === "failed"
+                          ? m.fi3_failed()
+                          : w.status === "draft"
+                            ? m.fi3_draft()
+                            : w.status === "enabled"
+                              ? m.p4_enabled()
+                              : m.fi3_paused()}
                     </p>
                     <div className="flex flex-wrap gap-2">
                       <button

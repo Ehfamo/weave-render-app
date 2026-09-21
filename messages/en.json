@@ -823,5 +823,6 @@
   "fi3_owner": "Owner",
   "fi3_editor": "Editor",
   "fi3_viewer": "Viewer",
-  "fi3_capabilities": "Project capabilities"
+  "fi3_capabilities": "Project capabilities",
+  "fi3_recover": "Recover interrupted execution"
 }

@@ -43,6 +43,26 @@ CREATE POLICY p4_comments_read ON public.project_collaboration_comments FOR SELE
 DROP POLICY p4_comments_insert ON public.project_collaboration_comments;
 CREATE POLICY p4_comments_insert ON public.project_collaboration_comments FOR INSERT TO authenticated WITH CHECK(author_id=auth.uid() AND public.xeomx_project_role(project_collaboration_comments.project_id) IS NOT NULL);
 
+-- Keep the Stage 5.3 prohibition on direct membership writes. This narrow operation
+-- changes only existing non-owner memberships in an active project owned by auth.uid().
+CREATE FUNCTION public.xeomx_change_project_member_role(p_project uuid,p_member uuid,p_role text)
+RETURNS text LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
+BEGIN
+ IF auth.uid() IS NULL OR p_role IS NULL OR p_role NOT IN ('editor','viewer') THEN
+  RAISE EXCEPTION 'COLLABORATION_FORBIDDEN' USING ERRCODE='42501';
+ END IF;
+ PERFORM 1 FROM public.projects p WHERE p.id=p_project AND p.owner_id=auth.uid() AND p.status='active' FOR UPDATE;
+ IF NOT FOUND OR public.xeomx_project_role(p_project) IS DISTINCT FROM 'owner' THEN
+  RAISE EXCEPTION 'COLLABORATION_FORBIDDEN' USING ERRCODE='42501';
+ END IF;
+ UPDATE public.project_members SET role=p_role
+ WHERE project_id=p_project AND user_id=p_member AND role IN ('editor','viewer') AND user_id<>auth.uid();
+ IF NOT FOUND THEN RAISE EXCEPTION 'COLLABORATION_FORBIDDEN' USING ERRCODE='42501'; END IF;
+ RETURN p_role;
+END $$;
+REVOKE ALL ON FUNCTION public.xeomx_change_project_member_role(uuid,uuid,text) FROM PUBLIC,anon,service_role;
+GRANT EXECUTE ON FUNCTION public.xeomx_change_project_member_role(uuid,uuid,text) TO authenticated;
+
 CREATE FUNCTION private.xeomx_runtime_guard() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
 BEGIN
  IF COALESCE(NULLIF(current_setting('request.jwt.claims',true),'')::jsonb->>'role','') <> 'service_role' THEN RAISE EXCEPTION 'RUNTIME_SERVER_REQUIRED' USING ERRCODE='42501'; END IF;

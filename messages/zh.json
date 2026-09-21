@@ -823,5 +823,6 @@
   "fi3_owner": "所有者",
   "fi3_editor": "编辑者",
   "fi3_viewer": "查看者",
-  "fi3_capabilities": "项目能力"
+  "fi3_capabilities": "项目能力",
+  "fi3_recover": "恢复中断的执行"
 }

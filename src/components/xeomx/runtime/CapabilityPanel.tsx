@@ -54,11 +54,12 @@ export function useCapabilityProject(fixedProjectId?: string) {
       return r.data;
     },
   });
-  const [busy, setBusy] = useState(false);
+  const [pending, setPending] = useState(0);
+  const busy = pending > 0;
   const [failed, setFailed] = useState(false);
-  async function act(work: () => Promise<{ ok: boolean }>) {
-    if (busy) return;
-    setBusy(true);
+  async function act(work: () => Promise<{ ok: boolean }>, concurrent = false) {
+    if (busy && !concurrent) return;
+    setPending((n) => n + 1);
     setFailed(false);
     try {
       if (!(await work()).ok) throw Error();
@@ -70,7 +71,7 @@ export function useCapabilityProject(fixedProjectId?: string) {
     } catch {
       setFailed(true);
     } finally {
-      setBusy(false);
+      setPending((n) => n - 1);
     }
   }
   const data = user && !q.isError ? q.data : undefined;
@@ -137,12 +138,24 @@ export function JobArtifacts({ runtime }: { runtime: ReturnType<typeof useCapabi
                     <button
                       className={runtimeButton}
                       onClick={() =>
-                        void capabilityJobFn({ data: { id: job.id, action: "cancel" } }).then(() =>
-                          runtime.q.refetch(),
+                        void act(
+                          () => capabilityJobFn({ data: { id: job.id, action: "cancel" } }),
+                          true,
                         )
                       }
                     >
                       {m.fi3_cancel()}
+                    </button>
+                  ) : null}
+                  {job.state === "running" && Date.now() - Date.parse(job.updatedAt) > 300000 ? (
+                    <button
+                      disabled={busy}
+                      className={runtimeButton}
+                      onClick={() =>
+                        void act(() => capabilityJobFn({ data: { id: job.id, action: "recover" } }))
+                      }
+                    >
+                      {m.fi3_recover()}
                     </button>
                   ) : null}
                   {job.state === "failed" &&

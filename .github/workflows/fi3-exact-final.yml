@@ -1,0 +1,32 @@
+name: Preserve exact FI3 final closure history
+on:
+  push:
+    branches: [preservation/xeomx-fi3-final-20260921]
+    paths:
+      - .github/workflows/fi3-exact-final.yml
+      - artifacts/fi3-preservation/**
+permissions:
+  contents: write
+jobs:
+  recover-exact-fi3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify bundle and persist exact FI3 branch without rewriting
+        shell: bash
+        run: |
+          set -euo pipefail
+          bundle=artifacts/fi3-preservation/XEOMX_FI3_FINAL_CLOSURE_20260920.bundle
+          expected=daafae5a7ae8de32c743b3ba4a7b50076899f378
+          target=refs/heads/feature/xeomx-fi3-capability-runtime-20260915
+          echo "be4eb601ad78842ae55ce34e50c66eb6414b52f1d4b878f2c70774b8820088c4  $bundle" | sha256sum --check -
+          git cat-file -e 9b6f077baf2a4bf72edaf22ed71da4492d33c18e^{commit}
+          git bundle verify "$bundle"
+          test "$(git bundle list-heads "$bundle" "$target" | cut -d' ' -f1)" = "$expected"
+          git fetch "$bundle" "$target:refs/heads/recovered-fi3-final"
+          git merge-base --is-ancestor 9b6f077baf2a4bf72edaf22ed71da4492d33c18e "$expected"
+          git push origin "$expected:$target"
+          test "$(git ls-remote origin "$target" | cut -f1)" = "$expected"

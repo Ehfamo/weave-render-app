@@ -1,0 +1,151 @@
+{
+  "repository": "Ehfamo/weave-render-app",
+  "source_branch": "feature/xeomx-fi2-projects-memory-continuity-20260915",
+  "source_head": "9b6f077baf2a4bf72edaf22ed71da4492d33c18e",
+  "required_fi1_ancestor": "dcafa525ebae0cf126e7470be3ca9de8065274aa",
+  "final_branch": "feature/xeomx-fi3-capability-runtime-20260915",
+  "final_head": "daafae5a7ae8de32c743b3ba4a7b50076899f378",
+  "checkpoint_head": "f752b36ecea11ce99972427948916f9e9d52b44c",
+  "implementation_head": "55d2102e103d10ea0594938db21d0b669f8bb65a",
+  "ancestry": "PASS",
+  "files_changed": [
+    "artifacts/fi3-preservation/XEOMX_FI3_FINAL_CLOSURE_20260920.manifest.json",
+    "docs/FI3_CAPABILITY_RUNTIME_CLOSURE_EVIDENCE.md",
+    "messages/ar.json",
+    "messages/en.json",
+    "messages/fa.json",
+    "messages/hi.json",
+    "messages/zh.json",
+    "src/components/xeomx/business/BusinessAgentsWorkspace.tsx",
+    "src/components/xeomx/creative/CreativeWorkspace.tsx",
+    "src/components/xeomx/projects/ProjectWorkspace.tsx",
+    "src/components/xeomx/runtime/CapabilityPanel.tsx",
+    "src/components/xeomx/runtime/ProjectRuntimeOutputs.tsx",
+    "src/components/xeomx/team/ProjectOperations.tsx",
+    "src/lib/agents/contracts.ts",
+    "src/lib/agents/durable-approval.ts",
+    "src/lib/agents/orchestrator.ts",
+    "src/lib/agents/registry.ts",
+    "src/lib/automation/contracts.ts",
+    "src/lib/automation/runtime.server.ts",
+    "src/lib/automation/service.ts",
+    "src/lib/business-agents/runtime.ts",
+    "src/lib/business-agents/service.ts",
+    "src/lib/capability-runtime/composition.ts",
+    "src/lib/capability-runtime/contracts.ts",
+    "src/lib/capability-runtime/functions.ts",
+    "src/lib/capability-runtime/runtime.server.ts",
+    "src/lib/capability-runtime/service.ts",
+    "src/lib/capability-runtime/store.server.ts",
+    "src/lib/collaboration/service.ts",
+    "src/lib/core-execution/runtime.server.ts",
+    "src/lib/intelligence/planner.ts",
+    "src/lib/model-gateway/contracts.ts",
+    "src/lib/model-gateway/gateway.ts",
+    "src/lib/model-gateway/providers/creative-http.ts",
+    "src/lib/model-gateway/runtime.server.ts",
+    "src/routes/_authenticated/business-agents.tsx",
+    "src/routes/_authenticated/creative-workspace.tsx",
+    "src/routes/_authenticated/project-operations.tsx",
+    "supabase/migrations/20260920000000_fi3_capability_runtime.sql",
+    "tests/fi3-capability-runtime.test.mjs",
+    "tests/fi3-persistence.test.mjs",
+    "tests/helpers/fi3-fixture.mjs",
+    "tests/helpers/fi3-postgres.mjs",
+    "tests/model-gateway.test.mjs",
+    "tests/p5-business-agents.test.mjs"
+  ],
+  "migration_state": "MIGRATION_SOURCE_ONLY",
+  "validation": {
+    "fi3-focused": {
+      "tests": 22,
+      "pass": 22,
+      "fail": 0,
+      "skipped": 0
+    },
+    "fi3-postgres": {
+      "tests": 12,
+      "pass": 12,
+      "fail": 0,
+      "skipped": 0
+    },
+    "fi2": {
+      "tests": 24,
+      "pass": 24,
+      "fail": 0,
+      "skipped": 0
+    },
+    "brain-memory-fi1-search": {
+      "tests": 47,
+      "pass": 47,
+      "fail": 0,
+      "skipped": 0
+    },
+    "full": {
+      "tests": 374,
+      "pass": 374,
+      "fail": 0,
+      "skipped": 0
+    },
+    "smoke": {
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "skipped": 0
+    },
+    "typecheck": {
+      "status": "PASS",
+      "errors": 0
+    },
+    "lint": {
+      "status": "PASS",
+      "errors": 0,
+      "warnings": 11,
+      "existing_warnings": 9,
+      "new_fast_refresh_warnings": 2
+    },
+    "build": {
+      "status": "PASS",
+      "preset": "cloudflare-module",
+      "deployed": false
+    },
+    "diff_check": {
+      "status": "PASS"
+    },
+    "secret_review": {
+      "status": "PASS",
+      "method": "changed source review and credential-pattern scan; no credential literals found"
+    }
+  },
+  "source_status": "SOURCE_PASS",
+  "integration_status": "INTEGRATION_PASS",
+  "rendered_status": "NOT_STARTED",
+  "live_status": "NOT_CONFIGURED",
+  "deferred_external": [
+    "Paid/live external providers",
+    "Hosted production migration",
+    "Distributed workers and scheduler",
+    "Rendered browser/mobile/RTL/accessibility validation"
+  ],
+  "main_modified": false,
+  "production_modified": false,
+  "fi4_started": false,
+  "preservation": {
+    "checkpoint_remote_head": "f752b36ecea11ce99972427948916f9e9d52b44c",
+    "checkpoint_recovery_run": "https://github.com/Ehfamo/weave-render-app/actions/runs/35574973241",
+    "final_mechanism": "Verified Git bundle on dedicated GitHub preservation branch; normal non-force exact branch recovery workflow"
+  },
+  "commits_created": [
+    "f752b36ecea11ce99972427948916f9e9d52b44c",
+    "55d2102e103d10ea0594938db21d0b669f8bb65a",
+    "daafae5a7ae8de32c743b3ba4a7b50076899f378"
+  ],
+  "bundle": {
+    "path": "artifacts/fi3-preservation/XEOMX_FI3_FINAL_CLOSURE_20260920.bundle",
+    "sha256": "be4eb601ad78842ae55ce34e50c66eb6414b52f1d4b878f2c70774b8820088c4",
+    "verify": "PASS",
+    "head": "daafae5a7ae8de32c743b3ba4a7b50076899f378",
+    "prerequisite": "9b6f077baf2a4bf72edaf22ed71da4492d33c18e"
+  },
+  "github_persistence_status": "PENDING_EXACT_REF_VERIFICATION"
+}

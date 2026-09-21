@@ -1,0 +1,15 @@
+{
+  "repository": "Ehfamo/weave-render-app",
+  "source_branch": "feature/xeomx-fi2-projects-memory-continuity-20260915",
+  "source_head": "9b6f077baf2a4bf72edaf22ed71da4492d33c18e",
+  "checkpoint_branch": "feature/xeomx-fi3-capability-runtime-20260915",
+  "checkpoint_head": "f752b36ecea11ce99972427948916f9e9d52b44c",
+  "bundle": "artifacts/fi3-preservation/XEOMX_FI3_INTERRUPTED_CHECKPOINT_20260921.bundle",
+  "bundle_sha256": "691f33cf2a6a412de4f1270f4ba9a0c136ce43d703d589261a2a9ba8b0d0150d",
+  "bundle_verify": "PASS",
+  "state": "WIP_INTERRUPTED_CHECKPOINT",
+  "validation": "NOT_CLOSED",
+  "production_modified": false,
+  "main_modified": false,
+  "fi4_started": false
+}

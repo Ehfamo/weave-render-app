@@ -4,7 +4,7 @@ on:
     branches: [preservation/xeomx-fi4-interrupted-20260922]
     paths:
       - .github/workflows/fi4-checkpoint-recovery.yml
-      - artifacts/fi4-preservation/XEOMX_FI4_CHECKPOINT_20260922.bundle
+      - artifacts/fi4-preservation/XEOMX_FI4_VALIDATION_CHECKPOINT_20260922.bundle
 permissions:
   contents: write
 jobs:
@@ -19,10 +19,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          bundle=artifacts/fi4-preservation/XEOMX_FI4_CHECKPOINT_20260922.bundle
-          expected=e5d8fd4a2b9848ce5761f7e9076c784f7626f702
+          bundle=artifacts/fi4-preservation/XEOMX_FI4_VALIDATION_CHECKPOINT_20260922.bundle
+          expected=b41a439a95b8d8fc0a679ee113ce1f0778f85e6f
           target=refs/heads/feature/xeomx-fi4-marketplace-excellence-20260915
-          echo "3cd36c546f73264572412c90723b0bea62ec878e8ffd701f78065cbeac869254  $bundle" | sha256sum --check -
+          echo "eeb65868b5afce0e5c2fd40ec7fde65f6ae1479131ac233fdf7d44c0cf1546ce  $bundle" | sha256sum --check -
           git cat-file -e b33248cb7cd0fb27f76d74b2dab60c265fba84a7^{commit}
           git bundle verify "$bundle"
           test "$(git bundle list-heads "$bundle" "$target" | cut -d' ' -f1)" = "$expected"

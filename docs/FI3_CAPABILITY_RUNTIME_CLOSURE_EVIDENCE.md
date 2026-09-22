@@ -1,7 +1,7 @@
 # FI3 Capability Runtime — source and integration evidence
 
 Repository: `Ehfamo/weave-render-app`.
-Validation date: 2026-09-21. Scope: FI3 only; FI4 NOT_STARTED.
+Validation date: 2026-09-22 (complete matrix re-executed after recovery). Scope: FI3 only; FI4 NOT_STARTED.
 
 ## Exact source and interrupted-work preservation
 
@@ -13,11 +13,15 @@ Validation date: 2026-09-21. Scope: FI3 only; FI4 NOT_STARTED.
 - Checkpoint: `f752b36ecea11ce99972427948916f9e9d52b44c` — `wip(fi3): preserve interrupted capability runtime work`.
 - Closure fixes: `55d2102e103d10ea0594938db21d0b669f8bb65a` — `fix(fi3): enforce collaboration ACL and durable automation state`.
 - This evidence and its manifest are recorded by a subsequent documentation commit, without amending either implementation commit.
-- Final HEAD is the commit introducing this evidence/manifest: resolve with `git log -1 --format=%H -- docs/FI3_CAPABILITY_RUNTIME_CLOSURE_EVIDENCE.md` at the closure ref. Its literal SHA and exact bundle hash are recorded in the companion manifest on `preservation/xeomx-fi3-final-20260921`. A Git commit cannot embed its own literal SHA without changing that SHA.
+- Final HEAD is the commit finalizing this evidence and the September 22 manifest: resolve with `git log -1 --format=%H -- docs/FI3_CAPABILITY_RUNTIME_CLOSURE_EVIDENCE.md` at the closure ref. Its literal SHA and exact bundle hash are recorded in the companion manifest on `preservation/xeomx-fi3-final-20260922`. A Git commit cannot embed its own literal SHA without changing that SHA.
 
 The original working copy's unrelated image modification and temporary Supabase files were left untouched. FI3 uses its existing isolated worktree; no reset, clean, rebase, squash or FI2 reconstruction occurred.
 
 The first normal shell push returned BLOCKED_BY_CREDENTIAL. No shell authentication retry was made. The GitHub connector preserved the exact incremental bundle and a narrowly scoped recovery workflow on `preservation/xeomx-fi3-interrupted-20260921` (preservation commit `db1fa819624869d12506d2e4f66fbc15733fe388`). GitHub Actions run [35574973241](https://github.com/Ehfamo/weave-render-app/actions/runs/35574973241) succeeded. The FI3 branch was then independently read through the connector and its HEAD equalled the exact checkpoint SHA **before** further implementation.
+
+## September 22 interruption recovery
+
+The second interruption left a clean FI3 worktree at `daafae5a7ae8de32c743b3ba4a7b50076899f378`, containing both the ACL/runtime fixes and the first closure evidence commit beyond checkpoint `f752b36`. No source was rebuilt and no additional WIP commit was needed. The already-prepared exact bundle (`be4eb601ad78842ae55ce34e50c66eb6414b52f1d4b878f2c70774b8820088c4`) was recovered through GitHub Actions [35692211060](https://github.com/Ehfamo/weave-render-app/actions/runs/35692211060), and the remote FI3 ref was verified as the exact `daafae5` commit before any new tests or changes. The September 22 closure changes only this evidence and the newly requested dated manifest. The older manifest remains preserved as historical evidence.
 
 ## Canonical execution and persistence
 
@@ -72,7 +76,7 @@ Existing lockfile and installed dependency state were used; no dependency/lockfi
 | `git diff --check`                                        | PASS                                                                                             |
 | Changed-file credential review                            | PASS; no credential literals found; environment/build/cache/archive files excluded               |
 
-The final full-suite run took about five seconds. A preceding run was 373/374 because an old invalid-input test used `video`, now a supported FI3 capability. That fixture now uses an actually unsupported capability and retains its invalid-request/no-dispatch assertions; an additional assertion verifies video without an eligible provider is PROVIDER_UNAVAILABLE. No valid assertion was deleted and no tests were skipped. The moved Business UI source assertion reads the wrapper and shared implementation. Critical FI3 gates are behavioral and transactional, not source-string checks.
+On September 22, targeted tests passed 58/58 before the complete matrix was re-executed in the requested order. All gates passed again, including the production build and package smoke test. The final full-suite run took about five seconds. A preceding run was 373/374 because an old invalid-input test used `video`, now a supported FI3 capability. That fixture now uses an actually unsupported capability and retains its invalid-request/no-dispatch assertions; an additional assertion verifies video without an eligible provider is PROVIDER_UNAVAILABLE. No valid assertion was deleted and no tests were skipped. The moved Business UI source assertion reads the wrapper and shared implementation. Critical FI3 gates are behavioral and transactional, not source-string checks.
 
 Targeted PostgreSQL testing also exposed two genuine ACL errors, both fixed: direct membership UPDATE and caller-supplied workflow ID INSERT. The final tests prove the authorized operations while retaining the original direct-write restrictions.
 
@@ -88,6 +92,6 @@ DEFERRED_EXTERNAL: paid/live creative and model-provider verification; hosted da
 
 ## Exact final preservation
 
-The source manifest is `artifacts/fi3-preservation/XEOMX_FI3_FINAL_CLOSURE_20260920.manifest.json`. Its companion on `preservation/xeomx-fi3-final-20260921` binds the literal final commit, exact bundle SHA-256, file list and validation to GitHub recovery material. The scoped recovery workflow verifies the FI2 prerequisite, bundle hash, bundle HEAD, ancestry and exact remote ref equality, then performs a normal non-force push of only the FI3 branch. No closure is declared from a local-only bundle.
+The source manifest is `artifacts/fi3-preservation/XEOMX_FI3_FINAL_CLOSURE_20260922.manifest.json`. Its companion on `preservation/xeomx-fi3-final-20260922` binds the literal final commit, exact bundle SHA-256, file list and validation to GitHub recovery material. The scoped recovery workflow verifies the FI2 prerequisite, bundle hash, bundle HEAD, ancestry and exact remote ref equality, then performs a normal non-force push of only the FI3 branch. No closure is declared from a local-only bundle.
 
 Files changed are enumerated in the manifest: capability runtime/composition/server functions; Creative/Business/Project/Team UI and three routes; canonical Orchestrator/approvals/registry; automation/collaboration and Business services; P9 planner/Model Gateway/creative transport; five locales; the source-only migration; focused behavioral and PostgreSQL tests/fixtures and two adapted existing UI/Gateway tests; this evidence and manifest.

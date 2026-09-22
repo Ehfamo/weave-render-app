@@ -6,7 +6,7 @@
   "recovered_newer_head": "daafae5a7ae8de32c743b3ba4a7b50076899f378",
   "final_branch": "feature/xeomx-fi3-capability-runtime-20260915",
   "final_head": "b33248cb7cd0fb27f76d74b2dab60c265fba84a7",
-  "remote_head": null,
+  "remote_head": "b33248cb7cd0fb27f76d74b2dab60c265fba84a7",
   "ancestry": {
     "status": "PASS",
     "fi2_source": "9b6f077baf2a4bf72edaf22ed71da4492d33c18e",
@@ -326,7 +326,9 @@
   "preservation": {
     "continuation_recovery_run": "https://github.com/Ehfamo/weave-render-app/actions/runs/35692211060",
     "final_preservation_branch": "preservation/xeomx-fi3-final-20260922",
-    "method": "Exact verified Git bundle and scoped non-force branch recovery workflow; final remote equality required before FI3_PASS"
+    "method": "Exact verified Git bundle and scoped non-force branch recovery workflow; final remote equality required before FI3_PASS",
+    "final_recovery_run": "https://github.com/Ehfamo/weave-render-app/actions/runs/35692629997",
+    "exact_remote_equality": true
   },
   "bundle": {
     "path": "artifacts/fi3-preservation/XEOMX_FI3_FINAL_CLOSURE_20260922.bundle",
@@ -336,5 +338,7 @@
     "verify": "PASS",
     "prerequisite": "9b6f077baf2a4bf72edaf22ed71da4492d33c18e"
   },
-  "github_persistence": "PENDING_EXACT_REF_VERIFICATION"
+  "github_persistence": "VERIFIED_EXACT_HISTORY",
+  "final_status": "FI3_PASS",
+  "next_allowed_stage": "FI4"
 }

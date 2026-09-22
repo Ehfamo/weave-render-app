@@ -1,0 +1,22 @@
+{
+  "repository": "Ehfamo/weave-render-app",
+  "source_head": "b33248cb7cd0fb27f76d74b2dab60c265fba84a7",
+  "branch": "feature/xeomx-fi4-marketplace-excellence-20260915",
+  "checkpoint_head": "e5d8fd4a2b9848ce5761f7e9076c784f7626f702",
+  "bundle": "artifacts/fi4-preservation/XEOMX_FI4_CHECKPOINT_20260922.bundle",
+  "bundle_sha256": "3cd36c546f73264572412c90723b0bea62ec878e8ffd701f78065cbeac869254",
+  "bundle_verify": "PASS",
+  "validation": "NOT_STARTED",
+  "closure": "WIP_NOT_CLOSED",
+  "pending": [
+    "locale messages",
+    "behavioral fixtures and tests",
+    "PostgreSQL integration",
+    "targeted fixes",
+    "full regression/typecheck/lint/build/smoke",
+    "closure evidence and final manifest"
+  ],
+  "main_modified": false,
+  "production_modified": false,
+  "fi5_started": false
+}

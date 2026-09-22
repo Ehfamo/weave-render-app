@@ -1,0 +1,32 @@
+name: Recover exact FI4 checkpoint
+on:
+  push:
+    branches: [preservation/xeomx-fi4-interrupted-20260922]
+    paths:
+      - .github/workflows/fi4-checkpoint-recovery.yml
+      - artifacts/fi4-preservation/XEOMX_FI4_CHECKPOINT_20260922.bundle
+permissions:
+  contents: write
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify and persist exact FI4 history
+        shell: bash
+        run: |
+          set -euo pipefail
+          bundle=artifacts/fi4-preservation/XEOMX_FI4_CHECKPOINT_20260922.bundle
+          expected=e5d8fd4a2b9848ce5761f7e9076c784f7626f702
+          target=refs/heads/feature/xeomx-fi4-marketplace-excellence-20260915
+          echo "3cd36c546f73264572412c90723b0bea62ec878e8ffd701f78065cbeac869254  $bundle" | sha256sum --check -
+          git cat-file -e b33248cb7cd0fb27f76d74b2dab60c265fba84a7^{commit}
+          git bundle verify "$bundle"
+          test "$(git bundle list-heads "$bundle" "$target" | cut -d' ' -f1)" = "$expected"
+          git fetch "$bundle" "$target:refs/heads/recovered-fi4"
+          git merge-base --is-ancestor b33248cb7cd0fb27f76d74b2dab60c265fba84a7 "$expected"
+          git push origin "$expected:$target"
+          test "$(git ls-remote origin "$target" | cut -f1)" = "$expected"

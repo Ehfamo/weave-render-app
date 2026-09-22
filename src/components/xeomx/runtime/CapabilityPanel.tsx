@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useSearch } from "@tanstack/react-router";
@@ -121,6 +122,7 @@ export function JobArtifacts({ runtime }: { runtime: ReturnType<typeof useCapabi
                     ? m.fi1_provider_not_configured()
                     : jobState(job.state)}
                 </p>
+                {job.state === "failed" ? <Link className={runtimeButton} to="/marketplace" search={{reference:job.id,kind:"job"}}>{m.fi4_find_capability()}</Link> : null}
                 <time className="text-xs">{job.updatedAt}</time>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {job.state === "queued" ? (

@@ -52,7 +52,7 @@ class EmptyMemoryAdapter implements MemoryAdapter {
   }
 }
 
-function ephemeralServices(userId: string, projectId: string) {
+export function ephemeralServices(userId: string, projectId: string) {
   const now = new Date().toISOString();
   const memory = new MemoryService(new EmptyMemoryAdapter(userId));
   const brain = new ProjectBrainService(memory, {

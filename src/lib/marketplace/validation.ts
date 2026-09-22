@@ -22,7 +22,7 @@ export function canonicalManifestValue(manifest: MarketplacePackageManifest) {
       : input && typeof input === "object"
         ? Object.fromEntries(
             Object.entries(input)
-              .sort(([a], [b]) => a.localeCompare(b))
+              .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
               .map(([key, child]) => [key, sort(child)]),
           )
         : input;

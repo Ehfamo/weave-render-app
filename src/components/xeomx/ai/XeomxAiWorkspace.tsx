@@ -1,3 +1,4 @@
+import { MarketplaceWorkspace } from "@/components/xeomx/marketplace/MarketplaceWorkspace";
 import { useNavigate } from "@tanstack/react-router";
 import {
   AlertTriangle,
@@ -54,6 +55,7 @@ export function XeomxAiWorkspace({
   conversationId?: string;
   onPersisted?: (id: string) => Promise<void>;
 } = {}) {
+  const [marketplace, setMarketplace] = useState(false);
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [goal, setGoal] = useState("");
@@ -217,6 +219,10 @@ export function XeomxAiWorkspace({
               </div>
             </div>
 
+            {!response?.ok && ["PROVIDER_NOT_CONFIGURED", "CAPABILITY_NOT_YET_INTEGRATED", "NO_CAPABLE_AGENT", "MISSING_CAPABILITY"].includes(result.errorCode ?? "") ? <section>
+              <button type="button" className="min-h-11 rounded-xl border px-4 focus-visible:ring-2" onClick={() => setMarketplace(!marketplace)}>{marketplace ? m.fi4_return_task() : m.fi4_find_capability()}</button>
+              {marketplace ? <MarketplaceWorkspace embedded initialGoal={result.goal} reference={result.conversationId} kind="conversation" /> : null}
+            </section> : null}
             {result.output ? (
               <article className="rounded-2xl border bg-card p-5">
                 <h2 className="text-sm font-semibold">{m.fi1_result()}</h2>

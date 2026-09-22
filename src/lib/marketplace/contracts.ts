@@ -70,7 +70,7 @@ export interface MarketplacePackageManifest {
   previews: readonly MarketplacePreview[];
   changelog: string;
   payload: JsonValue;
-  integrity: { algorithm: "xeomx-canonical-v1"; digest: string };
+  integrity: { algorithm: "xeomx-canonical-v1" | "sha256"; digest: string };
   createdAt: string;
   publishedAt?: string;
 }

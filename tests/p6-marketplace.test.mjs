@@ -6,7 +6,7 @@ import {
   restrictedObjectAdapter,
 } from "../src/lib/marketplace/adapters.ts";
 import { MarketplaceRuntimePolicy } from "../src/lib/marketplace/security.ts";
-import { MarketplaceService } from "../src/lib/marketplace/service.ts";
+import { MarketplaceService } from "../src/lib/marketplace/reference.ts";
 import {
   MarketplaceValidationService,
   manifestIntegrity,

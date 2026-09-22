@@ -893,5 +893,10 @@
   "fi4_version_trial_reviews": "Eligibility uses a completed trial of this exact version. A trial is not live-provider verification.",
   "fi4_versions": "Versions",
   "fi4_why_match": "Why this matches",
-  "fi4_type": "Capability type"
+  "fi4_type": "Capability type",
+  "fi4_user_data": "User data",
+  "fi4_project_data": "Project data",
+  "fi4_files": "Files",
+  "fi4_memory": "Memory",
+  "fi4_connected_apps": "Connected apps"
 }

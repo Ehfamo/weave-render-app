@@ -93,7 +93,7 @@ export class MarketplaceService {
       ]);
     await validatePublishedPackage(entry.manifest, available);
     await this.dependencies(entry, rows);
-    return this.store.publish(entry);
+    return this.store.publish({ ...entry, createdAt: this.now() });
   }
   async discover(
     input: {
@@ -223,6 +223,13 @@ export class MarketplaceService {
     ).flags.map((x) => x.code);
     if (!privacy) signals.push("INCOMPLETE_PRIVACY_DECLARATION");
     if (!manifest.disclosure.signature) signals.push("UNSIGNED_PACKAGE");
+    if (
+      /verified by xeomx|security certified|officially trusted/i.test(
+        `${manifest.title} ${manifest.description}`,
+      )
+    )
+      signals.push("UNSUBSTANTIATED_TRUST_CLAIM");
+    if (manifest.permissions.length > 10) signals.push("EXCESSIVE_PERMISSION_SCOPE");
     if (manifest.permissions.some((x) => x.risk === "sensitive" || x.risk === "external"))
       signals.push("CONSEQUENTIAL_PERMISSIONS");
     if (dependencyState !== "RESOLVED") signals.push("BROKEN_DEPENDENCY");

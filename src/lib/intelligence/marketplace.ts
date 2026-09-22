@@ -79,11 +79,8 @@ export function evaluateCompatibility(
     minimum = parts(manifest.compatibility.minimumVersion);
   if (current === undefined || minimum === undefined)
     return { state: "UNKNOWN", reasons: ["VERSION_NOT_COMPARABLE"] };
-  if (
-    current.findIndex((v, i) => v !== minimum[i]) >= 0 &&
-    current[current.findIndex((v, i) => v !== minimum[i])] <
-      minimum[current.findIndex((v, i) => v !== minimum[i])]
-  )
+  const difference = current.findIndex((v, i) => v !== minimum[i]);
+  if (difference >= 0 && current[difference] < minimum[difference])
     return { state: "INCOMPATIBLE", reasons: ["RUNTIME_VERSION_TOO_OLD"] };
   const denied = manifest.permissions.filter((x) => !context.allowedPermissions.has(x.id));
   if (denied.length) reasons.push("ADDITIONAL_PERMISSION_REQUIRED");

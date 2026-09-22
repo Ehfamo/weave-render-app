@@ -893,5 +893,10 @@
   "fi4_version_trial_reviews": "评价资格基于此确切版本的已完成试用；试用不等于提供商现场验证。",
   "fi4_versions": "版本",
   "fi4_why_match": "匹配原因",
-  "fi4_type": "能力类型"
+  "fi4_type": "能力类型",
+  "fi4_user_data": "用户数据",
+  "fi4_project_data": "项目数据",
+  "fi4_files": "文件",
+  "fi4_memory": "记忆",
+  "fi4_connected_apps": "已连接应用"
 }

@@ -3,6 +3,11 @@ import type { MarketplacePackageManifest, MarketplaceListing } from "./contracts
 export interface MarketplaceDisclosure {
   languages: string[];
   privacy?: {
+    userData?: string;
+    projectData?: string;
+    files?: string;
+    memory?: string;
+    connectedApps?: string;
     dataAccess: string[];
     destinations: string[];
     retention?: string;

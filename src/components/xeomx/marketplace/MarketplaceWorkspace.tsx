@@ -40,8 +40,7 @@ export function MarketplaceWorkspace({
     marketplaceTrialFn = guarded(api.marketplaceTrialFn),
     marketplaceReadinessFn = guarded(api.marketplaceReadinessFn),
     marketplaceApproveFn = guarded(api.marketplaceApproveFn),
-    marketplaceReviewFn = guarded(api.marketplaceReviewFn),
-    marketplaceRecommendFn = guarded(api.marketplaceRecommendFn);
+    marketplaceReviewFn = guarded(api.marketplaceReviewFn);
 
   const [goal, setGoal] = useState(initialGoal),
     [category, setCategory] = useState(""),
@@ -382,6 +381,11 @@ export function MarketplaceWorkspace({
               <p>{status(detail.privacyState)}</p>
               <dl>
                 {Object.entries({
+                  [m.fi4_user_data()]: detail.privacy.userData ?? m.fi4_not_declared(),
+                  [m.fi4_project_data()]: detail.privacy.projectData ?? m.fi4_not_declared(),
+                  [m.fi4_files()]: detail.privacy.files ?? m.fi4_not_declared(),
+                  [m.fi4_memory()]: detail.privacy.memory ?? m.fi4_not_declared(),
+                  [m.fi4_connected_apps()]: detail.privacy.connectedApps ?? m.fi4_not_declared(),
                   [m.fi4_data_access()]:
                     detail.privacy.dataAccess.join(", ") || m.fi4_not_declared(),
                   [m.fi4_destinations()]:
@@ -459,7 +463,7 @@ export function MarketplaceWorkspace({
                 {m.p8_runtime_varies()} · {m.fi4_unknown()}
               </p>
               {!user ? (
-                <Link className={button} to="/auth" search={{ redirect: undefined }}>
+                <Link className={button} to="/auth" search={{ next: "/marketplace" }}>
                   {m.fi4_login_required()}
                 </Link>
               ) : (

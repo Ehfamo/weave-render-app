@@ -1,0 +1,136 @@
+{
+  "repository": "Ehfamo/weave-render-app",
+  "source_branch": "feature/xeomx-fi3-capability-runtime-20260915",
+  "source_head": "b33248cb7cd0fb27f76d74b2dab60c265fba84a7",
+  "final_branch": "feature/xeomx-fi4-marketplace-excellence-20260915",
+  "final_head": {
+    "resolve": "git rev-parse HEAD in the checkout containing this closure evidence",
+    "literal_attestation": "https://github.com/Ehfamo/weave-render-app/blob/preservation/xeomx-fi4-final-20260922/artifacts/fi4-preservation/XEOMX_FI4_FINAL_CLOSURE_20260922.manifest.json"
+  },
+  "remote_head": "VERIFY_AFTER_COMMIT_IN_COMPANION_ATTESTATION",
+  "ancestry": {
+    "FI3": "b33248cb7cd0fb27f76d74b2dab60c265fba84a7",
+    "FI2": "9b6f077baf2a4bf72edaf22ed71da4492d33c18e",
+    "FI1": "dcafa525ebae0cf126e7470be3ca9de8065274aa",
+    "status": "PASS"
+  },
+  "commits": [
+    "e5d8fd4a2b9848ce5761f7e9076c784f7626f702",
+    "b41a439a95b8d8fc0a679ee113ce1f0778f85e6f",
+    "THIS_CLOSURE_COMMIT"
+  ],
+  "files_changed": [
+    "artifacts/fi4-preservation/XEOMX_FI4_FINAL_CLOSURE_20260922.manifest.json",
+    "docs/FI4_MARKETPLACE_EXCELLENCE_I_EVIDENCE.md",
+    "messages/ar.json",
+    "messages/en.json",
+    "messages/fa.json",
+    "messages/hi.json",
+    "messages/zh.json",
+    "src/components/xeomx/ai/XeomxAiWorkspace.tsx",
+    "src/components/xeomx/marketplace/MarketplaceWorkspace.tsx",
+    "src/components/xeomx/runtime/CapabilityPanel.tsx",
+    "src/lib/core-execution/runtime.server.ts",
+    "src/lib/intelligence/marketplace.ts",
+    "src/lib/marketplace/catalog.ts",
+    "src/lib/marketplace/contracts.ts",
+    "src/lib/marketplace/functions.ts",
+    "src/lib/marketplace/integrity.ts",
+    "src/lib/marketplace/runtime.server.ts",
+    "src/lib/marketplace/sandbox.ts",
+    "src/lib/marketplace/service.ts",
+    "src/lib/marketplace/store.server.ts",
+    "src/lib/marketplace/validation.ts",
+    "src/routeTree.gen.ts",
+    "src/routes/_authenticated/marketplace.tsx",
+    "src/routes/marketplace.tsx",
+    "supabase/migrations/20260922000000_fi4_marketplace.sql",
+    "tests/fi4-marketplace.test.mjs",
+    "tests/fi4-persistence.test.mjs",
+    "tests/helpers/fi4-fixture.mjs",
+    "tests/helpers/p6-marketplace-reference.ts",
+    "tests/p6-marketplace.test.mjs",
+    "tests/p8-ux-excellence.test.mjs"
+  ],
+  "migration_state": "MIGRATION_SOURCE_ONLY",
+  "marketplace_persistence": "INTEGRATION_PASS",
+  "guest_discovery": "INTEGRATION_PASS",
+  "semantic_discovery": "INTEGRATION_PASS; bounded P9 intent relevance",
+  "contextual_marketplace": "INTEGRATION_PASS; original conversation/job retained",
+  "sandbox_trial": "INTEGRATION_PASS; bounded text sandbox; no untrusted executable/MCP tools",
+  "trust_center": "SOURCE_PASS; independent evidence dimensions",
+  "package_integrity": "INTEGRATION_PASS; SHA-256 enforced",
+  "signature_state": "NOT_CONFIGURED / NOT_VERIFIED",
+  "mcp_zero_trust": "INTEGRATION_PASS; inspected declarations never auto-trusted or executed",
+  "version_permissions": "INTEGRATION_PASS; explicit version/digest reapproval",
+  "dependency_graph": "INTEGRATION_PASS",
+  "privacy_card": "SOURCE_PASS; undeclared remains NOT_DECLARED",
+  "moderation": "INTEGRATION_PASS; signals not accusations",
+  "verified_reviews": "INTEGRATION_PASS; actual completed version trial required",
+  "fi4_focused_tests": {
+    "passed": 27,
+    "failed": 0,
+    "skipped": 0
+  },
+  "fi3_regression": {
+    "passed": 34,
+    "failed": 0
+  },
+  "fi2_regression": {
+    "passed": 24,
+    "failed": 0
+  },
+  "fi1_regression": {
+    "passed": 13,
+    "failed": 0
+  },
+  "project_brain": {
+    "passed": 12,
+    "failed": 0
+  },
+  "memory": {
+    "passed": 8,
+    "failed": 0
+  },
+  "search_command_center": {
+    "passed": 14,
+    "failed": 0
+  },
+  "postgresql_integration": {
+    "fi4_passed": 13,
+    "fi3_passed": 12,
+    "fi2_passed": 6,
+    "failed": 0,
+    "location": "isolated local PGlite"
+  },
+  "full_suite": {
+    "passed": 414,
+    "failed": 0,
+    "skipped": 0
+  },
+  "typecheck": "PASS",
+  "lint": {
+    "errors": 0,
+    "warnings": 11,
+    "warning_kind": "unchanged Fast Refresh"
+  },
+  "build": "PASS",
+  "smoke": {
+    "passed": 1,
+    "failed": 0
+  },
+  "diff_check": "PASS",
+  "secret_review": "PASS",
+  "deferred_external": [
+    "Signing authority",
+    "Third-party MCP live verification",
+    "Paid/live provider trial",
+    "Hosted production migration",
+    "Rendered browser/mobile/RTL/accessibility QA",
+    "Real-user Marketplace validation"
+  ],
+  "main_modified": false,
+  "production_modified": false,
+  "fi5_started": false,
+  "github_persistence": "Final companion attestation must verify exact remote equality before closure"
+}

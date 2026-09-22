@@ -71,6 +71,7 @@ BEGIN
  INSERT INTO public.marketplace_packages(id,owner_id,visibility,scope_project_id) VALUES(m->>'packageId',p_actor,p_entry->>'visibility',scoped) ON CONFLICT DO NOTHING;
  SELECT * INTO package FROM public.marketplace_packages WHERE id=m->>'packageId' FOR UPDATE;
  IF package.owner_id IS DISTINCT FROM p_actor OR package.visibility IS DISTINCT FROM p_entry->>'visibility' OR package.scope_project_id IS DISTINCT FROM scoped THEN RAISE EXCEPTION 'OWNER_OR_SCOPE_MISMATCH'; END IF;
+ p_entry:=jsonb_set(p_entry,'{createdAt}',to_jsonb(to_char(now() AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')));
  INSERT INTO public.marketplace_versions(id,package_id,version,digest,entry) VALUES((p_entry->>'id')::uuid,m->>'packageId',m->>'version',m#>>'{integrity,digest}',p_entry);
  INSERT INTO public.marketplace_listings(id,public_data) VALUES((p_entry->>'id')::uuid,jsonb_build_object('title',m->>'title','summary',m->>'summary','type',m->>'objectType','version',m->>'version','category',p_entry->>'category'));
  RETURN p_entry;

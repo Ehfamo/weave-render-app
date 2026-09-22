@@ -11,10 +11,10 @@ import {
   type MarketplacePackageManifest,
   type MarketplaceReview,
   type MarketplaceVersion,
-} from "./contracts.ts";
-import type { MarketplaceObjectAdapter } from "./adapters.ts";
-import { MarketplaceValidationService } from "./validation.ts";
-import { MarketplaceRuntimePolicy } from "./security.ts";
+} from "../../src/lib/marketplace/contracts.ts";
+import type { MarketplaceObjectAdapter } from "../../src/lib/marketplace/adapters.ts";
+import { MarketplaceValidationService } from "../../src/lib/marketplace/validation.ts";
+import { MarketplaceRuntimePolicy } from "../../src/lib/marketplace/security.ts";
 
 export interface MarketplaceActor {
   userId: string;

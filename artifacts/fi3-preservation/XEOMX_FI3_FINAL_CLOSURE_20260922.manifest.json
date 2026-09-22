@@ -1,0 +1,340 @@
+{
+  "repository": "Ehfamo/weave-render-app",
+  "source_branch": "feature/xeomx-fi2-projects-memory-continuity-20260915",
+  "source_head": "9b6f077baf2a4bf72edaf22ed71da4492d33c18e",
+  "starting_checkpoint_head": "f752b36ecea11ce99972427948916f9e9d52b44c",
+  "recovered_newer_head": "daafae5a7ae8de32c743b3ba4a7b50076899f378",
+  "final_branch": "feature/xeomx-fi3-capability-runtime-20260915",
+  "final_head": "b33248cb7cd0fb27f76d74b2dab60c265fba84a7",
+  "remote_head": null,
+  "ancestry": {
+    "status": "PASS",
+    "fi2_source": "9b6f077baf2a4bf72edaf22ed71da4492d33c18e",
+    "fi1_ancestor": "dcafa525ebae0cf126e7470be3ca9de8065274aa"
+  },
+  "commits": [
+    "f752b36ecea11ce99972427948916f9e9d52b44c",
+    "55d2102e103d10ea0594938db21d0b669f8bb65a",
+    "daafae5a7ae8de32c743b3ba4a7b50076899f378",
+    "b33248cb7cd0fb27f76d74b2dab60c265fba84a7"
+  ],
+  "files_changed": [
+    "artifacts/fi3-preservation/XEOMX_FI3_FINAL_CLOSURE_20260920.manifest.json",
+    "artifacts/fi3-preservation/XEOMX_FI3_FINAL_CLOSURE_20260922.manifest.json",
+    "docs/FI3_CAPABILITY_RUNTIME_CLOSURE_EVIDENCE.md",
+    "messages/ar.json",
+    "messages/en.json",
+    "messages/fa.json",
+    "messages/hi.json",
+    "messages/zh.json",
+    "src/components/xeomx/business/BusinessAgentsWorkspace.tsx",
+    "src/components/xeomx/creative/CreativeWorkspace.tsx",
+    "src/components/xeomx/projects/ProjectWorkspace.tsx",
+    "src/components/xeomx/runtime/CapabilityPanel.tsx",
+    "src/components/xeomx/runtime/ProjectRuntimeOutputs.tsx",
+    "src/components/xeomx/team/ProjectOperations.tsx",
+    "src/lib/agents/contracts.ts",
+    "src/lib/agents/durable-approval.ts",
+    "src/lib/agents/orchestrator.ts",
+    "src/lib/agents/registry.ts",
+    "src/lib/automation/contracts.ts",
+    "src/lib/automation/runtime.server.ts",
+    "src/lib/automation/service.ts",
+    "src/lib/business-agents/runtime.ts",
+    "src/lib/business-agents/service.ts",
+    "src/lib/capability-runtime/composition.ts",
+    "src/lib/capability-runtime/contracts.ts",
+    "src/lib/capability-runtime/functions.ts",
+    "src/lib/capability-runtime/runtime.server.ts",
+    "src/lib/capability-runtime/service.ts",
+    "src/lib/capability-runtime/store.server.ts",
+    "src/lib/collaboration/service.ts",
+    "src/lib/core-execution/runtime.server.ts",
+    "src/lib/intelligence/planner.ts",
+    "src/lib/model-gateway/contracts.ts",
+    "src/lib/model-gateway/gateway.ts",
+    "src/lib/model-gateway/providers/creative-http.ts",
+    "src/lib/model-gateway/runtime.server.ts",
+    "src/routes/_authenticated/business-agents.tsx",
+    "src/routes/_authenticated/creative-workspace.tsx",
+    "src/routes/_authenticated/project-operations.tsx",
+    "supabase/migrations/20260920000000_fi3_capability_runtime.sql",
+    "tests/fi3-capability-runtime.test.mjs",
+    "tests/fi3-persistence.test.mjs",
+    "tests/helpers/fi3-fixture.mjs",
+    "tests/helpers/fi3-postgres.mjs",
+    "tests/model-gateway.test.mjs",
+    "tests/p5-business-agents.test.mjs"
+  ],
+  "migration_state": "MIGRATION_SOURCE_ONLY",
+  "creative_runtime": {
+    "status": "INTEGRATION_PASS",
+    "path": "CreativeWorkspaceService -> TaskOrchestrator -> Model Gateway -> configured HTTPS provider adapter",
+    "missing_provider": "NOT_CONFIGURED; no artifact",
+    "live_verified": false
+  },
+  "business_agents": {
+    "status": "INTEGRATION_PASS",
+    "areas": [
+      "Research",
+      "Marketing",
+      "Sales",
+      "Support",
+      "Data"
+    ],
+    "path": "BusinessAgentService -> TaskOrchestrator -> Model Gateway"
+  },
+  "automation": {
+    "status": "INTEGRATION_PASS",
+    "states": [
+      "Draft",
+      "Enabled",
+      "Paused",
+      "Failed",
+      "Needs Approval"
+    ],
+    "persistence": "workflow_definitions / workflow_versions / controlled_runs",
+    "scheduler": "DEFERRED_EXTERNAL"
+  },
+  "team_permissions": {
+    "status": "INTEGRATION_PASS",
+    "roles": [
+      "owner",
+      "editor",
+      "viewer"
+    ],
+    "authority": "server auth + restricted RPC + project RLS",
+    "direct_membership_writes": "REVOKED"
+  },
+  "approval_resume": {
+    "status": "INTEGRATION_PASS",
+    "behavior": "Resume saved context/plan/output checkpoint; skip completed steps"
+  },
+  "approval_idempotency": {
+    "status": "INTEGRATION_PASS",
+    "behavior": "exact job/project/step/tool binding; one consume; reject/cancel terminal; uncertain consequential retries denied"
+  },
+  "background_jobs": {
+    "status": "INTEGRATION_PASS",
+    "states": [
+      "Queued",
+      "Running",
+      "Waiting Approval",
+      "Completed",
+      "Failed",
+      "Cancelled"
+    ],
+    "distributed_worker": "DEFERRED_EXTERNAL"
+  },
+  "artifacts": {
+    "status": "INTEGRATION_PASS",
+    "persistence": "canonical assets + conversation messages + project activity",
+    "isolation": "authorized owner/project"
+  },
+  "validation_date": "2026-09-22",
+  "fi3_focused_tests": {
+    "status": "PASS",
+    "exit": 0,
+    "command": [
+      "node",
+      "--experimental-strip-types",
+      "--test",
+      "tests/fi3-capability-runtime.test.mjs"
+    ],
+    "seconds": 0.29,
+    "tests": 22,
+    "pass": 22,
+    "fail": 0,
+    "skipped": 0
+  },
+  "fi2_regression": {
+    "status": "PASS",
+    "exit": 0,
+    "command": [
+      "node",
+      "--experimental-strip-types",
+      "--test",
+      "tests/fi2-projects-continuity.test.mjs",
+      "tests/fi2-persistence-migration.test.mjs"
+    ],
+    "seconds": 3.99,
+    "tests": 24,
+    "pass": 24,
+    "fail": 0,
+    "skipped": 0
+  },
+  "project_brain": {
+    "status": "PASS",
+    "exit": 0,
+    "command": [
+      "node",
+      "--experimental-strip-types",
+      "--test",
+      "tests/project-brain.test.mjs"
+    ],
+    "seconds": 0.22,
+    "tests": 12,
+    "pass": 12,
+    "fail": 0,
+    "skipped": 0
+  },
+  "memory": {
+    "status": "PASS",
+    "exit": 0,
+    "command": [
+      "node",
+      "--experimental-strip-types",
+      "--test",
+      "tests/memory-core.test.mjs"
+    ],
+    "seconds": 0.19,
+    "tests": 8,
+    "pass": 8,
+    "fail": 0,
+    "skipped": 0
+  },
+  "fi1_regression": {
+    "status": "PASS",
+    "exit": 0,
+    "command": [
+      "node",
+      "--experimental-strip-types",
+      "--test",
+      "tests/fi1-core-execution.test.mjs"
+    ],
+    "seconds": 0.21,
+    "tests": 13,
+    "pass": 13,
+    "fail": 0,
+    "skipped": 0
+  },
+  "search_command_center": {
+    "status": "PASS",
+    "exit": 0,
+    "command": [
+      "node",
+      "--experimental-strip-types",
+      "--test",
+      "tests/global-search.test.mjs",
+      "tests/command-center.test.mjs"
+    ],
+    "seconds": 0.23,
+    "tests": 14,
+    "pass": 14,
+    "fail": 0,
+    "skipped": 0
+  },
+  "postgresql_integration": {
+    "status": "PASS",
+    "exit": 0,
+    "command": [
+      "node",
+      "--experimental-strip-types",
+      "--test",
+      "tests/fi3-persistence.test.mjs"
+    ],
+    "seconds": 2.82,
+    "tests": 12,
+    "pass": 12,
+    "fail": 0,
+    "skipped": 0
+  },
+  "full_suite": {
+    "status": "PASS",
+    "exit": 0,
+    "command": [
+      "npm",
+      "test"
+    ],
+    "seconds": 4.66,
+    "tests": 374,
+    "pass": 374,
+    "fail": 0,
+    "skipped": 0
+  },
+  "typecheck": {
+    "status": "PASS",
+    "exit": 0,
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "seconds": 9.85
+  },
+  "lint": {
+    "status": "PASS",
+    "exit": 0,
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "seconds": 12.49,
+    "errors": 0,
+    "warnings": 11
+  },
+  "build": {
+    "status": "PASS",
+    "exit": 0,
+    "command": [
+      "npm",
+      "run",
+      "build"
+    ],
+    "seconds": 18.52
+  },
+  "smoke": {
+    "status": "PASS",
+    "exit": 0,
+    "command": [
+      "npm",
+      "run",
+      "test:smoke"
+    ],
+    "seconds": 0.29,
+    "tests": 1,
+    "pass": 1,
+    "fail": 0,
+    "skipped": 0
+  },
+  "diff_check": {
+    "status": "PASS",
+    "exit": 0,
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "seconds": 0.01
+  },
+  "secret_review": {
+    "status": "PASS",
+    "files_reviewed": 46,
+    "findings": [],
+    "review": "Changed-file credential scan plus server authorization, trace/error and URL review; no environment/build/cache/archive files committed."
+  },
+  "deferred_external": [
+    "Paid/live Creative/provider verification",
+    "Hosted production migration",
+    "Distributed workers and scheduling",
+    "Rendered browser/mobile/RTL/accessibility QA"
+  ],
+  "main_modified": false,
+  "production_modified": false,
+  "fi4_started": false,
+  "preservation": {
+    "continuation_recovery_run": "https://github.com/Ehfamo/weave-render-app/actions/runs/35692211060",
+    "final_preservation_branch": "preservation/xeomx-fi3-final-20260922",
+    "method": "Exact verified Git bundle and scoped non-force branch recovery workflow; final remote equality required before FI3_PASS"
+  },
+  "bundle": {
+    "path": "artifacts/fi3-preservation/XEOMX_FI3_FINAL_CLOSURE_20260922.bundle",
+    "sha256": "de1b807a93e26b04f271828ad0f003122692a8288c83d9fba00fa1af58377d2d",
+    "bytes": 62547,
+    "head": "b33248cb7cd0fb27f76d74b2dab60c265fba84a7",
+    "verify": "PASS",
+    "prerequisite": "9b6f077baf2a4bf72edaf22ed71da4492d33c18e"
+  },
+  "github_persistence": "PENDING_EXACT_REF_VERIFICATION"
+}

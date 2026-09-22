@@ -94,32 +94,29 @@ test("permission updates identify consequential increases and require review", (
     { id: "email.send", kind: "added", to: "external", requiresReview: true },
   ]);
 });
-test("acquire flows directly to destination install use-now and library controls", async () => {
+test("marketplace readiness and trial controls invoke canonical services without fake install success", async () => {
   const ui = await read("src/components/xeomx/marketplace/MarketplaceWorkspace.tsx");
   for (const token of [
-    "setAcquired(true)",
-    "p8_install_destination",
-    "setInstalled(true)",
-    "p8_use_now",
+    "marketplaceReadinessFn",
+    "marketplaceApproveFn",
+    "marketplaceTrialFn",
     "p8_review_permissions",
-    "p8_disable",
-    "p8_uninstall",
+    "fi4_no_install",
   ])
-    assert.match(ui, new RegExp(token.replace(/[()]/g, "\\$&")));
+    assert.ok(ui.includes(token));
+  assert.doesNotMatch(ui, /setAcquired\(true\)|setInstalled\(true\)/);
 });
-test("marketplace exposes safe example preview compare reviews creator fixes ledger and maintenance terminology", async () => {
+test("marketplace exposes truthful trials reviews moderation and maintenance without fabricated commerce", async () => {
   const ui = await read("src/components/xeomx/marketplace/MarketplaceWorkspace.tsx");
   for (const token of [
-    "p8_demo_not_live",
-    "p8_compare",
+    "fi4_sample_notice",
     "p8_no_reviews",
-    "p8_validation_findings",
-    "p8_fix_license",
-    "p8_gross_sales",
-    "p8_commission",
-    "p8_payout_status",
+    "fi4_moderation",
+    "fi4_maintenance",
+    "fi4_unknown",
   ])
-    assert.match(ui, new RegExp(token));
+    assert.ok(ui.includes(token));
+  assert.doesNotMatch(ui, /setAcquired\(true\)|setInstalled\(true\)/);
   assert.deepEqual(MARKETPLACE_STATUS_LABELS, {
     draft: "Draft",
     validating: "Validating",

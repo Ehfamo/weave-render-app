@@ -219,10 +219,31 @@ export function XeomxAiWorkspace({
               </div>
             </div>
 
-            {!response?.ok && ["PROVIDER_NOT_CONFIGURED", "CAPABILITY_NOT_YET_INTEGRATED", "NO_CAPABLE_AGENT", "MISSING_CAPABILITY"].includes(result.errorCode ?? "") ? <section>
-              <button type="button" className="min-h-11 rounded-xl border px-4 focus-visible:ring-2" onClick={() => setMarketplace(!marketplace)}>{marketplace ? m.fi4_return_task() : m.fi4_find_capability()}</button>
-              {marketplace ? <MarketplaceWorkspace embedded initialGoal={result.goal} reference={result.conversationId} kind="conversation" /> : null}
-            </section> : null}
+            {!response?.ok &&
+            [
+              "PROVIDER_NOT_CONFIGURED",
+              "CAPABILITY_NOT_YET_INTEGRATED",
+              "NO_CAPABLE_AGENT",
+              "MISSING_CAPABILITY",
+            ].includes(result.errorCode ?? "") ? (
+              <section>
+                <button
+                  type="button"
+                  className="min-h-11 rounded-xl border px-4 focus-visible:ring-2"
+                  onClick={() => setMarketplace(!marketplace)}
+                >
+                  {marketplace ? m.fi4_return_task() : m.fi4_find_capability()}
+                </button>
+                {marketplace ? (
+                  <MarketplaceWorkspace
+                    embedded
+                    initialGoal={result.goal}
+                    reference={result.conversationId}
+                    kind="conversation"
+                  />
+                ) : null}
+              </section>
+            ) : null}
             {result.output ? (
               <article className="rounded-2xl border bg-card p-5">
                 <h2 className="text-sm font-semibold">{m.fi1_result()}</h2>

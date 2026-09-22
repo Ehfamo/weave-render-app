@@ -51,15 +51,20 @@ const overlap = (a: Set<string>, b: Set<string>) => {
   const union = new Set([...a, ...b]);
   return union.size ? [...a].filter((x) => b.has(x)).length / union.size : 0;
 };
-const major = (version: string) =>
-  /^\d+\.\d+\.\d+$/.test(version) ? Number(version.split(".")[0]) : undefined;
+const parts = (version: string) =>
+  /^\d+\.\d+\.\d+$/.test(version) ? version.split(".").map(Number) : undefined;
 
 export function matchGoalToCapabilities(goal: string): readonly IntelligenceCapability[] {
   const g = normalized(goal);
   const out: IntelligenceCapability[] = [];
-  if (/seo|search|rank|اینستاگرام|instagram|launch|راه اندازی/.test(g)) out.push("marketing");
-  if (/research|competitor|تحقیق|رقیب/.test(g)) out.push("research");
-  if (/voice|image|video|character|صدا|تصویر|ویدیو|کاراکتر/.test(g)) out.push("creative.generate");
+  if (/seo|search|rank|اینستاگرام|instagram|launch|راه اندازی|تسويق|营销|मार्केटिंग/.test(g))
+    out.push("marketing");
+  if (/research|competitor|تحقیق|رقیب|بحث|منافس|研究|竞争|शोध|प्रतियोगी/.test(g))
+    out.push("research");
+  if (
+    /voice|image|video|character|صدا|تصویر|ویدیو|کاراکتر|صورة|فيديو|图像|视频|चित्र|वीडियो/.test(g)
+  )
+    out.push("creative.generate");
   if (/sales|follow up|فروش|پیگیری/.test(g)) out.push("sales");
   return out.length ? [...new Set(out)] : ["marketplace.search"];
 }
@@ -70,15 +75,20 @@ export function evaluateCompatibility(
   const reasons: string[] = [];
   if (manifest.compatibility.runtime !== "xeomx")
     return { state: "INCOMPATIBLE", reasons: ["RUNTIME_MISMATCH"] };
-  const current = major(context.runtimeVersion),
-    minimum = major(manifest.compatibility.minimumVersion);
+  const current = parts(context.runtimeVersion),
+    minimum = parts(manifest.compatibility.minimumVersion);
   if (current === undefined || minimum === undefined)
     return { state: "UNKNOWN", reasons: ["VERSION_NOT_COMPARABLE"] };
-  if (current < minimum) return { state: "INCOMPATIBLE", reasons: ["RUNTIME_VERSION_TOO_OLD"] };
+  if (
+    current.findIndex((v, i) => v !== minimum[i]) >= 0 &&
+    current[current.findIndex((v, i) => v !== minimum[i])] <
+      minimum[current.findIndex((v, i) => v !== minimum[i])]
+  )
+    return { state: "INCOMPATIBLE", reasons: ["RUNTIME_VERSION_TOO_OLD"] };
   const denied = manifest.permissions.filter((x) => !context.allowedPermissions.has(x.id));
   if (denied.length) reasons.push("ADDITIONAL_PERMISSION_REQUIRED");
   const missing = manifest.dependencies.filter(
-    (x) => !x.optional && !context.installedPackages[x.packageId],
+    (x) => !x.optional && context.installedPackages[x.packageId] !== x.version,
   );
   if (missing.length) reasons.push("DEPENDENCY_INSTALL_REQUIRED");
   return {

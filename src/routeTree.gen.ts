@@ -26,6 +26,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as OperatorRouteImport } from './routes/operator'
 import { Route as ObservabilityRouteImport } from './routes/observability'
+import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as MagazineRouteImport } from './routes/magazine'
 import { Route as LegalRouteImport } from './routes/legal'
 import { Route as IntegrationsRouteImport } from './routes/integrations'
@@ -79,7 +80,6 @@ import { Route as AgentsObservabilityRouteImport } from './routes/agents.observa
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 import { Route as AuthenticatedProjectOperationsRouteImport } from './routes/_authenticated/project-operations'
 import { Route as AuthenticatedMemoryRouteImport } from './routes/_authenticated/memory'
-import { Route as AuthenticatedMarketplaceRouteImport } from './routes/_authenticated/marketplace'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCreativeWorkspaceRouteImport } from './routes/_authenticated/creative-workspace'
 import { Route as AuthenticatedBusinessAgentsRouteImport } from './routes/_authenticated/business-agents'
@@ -170,6 +170,11 @@ const OperatorRoute = OperatorRouteImport.update({
 const ObservabilityRoute = ObservabilityRouteImport.update({
   id: '/observability',
   path: '/observability',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceRoute = MarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MagazineRoute = MagazineRouteImport.update({
@@ -437,12 +442,6 @@ const AuthenticatedMemoryRoute = AuthenticatedMemoryRouteImport.update({
   path: '/memory',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedMarketplaceRoute =
-  AuthenticatedMarketplaceRouteImport.update({
-    id: '/marketplace',
-    path: '/marketplace',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -498,6 +497,7 @@ export interface FileRoutesByFullPath {
   '/integrations': typeof IntegrationsRoute
   '/legal': typeof LegalRoute
   '/magazine': typeof MagazineRouteWithChildren
+  '/marketplace': typeof MarketplaceRoute
   '/observability': typeof ObservabilityRoute
   '/operator': typeof OperatorRoute
   '/pricing': typeof PricingRoute
@@ -518,7 +518,6 @@ export interface FileRoutesByFullPath {
   '/business-agents': typeof AuthenticatedBusinessAgentsRoute
   '/creative-workspace': typeof AuthenticatedCreativeWorkspaceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/marketplace': typeof AuthenticatedMarketplaceRoute
   '/memory': typeof AuthenticatedMemoryRoute
   '/project-operations': typeof AuthenticatedProjectOperationsRoute
   '/saved': typeof AuthenticatedSavedRoute
@@ -576,6 +575,7 @@ export interface FileRoutesByTo {
   '/integrations': typeof IntegrationsRoute
   '/legal': typeof LegalRoute
   '/magazine': typeof MagazineRouteWithChildren
+  '/marketplace': typeof MarketplaceRoute
   '/observability': typeof ObservabilityRoute
   '/operator': typeof OperatorRoute
   '/pricing': typeof PricingRoute
@@ -596,7 +596,6 @@ export interface FileRoutesByTo {
   '/business-agents': typeof AuthenticatedBusinessAgentsRoute
   '/creative-workspace': typeof AuthenticatedCreativeWorkspaceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/marketplace': typeof AuthenticatedMarketplaceRoute
   '/memory': typeof AuthenticatedMemoryRoute
   '/project-operations': typeof AuthenticatedProjectOperationsRoute
   '/saved': typeof AuthenticatedSavedRoute
@@ -656,6 +655,7 @@ export interface FileRoutesById {
   '/integrations': typeof IntegrationsRoute
   '/legal': typeof LegalRoute
   '/magazine': typeof MagazineRouteWithChildren
+  '/marketplace': typeof MarketplaceRoute
   '/observability': typeof ObservabilityRoute
   '/operator': typeof OperatorRoute
   '/pricing': typeof PricingRoute
@@ -676,7 +676,6 @@ export interface FileRoutesById {
   '/_authenticated/business-agents': typeof AuthenticatedBusinessAgentsRoute
   '/_authenticated/creative-workspace': typeof AuthenticatedCreativeWorkspaceRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/marketplace': typeof AuthenticatedMarketplaceRoute
   '/_authenticated/memory': typeof AuthenticatedMemoryRoute
   '/_authenticated/project-operations': typeof AuthenticatedProjectOperationsRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
@@ -736,6 +735,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/legal'
     | '/magazine'
+    | '/marketplace'
     | '/observability'
     | '/operator'
     | '/pricing'
@@ -756,7 +756,6 @@ export interface FileRouteTypes {
     | '/business-agents'
     | '/creative-workspace'
     | '/dashboard'
-    | '/marketplace'
     | '/memory'
     | '/project-operations'
     | '/saved'
@@ -814,6 +813,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/legal'
     | '/magazine'
+    | '/marketplace'
     | '/observability'
     | '/operator'
     | '/pricing'
@@ -834,7 +834,6 @@ export interface FileRouteTypes {
     | '/business-agents'
     | '/creative-workspace'
     | '/dashboard'
-    | '/marketplace'
     | '/memory'
     | '/project-operations'
     | '/saved'
@@ -893,6 +892,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/legal'
     | '/magazine'
+    | '/marketplace'
     | '/observability'
     | '/operator'
     | '/pricing'
@@ -913,7 +913,6 @@ export interface FileRouteTypes {
     | '/_authenticated/business-agents'
     | '/_authenticated/creative-workspace'
     | '/_authenticated/dashboard'
-    | '/_authenticated/marketplace'
     | '/_authenticated/memory'
     | '/_authenticated/project-operations'
     | '/_authenticated/saved'
@@ -973,6 +972,7 @@ export interface RootRouteChildren {
   IntegrationsRoute: typeof IntegrationsRoute
   LegalRoute: typeof LegalRoute
   MagazineRoute: typeof MagazineRouteWithChildren
+  MarketplaceRoute: typeof MarketplaceRoute
   ObservabilityRoute: typeof ObservabilityRoute
   OperatorRoute: typeof OperatorRoute
   PricingRoute: typeof PricingRoute
@@ -1135,6 +1135,13 @@ declare module '@tanstack/react-router' {
       path: '/observability'
       fullPath: '/observability'
       preLoaderRoute: typeof ObservabilityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace': {
+      id: '/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof MarketplaceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/magazine': {
@@ -1508,13 +1515,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMemoryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/marketplace': {
-      id: '/_authenticated/marketplace'
-      path: '/marketplace'
-      fullPath: '/marketplace'
-      preLoaderRoute: typeof AuthenticatedMarketplaceRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -1564,7 +1564,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBusinessAgentsRoute: typeof AuthenticatedBusinessAgentsRoute
   AuthenticatedCreativeWorkspaceRoute: typeof AuthenticatedCreativeWorkspaceRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedMarketplaceRoute: typeof AuthenticatedMarketplaceRoute
   AuthenticatedMemoryRoute: typeof AuthenticatedMemoryRoute
   AuthenticatedProjectOperationsRoute: typeof AuthenticatedProjectOperationsRoute
   AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
@@ -1576,7 +1575,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBusinessAgentsRoute: AuthenticatedBusinessAgentsRoute,
   AuthenticatedCreativeWorkspaceRoute: AuthenticatedCreativeWorkspaceRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedMarketplaceRoute: AuthenticatedMarketplaceRoute,
   AuthenticatedMemoryRoute: AuthenticatedMemoryRoute,
   AuthenticatedProjectOperationsRoute: AuthenticatedProjectOperationsRoute,
   AuthenticatedSavedRoute: AuthenticatedSavedRoute,
@@ -1668,6 +1666,7 @@ const rootRouteChildren: RootRouteChildren = {
   IntegrationsRoute: IntegrationsRoute,
   LegalRoute: LegalRoute,
   MagazineRoute: MagazineRouteWithChildren,
+  MarketplaceRoute: MarketplaceRoute,
   ObservabilityRoute: ObservabilityRoute,
   OperatorRoute: OperatorRoute,
   PricingRoute: PricingRoute,
@@ -1715,11 +1714,15 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
+
 import type { startInstance } from './start.ts'
+
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
+
     router: Awaited<ReturnType<typeof getRouter>>
+
     config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }

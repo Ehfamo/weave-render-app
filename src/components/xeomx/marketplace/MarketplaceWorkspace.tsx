@@ -1,69 +1,658 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Header } from "@/components/xeomx/Header";
 import { useAuth } from "@/hooks/use-auth";
 import { useProjectsHome } from "@/hooks/use-projects";
-import { marketplaceDiscoverFn, marketplaceDetailFn, marketplaceTrialFn, marketplaceReadinessFn, marketplaceApproveFn, marketplaceReviewFn, marketplaceRecommendFn } from "@/lib/marketplace/functions";
+import * as api from "@/lib/marketplace/functions";
 import type { MarketplaceService } from "@/lib/marketplace/service";
 import type { TrialRecord } from "@/lib/marketplace/catalog";
 import { MARKETPLACE_OBJECT_TYPES } from "@/lib/marketplace/contracts";
 import { m } from "@/paraglide/messages.js";
-const button="min-h-11 rounded-xl border px-4 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50";
-type Card=Awaited<ReturnType<MarketplaceService["discover"]>>[number];
-type Detail=Awaited<ReturnType<MarketplaceService["details"]>>;
-export function MarketplaceWorkspace({ embedded=false, initialGoal="", reference, kind="conversation" }: { embedded?:boolean;initialGoal?:string;reference?:string;kind?:"job"|"conversation" }={}) {
-  const {user}=useAuth(); const projects=useProjectsHome();
-  const [goal,setGoal]=useState(initialGoal),[category,setCategory]=useState(""),[type,setType]=useState(""),[locale,setLocale]=useState(""),[compatible,setCompatible]=useState(false),[free,setFree]=useState(false);
-  const [cards,setCards]=useState<Card[]>([]),[detail,setDetail]=useState<Detail|null>(null),[busy,setBusy]=useState(false),[loading,setLoading]=useState(true),[error,setError]=useState("");
-  const [continuation,setContinuation]=useState<{projectId:string;referenceId:string;kind:"job"|"conversation"}|null>(null);
-  const [projectId,setProjectId]=useState(""),[network,setNetwork]=useState(false),[privateContext,setPrivateContext]=useState(false),[consent,setConsent]=useState(false);
-  const [trial,setTrial]=useState<TrialRecord|null>(null),[readiness,setReadiness]=useState(""),[review,setReview]=useState(""),[rating,setRating]=useState(3);
-  useEffect(()=>{ let cancelled=false; setLoading(true); setError(""); setDetail(null);setCards([]);setContinuation(null);setTrial(null);setProjectId("");
-    const work=reference ? marketplaceRecommendFn({data:{id:reference,kind}}).then(r=>{if(r.ok){if(!cancelled){setContinuation(r.data.continuation);setProjectId(r.data.continuation.projectId);}return {ok:true as const,data:r.data.recommendations};}return r;}) : marketplaceDiscoverFn({data:{goal:initialGoal}});
-    work.then(r=>{if(!cancelled){if(r.ok)setCards(r.data);else setError(r.error);}}).catch(()=>{if(!cancelled)setError("UNAVAILABLE");}).finally(()=>{if(!cancelled)setLoading(false);});
-    return ()=>{cancelled=true;};
-  },[user?.id,reference,kind,initialGoal]);
-  async function act(run:()=>Promise<void>) {if(busy)return;setBusy(true);setError("");try{await run();}catch{setError("UNAVAILABLE");}finally{setBusy(false);}}
-  async function open(id:string) {await act(async()=>{const r=await marketplaceDetailFn({data:{id}});if(r.ok){setDetail(r.data);setTrial(null);setReadiness("");setConsent(false);setPrivateContext(false);setNetwork(false);}else setError(r.error);});}
-  const status=(code:string)=>({VERIFIED:m.fi4_verified(),NOT_VERIFIED:m.fi4_not_verified(),NOT_EVALUATED:m.fi4_not_evaluated(),NOT_ENOUGH_DATA:m.fi4_not_enough_data(),NOT_CONFIGURED:m.fi4_not_configured(),UNAVAILABLE:m.fi4_unavailable(),UNKNOWN:m.fi4_unknown(),NOT_DECLARED:m.fi4_not_declared(),PUBLISHER_DECLARED:m.fi4_declared(),VERSION_TRIAL_VERIFIED:m.fi4_trial_verified(),RESOLVED:m.fi4_resolved(),INVALID_DEPENDENCIES:m.fi4_invalid_dependencies(),COMPLETED:m.fi4_completed(),FAILED:m.fi4_failed(),RUNNING:m.fi4_running(),APPROVAL_REQUIRED:m.fi4_approval_required(),REAPPROVAL_REQUIRED:m.fi4_reapproval(),READY_FOR_ACQUISITION:m.fi4_ready(),COMPATIBLE:m.p8_compatible(),COMPATIBLE_WITH_REQUIREMENTS:m.fi4_requirements(),INCOMPATIBLE:m.fi4_incompatible()}[code]??code);
-  return <div dir="auto" className="min-h-screen bg-background text-foreground">{!embedded?<Header/>:null}<main className="mx-auto max-w-6xl space-y-5 p-4 sm:p-6">
-    <header><h1 className="text-2xl font-semibold">{m.p8_marketplace()}</h1><p>{m.p8_market_goal_hint()}</p></header>
-    {continuation?<aside className="rounded-xl border p-4"><p>{m.fi4_task_preserved()}</p><Link className={button} to="/projects/$projectId" params={{projectId:continuation.projectId}} search={continuation.kind==="conversation"?{conversationId:continuation.referenceId}:{}}>{m.fi4_return_task()}</Link></aside>:null}
-    {error?<p role="alert">{error==="AUTH_REQUIRED"?m.fi4_login_required():error==="NOT_CONFIGURED"?m.fi4_not_configured():m.fi4_unavailable()}</p>:null}
-    {!detail?<><form onSubmit={e=>{e.preventDefault();void act(async()=>{const r=await marketplaceDiscoverFn({data:{goal,type,category,locale,compatibleOnly:compatible,freeOnly:free}});if(r.ok)setCards(r.data);else setError(r.error);});}} className="space-y-3">
-      <label className="block">{m.p8_market_goal()}<input className="block min-h-11 w-full rounded-lg border bg-background p-3" value={goal} onChange={e=>setGoal(e.target.value)} maxLength={500}/></label>
-      <details className="rounded-xl border p-3"><summary className="cursor-pointer focus-visible:ring-2">{m.fi4_filters()}</summary><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <label>{m.fi4_type()}<select className="block min-h-11 border bg-background" value={type} onChange={e=>setType(e.target.value)}><option value="">{m.fi4_all()}</option>{MARKETPLACE_OBJECT_TYPES.map(x=><option key={x}>{x}</option>)}</select></label>
-        <label>{m.p8_category()}<input className="block min-h-11 border bg-background" value={category} onChange={e=>setCategory(e.target.value)} maxLength={80}/></label>
-        <label>{m.p8_language()}<select className="block min-h-11 border bg-background" value={locale} onChange={e=>setLocale(e.target.value)}><option value="">{m.fi4_all()}</option>{["en","fa","ar","zh","hi"].map(x=><option key={x}>{x}</option>)}</select></label>
-        <label><input type="checkbox" checked={compatible} onChange={e=>setCompatible(e.target.checked)}/>{m.p8_compatibility()}</label>
-        <label><input type="checkbox" checked={free} onChange={e=>setFree(e.target.checked)}/>{m.p8_price()} · {m.common_free()}</label>
-      </div></details><button className={button} disabled={busy}>{m.fi4_search()}</button></form>
-      {loading?<p role="status">{m.common_loading()}</p>:!cards.length?<p>{m.fi4_empty()}</p>:<ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{cards.map(card=><li key={card.id} className="rounded-xl border p-4"><h2 className="font-semibold">{card.title}</h2><p>{card.summary}</p><p className="text-sm">{m.fi4_why_match()}: {m.fi4_goal_metadata()}</p><p>{status(card.compatibility.state)}</p><p>{m.p8_price()}: {card.price?card.price.kind==="FREE"?m.common_free():`${card.price.amount} ${card.price.currency}`:m.fi4_unknown()}</p><button className={button} aria-current={detail?.id===card.id?"page":undefined} disabled={busy} onClick={()=>void open(card.id)}>{m.fi4_inspect()}<span className="sr-only"> {card.title}</span></button></li>)}</ul>}</>:<article className="space-y-4">
-      <button className={button} onClick={()=>setDetail(null)}>{m.fi4_back()}</button><h2 className="text-xl font-semibold">{detail.title} · {detail.version}</h2><p>{detail.description}</p>
-      <label>{m.fi4_versions()}<select className="ms-2 min-h-11 border bg-background" value={detail.id} onChange={e=>void open(e.target.value)}>{detail.versions.map(x=><option key={x.id} value={x.id}>{x.version}</option>)}</select></label>
-      <section className="rounded-xl border p-4"><h3 className="font-semibold">{m.p8_trust_permissions()}</h3><p>{m.p8_cannot_escalate()}</p><p>{m.p8_external_approval()}</p><p>{m.p8_can_read()}</p><ul>{detail.permissions.length?detail.permissions.map(p=><li key={p.id}>{p.id} · {p.reason} · {p.risk}</li>):<li>{m.fi4_no_permissions()}</li>}</ul>
-        <dl className="mt-3 grid gap-3 sm:grid-cols-2">{([[m.fi4_publisher(),detail.trust.publisher],[m.fi4_integrity(),detail.trust.integrity],[m.fi4_signature(),detail.trust.signature],[m.fi4_security(),detail.trust.security],[m.fi4_reliability(),detail.trust.reliability],[m.fi4_maintenance(),detail.trust.maintenance]] as const).map(([label,v])=><div key={label}><dt>{label}</dt><dd>{status(v)}</dd></div>)}</dl><p>{m.fi4_registry_not_trust()}</p><p className="break-all">SHA-256: {detail.digest}</p><p>{m.p8_compatible()}: {status(detail.compatibility.state)}</p>
-      </section>
-      <details className="rounded-xl border p-4"><summary className="cursor-pointer focus-visible:ring-2">{m.fi4_privacy()}</summary><p>{status(detail.privacyState)}</p><dl>{Object.entries({[m.fi4_data_access()]:detail.privacy.dataAccess.join(", ")||m.fi4_not_declared(),[m.fi4_destinations()]:detail.privacy.destinations.join(", ")||m.fi4_not_declared(),[m.fi4_retention()]:detail.privacy.retention??m.fi4_not_declared(),[m.fi4_training()]:detail.privacy.training??m.fi4_not_declared(),[m.fi4_region()]:detail.privacy.region??m.fi4_not_declared()}).map(([k,v])=><div key={k}><dt>{k}</dt><dd>{status(v)}</dd></div>)}</dl></details>
-      <details className="rounded-xl border p-4"><summary className="cursor-pointer focus-visible:ring-2">{m.fi4_dependencies()}</summary><p>{status(detail.dependencyState)}</p><div className="overflow-x-auto"><ul>{detail.dependencies.map(d=><li key={`${d.packageId}@${d.version}`}>{d.packageId} @ {d.version}</li>)}</ul><p>{m.fi4_tools()}: {detail.requirements.tools.join(", ")||m.fi4_not_declared()}</p><p>{m.fi4_network()}: {detail.requirements.network.join(", ")||m.fi4_not_declared()}</p><p>{m.fi4_credentials()}: {detail.requirements.credentials.join(", ")||m.fi4_not_declared()}</p>{detail.mcp?<pre>{JSON.stringify(detail.mcp,null,2)}</pre>:null}</div></details>
-      <details className="rounded-xl border p-4"><summary className="cursor-pointer focus-visible:ring-2">{m.p8_provenance()} / {m.p8_license()}</summary><p>{detail.provenance.creatorDeclaration}</p><p>{detail.license.identifier}</p><p>{m.fi4_declared()}</p></details>
-      <details className="rounded-xl border p-4"><summary className="cursor-pointer focus-visible:ring-2">{m.fi4_moderation()}</summary><p>{m.fi4_signals_not_verdict()}</p><ul>{detail.signals.map(s=><li key={s}>{s}</li>)}</ul></details>
-      <section className="rounded-xl border p-4"><h3>{m.fi4_trial()}</h3><p>{m.fi4_sample_notice()}</p><p>{m.fi4_trial_limits()}</p><p>{m.p8_acquisition_price()}: {detail.price?detail.price.kind==="FREE"?m.common_free():`${detail.price.amount} ${detail.price.currency}`:m.fi4_unknown()}</p><p>{m.p8_runtime_varies()} · {m.fi4_unknown()}</p>
-        {!user?<Link className={button} to="/auth">{m.fi4_login_required()}</Link>:<div className="space-y-3">
-          <label className="block">{m.p8_install_destination()}<select className="ms-2 min-h-11 border bg-background" value={projectId} onChange={e=>{setProjectId(e.target.value);setPrivateContext(false);setReadiness("");}}><option value="">{m.fi4_sample_only()}</option>{projects.data?.projects.map(p=><option value={p.id} key={p.id}>{p.name}</option>)}</select></label>
-          <label className="block"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/>{m.fi4_consent_permissions()}</label>
-          <label className="block"><input type="checkbox" checked={network} onChange={e=>setNetwork(e.target.checked)}/>{m.fi4_consent_network()}</label>
-          <label className="block"><input type="checkbox" disabled={!projectId||!detail.permissions.some(p=>p.id==="project.read")} checked={privateContext} onChange={e=>setPrivateContext(e.target.checked)}/>{m.fi4_consent_private()}</label>
-          <button className={button} disabled={busy||!consent||!detail.trial.eligible} onClick={()=>void act(async()=>{const r=await marketplaceTrialFn({data:{id:crypto.randomUUID(),versionId:detail.id,projectId:projectId||undefined,approvedPermissionIds:detail.permissions.map(p=>p.id),allowNetwork:network,usePrivateContext:privateContext}});if(r.ok)setTrial(r.data);else setError(r.error);})}>{m.fi4_run_trial()}</button>
-          {!detail.trial.eligible?<p>{m.fi4_trial_unavailable()}</p>:null}
-          {projectId?<><button className={button} disabled={busy} onClick={()=>void act(async()=>{const r=await marketplaceReadinessFn({data:{id:detail.id,projectId}});if(r.ok)setReadiness(r.data.state);else setError(r.error);})}>{m.p8_acquire()} · {m.fi4_check_readiness()}</button><button className={button} disabled={busy||!consent} onClick={()=>void act(async()=>{const r=await marketplaceApproveFn({data:{id:detail.id,projectId,digest:detail.digest,permissions:detail.permissions.map(p=>p.id)}});if(r.ok)setReadiness(r.data.state);else setError(r.error);})}>{m.p8_review_permissions()}</button></>:null}
-          <p>{m.fi4_no_install()}</p>{readiness?<p role="status">{status(readiness)}</p>:null}
-        </div>}
-        {trial?<div role="status"><h4>{m.fi4_trial()} · {status(trial.state)}</h4>{trial.errorCode?<p>{status(trial.errorCode)}</p>:null}<p className="whitespace-pre-wrap">{trial.output}</p></div>:null}
-      </section>
-      <section className="rounded-xl border p-4"><h3>{m.fi4_reviews()}</h3><p>{m.fi4_version_trial_reviews()}</p>{detail.reviews.length?<ul>{detail.reviews.map((r,i)=><li key={i}><p>{r.text}</p>{Object.entries(r.dimensions).map(([k,v])=><span key={k}>{k}: {v}/5 </span>)}</li>)}</ul>:<p>{m.p8_no_reviews()}</p>}
-      {detail.reviewEligibility==="ELIGIBLE"||trial?.state==="COMPLETED"?<form onSubmit={e=>{e.preventDefault();void act(async()=>{const r=await marketplaceReviewFn({data:{id:detail.id,dimensions:{usefulness:rating},text:review}});if(!r.ok)setError(r.error);else{const refreshed=await marketplaceDetailFn({data:{id:detail.id}});if(refreshed.ok)setDetail(refreshed.data);setReview("");}});}}><label className="block">{m.fi4_usefulness()}<input type="number" min={1} max={5} value={rating} onChange={e=>setRating(Number(e.target.value))}/></label><label className="block">{m.fi4_review_text()}<textarea className="block w-full border bg-background p-2" value={review} onChange={e=>setReview(e.target.value)} maxLength={2000} required/></label><button className={button} disabled={busy}>{m.fi4_submit_review()}</button></form>:<p>{m.fi4_not_enough_data()}</p>}</section>
-    </article>}
-  </main></div>;
+const button =
+  "min-h-11 rounded-xl border px-4 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50";
+type Card = Awaited<ReturnType<MarketplaceService["discover"]>>[number];
+type Detail = Awaited<ReturnType<MarketplaceService["details"]>>;
+export function MarketplaceWorkspace({
+  embedded = false,
+  initialGoal = "",
+  reference,
+  kind = "conversation",
+}: {
+  embedded?: boolean;
+  initialGoal?: string;
+  reference?: string;
+  kind?: "job" | "conversation";
+} = {}) {
+  const { user } = useAuth();
+  const projects = useProjectsHome();
+  const actorRef = useRef(user?.id);
+  actorRef.current = user?.id;
+  const guarded =
+    <P, R>(fn: (input: P) => Promise<R>) =>
+    async (input: P): Promise<R> => {
+      const actor = actorRef.current;
+      const result = await fn(input);
+      if (actorRef.current !== actor) throw Error("ACTOR_CHANGED");
+      return result;
+    };
+  const marketplaceDiscoverFn = guarded(api.marketplaceDiscoverFn),
+    marketplaceDetailFn = guarded(api.marketplaceDetailFn),
+    marketplaceTrialFn = guarded(api.marketplaceTrialFn),
+    marketplaceReadinessFn = guarded(api.marketplaceReadinessFn),
+    marketplaceApproveFn = guarded(api.marketplaceApproveFn),
+    marketplaceReviewFn = guarded(api.marketplaceReviewFn),
+    marketplaceRecommendFn = guarded(api.marketplaceRecommendFn);
+
+  const [goal, setGoal] = useState(initialGoal),
+    [category, setCategory] = useState(""),
+    [type, setType] = useState(""),
+    [locale, setLocale] = useState(""),
+    [compatible, setCompatible] = useState(false),
+    [free, setFree] = useState(false);
+  const [cards, setCards] = useState<Card[]>([]),
+    [detail, setDetail] = useState<Detail | null>(null),
+    [busy, setBusy] = useState(false),
+    [loading, setLoading] = useState(true),
+    [error, setError] = useState("");
+  const [continuation, setContinuation] = useState<{
+    projectId: string;
+    referenceId: string;
+    kind: "job" | "conversation";
+  } | null>(null);
+  const [projectId, setProjectId] = useState(""),
+    [network, setNetwork] = useState(false),
+    [privateContext, setPrivateContext] = useState(false),
+    [consent, setConsent] = useState(false);
+  const [trial, setTrial] = useState<TrialRecord | null>(null),
+    [readiness, setReadiness] = useState(""),
+    [review, setReview] = useState(""),
+    [rating, setRating] = useState(3);
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError("");
+    setDetail(null);
+    setCards([]);
+    setContinuation(null);
+    setTrial(null);
+    setProjectId("");
+    const work = reference
+      ? api.marketplaceRecommendFn({ data: { id: reference, kind } }).then((r) => {
+          if (r.ok) {
+            if (!cancelled) {
+              setContinuation(r.data.continuation);
+              setProjectId(r.data.continuation.projectId);
+            }
+            return { ok: true as const, data: r.data.recommendations };
+          }
+          return r;
+        })
+      : api.marketplaceDiscoverFn({ data: { goal: initialGoal } });
+    work
+      .then((r) => {
+        if (!cancelled) {
+          if (r.ok) setCards(r.data);
+          else setError(r.error);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setError("UNAVAILABLE");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, reference, kind, initialGoal]);
+  async function act(run: () => Promise<void>) {
+    if (busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      await run();
+    } catch {
+      setError("UNAVAILABLE");
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function open(id: string) {
+    await act(async () => {
+      const r = await marketplaceDetailFn({ data: { id } });
+      if (r.ok) {
+        setDetail(r.data);
+        setTrial(null);
+        setReadiness("");
+        setConsent(false);
+        setPrivateContext(false);
+        setNetwork(false);
+      } else setError(r.error);
+    });
+  }
+  const status = (code: string) =>
+    ({
+      VERIFIED: m.fi4_verified(),
+      NOT_VERIFIED: m.fi4_not_verified(),
+      NOT_EVALUATED: m.fi4_not_evaluated(),
+      NOT_ENOUGH_DATA: m.fi4_not_enough_data(),
+      NOT_CONFIGURED: m.fi4_not_configured(),
+      UNAVAILABLE: m.fi4_unavailable(),
+      UNKNOWN: m.fi4_unknown(),
+      NOT_DECLARED: m.fi4_not_declared(),
+      PUBLISHER_DECLARED: m.fi4_declared(),
+      VERSION_TRIAL_VERIFIED: m.fi4_trial_verified(),
+      RESOLVED: m.fi4_resolved(),
+      INVALID_DEPENDENCIES: m.fi4_invalid_dependencies(),
+      COMPLETED: m.fi4_completed(),
+      FAILED: m.fi4_failed(),
+      RUNNING: m.fi4_running(),
+      APPROVAL_REQUIRED: m.fi4_approval_required(),
+      REAPPROVAL_REQUIRED: m.fi4_reapproval(),
+      READY_FOR_ACQUISITION: m.fi4_ready(),
+      COMPATIBLE: m.p8_compatible(),
+      COMPATIBLE_WITH_REQUIREMENTS: m.fi4_requirements(),
+      INCOMPATIBLE: m.fi4_incompatible(),
+    })[code] ?? code;
+  return (
+    <div dir="auto" className="min-h-screen bg-background text-foreground">
+      {!embedded ? <Header /> : null}
+      <main className="mx-auto max-w-6xl space-y-5 p-4 sm:p-6">
+        <header>
+          <h1 className="text-2xl font-semibold">{m.p8_marketplace()}</h1>
+          <p>{m.p8_market_goal_hint()}</p>
+        </header>
+        {continuation ? (
+          <aside className="rounded-xl border p-4">
+            <p>{m.fi4_task_preserved()}</p>
+            <Link
+              className={button}
+              to="/projects/$projectId"
+              params={{ projectId: continuation.projectId }}
+              search={
+                continuation.kind === "conversation"
+                  ? { conversationId: continuation.referenceId }
+                  : {}
+              }
+            >
+              {m.fi4_return_task()}
+            </Link>
+          </aside>
+        ) : null}
+        {error ? (
+          <p role="alert">
+            {error === "AUTH_REQUIRED"
+              ? m.fi4_login_required()
+              : error === "NOT_CONFIGURED"
+                ? m.fi4_not_configured()
+                : m.fi4_unavailable()}
+          </p>
+        ) : null}
+        {!detail ? (
+          <>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                void act(async () => {
+                  const r = await marketplaceDiscoverFn({
+                    data: {
+                      goal,
+                      type,
+                      category,
+                      locale,
+                      compatibleOnly: compatible,
+                      freeOnly: free,
+                    },
+                  });
+                  if (r.ok) setCards(r.data);
+                  else setError(r.error);
+                });
+              }}
+              className="space-y-3"
+            >
+              <label className="block">
+                {m.p8_market_goal()}
+                <input
+                  className="block min-h-11 w-full rounded-lg border bg-background p-3"
+                  value={goal}
+                  onChange={(e) => setGoal(e.target.value)}
+                  maxLength={500}
+                />
+              </label>
+              <details className="rounded-xl border p-3">
+                <summary className="cursor-pointer focus-visible:ring-2">{m.fi4_filters()}</summary>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  <label>
+                    {m.fi4_type()}
+                    <select
+                      className="block min-h-11 border bg-background"
+                      value={type}
+                      onChange={(e) => setType(e.target.value)}
+                    >
+                      <option value="">{m.fi4_all()}</option>
+                      {MARKETPLACE_OBJECT_TYPES.map((x) => (
+                        <option key={x}>{x}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    {m.p8_category()}
+                    <input
+                      className="block min-h-11 border bg-background"
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      maxLength={80}
+                    />
+                  </label>
+                  <label>
+                    {m.p8_language()}
+                    <select
+                      className="block min-h-11 border bg-background"
+                      value={locale}
+                      onChange={(e) => setLocale(e.target.value)}
+                    >
+                      <option value="">{m.fi4_all()}</option>
+                      {["en", "fa", "ar", "zh", "hi"].map((x) => (
+                        <option key={x}>{x}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={compatible}
+                      onChange={(e) => setCompatible(e.target.checked)}
+                    />
+                    {m.p8_compatibility()}
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={free}
+                      onChange={(e) => setFree(e.target.checked)}
+                    />
+                    {m.p8_price()} · {m.common_free()}
+                  </label>
+                </div>
+              </details>
+              <button className={button} disabled={busy}>
+                {m.fi4_search()}
+              </button>
+            </form>
+            {loading ? (
+              <p role="status">{m.common_loading()}</p>
+            ) : !cards.length ? (
+              <p>{m.fi4_empty()}</p>
+            ) : (
+              <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {cards.map((card) => (
+                  <li key={card.id} className="rounded-xl border p-4">
+                    <h2 className="font-semibold">{card.title}</h2>
+                    <p>{card.summary}</p>
+                    <p className="text-sm">
+                      {m.fi4_why_match()}: {m.fi4_goal_metadata()}
+                    </p>
+                    <p>{status(card.compatibility.state)}</p>
+                    <p>
+                      {m.p8_price()}:{" "}
+                      {card.price
+                        ? card.price.kind === "FREE"
+                          ? m.common_free()
+                          : `${card.price.amount} ${card.price.currency}`
+                        : m.fi4_unknown()}
+                    </p>
+                    <button
+                      className={button}
+                      aria-current={undefined}
+                      disabled={busy}
+                      onClick={() => void open(card.id)}
+                    >
+                      {m.fi4_inspect()}
+                      <span className="sr-only"> {card.title}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
+        ) : (
+          <article className="space-y-4">
+            <button className={button} onClick={() => setDetail(null)}>
+              {m.fi4_back()}
+            </button>
+            <h2 className="text-xl font-semibold">
+              {detail.title} · {detail.version}
+            </h2>
+            <p>{detail.description}</p>
+            <label>
+              {m.fi4_versions()}
+              <select
+                className="ms-2 min-h-11 border bg-background"
+                value={detail.id}
+                onChange={(e) => void open(e.target.value)}
+              >
+                {detail.versions.map((x) => (
+                  <option key={x.id} value={x.id}>
+                    {x.version}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <section className="rounded-xl border p-4">
+              <h3 className="font-semibold">{m.p8_trust_permissions()}</h3>
+              <p>{m.p8_cannot_escalate()}</p>
+              <p>{m.p8_external_approval()}</p>
+              <p>{m.p8_can_read()}</p>
+              <ul>
+                {detail.permissions.length ? (
+                  detail.permissions.map((p) => (
+                    <li key={p.id}>
+                      {p.id} · {p.reason} · {p.risk}
+                    </li>
+                  ))
+                ) : (
+                  <li>{m.fi4_no_permissions()}</li>
+                )}
+              </ul>
+              <dl className="mt-3 grid gap-3 sm:grid-cols-2">
+                {(
+                  [
+                    [m.fi4_publisher(), detail.trust.publisher],
+                    [m.fi4_integrity(), detail.trust.integrity],
+                    [m.fi4_signature(), detail.trust.signature],
+                    [m.fi4_security(), detail.trust.security],
+                    [m.fi4_reliability(), detail.trust.reliability],
+                    [m.fi4_maintenance(), detail.trust.maintenance],
+                  ] as const
+                ).map(([label, v]) => (
+                  <div key={label}>
+                    <dt>{label}</dt>
+                    <dd>{status(v)}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p>{m.fi4_registry_not_trust()}</p>
+              <p className="break-all">SHA-256: {detail.digest}</p>
+              <p>
+                {m.p8_compatible()}: {status(detail.compatibility.state)}
+              </p>
+            </section>
+            <details className="rounded-xl border p-4">
+              <summary className="cursor-pointer focus-visible:ring-2">{m.fi4_privacy()}</summary>
+              <p>{status(detail.privacyState)}</p>
+              <dl>
+                {Object.entries({
+                  [m.fi4_data_access()]:
+                    detail.privacy.dataAccess.join(", ") || m.fi4_not_declared(),
+                  [m.fi4_destinations()]:
+                    detail.privacy.destinations.join(", ") || m.fi4_not_declared(),
+                  [m.fi4_retention()]: detail.privacy.retention ?? m.fi4_not_declared(),
+                  [m.fi4_training()]: detail.privacy.training ?? m.fi4_not_declared(),
+                  [m.fi4_region()]: detail.privacy.region ?? m.fi4_not_declared(),
+                }).map(([k, v]) => (
+                  <div key={k}>
+                    <dt>{k}</dt>
+                    <dd>{status(v)}</dd>
+                  </div>
+                ))}
+              </dl>
+            </details>
+            <details className="rounded-xl border p-4">
+              <summary className="cursor-pointer focus-visible:ring-2">
+                {m.fi4_dependencies()}
+              </summary>
+              <p>{status(detail.dependencyState)}</p>
+              <div className="overflow-x-auto">
+                <ul>
+                  {detail.dependencies.map((d) => (
+                    <li key={`${d.packageId}@${d.version}`}>
+                      {d.packageId} @ {d.version}
+                    </li>
+                  ))}
+                </ul>
+                <p>
+                  {m.fi4_tools()}: {detail.requirements.tools.join(", ") || m.fi4_not_declared()}
+                </p>
+                <p>
+                  {m.fi4_network()}:{" "}
+                  {detail.requirements.network.join(", ") || m.fi4_not_declared()}
+                </p>
+                <p>
+                  {m.fi4_credentials()}:{" "}
+                  {detail.requirements.credentials.join(", ") || m.fi4_not_declared()}
+                </p>
+                {detail.mcp ? <pre>{JSON.stringify(detail.mcp, null, 2)}</pre> : null}
+              </div>
+            </details>
+            <details className="rounded-xl border p-4">
+              <summary className="cursor-pointer focus-visible:ring-2">
+                {m.p8_provenance()} / {m.p8_license()}
+              </summary>
+              <p>{detail.provenance.creatorDeclaration}</p>
+              <p>{detail.license.identifier}</p>
+              <p>{m.fi4_declared()}</p>
+            </details>
+            <details className="rounded-xl border p-4">
+              <summary className="cursor-pointer focus-visible:ring-2">
+                {m.fi4_moderation()}
+              </summary>
+              <p>{m.fi4_signals_not_verdict()}</p>
+              <ul>
+                {detail.signals.map((s) => (
+                  <li key={s}>{s}</li>
+                ))}
+              </ul>
+            </details>
+            <section className="rounded-xl border p-4">
+              <h3>{m.fi4_trial()}</h3>
+              <p>{m.fi4_sample_notice()}</p>
+              <p>{m.fi4_trial_limits()}</p>
+              <p>
+                {m.p8_acquisition_price()}:{" "}
+                {detail.price
+                  ? detail.price.kind === "FREE"
+                    ? m.common_free()
+                    : `${detail.price.amount} ${detail.price.currency}`
+                  : m.fi4_unknown()}
+              </p>
+              <p>
+                {m.p8_runtime_varies()} · {m.fi4_unknown()}
+              </p>
+              {!user ? (
+                <Link className={button} to="/auth" search={{ redirect: undefined }}>
+                  {m.fi4_login_required()}
+                </Link>
+              ) : (
+                <div className="space-y-3">
+                  <label className="block">
+                    {m.p8_install_destination()}
+                    <select
+                      className="ms-2 min-h-11 border bg-background"
+                      value={projectId}
+                      onChange={(e) => {
+                        setProjectId(e.target.value);
+                        setPrivateContext(false);
+                        setReadiness("");
+                      }}
+                    >
+                      <option value="">{m.fi4_sample_only()}</option>
+                      {projects.data?.projects.map((p) => (
+                        <option value={p.id} key={p.id}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="block">
+                    <input
+                      type="checkbox"
+                      checked={consent}
+                      onChange={(e) => setConsent(e.target.checked)}
+                    />
+                    {m.fi4_consent_permissions()}
+                  </label>
+                  <label className="block">
+                    <input
+                      type="checkbox"
+                      checked={network}
+                      onChange={(e) => setNetwork(e.target.checked)}
+                    />
+                    {m.fi4_consent_network()}
+                  </label>
+                  <label className="block">
+                    <input
+                      type="checkbox"
+                      disabled={
+                        !projectId || !detail.permissions.some((p) => p.id === "project.read")
+                      }
+                      checked={privateContext}
+                      onChange={(e) => setPrivateContext(e.target.checked)}
+                    />
+                    {m.fi4_consent_private()}
+                  </label>
+                  <button
+                    className={button}
+                    disabled={busy || !consent || !detail.trial.eligible}
+                    onClick={() =>
+                      void act(async () => {
+                        const r = await marketplaceTrialFn({
+                          data: {
+                            id: crypto.randomUUID(),
+                            versionId: detail.id,
+                            projectId: projectId || undefined,
+                            approvedPermissionIds: detail.permissions.map((p) => p.id),
+                            allowNetwork: network,
+                            usePrivateContext: privateContext,
+                          },
+                        });
+                        if (r.ok) setTrial(r.data);
+                        else setError(r.error);
+                      })
+                    }
+                  >
+                    {m.fi4_run_trial()}
+                  </button>
+                  {!detail.trial.eligible ? <p>{m.fi4_trial_unavailable()}</p> : null}
+                  {projectId ? (
+                    <>
+                      <button
+                        className={button}
+                        disabled={busy}
+                        onClick={() =>
+                          void act(async () => {
+                            const r = await marketplaceReadinessFn({
+                              data: { id: detail.id, projectId },
+                            });
+                            if (r.ok) setReadiness(r.data.state);
+                            else setError(r.error);
+                          })
+                        }
+                      >
+                        {m.p8_acquire()} · {m.fi4_check_readiness()}
+                      </button>
+                      <button
+                        className={button}
+                        disabled={busy || !consent}
+                        onClick={() =>
+                          void act(async () => {
+                            const r = await marketplaceApproveFn({
+                              data: {
+                                id: detail.id,
+                                projectId,
+                                digest: detail.digest,
+                                permissions: detail.permissions.map((p) => p.id),
+                              },
+                            });
+                            if (r.ok) setReadiness(r.data.state);
+                            else setError(r.error);
+                          })
+                        }
+                      >
+                        {m.p8_review_permissions()}
+                      </button>
+                    </>
+                  ) : null}
+                  <p>{m.fi4_no_install()}</p>
+                  {readiness ? <p role="status">{status(readiness)}</p> : null}
+                </div>
+              )}
+              {trial ? (
+                <div role="status">
+                  <h4>
+                    {m.fi4_trial()} · {status(trial.state)}
+                  </h4>
+                  {trial.errorCode ? <p>{status(trial.errorCode)}</p> : null}
+                  <p className="whitespace-pre-wrap">{trial.output}</p>
+                </div>
+              ) : null}
+            </section>
+            <section className="rounded-xl border p-4">
+              <h3>{m.fi4_reviews()}</h3>
+              <p>{m.fi4_version_trial_reviews()}</p>
+              {detail.reviews.length ? (
+                <ul>
+                  {detail.reviews.map((r, i) => (
+                    <li key={i}>
+                      <p>{r.text}</p>
+                      {Object.entries(r.dimensions).map(([k, v]) => (
+                        <span key={k}>
+                          {k}: {v}/5{" "}
+                        </span>
+                      ))}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>{m.p8_no_reviews()}</p>
+              )}
+              {detail.reviewEligibility === "ELIGIBLE" || trial?.state === "COMPLETED" ? (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    void act(async () => {
+                      const r = await marketplaceReviewFn({
+                        data: { id: detail.id, dimensions: { usefulness: rating }, text: review },
+                      });
+                      if (!r.ok) setError(r.error);
+                      else {
+                        const refreshed = await marketplaceDetailFn({ data: { id: detail.id } });
+                        if (refreshed.ok) setDetail(refreshed.data);
+                        setReview("");
+                      }
+                    });
+                  }}
+                >
+                  <label className="block">
+                    {m.fi4_usefulness()}
+                    <input
+                      type="number"
+                      min={1}
+                      max={5}
+                      value={rating}
+                      onChange={(e) => setRating(Number(e.target.value))}
+                    />
+                  </label>
+                  <label className="block">
+                    {m.fi4_review_text()}
+                    <textarea
+                      className="block w-full border bg-background p-2"
+                      value={review}
+                      onChange={(e) => setReview(e.target.value)}
+                      maxLength={2000}
+                      required
+                    />
+                  </label>
+                  <button className={button} disabled={busy}>
+                    {m.fi4_submit_review()}
+                  </button>
+                </form>
+              ) : (
+                <p>{m.fi4_not_enough_data()}</p>
+              )}
+            </section>
+          </article>
+        )}
+      </main>
+    </div>
+  );
 }

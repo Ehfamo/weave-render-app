@@ -1,0 +1,29 @@
+{
+  "repository": "Ehfamo/weave-render-app",
+  "source_fi3_sha": "b33248cb7cd0fb27f76d74b2dab60c265fba84a7",
+  "fi4_branch": "feature/xeomx-fi4-marketplace-excellence-20260915",
+  "checkpoint_sha": "e030417eb9892548f6c43ca40fb23d2f299e76f4",
+  "bundle": "artifacts/fi4-preservation/XEOMX_FI4_FINAL_CLOSURE_20260922.bundle",
+  "bundle_sha256": "971480502b6a6fb654e3b30f3b8f14c9095e8e3bc2e6a4fcc711628629116057",
+  "status": "EXACT_CHECKPOINT_RECOVERY_PENDING",
+  "full_suite": {
+    "passed": 414,
+    "failed": 0,
+    "skipped": 0
+  },
+  "selected_regression": {
+    "passed": 105,
+    "failed": 0
+  },
+  "typecheck": "PASS",
+  "lint": {
+    "errors": 0,
+    "warnings": 11
+  },
+  "build": "PASS",
+  "smoke": "PASS",
+  "main_modified": false,
+  "production_modified": false,
+  "fi5_started": false,
+  "closure": "Final September 23 documentation and remote equality pending"
+}

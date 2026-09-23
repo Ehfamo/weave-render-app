@@ -1,0 +1,201 @@
+{
+  "repository": "Ehfamo/weave-render-app",
+  "closure_date": "2026-09-23",
+  "source_branch": "feature/xeomx-fi3-capability-runtime-20260915",
+  "source_fi3_sha": "b33248cb7cd0fb27f76d74b2dab60c265fba84a7",
+  "fi4_branch": "feature/xeomx-fi4-marketplace-excellence-20260915",
+  "validated_checkpoint_sha": "b41a439a95b8d8fc0a679ee113ce1f0778f85e6f",
+  "validated_source_sha": "e030417eb9892548f6c43ca40fb23d2f299e76f4",
+  "recovered_checkpoint_remote_sha": "e030417eb9892548f6c43ca40fb23d2f299e76f4",
+  "recovered_checkpoint_remote_match": true,
+  "checkpoint_recovery_workflow_run": 35819077227,
+  "final_fi4_sha": {
+    "resolve": "git log -1 --format=%H -- artifacts/fi4-preservation/XEOMX_FI4_FINAL_CLOSURE_20260923.manifest.json",
+    "literal_attestation": "https://github.com/Ehfamo/weave-render-app/blob/preservation/xeomx-fi4-final-20260923/artifacts/fi4-preservation/XEOMX_FI4_FINAL_CLOSURE_20260923.manifest.json"
+  },
+  "remote_fi4_sha": {
+    "literal_attestation": "https://github.com/Ehfamo/weave-render-app/blob/preservation/xeomx-fi4-final-20260923/artifacts/fi4-preservation/XEOMX_FI4_FINAL_CLOSURE_20260923.manifest.json"
+  },
+  "remote_match": null,
+  "manifest_role": "SOURCE_PRE_PUBLICATION_RECORD; literal final hashes and final status are in the preservation-branch companion",
+  "final_attestation_url": "https://github.com/Ehfamo/weave-render-app/blob/preservation/xeomx-fi4-final-20260923/artifacts/fi4-preservation/XEOMX_FI4_FINAL_CLOSURE_20260923.manifest.json",
+  "ancestry": {
+    "FI3": "b33248cb7cd0fb27f76d74b2dab60c265fba84a7",
+    "FI2": "9b6f077baf2a4bf72edaf22ed71da4492d33c18e",
+    "FI1": "dcafa525ebae0cf126e7470be3ca9de8065274aa",
+    "status": "PASS"
+  },
+  "commits": [
+    "e5d8fd4a2b9848ce5761f7e9076c784f7626f702",
+    "b41a439a95b8d8fc0a679ee113ce1f0778f85e6f",
+    "e030417eb9892548f6c43ca40fb23d2f299e76f4",
+    {
+      "resolve": "git log -1 --format=%H -- artifacts/fi4-preservation/XEOMX_FI4_FINAL_CLOSURE_20260923.manifest.json"
+    }
+  ],
+  "files_changed": [
+    "artifacts/fi4-preservation/XEOMX_FI4_FINAL_CLOSURE_20260922.manifest.json",
+    "artifacts/fi4-preservation/XEOMX_FI4_FINAL_CLOSURE_20260923.manifest.json",
+    "docs/FI4_MARKETPLACE_EXCELLENCE_I_EVIDENCE.md",
+    "messages/ar.json",
+    "messages/en.json",
+    "messages/fa.json",
+    "messages/hi.json",
+    "messages/zh.json",
+    "src/components/xeomx/ai/XeomxAiWorkspace.tsx",
+    "src/components/xeomx/marketplace/MarketplaceWorkspace.tsx",
+    "src/components/xeomx/runtime/CapabilityPanel.tsx",
+    "src/lib/core-execution/runtime.server.ts",
+    "src/lib/intelligence/marketplace.ts",
+    "src/lib/marketplace/catalog.ts",
+    "src/lib/marketplace/contracts.ts",
+    "src/lib/marketplace/functions.ts",
+    "src/lib/marketplace/integrity.ts",
+    "src/lib/marketplace/runtime.server.ts",
+    "src/lib/marketplace/sandbox.ts",
+    "src/lib/marketplace/service.ts",
+    "src/lib/marketplace/store.server.ts",
+    "src/lib/marketplace/validation.ts",
+    "src/routeTree.gen.ts",
+    "src/routes/_authenticated/marketplace.tsx",
+    "src/routes/marketplace.tsx",
+    "supabase/migrations/20260922000000_fi4_marketplace.sql",
+    "tests/fi4-marketplace.test.mjs",
+    "tests/fi4-persistence.test.mjs",
+    "tests/helpers/fi4-fixture.mjs",
+    "tests/helpers/p6-marketplace-reference.ts",
+    "tests/p6-marketplace.test.mjs",
+    "tests/p8-ux-excellence.test.mjs"
+  ],
+  "migration_state": "MIGRATION_SOURCE_ONLY",
+  "validation_provenance": {
+    "execution": "Completed in preceding working session; recorded in validated_source_sha",
+    "current_closure": "Documentation-only; runtime/test/schema/locale/dependency content unchanged from validated_source_sha",
+    "full_suite_rerun": false,
+    "temporary_console_logs": "NOT_AVAILABLE_IN_CURRENT_WORKER",
+    "current_checks": [
+      "exact ancestry",
+      "source equivalence",
+      "manifest/evidence integrity",
+      "git diff --check",
+      "changed-file secret review"
+    ]
+  },
+  "full_suite": {
+    "status": "PASS",
+    "passed": 414,
+    "failed": 0,
+    "skipped": 0
+  },
+  "selected_regression": {
+    "status": "PASS",
+    "passed": 105,
+    "failed": 0,
+    "skipped": 0
+  },
+  "fi4_focused": {
+    "status": "PASS",
+    "passed": 27,
+    "failed": 0,
+    "skipped": 0
+  },
+  "postgresql": {
+    "status": "PASS",
+    "fi4_passed": 13,
+    "fi4_subtests": 12,
+    "fi4_parent_tests": 1,
+    "fi3_passed": 12,
+    "fi2_passed": 6,
+    "failed": 0,
+    "skipped": 0,
+    "environment": "isolated local PGlite"
+  },
+  "typecheck": "PASS",
+  "lint": {
+    "status": "PASS",
+    "errors": 0,
+    "warnings": 11,
+    "warning_kind": "unchanged Fast Refresh"
+  },
+  "build": "PASS",
+  "smoke": {
+    "status": "PASS",
+    "passed": 1,
+    "failed": 0
+  },
+  "diff_check": "PASS",
+  "secret_review": "PASS",
+  "evidence_path": "docs/FI4_MARKETPLACE_EXCELLENCE_I_EVIDENCE.md",
+  "preservation_branch": "preservation/xeomx-fi4-final-20260923",
+  "bundle_path": "artifacts/fi4-preservation/XEOMX_FI4_FINAL_CLOSURE_20260923.bundle",
+  "bundle_sha256": "RECORDED_AFTER_COMMIT_IN_FINAL_ATTESTATION",
+  "main_modified": false,
+  "production_modified": false,
+  "fi5_started": false,
+  "deferred_external": [
+    {
+      "item": "Signing authority",
+      "status": "DEFERRED_EXTERNAL"
+    },
+    {
+      "item": "Third-party MCP live verification",
+      "status": "DEFERRED_EXTERNAL"
+    },
+    {
+      "item": "Paid/live provider trial",
+      "status": "DEFERRED_EXTERNAL"
+    },
+    {
+      "item": "Hosted production migration",
+      "status": "DEFERRED_EXTERNAL"
+    },
+    {
+      "item": "Rendered browser/mobile/RTL/accessibility QA",
+      "status": "DEFERRED_EXTERNAL"
+    },
+    {
+      "item": "Real-user Marketplace validation",
+      "status": "DEFERRED_EXTERNAL"
+    }
+  ],
+  "status": "PENDING_FINAL_REMOTE_VERIFICATION",
+  "next_allowed_stage": "NONE",
+  "marketplace_persistence": "INTEGRATION_PASS",
+  "guest_discovery": "INTEGRATION_PASS",
+  "semantic_discovery": "INTEGRATION_PASS; bounded P9 intent relevance",
+  "contextual_marketplace": "INTEGRATION_PASS; original conversation/job retained",
+  "sandbox_trial": "INTEGRATION_PASS; bounded text sandbox; no untrusted executable/MCP tools",
+  "trust_center": "SOURCE_PASS; independent evidence dimensions",
+  "package_integrity": "INTEGRATION_PASS; SHA-256 enforced",
+  "signature_state": "NOT_CONFIGURED / NOT_VERIFIED",
+  "mcp_zero_trust": "INTEGRATION_PASS; inspected declarations never auto-trusted or executed",
+  "version_permissions": "INTEGRATION_PASS; explicit version/digest reapproval",
+  "dependency_graph": "INTEGRATION_PASS",
+  "privacy_card": "SOURCE_PASS; undeclared remains NOT_DECLARED",
+  "moderation": "INTEGRATION_PASS; signals not accusations",
+  "verified_reviews": "INTEGRATION_PASS; actual completed version trial required",
+  "fi3_regression": {
+    "passed": 34,
+    "failed": 0
+  },
+  "fi2_regression": {
+    "passed": 24,
+    "failed": 0
+  },
+  "fi1_regression": {
+    "passed": 13,
+    "failed": 0
+  },
+  "project_brain": {
+    "passed": 12,
+    "failed": 0
+  },
+  "memory": {
+    "passed": 8,
+    "failed": 0
+  },
+  "search_command_center": {
+    "passed": 14,
+    "failed": 0
+  }
+}

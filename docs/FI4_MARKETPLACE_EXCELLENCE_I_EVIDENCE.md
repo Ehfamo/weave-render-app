@@ -6,17 +6,29 @@ Exact FI3 prerequisite: `b33248cb7cd0fb27f76d74b2dab60c265fba84a7`.
 FI2 ancestor: `9b6f077baf2a4bf72edaf22ed71da4492d33c18e`.
 FI1 ancestor: `dcafa525ebae0cf126e7470be3ca9de8065274aa`.
 FI4 branch: `feature/xeomx-fi4-marketplace-excellence-20260915`.
+Final closure date: `2026-09-23`.
 
 Emergency checkpoint: `e5d8fd4a2b9848ce5761f7e9076c784f7626f702`.
 Second checkpoint: `b41a439a95b8d8fc0a679ee113ce1f0778f85e6f`.
 Both exact commits were verified on the FI4 GitHub branch before further work.
 Recovery workflow runs `35734229882` and `35735698583` succeeded, including
 bundle SHA-256, prerequisite, ancestry and remote-HEAD equality checks.
-The source commit containing this evidence is the final FI4 closure HEAD.
-Its literal SHA and verified remote SHA are recorded after commit creation in
-`artifacts/fi4-preservation/XEOMX_FI4_FINAL_CLOSURE_20260922.manifest.json` on
-`preservation/xeomx-fi4-final-20260922`. This companion avoids a self-referential
-commit hash. A local source manifest never pretends to know its own future SHA.
+Recovered validated source commit: `e030417eb9892548f6c43ca40fb23d2f299e76f4`.
+On September 23, this newer local commit was preserved before closure edits.
+Recovery workflow run `35819077227` succeeded; the FI4 branch was then read back
+from GitHub and matched this exact local SHA. Its existing bundle SHA-256 is
+`971480502b6a6fb654e3b30f3b8f14c9095e8e3bc2e6a4fcc711628629116057`.
+
+The final closure commit changes evidence/manifest only. Its literal SHA,
+verified remote SHA, final bundle digest and recovery result are recorded after
+commit creation in
+`artifacts/fi4-preservation/XEOMX_FI4_FINAL_CLOSURE_20260923.manifest.json` on
+`preservation/xeomx-fi4-final-20260923`. This companion is the final attestation.
+The source-branch copy records the pre-publication state and points to that
+attestation: a commit cannot contain its own literal hash. The final source
+commit can also be resolved with `git log -1 --format=%H --
+artifacts/fi4-preservation/XEOMX_FI4_FINAL_CLOSURE_20260923.manifest.json`.
+The September 22 manifest remains a historical record, not the final attestation.
 
 ## Architecture and implementation
 
@@ -127,10 +139,20 @@ Supported dimensions are usefulness, reliability, setup, documentation, value an
 support. No ratings are synthesized. Reviews are trial-verified, not claims of
 live-provider verification, acquisition or purchase.
 
-## Executed validation in this environment
+## Recorded validation and September 23 closure checks
 
 Existing installed dependencies and repository lockfile were reused; lockfile
 unchanged. No live credentials or Production database were used.
+The following source/integration gates were executed in the preceding working
+session against the code subsequently committed as `e030417`. They are recorded
+in that exact preserved commit; they are not claimed as freshly rerun on
+September 23. The temporary console log files are no longer available in this
+worker. The recovered source includes changes after checkpoint `b41a439`, and
+those changes were already present during the final 414-test validation.
+No source, tests, runtime, migration, locale or dependency files changed after
+that validated source for this documentation-only closure. Therefore the full
+suite/build were not repeated. Ancestry, source equivalence, JSON/evidence
+integrity, diff whitespace and changed-file credential checks were rerun.
 
 | Gate | Actual result |
 | --- | --- |
@@ -182,6 +204,9 @@ FI1–FI3 data. No duplicate project, memory, orchestration or payment tables.
 Secret review covered all changed tracked/untracked source, tests, migration,
 messages and evidence. Only configuration variable names and deterministic
 fixtures exist; no credentials or dependency/build caches enter commits.
+The September 23 scan also reviewed the existing negative-validation credential
+fixture in `tests/p6-marketplace.test.mjs`; it is unchanged from the FI3 base,
+not an added credential. No credential value is included in scan output.
 No private package/project content is placed in URLs, public traces or analytics.
 
 DEFERRED_EXTERNAL: signing authority; live third-party MCP verification; paid/live
@@ -193,7 +218,9 @@ FI5 commerce/creator economy remains NOT_STARTED.
 Main modified: NO. Production modified: NO. Production Supabase modified: NO.
 DNS/payments/payouts modified: NO. No merge, force push, history rewrite or deployment.
 
-The final preservation branch contains the exact incremental Git bundle, SHA-256,
-literal final HEAD/remote HEAD manifest and a scoped non-force recovery workflow.
-It verifies the FI3 prerequisite, bundle identity and remote equality. Closure is
-reported only after that remote equality is observed. No local-only completion.
+The final preservation branch is required to contain the exact incremental Git
+bundle, SHA-256, literal final HEAD/remote HEAD manifest and a scoped non-force
+recovery workflow. Recovery verifies the FI3 prerequisite, bundle identity,
+ancestry and remote equality. FI4_PASS and NEXT_ALLOWED_STAGE=FI5 are recorded
+only in the final companion after that equality is observed. FI5 is not executed.
+No local-only completion is accepted.

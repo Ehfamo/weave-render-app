@@ -10,9 +10,9 @@
   "recovered_checkpoint_remote_match": true,
   "checkpoint_recovery_workflow_run": 35819077227,
   "final_fi4_sha": "b8238f9ed6c82399f89fbc80ba2a8c61d398de60",
-  "remote_fi4_sha": "e030417eb9892548f6c43ca40fb23d2f299e76f4",
-  "remote_match": false,
-  "manifest_role": "FINAL_LITERAL_ATTESTATION_PENDING_RECOVERY",
+  "remote_fi4_sha": "b8238f9ed6c82399f89fbc80ba2a8c61d398de60",
+  "remote_match": true,
+  "manifest_role": "FINAL_VERIFIED_ATTESTATION",
   "final_attestation_url": "https://github.com/Ehfamo/weave-render-app/blob/preservation/xeomx-fi4-final-20260923/artifacts/fi4-preservation/XEOMX_FI4_FINAL_CLOSURE_20260923.manifest.json",
   "ancestry": {
     "FI3": "b33248cb7cd0fb27f76d74b2dab60c265fba84a7",
@@ -151,8 +151,8 @@
       "status": "DEFERRED_EXTERNAL"
     }
   ],
-  "status": "PENDING_FINAL_REMOTE_VERIFICATION",
-  "next_allowed_stage": "NONE",
+  "status": "FI4_PASS",
+  "next_allowed_stage": "FI5",
   "marketplace_persistence": "INTEGRATION_PASS",
   "guest_discovery": "INTEGRATION_PASS",
   "semantic_discovery": "INTEGRATION_PASS; bounded P9 intent relevance",
@@ -191,9 +191,19 @@
     "passed": 14,
     "failed": 0
   },
-  "bundle_verify": "PASS_LOCAL; GITHUB_RECOVERY_PENDING",
+  "bundle_verify": "PASS; local verification and GitHub checked-out bundle SHA-256, prerequisite, head and ancestry verified",
   "bundle_head": "b8238f9ed6c82399f89fbc80ba2a8c61d398de60",
   "bundle_git_blob": "e9503dc8524861f552b4645c76acc18413c5f6ff",
-  "github_recovery": "PENDING",
-  "main_sha_before": "fb18042fdb281f7ca2d2731c16edac899aa6222b"
+  "github_recovery": {
+    "status": "PASS",
+    "preservation_commit": "c9481b4c0439e580d4fca3e0996700c771130b59",
+    "workflow_run": 35819453953,
+    "workflow_url": "https://github.com/Ehfamo/weave-render-app/actions/runs/35819453953",
+    "job_id": 107047978338,
+    "remote_equality": "PASS",
+    "push": "NORMAL_NON_FORCE",
+    "main_unchanged": true
+  },
+  "main_sha_before": "fb18042fdb281f7ca2d2731c16edac899aa6222b",
+  "main_sha_after": "fb18042fdb281f7ca2d2731c16edac899aa6222b"
 }

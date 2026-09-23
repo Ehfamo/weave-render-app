@@ -1,0 +1,35 @@
+name: Recover exact final FI4 history
+on:
+  push:
+    branches: [preservation/xeomx-fi4-final-20260923]
+    paths:
+      - .github/workflows/fi4-final-recovery.yml
+      - artifacts/fi4-preservation/XEOMX_FI4_FINAL_CLOSURE_20260923.bundle
+permissions:
+  contents: write
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify and persist exact final FI4 history
+        shell: bash
+        run: |
+          set -euo pipefail
+          bundle=artifacts/fi4-preservation/XEOMX_FI4_FINAL_CLOSURE_20260923.bundle
+          expected=b8238f9ed6c82399f89fbc80ba2a8c61d398de60
+          target=refs/heads/feature/xeomx-fi4-marketplace-excellence-20260915
+          main_before="$(git ls-remote origin refs/heads/main | cut -f1)"
+          echo "50d38fdf983dcfac9173cfa261643a55d54a400c442fb5611d07cc989bcfd15d  $bundle" | sha256sum --check -
+          git cat-file -e b33248cb7cd0fb27f76d74b2dab60c265fba84a7^{commit}
+          git bundle verify "$bundle"
+          test "$(git bundle list-heads "$bundle" "$target" | cut -d' ' -f1)" = "$expected"
+          git fetch "$bundle" "$target:refs/heads/recovered-final-fi4"
+          test "$(git rev-parse recovered-final-fi4)" = "$expected"
+          git merge-base --is-ancestor b33248cb7cd0fb27f76d74b2dab60c265fba84a7 "$expected"
+          git push origin "$expected:$target"
+          test "$(git ls-remote origin "$target" | cut -f1)" = "$expected"
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$main_before"

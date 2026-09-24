@@ -1,3 +1,5 @@
+import { MarketplaceCommerce } from "./commerce.ts";
+import type { CommerceAction, CommerceProviders } from "./commerce.ts";
 import type {
   CatalogEntry,
   CatalogManifest,
@@ -57,7 +59,28 @@ export class MarketplaceService {
     await verifyPackage(entry.manifest);
     return entry;
   }
+  commerce(action: CommerceAction, data: unknown = {}) {
+    return this.commerceBoundary().command(action, data);
+  }
+  commerceBoundary(providers: CommerceProviders = {}) {
+    this.actor();
+    if (!this.store.commerce) throw Error("NOT_CONFIGURED");
+    return new MarketplaceCommerce(
+      { command: (a, d) => this.store.commerce!(a, d) },
+      (entry) => this.validatePublication(entry),
+      providers,
+      async (id) => {
+        const entry = await this.entry(id);
+        await this.dependencies(entry);
+        return entry;
+      },
+    );
+  }
   async publish(entry: CatalogEntry) {
+    await this.validatePublication(entry);
+    return this.store.publish({ ...entry, createdAt: this.now() });
+  }
+  async validatePublication(entry: CatalogEntry) {
     if (entry.manifest.creatorId !== this.actor()) throw Error("OWNER_REQUIRED");
     if (entry.visibility === "project") {
       if (!entry.scopeProjectId) throw Error("PROJECT_ACCESS_DENIED");
@@ -93,7 +116,7 @@ export class MarketplaceService {
       ]);
     await validatePublishedPackage(entry.manifest, available);
     await this.dependencies(entry, rows);
-    return this.store.publish({ ...entry, createdAt: this.now() });
+    return entry;
   }
   async discover(
     input: {

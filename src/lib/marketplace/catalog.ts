@@ -60,6 +60,10 @@ export interface PermissionGrant {
 /** Caller-bound port. Implementations enforce RLS and durable uniqueness; no production map store. */
 export interface MarketplaceStore {
   readonly userId?: string;
+  commerce?(
+    action: string,
+    data: import("./commerce.ts").CommerceInput,
+  ): Promise<import("../stage53-json.ts").JsonValue>;
   list(): Promise<CatalogEntry[]>;
   get(id: string): Promise<CatalogEntry | null>;
   publish(entry: CatalogEntry): Promise<CatalogEntry>;

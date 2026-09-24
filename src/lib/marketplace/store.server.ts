@@ -9,6 +9,16 @@ export class SupabaseMarketplaceStore implements MarketplaceStore {
     private readonly client: SupabaseClient,
     private readonly admin: SupabaseClient,
   ) {}
+  async commerce(action: string, data: import("./commerce.ts").CommerceInput) {
+    if (!this.userId) throw Error("AUTH_REQUIRED");
+    return (await database(
+      this.admin.rpc("xeomx_marketplace_commerce", {
+        p_actor: this.userId,
+        p_action: action,
+        p_data: data,
+      }),
+    )) as import("../stage53-json.ts").JsonValue;
+  }
   async list() {
     const visible = await database(
       this.client

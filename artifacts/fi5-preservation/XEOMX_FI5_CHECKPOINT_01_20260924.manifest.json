@@ -1,0 +1,14 @@
+{
+  "repository": "Ehfamo/weave-render-app",
+  "source_fi4_sha": "b8238f9ed6c82399f89fbc80ba2a8c61d398de60",
+  "fi5_branch": "feature/xeomx-fi5-marketplace-commerce-lifecycle-20260924",
+  "checkpoint_head": "dc8196bf93533d5c818c7123d842c6d756e707eb",
+  "bundle_path": "artifacts/fi5-preservation/XEOMX_FI5_CHECKPOINT_01_20260924.bundle",
+  "bundle_sha256": "d4c24727b9b5dad0043b86cc589c0f854030adcab7747148deb69cd24d9c53e7",
+  "status": "FI5_IN_PROGRESS",
+  "tests": "NOT_STARTED",
+  "main_modified": false,
+  "production_modified": false,
+  "real_money_moved": false,
+  "fi6_started": false
+}

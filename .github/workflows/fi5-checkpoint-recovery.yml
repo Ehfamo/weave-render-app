@@ -1,0 +1,32 @@
+name: Recover exact FI5 checkpoint
+on:
+  push:
+    branches: [preservation/xeomx-fi5-interrupted-20260924]
+    paths:
+      - .github/workflows/fi5-checkpoint-recovery.yml
+      - artifacts/fi5-preservation/*.bundle
+permissions:
+  contents: write
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify and persist exact FI5 checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          bundle=artifacts/fi5-preservation/XEOMX_FI5_CHECKPOINT_01_20260924.bundle
+          expected=dc8196bf93533d5c818c7123d842c6d756e707eb
+          target=refs/heads/feature/xeomx-fi5-marketplace-commerce-lifecycle-20260924
+          echo "d4c24727b9b5dad0043b86cc589c0f854030adcab7747148deb69cd24d9c53e7  $bundle" | sha256sum --check -
+          git cat-file -e b8238f9ed6c82399f89fbc80ba2a8c61d398de60^{commit}
+          git bundle verify "$bundle"
+          test "$(git bundle list-heads "$bundle" "$target" | cut -d' ' -f1)" = "$expected"
+          git fetch "$bundle" "$target:refs/heads/recovered-fi5"
+          git merge-base --is-ancestor b8238f9ed6c82399f89fbc80ba2a8c61d398de60 "$expected"
+          git push origin "$expected:$target"
+          test "$(git ls-remote origin "$target" | cut -f1)" = "$expected"

@@ -131,6 +131,241 @@ END $$;
 REVOKE ALL ON FUNCTION public.xeomx_marketplace_publish(uuid,jsonb) FROM PUBLIC,anon,authenticated;
 GRANT EXECUTE ON FUNCTION public.xeomx_marketplace_publish(uuid,jsonb) TO service_role;
 CREATE TRIGGER fi5_price_immutable BEFORE UPDATE OR DELETE ON public.marketplace_prices FOR EACH ROW EXECUTE FUNCTION public.xeomx_marketplace_immutable();
+-- Financial mutations share publisher locks, including negative balance adjustments.
+-- This is an internal extension of the existing Marketplace RPC, not another payment ledger.
+CREATE FUNCTION private.fi5_release_earnings(p_acquisition uuid) RETURNS void LANGUAGE plpgsql SET search_path='' AS $$ BEGIN
+ IF NOT EXISTS(SELECT 1 FROM public.marketplace_adjustments x WHERE x.acquisition_id=p_acquisition AND ((x.kind='REFUND' AND x.state IN ('REQUESTED','UNDER_REVIEW','APPROVED','PROVIDER_PENDING')) OR (x.kind='DISPUTE' AND x.state IN ('OPEN','EVIDENCE_REQUIRED','UNDER_REVIEW','RESOLVED_BUYER')))) THEN
+  UPDATE public.marketplace_earnings e SET state='AVAILABLE' WHERE e.acquisition_id=p_acquisition AND e.state='HELD' AND e.creator_net IS NOT NULL AND NOT EXISTS(SELECT 1 FROM public.marketplace_payout_items pi WHERE pi.earning_id=e.id AND pi.active);
+ END IF;
+END $$;
+REVOKE ALL ON FUNCTION private.fi5_release_earnings(uuid) FROM PUBLIC,anon,authenticated;
+CREATE FUNCTION private.fi5_finance(p_actor uuid,p_action text,p_data jsonb) RETURNS jsonb LANGUAGE plpgsql SET search_path='' AS $$
+DECLARE
+ v_a public.marketplace_acquisitions; v_i public.billing_checkout_intents; v_r public.marketplace_adjustments;
+ v_pay public.marketplace_payouts; v_pub public.marketplace_publishers; v_ap public.approval_requests;
+ v_receipt public.marketplace_settlement_receipts; v_event jsonb; v_id uuid; v_event_id uuid;
+ v_amount bigint; v_total bigint; v_fee bigint; v_old text; v_target text; v_kind text; v_created boolean; v_claim boolean:=false;
+ v_hash text:=p_data->>'_request_hash'; v_key text:=p_data->>'idempotency_key'; v_provider text; v_result jsonb;
+BEGIN
+ IF p_action='payment_event' THEN
+  v_event:=p_data->'event';
+  SELECT * INTO v_a FROM public.marketplace_acquisitions WHERE id=(v_event->>'checkoutIntentId')::uuid;
+  IF v_a.id IS NULL OR v_a.buyer_id<>p_actor OR v_event->>'userId'<>p_actor::text OR v_event->>'signatureVerified' IS DISTINCT FROM 'true' THEN RAISE EXCEPTION 'PROVIDER_EVIDENCE_REQUIRED'; END IF;
+  PERFORM private.xeomx_billing_lock('fi5-publisher:'||v_a.publisher_id);
+  SELECT * INTO v_a FROM public.marketplace_acquisitions WHERE id=v_a.id FOR UPDATE;
+  SELECT * INTO v_i FROM public.billing_checkout_intents WHERE id=v_a.id FOR UPDATE;
+  IF v_i.provider='NOT_CONFIGURED' OR v_i.provider IS DISTINCT FROM v_event->>'provider' OR v_i.amount_minor IS DISTINCT FROM (v_event#>>'{money,amountMinor}')::bigint OR v_i.currency IS DISTINCT FROM v_event#>>'{money,currency}' THEN RAISE EXCEPTION 'EVENT_BINDING_MISMATCH'; END IF;
+  IF v_event->>'eventType' NOT IN ('payment_pending','payment_confirmed','payment_failed','payment_cancelled') THEN RAISE EXCEPTION 'INVALID_TRANSITION'; END IF;
+  SELECT payment_event_id,created INTO v_event_id,v_created FROM public.xeomx_record_verified_billing_event(p_actor,v_a.id,v_i.provider,v_event->>'providerEventId',v_event->>'eventType',v_event->>'payloadDigest',true,'provider-adapter',v_i.amount_minor,v_i.currency,(v_event->>'occurredAt')::timestamptz,'{}');
+  IF NOT v_created THEN RETURN to_jsonb(v_a); END IF;
+  IF v_a.phase<>'PROVIDER_PENDING' THEN RAISE EXCEPTION 'INVALID_TRANSITION'; END IF;
+  IF v_a.price->>'billing_model'='SUBSCRIPTION' AND v_event->>'eventType'='payment_confirmed' THEN RAISE EXCEPTION 'SUBSCRIPTION_PERIOD_EVIDENCE_REQUIRED'; END IF;
+  v_target:=CASE v_event->>'eventType' WHEN 'payment_confirmed' THEN 'SETTLED' WHEN 'payment_failed' THEN 'FAILED' WHEN 'payment_cancelled' THEN 'CANCELLED' ELSE 'PROVIDER_PENDING' END;
+  UPDATE public.marketplace_acquisitions SET phase=v_target,updated_at=now() WHERE id=v_a.id;
+  IF v_target='SETTLED' THEN
+   PERFORM public.xeomx_activate_billing_entitlement(v_a.entitlement_id,v_event_id);
+   UPDATE public.billing_checkout_intents SET status='completed' WHERE id=v_a.id;
+   v_fee:=CASE WHEN v_a.fee_bps IS NULL THEN NULL ELSE floor(v_i.amount_minor::numeric*v_a.fee_bps/10000)::bigint END;
+   INSERT INTO public.marketplace_earnings(acquisition_id,publisher_id,source_event_id,kind,gross,platform_fee,creator_net,currency,state)
+   VALUES(v_a.id,v_a.publisher_id,v_event_id,'SALE',v_i.amount_minor,v_fee,v_i.amount_minor-v_fee,v_i.currency,CASE WHEN v_fee IS NULL THEN 'HELD' ELSE 'AVAILABLE' END);
+  ELSIF v_target IN ('FAILED','CANCELLED') THEN
+   UPDATE public.billing_checkout_intents SET status=lower(v_target) WHERE id=v_a.id;
+   UPDATE public.billing_entitlements SET status='revoked' WHERE id=v_a.entitlement_id;
+  END IF;
+  PERFORM private.fi5_audit(p_actor,v_a.project_id,'payment',v_a.id,v_a.phase,v_target,v_event_id::text);
+  RETURN (SELECT to_jsonb(x) FROM public.marketplace_acquisitions x WHERE x.id=v_a.id);
+ ELSIF p_action IN ('refund','dispute') THEN
+  v_kind:=upper(p_action);
+  SELECT * INTO v_a FROM public.marketplace_acquisitions WHERE id=(p_data->>'id')::uuid;
+  IF v_a.id IS NULL OR v_a.buyer_id<>p_actor OR NOT private.fi5_member(p_actor,v_a.project_id) THEN RAISE EXCEPTION 'TRANSACTION_ACCESS_DENIED'; END IF;
+  PERFORM private.xeomx_billing_lock('fi5-publisher:'||v_a.publisher_id);
+  SELECT * INTO v_a FROM public.marketplace_acquisitions WHERE id=v_a.id FOR UPDATE;
+  SELECT * INTO v_r FROM public.marketplace_adjustments WHERE actor_id=p_actor AND kind=v_kind AND idempotency_key=v_key;
+  IF v_r.id IS NOT NULL THEN
+   IF v_r.request_hash IS DISTINCT FROM v_hash THEN RAISE EXCEPTION 'IDEMPOTENCY_CONFLICT'; END IF;
+   RETURN to_jsonb(v_r);
+  END IF;
+  IF v_key IS NULL OR length(v_key)<8 OR v_a.phase NOT IN ('SETTLED','PARTIALLY_REFUNDED') OR v_a.price->>'billing_model'='FREE' THEN RAISE EXCEPTION 'INVALID_TRANSITION'; END IF;
+  v_amount:=CASE WHEN v_kind='REFUND' THEN (p_data->>'amount')::bigint ELSE (v_a.price->>'amount')::bigint END;
+  IF p_data->>'currency' IS DISTINCT FROM v_a.price->>'currency' THEN RAISE EXCEPTION 'CURRENCY_MISMATCH'; END IF;
+  IF jsonb_typeof(coalesce(p_data->'evidence','[]'))<>'array' OR jsonb_array_length(coalesce(p_data->'evidence','[]'))>20 THEN RAISE EXCEPTION 'INVALID_EVIDENCE'; END IF;
+  IF EXISTS(SELECT 1 FROM public.marketplace_earnings e JOIN public.marketplace_payout_items pi ON pi.earning_id=e.id JOIN public.marketplace_payouts po ON po.id=pi.payout_id WHERE e.acquisition_id=v_a.id AND pi.active AND po.state IN ('DRAFT','READY','PROVIDER_PENDING')) THEN RAISE EXCEPTION 'PAYOUT_RECONCILIATION_REQUIRED'; END IF;
+  SELECT coalesce(sum(x.amount),0) INTO v_total FROM public.marketplace_adjustments x WHERE x.acquisition_id=v_a.id AND x.kind='REFUND' AND x.state NOT IN ('REJECTED','FAILED');
+  IF v_amount IS NULL OR v_amount<=0 OR (v_kind='REFUND' AND v_amount+v_total>(v_a.price->>'amount')::bigint) THEN RAISE EXCEPTION 'REFUND_CEILING'; END IF;
+  INSERT INTO public.marketplace_adjustments(acquisition_id,actor_id,kind,state,amount,currency,reason,evidence,idempotency_key,request_hash)
+  VALUES(v_a.id,p_actor,v_kind,CASE WHEN v_kind='REFUND' THEN 'REQUESTED' ELSE 'OPEN' END,v_amount,p_data->>'currency',p_data->>'reason',coalesce(p_data->'evidence','[]'),v_key,v_hash) RETURNING * INTO v_r;
+  IF v_kind='REFUND' THEN
+   v_id:=private.fi5_approval(p_actor,v_a.project_id,v_r.id,'refund',v_a.publisher_id);
+   UPDATE public.marketplace_adjustments SET approval_id=v_id WHERE id=v_r.id RETURNING * INTO v_r;
+  END IF;
+  UPDATE public.marketplace_earnings SET state='HELD' WHERE acquisition_id=v_a.id AND state='AVAILABLE';
+  PERFORM private.fi5_audit(p_actor,v_a.project_id,p_action,v_r.id,NULL,v_r.state,v_r.reason);
+  RETURN to_jsonb(v_r);
+ ELSIF p_action IN ('refund_decide','refund_submit','dispute_decide') THEN
+  SELECT * INTO v_r FROM public.marketplace_adjustments WHERE id=(p_data->>'id')::uuid;
+  SELECT * INTO v_a FROM public.marketplace_acquisitions WHERE id=v_r.acquisition_id;
+  IF v_r.id IS NULL OR (p_actor<>v_a.publisher_id AND p_actor<>v_a.buyer_id) OR (p_actor=v_a.buyer_id AND NOT private.fi5_member(p_actor,v_a.project_id)) THEN RAISE EXCEPTION 'ADJUSTMENT_ACCESS_DENIED'; END IF;
+  PERFORM private.xeomx_billing_lock('fi5-publisher:'||v_a.publisher_id);
+  SELECT * INTO v_r FROM public.marketplace_adjustments WHERE id=v_r.id FOR UPDATE;
+  v_old:=v_r.state;
+  IF p_action='dispute_decide' THEN
+   v_target:=p_data->>'state';
+   IF v_r.kind<>'DISPUTE' THEN RAISE EXCEPTION 'INVALID_TRANSITION'; END IF;
+   IF v_target=v_old THEN RETURN to_jsonb(v_r); END IF;
+   IF NOT ((v_old='OPEN' AND v_target IN ('EVIDENCE_REQUIRED','UNDER_REVIEW')) OR (v_old='EVIDENCE_REQUIRED' AND v_target='UNDER_REVIEW') OR (v_old='UNDER_REVIEW' AND v_target IN ('RESOLVED_BUYER','RESOLVED_CREATOR')) OR (v_old IN ('RESOLVED_BUYER','RESOLVED_CREATOR') AND v_target='CLOSED')) THEN RAISE EXCEPTION 'INVALID_TRANSITION'; END IF;
+   -- Without external adjudication, only explicit counterparty concession can resolve.
+   IF (v_target='RESOLVED_BUYER' AND p_actor<>v_a.publisher_id) OR (v_target='RESOLVED_CREATOR' AND p_actor<>v_a.buyer_id) THEN RAISE EXCEPTION 'COUNTERPARTY_DECISION_REQUIRED'; END IF;
+   IF v_target='CLOSED' AND v_old='RESOLVED_BUYER' AND v_a.phase<>'REFUNDED' THEN RAISE EXCEPTION 'REFUND_RECONCILIATION_REQUIRED'; END IF;
+   IF p_data ? 'evidence' AND (jsonb_typeof(p_data->'evidence')<>'array' OR jsonb_array_length(p_data->'evidence')>20) THEN RAISE EXCEPTION 'INVALID_EVIDENCE'; END IF;
+   UPDATE public.marketplace_adjustments SET state=v_target,evidence=coalesce(p_data->'evidence',evidence),updated_at=now() WHERE id=v_r.id;
+  ELSE
+   IF v_r.kind<>'REFUND' THEN RAISE EXCEPTION 'INVALID_TRANSITION'; END IF;
+   SELECT * INTO v_ap FROM public.approval_requests WHERE id=v_r.approval_id;
+   IF v_r.state IN ('REQUESTED','UNDER_REVIEW') THEN
+    v_target:=CASE v_ap.status WHEN 'approved' THEN 'APPROVED' WHEN 'denied' THEN 'REJECTED' ELSE 'UNDER_REVIEW' END;
+    UPDATE public.marketplace_adjustments SET state=v_target,updated_at=now() WHERE id=v_r.id RETURNING * INTO v_r;
+   END IF;
+   IF p_action='refund_submit' AND v_r.state='APPROVED' THEN
+    PERFORM private.fi5_consume(v_r.approval_id);
+    v_provider:=coalesce(p_data->>'_operation_provider','NOT_CONFIGURED');
+    v_claim:=v_provider<>'NOT_CONFIGURED';
+    UPDATE public.marketplace_adjustments SET state='PROVIDER_PENDING',provider=v_provider,execution_claimed=v_claim,updated_at=now() WHERE id=v_r.id RETURNING * INTO v_r;
+   END IF;
+   v_target:=v_r.state;
+  END IF;
+  IF v_old<>v_target THEN PERFORM private.fi5_audit(p_actor,v_a.project_id,p_action,v_r.id,v_old,v_target,left(coalesce(p_data->>'reason',v_r.reason),1000)); END IF;
+  PERFORM private.fi5_release_earnings(v_a.id);
+  RETURN (SELECT to_jsonb(x)||jsonb_build_object('claimed',v_claim,'provider_status',CASE WHEN x.provider='NOT_CONFIGURED' THEN 'NOT_CONFIGURED' ELSE 'AVAILABLE' END) FROM public.marketplace_adjustments x WHERE x.id=v_r.id);
+ ELSIF p_action='payout' THEN
+  SELECT * INTO v_pub FROM public.marketplace_publishers WHERE user_id=p_actor;
+  IF v_pub.user_id IS NULL OR NOT EXISTS(SELECT 1 FROM public.projects WHERE id=(p_data->>'project_id')::uuid AND owner_id=p_actor AND status='active') THEN RAISE EXCEPTION 'PUBLISHER_OWNER_REQUIRED'; END IF;
+  PERFORM private.xeomx_billing_lock('fi5-publisher:'||p_actor);
+  SELECT * INTO v_pay FROM public.marketplace_payouts WHERE publisher_id=p_actor AND idempotency_key=v_key;
+  IF v_pay.id IS NOT NULL THEN
+   IF v_pay.request_hash IS DISTINCT FROM v_hash THEN RAISE EXCEPTION 'IDEMPOTENCY_CONFLICT'; END IF;
+   RETURN to_jsonb(v_pay);
+  END IF;
+  IF v_key IS NULL OR length(v_key)<8 THEN RAISE EXCEPTION 'INVALID_IDEMPOTENCY_KEY'; END IF;
+  IF p_data->>'currency' NOT IN ('USD','IRR','IRT') THEN RAISE EXCEPTION 'CURRENCY_MISMATCH'; END IF;
+  IF EXISTS(SELECT 1 FROM public.marketplace_earnings e WHERE e.publisher_id=p_actor AND e.state='HELD') THEN RAISE EXCEPTION 'HELD_EARNINGS'; END IF;
+  -- Payout the entire available currency balance, including negative refund entries.
+  SELECT coalesce(sum(e.creator_net),0) INTO v_total FROM public.marketplace_earnings e WHERE e.publisher_id=p_actor AND e.currency=p_data->>'currency' AND e.state='AVAILABLE' AND NOT EXISTS(SELECT 1 FROM public.marketplace_payout_items pi WHERE pi.earning_id=e.id AND pi.active);
+  IF v_total<=0 THEN RAISE EXCEPTION 'NO_AVAILABLE_EARNINGS'; END IF;
+  v_target:=CASE WHEN v_pub.payout_eligible AND v_pub.state='ACTIVE' THEN 'DRAFT' ELSE 'ELIGIBILITY_REQUIRED' END;
+  INSERT INTO public.marketplace_payouts(publisher_id,project_id,amount,currency,state,eligibility_snapshot,idempotency_key,request_hash)
+  VALUES(p_actor,(p_data->>'project_id')::uuid,v_total,p_data->>'currency',v_target,jsonb_build_object('eligible',v_pub.payout_eligible,'identity_state',v_pub.identity_state,'verification_reference',v_pub.verification_reference),v_key,v_hash) RETURNING * INTO v_pay;
+  IF v_target='DRAFT' THEN
+   v_id:=private.fi5_approval(p_actor,v_pay.project_id,v_pay.id,'payout',p_actor);
+   UPDATE public.marketplace_payouts SET approval_id=v_id WHERE id=v_pay.id RETURNING * INTO v_pay;
+   INSERT INTO public.marketplace_payout_items(payout_id,earning_id) SELECT v_pay.id,e.id FROM public.marketplace_earnings e WHERE e.publisher_id=p_actor AND e.currency=v_pay.currency AND e.state='AVAILABLE' AND NOT EXISTS(SELECT 1 FROM public.marketplace_payout_items pi WHERE pi.earning_id=e.id AND pi.active);
+   UPDATE public.marketplace_earnings e SET state='HELD' WHERE e.id IN (SELECT pi.earning_id FROM public.marketplace_payout_items pi WHERE pi.payout_id=v_pay.id);
+  END IF;
+  PERFORM private.fi5_audit(p_actor,v_pay.project_id,'payout',v_pay.id,NULL,v_target);
+  RETURN to_jsonb(v_pay);
+ ELSIF p_action='payout_submit' THEN
+  SELECT * INTO v_pay FROM public.marketplace_payouts WHERE id=(p_data->>'id')::uuid;
+  IF v_pay.id IS NULL OR v_pay.publisher_id<>p_actor OR NOT EXISTS(SELECT 1 FROM public.projects WHERE id=v_pay.project_id AND owner_id=p_actor AND status='active') THEN RAISE EXCEPTION 'PAYOUT_ACCESS_DENIED'; END IF;
+  PERFORM private.xeomx_billing_lock('fi5-publisher:'||p_actor);
+  SELECT * INTO v_pay FROM public.marketplace_payouts WHERE id=v_pay.id FOR UPDATE;
+  v_old:=v_pay.state;
+  IF v_pay.state='DRAFT' THEN
+   SELECT * INTO v_ap FROM public.approval_requests WHERE id=v_pay.approval_id;
+   IF v_ap.status='denied' THEN
+    UPDATE public.marketplace_payouts SET state='CANCELLED',updated_at=now() WHERE id=v_pay.id RETURNING * INTO v_pay;
+    UPDATE public.marketplace_payout_items SET active=false WHERE payout_id=v_pay.id;
+    UPDATE public.marketplace_earnings e SET state='AVAILABLE' WHERE e.id IN (SELECT pi.earning_id FROM public.marketplace_payout_items pi WHERE pi.payout_id=v_pay.id);
+   ELSE
+    SELECT * INTO v_pub FROM public.marketplace_publishers WHERE user_id=p_actor;
+    IF NOT v_pub.payout_eligible OR v_pub.state<>'ACTIVE' THEN RAISE EXCEPTION 'PAYOUT_INELIGIBLE'; END IF;
+    PERFORM private.fi5_consume(v_pay.approval_id);
+    PERFORM private.fi5_audit(p_actor,v_pay.project_id,'payout',v_pay.id,v_old,'READY');
+    v_provider:=coalesce(p_data->>'_operation_provider','NOT_CONFIGURED');
+    v_claim:=v_provider<>'NOT_CONFIGURED';
+    UPDATE public.marketplace_payouts SET state='PROVIDER_PENDING',provider=v_provider,execution_claimed=v_claim,updated_at=now() WHERE id=v_pay.id RETURNING * INTO v_pay;
+   END IF;
+  END IF;
+  IF v_old<>v_pay.state THEN PERFORM private.fi5_audit(p_actor,v_pay.project_id,'payout',v_pay.id,v_old,v_pay.state); END IF;
+  RETURN to_jsonb(v_pay)||jsonb_build_object('claimed',v_claim,'provider_status',CASE WHEN v_pay.provider='NOT_CONFIGURED' THEN 'NOT_CONFIGURED' ELSE 'AVAILABLE' END);
+ ELSIF p_action='operation_reference' THEN
+  v_kind:=p_data->>'kind'; v_provider:=p_data->>'provider';
+  IF length(p_data->>'reference') NOT BETWEEN 1 AND 240 OR v_provider='NOT_CONFIGURED' THEN RAISE EXCEPTION 'INVALID_PROVIDER_REFERENCE'; END IF;
+  IF v_kind='refund' THEN
+   SELECT * INTO v_r FROM public.marketplace_adjustments WHERE id=(p_data->>'id')::uuid FOR UPDATE;
+   SELECT * INTO v_a FROM public.marketplace_acquisitions WHERE id=v_r.acquisition_id;
+   IF p_actor NOT IN (v_a.buyer_id,v_a.publisher_id) OR v_r.state<>'PROVIDER_PENDING' OR NOT v_r.execution_claimed OR v_r.provider IS DISTINCT FROM v_provider THEN RAISE EXCEPTION 'ADJUSTMENT_ACCESS_DENIED'; END IF;
+   IF v_r.provider_reference IS NOT NULL AND v_r.provider_reference<>p_data->>'reference' THEN RAISE EXCEPTION 'IDEMPOTENCY_CONFLICT'; END IF;
+   UPDATE public.marketplace_adjustments SET provider_reference=p_data->>'reference' WHERE id=v_r.id RETURNING to_jsonb(marketplace_adjustments) INTO v_result;
+  ELSIF v_kind='payout' THEN
+   SELECT * INTO v_pay FROM public.marketplace_payouts WHERE id=(p_data->>'id')::uuid FOR UPDATE;
+   IF v_pay.publisher_id IS DISTINCT FROM p_actor OR v_pay.state<>'PROVIDER_PENDING' OR NOT v_pay.execution_claimed OR v_pay.provider IS DISTINCT FROM v_provider THEN RAISE EXCEPTION 'PAYOUT_ACCESS_DENIED'; END IF;
+   IF v_pay.provider_reference IS NOT NULL AND v_pay.provider_reference<>p_data->>'reference' THEN RAISE EXCEPTION 'IDEMPOTENCY_CONFLICT'; END IF;
+   UPDATE public.marketplace_payouts SET provider_reference=p_data->>'reference' WHERE id=v_pay.id RETURNING to_jsonb(marketplace_payouts) INTO v_result;
+  ELSE RAISE EXCEPTION 'INVALID_OPERATION'; END IF;
+  RETURN v_result;
+ ELSIF p_action='operation_event' THEN
+  v_event:=p_data->'event'; v_kind:=p_data->>'kind';
+  IF v_event->>'signatureVerified' IS DISTINCT FROM 'true' OR v_event->>'state' NOT IN ('SETTLED','FAILED') OR v_event->>'provider'='NOT_CONFIGURED' THEN RAISE EXCEPTION 'PROVIDER_EVIDENCE_REQUIRED'; END IF;
+  PERFORM private.xeomx_billing_lock('fi5-operation:'||(v_event->>'provider')||':'||(v_event->>'eventId'));
+  SELECT * INTO v_receipt FROM public.marketplace_settlement_receipts WHERE provider=v_event->>'provider' AND event_id=v_event->>'eventId';
+  IF v_kind='refund' THEN
+   SELECT * INTO v_r FROM public.marketplace_adjustments WHERE id=(v_event->>'entityId')::uuid;
+   SELECT * INTO v_a FROM public.marketplace_acquisitions WHERE id=v_r.acquisition_id;
+   IF v_r.id IS NULL OR p_actor NOT IN (v_a.buyer_id,v_a.publisher_id) OR v_r.provider IS DISTINCT FROM v_event->>'provider' OR v_r.amount IS DISTINCT FROM (v_event->>'amountMinor')::bigint OR v_r.currency IS DISTINCT FROM v_event->>'currency' THEN RAISE EXCEPTION 'EVENT_BINDING_MISMATCH'; END IF;
+  ELSIF v_kind='payout' THEN
+   SELECT * INTO v_pay FROM public.marketplace_payouts WHERE id=(v_event->>'entityId')::uuid;
+   IF v_pay.id IS NULL OR v_pay.publisher_id<>p_actor OR v_pay.provider IS DISTINCT FROM v_event->>'provider' OR v_pay.amount IS DISTINCT FROM (v_event->>'amountMinor')::bigint OR v_pay.currency IS DISTINCT FROM v_event->>'currency' THEN RAISE EXCEPTION 'EVENT_BINDING_MISMATCH'; END IF;
+  ELSE RAISE EXCEPTION 'INVALID_OPERATION'; END IF;
+  IF v_receipt.event_id IS NOT NULL THEN
+   IF v_receipt.record IS DISTINCT FROM v_event OR v_receipt.kind<>v_kind THEN RAISE EXCEPTION 'IDEMPOTENCY_CONFLICT'; END IF;
+   RETURN jsonb_build_object('state','ALREADY_PROCESSED');
+  END IF;
+  PERFORM private.xeomx_billing_lock('fi5-publisher:'||CASE WHEN v_kind='refund' THEN v_a.publisher_id ELSE v_pay.publisher_id END);
+  IF v_kind='refund' THEN
+   SELECT * INTO v_r FROM public.marketplace_adjustments WHERE id=v_r.id FOR UPDATE;
+   SELECT * INTO v_a FROM public.marketplace_acquisitions WHERE id=v_a.id FOR UPDATE;
+   IF v_r.state<>'PROVIDER_PENDING' OR v_r.provider_reference IS NULL OR NOT v_r.execution_claimed THEN RAISE EXCEPTION 'INVALID_TRANSITION'; END IF;
+   v_target:=CASE WHEN v_event->>'state'='SETTLED' THEN 'REFUNDED' ELSE 'FAILED' END;
+   IF v_target='REFUNDED' THEN
+    SELECT * INTO v_i FROM public.billing_checkout_intents WHERE id=v_a.id;
+    SELECT payment_event_id INTO v_event_id FROM public.xeomx_record_verified_billing_event(v_a.buyer_id,v_a.id,v_i.provider,'refund:'||v_r.id||':'||(v_event->>'eventId'),'refund_confirmed',v_event->>'payloadDigest',true,'refund-adapter',v_r.amount,v_r.currency,now(),jsonb_build_object('refund_id',v_r.id,'refund_provider',v_r.provider));
+    SELECT coalesce(sum(x.amount),0)+v_r.amount INTO v_total FROM public.marketplace_adjustments x WHERE x.acquisition_id=v_a.id AND x.kind='REFUND' AND x.state='REFUNDED';
+    IF v_total>(v_a.price->>'amount')::bigint THEN RAISE EXCEPTION 'REFUND_CEILING'; END IF;
+    -- Cumulative rounding means many small partial refunds cannot over-reverse a fee.
+    v_fee:=CASE WHEN v_a.fee_bps IS NULL THEN NULL ELSE floor(v_total::numeric*v_a.fee_bps/10000)::bigint-floor((v_total-v_r.amount)::numeric*v_a.fee_bps/10000)::bigint END;
+    INSERT INTO public.marketplace_earnings(acquisition_id,publisher_id,source_event_id,kind,gross,platform_fee,creator_net,currency,state) VALUES(v_a.id,v_a.publisher_id,v_event_id,'REFUND',-v_r.amount,-v_fee,-v_r.amount+v_fee,v_r.currency,'HELD');
+    UPDATE public.marketplace_acquisitions SET phase=CASE WHEN v_total=(v_a.price->>'amount')::bigint THEN 'REFUNDED' ELSE 'PARTIALLY_REFUNDED' END,updated_at=now() WHERE id=v_a.id;
+    IF v_total=(v_a.price->>'amount')::bigint THEN PERFORM public.xeomx_set_billing_entitlement_status(v_a.entitlement_id,'refunded',v_event_id,'verified-refund'); END IF;
+   END IF;
+   UPDATE public.marketplace_adjustments SET state=v_target,updated_at=now() WHERE id=v_r.id;
+   PERFORM private.fi5_release_earnings(v_a.id);
+   PERFORM private.fi5_audit(p_actor,v_a.project_id,'refund_settlement',v_r.id,'PROVIDER_PENDING',v_target,v_event_id::text);
+  ELSE
+   SELECT * INTO v_pay FROM public.marketplace_payouts WHERE id=v_pay.id FOR UPDATE;
+   IF v_pay.state<>'PROVIDER_PENDING' OR v_pay.provider_reference IS NULL OR NOT v_pay.execution_claimed THEN RAISE EXCEPTION 'INVALID_TRANSITION'; END IF;
+   v_target:=CASE WHEN v_event->>'state'='SETTLED' THEN 'PAID' ELSE 'FAILED' END;
+   UPDATE public.marketplace_payouts SET state=v_target,updated_at=now() WHERE id=v_pay.id;
+   UPDATE public.marketplace_earnings e SET state=CASE WHEN v_target='PAID' THEN 'PAID' ELSE 'AVAILABLE' END WHERE e.id IN(SELECT pi.earning_id FROM public.marketplace_payout_items pi WHERE pi.payout_id=v_pay.id);
+   IF v_target='FAILED' THEN UPDATE public.marketplace_payout_items SET active=false WHERE payout_id=v_pay.id; END IF;
+   PERFORM private.fi5_audit(p_actor,v_pay.project_id,'payout_settlement',v_pay.id,'PROVIDER_PENDING',v_target,v_event->>'eventId');
+  END IF;
+  INSERT INTO public.marketplace_settlement_receipts(provider,event_id,entity_id,kind,payload_digest,processing_state,record) VALUES(v_event->>'provider',v_event->>'eventId',(v_event->>'entityId')::uuid,v_kind,v_event->>'payloadDigest','PROCESSED',v_event);
+  RETURN jsonb_build_object('state',v_target);
+ ELSIF p_action='dashboard' THEN
+  RETURN jsonb_build_object(
+   'publisher',(SELECT to_jsonb(x) FROM public.marketplace_publishers x WHERE x.user_id=p_actor),
+   'drafts',coalesce((SELECT jsonb_agg(to_jsonb(x)) FROM (SELECT * FROM public.marketplace_drafts WHERE owner_id=p_actor ORDER BY updated_at DESC LIMIT 100) x),'[]'),
+   'orders',coalesce((SELECT jsonb_agg(to_jsonb(x)) FROM (SELECT * FROM public.marketplace_acquisitions WHERE buyer_id=p_actor AND private.fi5_member(p_actor,project_id) ORDER BY created_at DESC LIMIT 100) x),'[]'),
+   'earnings',coalesce((SELECT jsonb_agg(to_jsonb(x)) FROM (SELECT * FROM public.marketplace_earnings WHERE publisher_id=p_actor ORDER BY created_at DESC LIMIT 100) x),'[]'),
+   'payouts',coalesce((SELECT jsonb_agg(to_jsonb(x)) FROM (SELECT * FROM public.marketplace_payouts WHERE publisher_id=p_actor AND private.fi5_member(p_actor,project_id) ORDER BY created_at DESC LIMIT 100) x),'[]'),
+   'adjustments',coalesce((SELECT jsonb_agg(to_jsonb(x)) FROM (SELECT adj.* FROM public.marketplace_adjustments adj JOIN public.marketplace_acquisitions acq ON acq.id=adj.acquisition_id WHERE acq.publisher_id=p_actor OR (acq.buyer_id=p_actor AND private.fi5_member(p_actor,acq.project_id)) ORDER BY adj.created_at DESC LIMIT 100) x),'[]'),
+   'approvals',coalesce((SELECT jsonb_agg(to_jsonb(x)) FROM (SELECT id,status,runtime_record,expires_at FROM public.approval_requests WHERE commerce_key IS NOT NULL AND runtime_record->>'approver'=p_actor::text ORDER BY created_at DESC LIMIT 100) x),'[]'),
+   'analytics',jsonb_build_object('free_acquisitions',(SELECT count(*) FROM public.marketplace_acquisitions WHERE publisher_id=p_actor AND phase='SETTLED' AND marketplace_acquisitions.price->>'billing_model'='FREE'),'paid_settlements',(SELECT count(*) FROM public.marketplace_earnings WHERE publisher_id=p_actor AND kind='SALE'),'conversion','NOT_ENOUGH_DATA','currency_totals',coalesce((SELECT jsonb_agg(to_jsonb(x)) FROM (SELECT currency,sum(gross) gross,sum(platform_fee) platform_fee,sum(creator_net) creator_net,bool_and(platform_fee IS NOT NULL) fees_known FROM public.marketplace_earnings WHERE publisher_id=p_actor GROUP BY currency) x),'[]')),
+   'providers',jsonb_build_object('payment','NOT_CONFIGURED','refund','NOT_CONFIGURED','payout','NOT_CONFIGURED'));
+ END IF;
+ RAISE EXCEPTION 'COMMERCE_ACTION_NOT_IMPLEMENTED';
+END $$;
+REVOKE ALL ON FUNCTION private.fi5_finance(uuid,text,jsonb) FROM PUBLIC,anon,authenticated;
+
 CREATE FUNCTION public.xeomx_marketplace_commerce(p_actor uuid,p_action text,p_data jsonb DEFAULT '{}') RETURNS jsonb
 LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
 DECLARE v public.marketplace_versions; d public.marketplace_drafts; a public.marketplace_acquisitions; i public.billing_checkout_intents;
@@ -290,7 +525,7 @@ BEGIN
   END IF;
   RETURN (SELECT to_jsonb(x)||jsonb_build_object('entitlement',(SELECT to_jsonb(e) FROM public.billing_entitlements e WHERE e.id=x.entitlement_id),'provider_status',(SELECT provider FROM public.billing_checkout_intents WHERE id=x.id),'adjustments',coalesce((SELECT jsonb_agg(to_jsonb(r)) FROM public.marketplace_adjustments r WHERE acquisition_id=x.id),'[]')) FROM public.marketplace_acquisitions x WHERE id=a.id);
  END IF;
- RAISE EXCEPTION 'COMMERCE_ACTION_NOT_IMPLEMENTED';
+ RETURN private.fi5_finance(p_actor,p_action,p_data);
 END $$;
 REVOKE ALL ON FUNCTION public.xeomx_marketplace_commerce(uuid,text,jsonb) FROM PUBLIC,anon,authenticated;
 GRANT EXECUTE ON FUNCTION public.xeomx_marketplace_commerce(uuid,text,jsonb) TO service_role;

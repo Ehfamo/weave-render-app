@@ -6,6 +6,7 @@ import { sha256, verifyPackage } from "./integrity.ts";
 import type { CatalogEntry } from "./catalog.ts";
 
 export const COMMERCE_ACTIONS = [
+  "quote",
   "publisher",
   "draft",
   "validate",
@@ -170,8 +171,9 @@ export class MarketplaceCommerce {
     if (action === "refund_submit" || action === "payout_submit") {
       // Durable reservation is established before invoking any provider. Retry does not
       // repeat a possibly completed external request; reconciliation uses verified events.
-      const pending = (await this.port.command(action, data)) as Record<string, JsonValue>;
       const provider = action === "refund_submit" ? this.providers.refund : this.providers.payout;
+      data._operation_provider = provider?.configured ? provider.id : "NOT_CONFIGURED";
+      const pending = (await this.port.command(action, data)) as Record<string, JsonValue>;
       if (!provider?.configured || pending.claimed !== true) return pending;
       try {
         const result = await provider.request({

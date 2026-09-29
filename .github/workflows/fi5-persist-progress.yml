@@ -17,10 +17,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          bundle=artifacts/fi5-preservation/XEOMX_FI5_CHECKPOINT_02_20260929.bundle
-          expected=3e01e4d9fd8f40b658d7437f369687de685eef2f
+          bundle=artifacts/fi5-preservation/XEOMX_FI5_CHECKPOINT_03_20260929.bundle
+          expected=7601c9976570fb6b16a1fd384a7820817144f90b
           target=refs/heads/feature/xeomx-fi5-marketplace-commerce-lifecycle-20260924
-          echo "43eff1379511d33e679d15c163fe0674e1729f5f6b09653e9e309d2093699776  $bundle" | sha256sum --check -
+          echo "f34dc72606b9339af3f861637bdcda63d104fe24f8554ee4963b1c1b85daed1c  $bundle" | sha256sum --check -
           git bundle verify "$bundle"
           test "$(git bundle list-heads "$bundle" "$target" | cut -d' ' -f1)" = "$expected"
           git fetch "$bundle" "$target:refs/heads/recovered-fi5"

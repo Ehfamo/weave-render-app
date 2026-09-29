@@ -1,0 +1,32 @@
+name: Recover exact FI5 workspace
+on:
+  push:
+    branches: [preservation/xeomx-fi5-recovery-20260929]
+    paths: [.github/workflows/fi5-workspace-recovery.yml]
+permissions:
+  contents: read
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/xeomx-fi5-marketplace-commerce-lifecycle-20260924
+          fetch-depth: 0
+      - name: Export exact preserved history
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = dc8196bf93533d5c818c7123d842c6d756e707eb
+          git merge-base --is-ancestor b8238f9ed6c82399f89fbc80ba2a8c61d398de60 HEAD
+          git bundle create XEOMX_FI5_RECOVERY_20260929.bundle refs/heads/feature/xeomx-fi5-marketplace-commerce-lifecycle-20260924
+          git bundle verify XEOMX_FI5_RECOVERY_20260929.bundle
+          sha256sum XEOMX_FI5_RECOVERY_20260929.bundle > XEOMX_FI5_RECOVERY_20260929.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xeomx-fi5-exact-recovery-20260929
+          path: |
+            XEOMX_FI5_RECOVERY_20260929.bundle
+            XEOMX_FI5_RECOVERY_20260929.sha256
+          retention-days: 30

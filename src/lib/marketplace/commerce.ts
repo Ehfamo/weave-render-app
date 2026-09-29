@@ -4,6 +4,7 @@ import { createBillingBoundary } from "../billing/index.ts";
 import type { BillingProvider } from "../billing/index.ts";
 import { sha256, verifyPackage } from "./integrity.ts";
 import type { CatalogEntry } from "./catalog.ts";
+import { MARKETPLACE_OBJECT_TYPES } from "./contracts.ts";
 
 export const COMMERCE_ACTIONS = [
   "quote",
@@ -43,10 +44,7 @@ export interface FinancialOperationProvider {
     currency: string;
     originalReference?: string;
   }): Promise<{ providerReference: string; state: "PENDING" }>;
-  verify(input: {
-    rawBody: Uint8Array;
-    headers: Record<string, string>;
-  }): Promise<{
+  verify(input: { rawBody: Uint8Array; headers: Record<string, string> }): Promise<{
     provider: string;
     eventId: string;
     entityId: string;
@@ -105,6 +103,60 @@ export function safeCommerceInput(value: unknown): CommerceInput {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw Error("INVALID_INPUT");
   return JSON.parse(serialized);
 }
+export function validateEnterprisePolicy(value: unknown): CommerceInput {
+  const policy = safeCommerceInput(value);
+  const arrays = [
+    "allowed_types",
+    "allowed_publishers",
+    "blocked_publishers",
+    "allowed_permissions",
+    "allowed_hosts",
+  ];
+  const booleans = [
+    "prohibit_consequential",
+    "require_security_review",
+    "admin_approval",
+    "require_commercial_license",
+  ];
+  const keys = [...arrays, ...booleans, "max_amount", "currency", "pinned_versions"];
+  if (Object.keys(policy).some((k) => !keys.includes(k))) throw Error("INVALID_POLICY");
+  for (const k of arrays)
+    if (
+      k in policy &&
+      (!Array.isArray(policy[k]) ||
+        policy[k].length > 100 ||
+        policy[k].some((x) => typeof x !== "string" || !x || x.length > 200))
+    )
+      throw Error("INVALID_POLICY");
+  for (const k of booleans)
+    if (k in policy && typeof policy[k] !== "boolean") throw Error("INVALID_POLICY");
+  if (
+    "max_amount" in policy &&
+    (!Number.isSafeInteger(policy.max_amount) ||
+      Number(policy.max_amount) < 0 ||
+      !["USD", "IRR", "IRT"].includes(String(policy.currency)))
+  )
+    throw Error("INVALID_POLICY");
+  if (
+    "allowed_types" in policy &&
+    (policy.allowed_types as string[]).some(
+      (x) => !(MARKETPLACE_OBJECT_TYPES as readonly string[]).includes(x),
+    )
+  )
+    throw Error("INVALID_POLICY");
+  if ("pinned_versions" in policy) {
+    const pins = policy.pinned_versions;
+    if (
+      !pins ||
+      typeof pins !== "object" ||
+      Array.isArray(pins) ||
+      Object.keys(pins).length > 100 ||
+      Object.values(pins).some((x) => typeof x !== "string" || !/^\d+\.\d+\.\d+$/.test(x))
+    )
+      throw Error("INVALID_POLICY");
+  }
+  return policy;
+}
 /** Extension behind MarketplaceService, sharing FI4 identity, store and validation.
  * No production provider is injected; deterministic adapters exist only in tests. */
 export class MarketplaceCommerce {
@@ -136,6 +188,8 @@ export class MarketplaceCommerce {
       throw Error("SERVER_FACT_REQUIRED");
     data._request_hash = await sha256(canonicalJson(data));
     if (action === "acquire") {
+      const existing = await this.port.command("acquire_lookup", data);
+      if (existing) return existing;
       if (!this.loadEntry) throw Error("NOT_CONFIGURED");
       data._digest = (await this.loadEntry(String(data.version_id))).manifest.integrity.digest;
     }
@@ -145,6 +199,7 @@ export class MarketplaceCommerce {
       data.price = validatePrice(data.price);
     }
     if (action === "price") data.price = validatePrice(data.price);
+    if (action === "policy") data.policy = validateEnterprisePolicy(data.policy);
     if (action === "validate") {
       const e = (await this.port.command("draft_get", data)) as unknown as { entry: CatalogEntry };
       try {

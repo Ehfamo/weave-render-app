@@ -73,6 +73,25 @@ CREATE TABLE public.marketplace_settlement_receipts (
 CREATE TABLE public.marketplace_enterprise_policies (
  project_id uuid PRIMARY KEY REFERENCES public.projects(id), policy jsonb NOT NULL, updated_by uuid NOT NULL REFERENCES auth.users(id),updated_at timestamptz NOT NULL DEFAULT now()
 );
+-- Immutable acquisition terms and append-oriented financial evidence.
+CREATE FUNCTION private.fi5_snapshot_guard() RETURNS trigger LANGUAGE plpgsql SET search_path='' AS $$ BEGIN
+ IF TG_OP='DELETE' THEN RAISE EXCEPTION 'COMMERCE_HISTORY_IMMUTABLE'; END IF;
+ IF (TG_TABLE_NAME='marketplace_acquisitions' AND (to_jsonb(OLD)-ARRAY['phase','approval_id','entitlement_id','updated_at']) IS DISTINCT FROM (to_jsonb(NEW)-ARRAY['phase','approval_id','entitlement_id','updated_at'])) OR
+    (TG_TABLE_NAME='marketplace_earnings' AND (to_jsonb(OLD)-'state') IS DISTINCT FROM (to_jsonb(NEW)-'state')) OR
+    (TG_TABLE_NAME='marketplace_payouts' AND (to_jsonb(OLD)-ARRAY['state','approval_id','provider','provider_reference','execution_claimed','updated_at']) IS DISTINCT FROM (to_jsonb(NEW)-ARRAY['state','approval_id','provider','provider_reference','execution_claimed','updated_at'])) THEN RAISE EXCEPTION 'COMMERCE_SNAPSHOT_IMMUTABLE'; END IF;
+ RETURN NEW;
+END $$;
+CREATE TRIGGER fi5_acquisition_snapshot BEFORE UPDATE OR DELETE ON public.marketplace_acquisitions FOR EACH ROW EXECUTE FUNCTION private.fi5_snapshot_guard();
+CREATE TRIGGER fi5_earning_snapshot BEFORE UPDATE OR DELETE ON public.marketplace_earnings FOR EACH ROW EXECUTE FUNCTION private.fi5_snapshot_guard();
+CREATE TRIGGER fi5_payout_snapshot BEFORE UPDATE OR DELETE ON public.marketplace_payouts FOR EACH ROW EXECUTE FUNCTION private.fi5_snapshot_guard();
+CREATE TRIGGER fi5_receipt_immutable BEFORE UPDATE OR DELETE ON public.marketplace_settlement_receipts FOR EACH ROW EXECUTE FUNCTION public.xeomx_marketplace_immutable();
+CREATE INDEX fi5_acquisition_buyer_project ON public.marketplace_acquisitions(buyer_id,project_id,created_at DESC);
+CREATE INDEX fi5_acquisition_publisher ON public.marketplace_acquisitions(publisher_id,created_at DESC);
+CREATE INDEX fi5_draft_owner ON public.marketplace_drafts(owner_id,updated_at DESC);
+CREATE INDEX fi5_adjustment_actor ON public.marketplace_adjustments(actor_id,created_at DESC);
+CREATE INDEX fi5_payout_project ON public.marketplace_payouts(project_id,publisher_id);
+CREATE INDEX fi5_payout_item_earning ON public.marketplace_payout_items(earning_id);
+
 ALTER TABLE public.approval_requests ADD COLUMN commerce_key text UNIQUE;
 ALTER TABLE public.approval_requests ALTER COLUMN run_id DROP NOT NULL;
 ALTER TABLE public.approval_requests ADD CONSTRAINT approval_subject_required CHECK(run_id IS NOT NULL OR commerce_key IS NOT NULL);
@@ -449,6 +468,13 @@ BEGIN
    UPDATE public.marketplace_listings SET state=lower(target),updated_at=now() WHERE id=v.id;
   END IF;
   PERFORM private.fi5_audit(p_actor,NULL,'lifecycle',v.id,old_state,target); RETURN jsonb_build_object('state',target);
+ ELSIF p_action='acquire_lookup' THEN
+  SELECT * INTO i FROM public.billing_checkout_intents WHERE user_id=p_actor AND idempotency_key='marketplace:'||key;
+  IF i.id IS NULL THEN RETURN 'null'::jsonb; END IF;
+  SELECT * INTO a FROM public.marketplace_acquisitions WHERE id=i.id;
+  IF a.id IS NULL OR NOT private.fi5_member(p_actor,a.project_id,true) THEN RAISE EXCEPTION 'TRANSACTION_ACCESS_DENIED'; END IF;
+  IF a.request_hash IS DISTINCT FROM fingerprint THEN RAISE EXCEPTION 'IDEMPOTENCY_CONFLICT'; END IF;
+  RETURN to_jsonb(a);
  ELSIF p_action='acquire' THEN
   pid:=(p_data->>'project_id')::uuid;
   IF key='' OR NOT private.fi5_member(p_actor,pid,true) THEN RAISE EXCEPTION 'PROJECT_ACCESS_DENIED'; END IF;
@@ -471,10 +497,10 @@ BEGIN
   IF (policy ? 'allowed_publishers' AND NOT (policy->'allowed_publishers' ? pub.user_id::text)) OR (policy->'blocked_publishers' ? pub.user_id::text) THEN RAISE EXCEPTION 'ENTERPRISE_PUBLISHER_POLICY'; END IF;
   IF policy ? 'allowed_types' AND NOT (policy->'allowed_types' ? (v.entry#>>'{manifest,objectType}')) THEN RAISE EXCEPTION 'ENTERPRISE_TYPE_POLICY'; END IF;
   IF EXISTS(SELECT 1 FROM jsonb_array_elements(v.entry#>'{manifest,permissions}') pm WHERE (policy ? 'allowed_permissions' AND NOT(policy->'allowed_permissions' ? (pm->>'id'))) OR (coalesce((policy->>'prohibit_consequential')::boolean,true) AND pm->>'risk'<>'safe_read')) THEN RAISE EXCEPTION 'ENTERPRISE_PERMISSION_POLICY'; END IF;
-  IF policy ? 'allowed_hosts' AND EXISTS(SELECT 1 FROM jsonb_array_elements_text(coalesce(v.entry#>'{manifest,disclosure,privacy,destinations}','[]')) h WHERE NOT(policy->'allowed_hosts' ? h)) THEN RAISE EXCEPTION 'ENTERPRISE_NETWORK_POLICY'; END IF;
+  IF policy ? 'allowed_hosts' AND EXISTS(SELECT 1 FROM jsonb_array_elements_text(coalesce(v.entry#>'{manifest,disclosure,privacy,destinations}','[]')||coalesce(v.entry#>'{manifest,disclosure,mcp,hosts}','[]')) h WHERE NOT(policy->'allowed_hosts' ? h)) THEN RAISE EXCEPTION 'ENTERPRISE_NETWORK_POLICY'; END IF;
   IF coalesce((policy->>'require_security_review')::boolean,false) THEN RAISE EXCEPTION 'SECURITY_NOT_VERIFIED'; END IF;
   IF policy ? 'pinned_versions' AND policy->'pinned_versions' ? v.package_id AND policy#>>ARRAY['pinned_versions',v.package_id]<>v.version THEN RAISE EXCEPTION 'VERSION_PIN_REQUIRED'; END IF;
-  IF coalesce((policy->>'require_commercial_license')::boolean,false) AND v.entry#>>'{manifest,license,commercialUse}'<>'true' THEN RAISE EXCEPTION 'LICENSE_POLICY'; END IF;
+  IF coalesce((policy->>'require_commercial_license')::boolean,false) AND v.entry#>>'{manifest,license,commercialUse}' IS DISTINCT FROM 'true' THEN RAISE EXCEPTION 'LICENSE_POLICY'; END IF;
   requires:=amount>0 OR coalesce((policy->>'admin_approval')::boolean,false);
   -- Membership is checked above; legacy account billing ownership semantics remain unchanged.
   INSERT INTO public.billing_checkout_intents(user_id,project_id,product_key,amount_minor,currency,provider,status,idempotency_key,metadata)
@@ -497,8 +523,10 @@ BEGIN
   target:=p_data->>'decision';
   IF target IS NULL OR target NOT IN ('approved','denied') THEN RAISE EXCEPTION 'INVALID_DECISION'; END IF;
   IF ap.status<>'pending' THEN IF ap.status=target THEN RETURN to_jsonb(ap); END IF; RAISE EXCEPTION 'ALREADY_DECIDED'; END IF;
+  IF ap.runtime_record->>'action' IN ('acquire','payout') AND NOT EXISTS(SELECT 1 FROM public.projects WHERE id=ap.project_id AND owner_id=p_actor AND status='active') THEN RAISE EXCEPTION 'APPROVER_REQUIRED'; END IF;
   IF ap.expires_at<=now() THEN RAISE EXCEPTION 'APPROVAL_EXPIRED'; END IF;
   UPDATE public.approval_requests SET status=target,decided_by=p_actor,decided_at=now(),decision_reason=left(p_data->>'reason',1000) WHERE id=ap.id RETURNING * INTO ap;
+  PERFORM private.fi5_audit(p_actor,ap.project_id,'approval',ap.id,'pending',target,ap.decision_reason);
   RETURN to_jsonb(ap);
  ELSIF p_action IN ('resume','order','assert_execution') THEN
   SELECT * INTO a FROM public.marketplace_acquisitions WHERE id=(p_data->>'id')::uuid FOR UPDATE;
@@ -509,6 +537,7 @@ BEGIN
     UPDATE public.marketplace_acquisitions SET phase='CANCELLED' WHERE id=a.id;
     UPDATE public.billing_checkout_intents SET status='cancelled' WHERE id=a.id;
     UPDATE public.billing_entitlements SET status='revoked' WHERE id=a.entitlement_id;
+    PERFORM private.fi5_audit(p_actor,a.project_id,'resume',a.id,a.phase,'CANCELLED');
    ELSE
     PERFORM private.fi5_consume(a.approval_id);
     target:=CASE WHEN a.price->>'billing_model'='FREE' THEN 'SETTLED' ELSE 'PROVIDER_PENDING' END;
@@ -521,9 +550,9 @@ BEGIN
    END IF;
   END IF;
   IF p_action='assert_execution' THEN
-   IF NOT EXISTS(SELECT 1 FROM public.billing_entitlements e JOIN public.marketplace_versions v ON v.id=a.version_id JOIN public.marketplace_packages p ON p.id=v.package_id JOIN public.marketplace_listings l ON l.id=v.id WHERE e.id=a.entitlement_id AND e.status='active' AND (e.valid_until IS NULL OR e.valid_until>now()) AND p.lifecycle<>'SECURITY_BLOCKED' AND l.state<>'security_blocked' AND v.digest=a.digest) THEN RAISE EXCEPTION 'ENTITLEMENT_NOT_EXECUTABLE'; END IF;
+   IF NOT EXISTS(SELECT 1 FROM public.billing_entitlements e JOIN public.marketplace_versions fi5row_v ON fi5row_v.id=a.version_id JOIN public.marketplace_packages p ON p.id=fi5row_v.package_id JOIN public.marketplace_listings l ON l.id=fi5row_v.id WHERE e.id=a.entitlement_id AND e.status='active' AND (e.valid_until IS NULL OR e.valid_until>now()) AND p.lifecycle<>'SECURITY_BLOCKED' AND l.state<>'security_blocked' AND fi5row_v.digest=a.digest) THEN RAISE EXCEPTION 'ENTITLEMENT_NOT_EXECUTABLE'; END IF;
   END IF;
-  RETURN (SELECT to_jsonb(x)||jsonb_build_object('entitlement',(SELECT to_jsonb(e) FROM public.billing_entitlements e WHERE e.id=x.entitlement_id),'provider_status',(SELECT provider FROM public.billing_checkout_intents WHERE id=x.id),'adjustments',coalesce((SELECT jsonb_agg(to_jsonb(r)) FROM public.marketplace_adjustments r WHERE acquisition_id=x.id),'[]')) FROM public.marketplace_acquisitions x WHERE id=a.id);
+  RETURN (SELECT to_jsonb(x)||jsonb_build_object('entitlement',(SELECT to_jsonb(e) FROM public.billing_entitlements e WHERE e.id=x.entitlement_id),'provider_status',(SELECT provider FROM public.billing_checkout_intents WHERE id=x.id),'adjustments',coalesce((SELECT jsonb_agg(to_jsonb(fi5row_r)) FROM public.marketplace_adjustments fi5row_r WHERE acquisition_id=x.id),'[]')) FROM public.marketplace_acquisitions x WHERE id=a.id);
  END IF;
  RETURN private.fi5_finance(p_actor,p_action,p_data);
 END $$;

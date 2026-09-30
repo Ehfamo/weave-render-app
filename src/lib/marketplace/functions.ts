@@ -126,7 +126,13 @@ export const marketplaceCommerceFn = createServerFn({ method: "POST" })
     try {
       const { dispatchCommerce } = await import("./commerce-boundary.ts");
       return dispatchCommerce(await service(), data);
-    } catch {
-      return { ok: false as const, error: "NOT_CONFIGURED" };
+    } catch (error) {
+      return {
+        ok: false as const,
+        error:
+          error instanceof Error && error.message === "AUTH_REQUIRED"
+            ? "AUTH_REQUIRED"
+            : "NOT_CONFIGURED",
+      };
     }
   });

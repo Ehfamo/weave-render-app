@@ -9,6 +9,37 @@ export class SupabaseMarketplaceStore implements MarketplaceStore {
     private readonly client: SupabaseClient,
     private readonly admin: SupabaseClient,
   ) {}
+  private async priced(entries: CatalogEntry[]) {
+    if (!entries.length) return entries;
+    const rows = await database(
+      this.client
+        .from("marketplace_current_prices")
+        .select("version_id,snapshot")
+        .in(
+          "version_id",
+          entries.map((e) => e.id),
+        ),
+    );
+    return entries.map((e) => {
+      const p = rows?.find((r) => r.version_id === e.id)?.snapshot;
+      // Price is a mutable offer projection; immutable package/version bytes stay untouched.
+      return {
+        ...e,
+        price: p
+          ? {
+              kind:
+                p.billing_model === "FREE"
+                  ? ("FREE" as const)
+                  : p.billing_model === "SUBSCRIPTION"
+                    ? ("SUBSCRIPTION_INCLUDED" as const)
+                    : ("ONE_TIME_PRICE" as const),
+              amount: p.currency === "USD" ? p.amount / 100 : p.amount,
+              currency: p.currency,
+            }
+          : null,
+      };
+    });
+  }
   async commerce(action: string, data: import("./commerce.ts").CommerceInput) {
     if (!this.userId) throw Error("AUTH_REQUIRED");
     return (await database(
@@ -38,7 +69,7 @@ export class SupabaseMarketplaceStore implements MarketplaceStore {
           visible.map((x) => x.id),
         ),
     );
-    return (rows ?? []).map((x) => x.entry as CatalogEntry);
+    return this.priced((rows ?? []).map((x) => x.entry as CatalogEntry));
   }
   async get(id: string) {
     const visible = await database(
@@ -49,7 +80,7 @@ export class SupabaseMarketplaceStore implements MarketplaceStore {
       this.admin.from("marketplace_versions").select("entry").eq("id", id).single(),
     );
     if (!row) return null;
-    return { ...row.entry, state: visible.state } as CatalogEntry;
+    return (await this.priced([{ ...row.entry, state: visible.state } as CatalogEntry]))[0];
   }
   async publish(entry: CatalogEntry) {
     return (await database(

@@ -158,6 +158,25 @@ CREATE FUNCTION private.fi5_release_earnings(p_acquisition uuid) RETURNS void LA
  END IF;
 END $$;
 REVOKE ALL ON FUNCTION private.fi5_release_earnings(uuid) FROM PUBLIC,anon,authenticated;
+CREATE FUNCTION private.fi5_acquisition_policy(p_version uuid,p_project uuid,p_price jsonb) RETURNS boolean LANGUAGE plpgsql SET search_path='' AS $$
+DECLARE v public.marketplace_versions; pub public.marketplace_publishers; policy jsonb; amount bigint;
+BEGIN
+ SELECT * INTO v FROM public.marketplace_versions WHERE id=p_version;
+ SELECT * INTO pub FROM public.marketplace_publishers WHERE user_id=(v.entry#>>'{manifest,creatorId}')::uuid;
+ IF v.id IS NULL OR pub.state IS DISTINCT FROM 'ACTIVE' OR NOT pub.commerce_eligible OR NOT EXISTS(SELECT 1 FROM public.marketplace_packages p JOIN public.marketplace_listings l ON l.id=v.id WHERE p.id=v.package_id AND p.lifecycle='ACTIVE' AND l.state='published') THEN RAISE EXCEPTION 'CAPABILITY_UNAVAILABLE'; END IF;
+  policy:=coalesce((SELECT ep.policy FROM public.marketplace_enterprise_policies ep WHERE project_id=p_project),'{}');
+  amount:=(p_price->>'amount')::bigint;
+  IF (policy ? 'max_amount' AND (policy->>'currency' IS DISTINCT FROM p_price->>'currency' OR amount>(policy->>'max_amount')::bigint)) THEN RAISE EXCEPTION 'ENTERPRISE_PRICE_POLICY'; END IF;
+  IF (policy ? 'allowed_publishers' AND NOT (policy->'allowed_publishers' ? pub.user_id::text)) OR (policy->'blocked_publishers' ? pub.user_id::text) THEN RAISE EXCEPTION 'ENTERPRISE_PUBLISHER_POLICY'; END IF;
+  IF policy ? 'allowed_types' AND NOT (policy->'allowed_types' ? (v.entry#>>'{manifest,objectType}')) THEN RAISE EXCEPTION 'ENTERPRISE_TYPE_POLICY'; END IF;
+  IF EXISTS(SELECT 1 FROM jsonb_array_elements(v.entry#>'{manifest,permissions}') pm WHERE (policy ? 'allowed_permissions' AND NOT(policy->'allowed_permissions' ? (pm->>'id'))) OR (coalesce((policy->>'prohibit_consequential')::boolean,true) AND pm->>'risk'<>'safe_read')) THEN RAISE EXCEPTION 'ENTERPRISE_PERMISSION_POLICY'; END IF;
+  IF policy ? 'allowed_hosts' AND EXISTS(SELECT 1 FROM jsonb_array_elements_text(coalesce(v.entry#>'{manifest,disclosure,privacy,destinations}','[]')||coalesce(v.entry#>'{manifest,disclosure,mcp,hosts}','[]')) h WHERE NOT(policy->'allowed_hosts' ? h)) THEN RAISE EXCEPTION 'ENTERPRISE_NETWORK_POLICY'; END IF;
+  IF coalesce((policy->>'require_security_review')::boolean,false) THEN RAISE EXCEPTION 'SECURITY_NOT_VERIFIED'; END IF;
+  IF policy ? 'pinned_versions' AND policy->'pinned_versions' ? v.package_id AND policy#>>ARRAY['pinned_versions',v.package_id]<>v.version THEN RAISE EXCEPTION 'VERSION_PIN_REQUIRED'; END IF;
+  IF coalesce((policy->>'require_commercial_license')::boolean,false) AND v.entry#>>'{manifest,license,commercialUse}' IS DISTINCT FROM 'true' THEN RAISE EXCEPTION 'LICENSE_POLICY'; END IF;
+  RETURN amount>0 OR coalesce((policy->>'admin_approval')::boolean,false);
+END $$;
+REVOKE ALL ON FUNCTION private.fi5_acquisition_policy(uuid,uuid,jsonb) FROM PUBLIC,anon,authenticated;
 CREATE FUNCTION private.fi5_finance(p_actor uuid,p_action text,p_data jsonb) RETURNS jsonb LANGUAGE plpgsql SET search_path='' AS $$
 DECLARE
  v_a public.marketplace_acquisitions; v_i public.billing_checkout_intents; v_r public.marketplace_adjustments;
@@ -170,6 +189,7 @@ BEGIN
   SELECT * INTO v_a FROM public.marketplace_acquisitions WHERE id=(p_data->>'id')::uuid FOR UPDATE;
   IF v_a.id IS NULL OR v_a.buyer_id<>p_actor OR NOT private.fi5_member(p_actor,v_a.project_id,true) THEN RAISE EXCEPTION 'TRANSACTION_ACCESS_DENIED'; END IF;
   IF v_a.phase<>'PROVIDER_PENDING' THEN RAISE EXCEPTION 'INVALID_TRANSITION'; END IF;
+  PERFORM private.fi5_acquisition_policy(v_a.version_id,v_a.project_id,v_a.price);
   SELECT * INTO v_i FROM public.billing_checkout_intents WHERE id=v_a.id FOR UPDATE;
   IF p_action='checkout_claim' THEN
    IF v_i.provider='NOT_CONFIGURED' THEN RETURN jsonb_build_object('id',v_i.id,'provider_status','NOT_CONFIGURED','claimed',false); END IF;
@@ -389,7 +409,7 @@ BEGIN
  ELSIF p_action='dashboard' THEN
   RETURN jsonb_build_object(
    'publisher',(SELECT to_jsonb(x) FROM public.marketplace_publishers x WHERE x.user_id=p_actor),
-   'drafts',coalesce((SELECT jsonb_agg(to_jsonb(x)) FROM (SELECT * FROM public.marketplace_drafts WHERE owner_id=p_actor ORDER BY updated_at DESC LIMIT 100) x),'[]'),
+   'drafts',coalesce((SELECT jsonb_agg(to_jsonb(x)) FROM (SELECT md.*,(SELECT l.state FROM public.marketplace_listings l WHERE l.id=md.id) lifecycle FROM public.marketplace_drafts md WHERE md.owner_id=p_actor ORDER BY md.updated_at DESC LIMIT 100) x),'[]'),
    'orders',coalesce((SELECT jsonb_agg(to_jsonb(x)) FROM (SELECT * FROM public.marketplace_acquisitions WHERE buyer_id=p_actor AND private.fi5_member(p_actor,project_id) ORDER BY created_at DESC LIMIT 100) x),'[]'),
    'earnings',coalesce((SELECT jsonb_agg(to_jsonb(x)) FROM (SELECT * FROM public.marketplace_earnings WHERE publisher_id=p_actor ORDER BY created_at DESC LIMIT 100) x),'[]'),
    'payouts',coalesce((SELECT jsonb_agg(to_jsonb(x)) FROM (SELECT * FROM public.marketplace_payouts WHERE publisher_id=p_actor AND private.fi5_member(p_actor,project_id) ORDER BY created_at DESC LIMIT 100) x),'[]'),
@@ -508,17 +528,8 @@ BEGIN
   SELECT * INTO price FROM public.marketplace_prices WHERE id=(p_data->>'price_id')::uuid AND version_id=v.id;
   IF price.id IS NULL OR (price.snapshot->>'effective_from')::timestamptz>now() OR (price.snapshot->>'effective_until')::timestamptz<=now() THEN RAISE EXCEPTION 'PRICE_EXPIRED'; END IF;
   IF NOT EXISTS(SELECT 1 FROM public.marketplace_permission_grants WHERE user_id=p_actor AND project_id=pid AND version_id=v.id AND digest=v.digest) THEN RAISE EXCEPTION 'REAPPROVAL_REQUIRED'; END IF;
-  policy:=coalesce((SELECT ep.policy FROM public.marketplace_enterprise_policies ep WHERE project_id=pid),'{}');
   amount:=(price.snapshot->>'amount')::bigint;
-  IF (policy ? 'max_amount' AND (policy->>'currency' IS DISTINCT FROM price.snapshot->>'currency' OR amount>(policy->>'max_amount')::bigint)) THEN RAISE EXCEPTION 'ENTERPRISE_PRICE_POLICY'; END IF;
-  IF (policy ? 'allowed_publishers' AND NOT (policy->'allowed_publishers' ? pub.user_id::text)) OR (policy->'blocked_publishers' ? pub.user_id::text) THEN RAISE EXCEPTION 'ENTERPRISE_PUBLISHER_POLICY'; END IF;
-  IF policy ? 'allowed_types' AND NOT (policy->'allowed_types' ? (v.entry#>>'{manifest,objectType}')) THEN RAISE EXCEPTION 'ENTERPRISE_TYPE_POLICY'; END IF;
-  IF EXISTS(SELECT 1 FROM jsonb_array_elements(v.entry#>'{manifest,permissions}') pm WHERE (policy ? 'allowed_permissions' AND NOT(policy->'allowed_permissions' ? (pm->>'id'))) OR (coalesce((policy->>'prohibit_consequential')::boolean,true) AND pm->>'risk'<>'safe_read')) THEN RAISE EXCEPTION 'ENTERPRISE_PERMISSION_POLICY'; END IF;
-  IF policy ? 'allowed_hosts' AND EXISTS(SELECT 1 FROM jsonb_array_elements_text(coalesce(v.entry#>'{manifest,disclosure,privacy,destinations}','[]')||coalesce(v.entry#>'{manifest,disclosure,mcp,hosts}','[]')) h WHERE NOT(policy->'allowed_hosts' ? h)) THEN RAISE EXCEPTION 'ENTERPRISE_NETWORK_POLICY'; END IF;
-  IF coalesce((policy->>'require_security_review')::boolean,false) THEN RAISE EXCEPTION 'SECURITY_NOT_VERIFIED'; END IF;
-  IF policy ? 'pinned_versions' AND policy->'pinned_versions' ? v.package_id AND policy#>>ARRAY['pinned_versions',v.package_id]<>v.version THEN RAISE EXCEPTION 'VERSION_PIN_REQUIRED'; END IF;
-  IF coalesce((policy->>'require_commercial_license')::boolean,false) AND v.entry#>>'{manifest,license,commercialUse}' IS DISTINCT FROM 'true' THEN RAISE EXCEPTION 'LICENSE_POLICY'; END IF;
-  requires:=amount>0 OR coalesce((policy->>'admin_approval')::boolean,false);
+  requires:=private.fi5_acquisition_policy(v.id,pid,price.snapshot);
   -- Membership is checked above; legacy account billing ownership semantics remain unchanged.
   INSERT INTO public.billing_checkout_intents(user_id,project_id,product_key,amount_minor,currency,provider,status,idempotency_key,metadata)
   VALUES(p_actor,pid,left(v.package_id||'@'||v.version,160),amount,price.snapshot->>'currency',coalesce(p_data->>'_provider','NOT_CONFIGURED'),CASE WHEN amount=0 AND NOT requires THEN 'completed' ELSE 'provider_pending' END,'marketplace:'||key,jsonb_build_object('marketplace',true)) RETURNING * INTO i;
@@ -548,6 +559,7 @@ BEGIN
  ELSIF p_action IN ('resume','order','assert_execution') THEN
   SELECT * INTO a FROM public.marketplace_acquisitions WHERE id=(p_data->>'id')::uuid FOR UPDATE;
   IF a.id IS NULL OR a.buyer_id<>p_actor OR NOT private.fi5_member(p_actor,a.project_id) THEN RAISE EXCEPTION 'TRANSACTION_ACCESS_DENIED'; END IF;
+  IF p_action='resume' AND NOT private.fi5_member(p_actor,a.project_id,true) THEN RAISE EXCEPTION 'PROJECT_ACCESS_DENIED'; END IF;
   IF p_action='resume' AND a.phase='WAITING_APPROVAL' THEN
    SELECT * INTO ap FROM public.approval_requests WHERE id=a.approval_id;
    IF ap.status='denied' THEN
@@ -556,6 +568,7 @@ BEGIN
     UPDATE public.billing_entitlements SET status='revoked' WHERE id=a.entitlement_id;
     PERFORM private.fi5_audit(p_actor,a.project_id,'resume',a.id,a.phase,'CANCELLED');
    ELSE
+    PERFORM private.fi5_acquisition_policy(a.version_id,a.project_id,a.price);
     PERFORM private.fi5_consume(a.approval_id);
     target:=CASE WHEN a.price->>'billing_model'='FREE' THEN 'SETTLED' ELSE 'PROVIDER_PENDING' END;
     UPDATE public.marketplace_acquisitions SET phase=target,updated_at=now() WHERE id=a.id;
@@ -575,6 +588,12 @@ BEGIN
 END $$;
 REVOKE ALL ON FUNCTION public.xeomx_marketplace_commerce(uuid,text,jsonb) FROM PUBLIC,anon,authenticated;
 GRANT EXECUTE ON FUNCTION public.xeomx_marketplace_commerce(uuid,text,jsonb) TO service_role;
+CREATE VIEW public.marketplace_current_prices WITH (security_invoker=true) AS
+ SELECT DISTINCT ON (version_id) id,version_id,snapshot FROM public.marketplace_prices
+ WHERE (snapshot->>'effective_from')::timestamptz<=now() AND (snapshot->>'effective_until' IS NULL OR (snapshot->>'effective_until')::timestamptz>now())
+ ORDER BY version_id,created_at DESC,id DESC;
+REVOKE ALL ON public.marketplace_current_prices FROM PUBLIC,anon,authenticated;
+GRANT SELECT ON public.marketplace_current_prices TO anon,authenticated,service_role;
 COMMIT;
 -- Rollback: disable FI5 endpoints; export acquisitions, approvals, financial events and all
 -- dependent accounting records before reversing FI5 additions. Never delete billing history.

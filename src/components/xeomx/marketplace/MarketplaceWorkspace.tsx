@@ -1,3 +1,4 @@
+import { MarketplaceAcquisition, MarketplaceCommercePanel } from "./MarketplaceCommerce";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Header } from "@/components/xeomx/Header";
@@ -161,6 +162,7 @@ export function MarketplaceWorkspace({
           <h1 className="text-2xl font-semibold">{m.p8_marketplace()}</h1>
           <p>{m.p8_market_goal_hint()}</p>
         </header>
+        {user ? <MarketplaceCommercePanel key={user.id} /> : null}
         {continuation ? (
           <aside className="rounded-xl border p-4">
             <p>{m.fi4_task_preserved()}</p>
@@ -590,6 +592,13 @@ export function MarketplaceWorkspace({
                 </div>
               ) : null}
             </section>
+            {user ? (
+              <MarketplaceAcquisition
+                key={`${user.id}:${detail.id}:${projectId}`}
+                versionId={detail.id}
+                projectId={projectId}
+              />
+            ) : null}
             <section className="rounded-xl border p-4">
               <h3>{m.fi4_reviews()}</h3>
               <p>{m.fi4_version_trial_reviews()}</p>

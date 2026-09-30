@@ -1,14 +1,14 @@
 {
   "repository": "Ehfamo/weave-render-app",
   "closure_date": "2026-09-30",
-  "record_type": "FINAL_EXACT_HISTORY_PRESERVATION",
+  "record_type": "FINAL_VERIFIED_CLOSURE",
   "source_fi4_sha": "b8238f9ed6c82399f89fbc80ba2a8c61d398de60",
   "fi5_branch": "feature/xeomx-fi5-marketplace-commerce-lifecycle-20260924",
   "first_checkpoint_sha": "dc8196bf93533d5c818c7123d842c6d756e707eb",
   "validated_source_sha": "2931d998529cef3578dcb574321dc824c95747dc",
   "final_fi5_sha": "cba07c197f3278efec81d125c969f25a406fd958",
-  "remote_fi5_sha": "2931d998529cef3578dcb574321dc824c95747dc",
-  "remote_match": false,
+  "remote_fi5_sha": "cba07c197f3278efec81d125c969f25a406fd958",
+  "remote_match": true,
   "final_identity_resolution": "Literal final commit identity is recorded outside that commit on the dedicated preservation branch.",
   "verified_checkpoint_remote_sha": "2931d998529cef3578dcb574321dc824c95747dc",
   "ancestry": {
@@ -163,7 +163,7 @@
   "preservation_branch": "preservation/xeomx-fi5-final-20260930",
   "bundle_path": "artifacts/fi5-preservation/XEOMX_FI5_FINAL_CLOSURE_20260930.bundle",
   "bundle_sha256": "cd88f216dcb2e45e81e443bfc22a63375338618b2dd3d347149b243b132cb75c",
-  "bundle_verify": "PASS",
+  "bundle_verify": "PASS_LOCAL_AND_GITHUB",
   "real_money_moved": false,
   "main_modified": false,
   "production_modified": false,
@@ -180,8 +180,8 @@
     "Rendered browser/mobile/RTL/accessibility QA",
     "Real-user commerce validation"
   ],
-  "status": "FI5_VALIDATED_AWAITING_REMOTE_EQUALITY",
-  "next_allowed_stage": "NONE",
+  "status": "FI5_PASS",
+  "next_allowed_stage": "FI6",
   "bundle_head": "cba07c197f3278efec81d125c969f25a406fd958",
   "bundle_prerequisite": "b8238f9ed6c82399f89fbc80ba2a8c61d398de60",
   "commits": [
@@ -191,5 +191,17 @@
     "4232b0710817311fc1bc287fbb79051cef2fc38b",
     "2931d998529cef3578dcb574321dc824c95747dc",
     "cba07c197f3278efec81d125c969f25a406fd958"
-  ]
+  ],
+  "github_persistence": {
+    "status": "PASS",
+    "method": "Exact incremental Git bundle imported by scoped preservation workflow; normal non-force push to FI5 only",
+    "workflow_run_id": 36710403826,
+    "workflow_run_url": "https://github.com/Ehfamo/weave-render-app/actions/runs/36710403826",
+    "workflow_conclusion": "success",
+    "sha256_checked_on_github": true,
+    "bundle_head_checked_on_github": true,
+    "fi4_ancestry_checked_on_github": true,
+    "remote_ref_independently_verified": true,
+    "main_ref_independently_verified_unchanged": true
+  }
 }

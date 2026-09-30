@@ -1,0 +1,12 @@
+{
+  "repository": "Ehfamo/weave-render-app",
+  "source_fi4_sha": "b8238f9ed6c82399f89fbc80ba2a8c61d398de60",
+  "checkpoint_sha": "2931d998529cef3578dcb574321dc824c95747dc",
+  "bundle_sha256": "35a424e5d930ef59d28db454028f51720394a283808387f3fd5c03f040afdd31",
+  "status": "FI5_IN_PROGRESS",
+  "validation": "NOT_STARTED on recovered UI/closure changes",
+  "real_money_moved": false,
+  "main_modified": false,
+  "production_modified": false,
+  "fi6_started": false
+}

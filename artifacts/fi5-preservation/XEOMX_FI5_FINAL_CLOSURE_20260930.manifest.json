@@ -1,0 +1,195 @@
+{
+  "repository": "Ehfamo/weave-render-app",
+  "closure_date": "2026-09-30",
+  "record_type": "FINAL_EXACT_HISTORY_PRESERVATION",
+  "source_fi4_sha": "b8238f9ed6c82399f89fbc80ba2a8c61d398de60",
+  "fi5_branch": "feature/xeomx-fi5-marketplace-commerce-lifecycle-20260924",
+  "first_checkpoint_sha": "dc8196bf93533d5c818c7123d842c6d756e707eb",
+  "validated_source_sha": "2931d998529cef3578dcb574321dc824c95747dc",
+  "final_fi5_sha": "cba07c197f3278efec81d125c969f25a406fd958",
+  "remote_fi5_sha": "2931d998529cef3578dcb574321dc824c95747dc",
+  "remote_match": false,
+  "final_identity_resolution": "Literal final commit identity is recorded outside that commit on the dedicated preservation branch.",
+  "verified_checkpoint_remote_sha": "2931d998529cef3578dcb574321dc824c95747dc",
+  "ancestry": {
+    "source_fi4": "PASS",
+    "history_rewritten": false
+  },
+  "implementation_commits": [
+    "dc8196bf93533d5c818c7123d842c6d756e707eb",
+    "3e01e4d9fd8f40b658d7437f369687de685eef2f",
+    "7601c9976570fb6b16a1fd384a7820817144f90b",
+    "4232b0710817311fc1bc287fbb79051cef2fc38b",
+    "2931d998529cef3578dcb574321dc824c95747dc"
+  ],
+  "files_changed": [
+    "artifacts/fi5-preservation/XEOMX_FI5_FINAL_CLOSURE_20260930.manifest.json",
+    "docs/FI5_MARKETPLACE_COMMERCE_LIFECYCLE_EVIDENCE.md",
+    "messages/ar.json",
+    "messages/en.json",
+    "messages/fa.json",
+    "messages/hi.json",
+    "messages/zh.json",
+    "src/components/xeomx/marketplace/MarketplaceCommerce.tsx",
+    "src/components/xeomx/marketplace/MarketplaceWorkspace.tsx",
+    "src/lib/marketplace/catalog.ts",
+    "src/lib/marketplace/commerce-boundary.ts",
+    "src/lib/marketplace/commerce-view.ts",
+    "src/lib/marketplace/commerce.ts",
+    "src/lib/marketplace/functions.ts",
+    "src/lib/marketplace/service.ts",
+    "src/lib/marketplace/store.server.ts",
+    "supabase/migrations/20260924063459_fi5_marketplace_commerce.sql",
+    "tests/fi5-closure.test.mjs",
+    "tests/fi5-commerce.test.mjs",
+    "tests/fi5-persistence.test.mjs",
+    "tests/helpers/fi5-fixture.mjs"
+  ],
+  "focused_tests": {
+    "status": "INTEGRATION_PASS",
+    "tests": 41,
+    "passed": 41,
+    "failed": 0,
+    "skipped": 0,
+    "commerce": 29,
+    "closure": 12
+  },
+  "postgresql_tests": {
+    "status": "INTEGRATION_PASS",
+    "tests": 15,
+    "passed": 15,
+    "failed": 0,
+    "skipped": 0,
+    "engine": "PGlite PostgreSQL, synthetic test data"
+  },
+  "fi4_regression": {
+    "status": "INTEGRATION_PASS",
+    "tests": 40,
+    "focused": 27,
+    "postgresql": 13,
+    "failed": 0,
+    "skipped": 0
+  },
+  "critical_regression": {
+    "status": "INTEGRATION_PASS",
+    "tests": 110,
+    "failed": 0,
+    "skipped": 0,
+    "files": [
+      "tests/fi3-capability-runtime.test.mjs",
+      "tests/fi3-persistence.test.mjs",
+      "tests/fi2-projects-continuity.test.mjs",
+      "tests/fi2-persistence-migration.test.mjs",
+      "tests/fi1-core-execution.test.mjs",
+      "tests/project-brain.test.mjs",
+      "tests/memory-core.test.mjs",
+      "tests/memory-migration.test.mjs",
+      "tests/global-search.test.mjs",
+      "tests/command-center.test.mjs",
+      "tests/stage53-project-search.test.mjs"
+    ]
+  },
+  "fi3_regression": "PASS in executed critical regression group",
+  "fi2_regression": "PASS in executed critical regression group",
+  "fi1_regression": "PASS in executed critical regression group",
+  "project_brain": "PASS in executed critical regression group",
+  "memory": "PASS in executed critical regression group",
+  "search_command_center": "PASS in executed critical regression group",
+  "billing_regression": {
+    "status": "SOURCE_PASS",
+    "tests": 15,
+    "failed": 0,
+    "skipped": 0
+  },
+  "full_suite": {
+    "status": "SOURCE_PASS",
+    "tests": 470,
+    "passed": 470,
+    "failed": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "runs": 1
+  },
+  "typecheck": {
+    "status": "SOURCE_PASS",
+    "errors": 0
+  },
+  "lint": {
+    "status": "SOURCE_PASS",
+    "errors": 0,
+    "warnings": 11
+  },
+  "build": {
+    "status": "SOURCE_PASS",
+    "deployed": false,
+    "warnings": [
+      "Nitro inlineDynamicImports ignored with codeSplitting",
+      "Wrangler main overridden by generated build config"
+    ],
+    "runs": 1
+  },
+  "smoke": {
+    "status": "SOURCE_PASS",
+    "tests": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0
+  },
+  "diff_check": "SOURCE_PASS",
+  "secret_review": {
+    "status": "SOURCE_PASS",
+    "actual_credentials_detected": false,
+    "scope": "All FI5 changed files from FI4 prerequisite; explicit rejection fixture reviewed as non-secret"
+  },
+  "validation_log_sha256": {
+    "closure-final-targeted.log": "4bac91c7bf76c4bbed678f64c632661194b7a8086fcbb6195d95bf6031e29eff",
+    "fi5-focused-final.log": "926798c882159e1592962db525b625aa8c741ec9df2e0cd9b6dabca00789a5c7",
+    "fi5-postgres-final.log": "7d1fa2721201cbfdd8eafbff775d40bb51708db8b21d0efacd8cd10d173d1736",
+    "billing-final.log": "b08acb5f4b8e54306b4daa844acb72c716651001605f41a73a9893e130c0c997",
+    "fi4-regression-final.log": "0b60666794e63ca4f5b1324cbaa2893acfd3663686044cd919c9f30b75af9caf",
+    "critical-regression-final.log": "130db34fb1f4b0bd0379213918d87bf22d512841c3521ce05943afe5a736701a",
+    "full-suite-final.log": "47e359b91101450e505d9557142357e3d7268b6517b9b8ebbfc7105e1122331e",
+    "typecheck-final.log": "ae791f9f57ffbb3c0a592b6a34e25250c1f7f6f13fde4d05f77a0d4e7681f89a",
+    "lint-final.log": "5cba91ec199975032ceaa86a3a6a6564e8d8aa91772242d61878cdf664c0c08b",
+    "build-final.log": "89c99cf557fd0f3c2f94474a01897a65f0800659d7ed1192ab5bc5507db38505",
+    "smoke-final.log": "330086479443c8b65f97421a1f0007f434c369676c85833defc23a4f1db8b329"
+  },
+  "payment_provider_state": "NOT_CONFIGURED",
+  "refund_provider_state": "NOT_CONFIGURED",
+  "payout_provider_state": "NOT_CONFIGURED",
+  "migration_state": "MIGRATION_SOURCE_ONLY",
+  "migration_path": "supabase/migrations/20260924063459_fi5_marketplace_commerce.sql",
+  "evidence_path": "docs/FI5_MARKETPLACE_COMMERCE_LIFECYCLE_EVIDENCE.md",
+  "preservation_branch": "preservation/xeomx-fi5-final-20260930",
+  "bundle_path": "artifacts/fi5-preservation/XEOMX_FI5_FINAL_CLOSURE_20260930.bundle",
+  "bundle_sha256": "cd88f216dcb2e45e81e443bfc22a63375338618b2dd3d347149b243b132cb75c",
+  "bundle_verify": "PASS",
+  "real_money_moved": false,
+  "main_modified": false,
+  "production_modified": false,
+  "fi6_started": false,
+  "main_sha_observed": "fb18042fdb281f7ca2d2731c16edac899aa6222b",
+  "deferred_external": [
+    "Live payment/refund/payout provider execution and real currency settlement",
+    "Recurring subscription provider execution",
+    "Bank/card provider and KYC/KYB external verification",
+    "Tax provider verification",
+    "Live financial webhook signature verification",
+    "Hosted Production migration",
+    "Live Marketplace signing/provider verification inherited from FI4",
+    "Rendered browser/mobile/RTL/accessibility QA",
+    "Real-user commerce validation"
+  ],
+  "status": "FI5_VALIDATED_AWAITING_REMOTE_EQUALITY",
+  "next_allowed_stage": "NONE",
+  "bundle_head": "cba07c197f3278efec81d125c969f25a406fd958",
+  "bundle_prerequisite": "b8238f9ed6c82399f89fbc80ba2a8c61d398de60",
+  "commits": [
+    "dc8196bf93533d5c818c7123d842c6d756e707eb",
+    "3e01e4d9fd8f40b658d7437f369687de685eef2f",
+    "7601c9976570fb6b16a1fd384a7820817144f90b",
+    "4232b0710817311fc1bc287fbb79051cef2fc38b",
+    "2931d998529cef3578dcb574321dc824c95747dc",
+    "cba07c197f3278efec81d125c969f25a406fd958"
+  ]
+}

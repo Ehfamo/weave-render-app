@@ -119,3 +119,14 @@ export const marketplacePublishFn = createServerFn({ method: "POST" })
     return x as unknown as CatalogEntry;
   })
   .handler(({ data }) => safely(async () => (await service()).publish(data)));
+
+export const marketplaceCommerceFn = createServerFn({ method: "POST" })
+  .validator((v: unknown) => v)
+  .handler(async ({ data }) => {
+    try {
+      const { dispatchCommerce } = await import("./commerce-boundary.ts");
+      return dispatchCommerce(await service(), data);
+    } catch {
+      return { ok: false as const, error: "NOT_CONFIGURED" };
+    }
+  });

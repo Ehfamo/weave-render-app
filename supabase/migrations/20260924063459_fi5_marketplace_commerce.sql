@@ -166,7 +166,23 @@ DECLARE
  v_amount bigint; v_total bigint; v_fee bigint; v_old text; v_target text; v_kind text; v_created boolean; v_claim boolean:=false;
  v_hash text:=p_data->>'_request_hash'; v_key text:=p_data->>'idempotency_key'; v_provider text; v_result jsonb;
 BEGIN
- IF p_action='payment_event' THEN
+ IF p_action IN ('checkout_claim','checkout_reference') THEN
+  SELECT * INTO v_a FROM public.marketplace_acquisitions WHERE id=(p_data->>'id')::uuid FOR UPDATE;
+  IF v_a.id IS NULL OR v_a.buyer_id<>p_actor OR NOT private.fi5_member(p_actor,v_a.project_id,true) THEN RAISE EXCEPTION 'TRANSACTION_ACCESS_DENIED'; END IF;
+  IF v_a.phase<>'PROVIDER_PENDING' THEN RAISE EXCEPTION 'INVALID_TRANSITION'; END IF;
+  SELECT * INTO v_i FROM public.billing_checkout_intents WHERE id=v_a.id FOR UPDATE;
+  IF p_action='checkout_claim' THEN
+   IF v_i.provider='NOT_CONFIGURED' THEN RETURN jsonb_build_object('id',v_i.id,'provider_status','NOT_CONFIGURED','claimed',false); END IF;
+   IF v_i.metadata->>'fi5_checkout_claimed'='true' THEN RETURN jsonb_build_object('id',v_i.id,'provider_status','PENDING_PROVIDER','claimed',false,'checkout_url',v_i.metadata->>'fi5_checkout_url'); END IF;
+   IF v_i.provider IS DISTINCT FROM p_data->>'_provider' THEN RAISE EXCEPTION 'PROVIDER_MISMATCH'; END IF;
+   UPDATE public.billing_checkout_intents SET metadata=metadata||jsonb_build_object('fi5_checkout_claimed',true) WHERE id=v_i.id;
+   RETURN to_jsonb(v_i)||jsonb_build_object('claimed',true);
+  END IF;
+  IF v_i.provider IS DISTINCT FROM p_data->>'provider' OR v_i.metadata->>'fi5_checkout_claimed' IS DISTINCT FROM 'true' OR v_i.provider_session_id IS NOT NULL THEN RAISE EXCEPTION 'IDEMPOTENCY_CONFLICT'; END IF;
+  UPDATE public.billing_checkout_intents SET provider_session_id=p_data->>'reference',status='session_created',expires_at=(p_data->>'expires_at')::timestamptz,metadata=metadata||jsonb_build_object('fi5_checkout_url',p_data->>'checkout_url') WHERE id=v_i.id;
+  PERFORM private.fi5_audit(p_actor,v_a.project_id,'checkout',v_a.id,'PROVIDER_PENDING','SESSION_CREATED');
+  RETURN jsonb_build_object('id',v_a.id,'phase','PROVIDER_PENDING','provider_status','AVAILABLE','checkout_url',p_data->>'checkout_url');
+ ELSIF p_action='payment_event' THEN
   v_event:=p_data->'event';
   SELECT * INTO v_a FROM public.marketplace_acquisitions WHERE id=(v_event->>'checkoutIntentId')::uuid;
   IF v_a.id IS NULL OR v_a.buyer_id<>p_actor OR v_event->>'userId'<>p_actor::text OR v_event->>'signatureVerified' IS DISTINCT FROM 'true' THEN RAISE EXCEPTION 'PROVIDER_EVIDENCE_REQUIRED'; END IF;
@@ -236,6 +252,7 @@ BEGIN
    IF (v_target='RESOLVED_BUYER' AND p_actor<>v_a.publisher_id) OR (v_target='RESOLVED_CREATOR' AND p_actor<>v_a.buyer_id) THEN RAISE EXCEPTION 'COUNTERPARTY_DECISION_REQUIRED'; END IF;
    IF v_target='CLOSED' AND v_old='RESOLVED_BUYER' AND v_a.phase<>'REFUNDED' THEN RAISE EXCEPTION 'REFUND_RECONCILIATION_REQUIRED'; END IF;
    IF p_data ? 'evidence' AND (jsonb_typeof(p_data->'evidence')<>'array' OR jsonb_array_length(p_data->'evidence')>20) THEN RAISE EXCEPTION 'INVALID_EVIDENCE'; END IF;
+   INSERT INTO public.audit_events(actor_id,project_id,event_type,target_type,target_id,result,metadata) VALUES(p_actor,v_a.project_id,'marketplace.dispute_evidence','marketplace_commerce',v_r.id,'succeeded',jsonb_build_object('references',coalesce(p_data->'evidence',v_r.evidence)));
    UPDATE public.marketplace_adjustments SET state=v_target,evidence=coalesce(p_data->'evidence',evidence),updated_at=now() WHERE id=v_r.id;
   ELSE
    IF v_r.kind<>'REFUND' THEN RAISE EXCEPTION 'INVALID_TRANSITION'; END IF;
@@ -508,7 +525,7 @@ BEGIN
   INSERT INTO public.marketplace_acquisitions(id,version_id,buyer_id,publisher_id,project_id,price,license,digest,request_hash,phase,fee_bps)
   VALUES(i.id,v.id,p_actor,pub.user_id,pid,price.snapshot,v.entry#>'{manifest,license}',v.digest,fingerprint,CASE WHEN requires THEN 'WAITING_APPROVAL' ELSE 'SETTLED' END,(p_data->>'_fee_bps')::int) RETURNING * INTO a;
   INSERT INTO public.billing_entitlements(user_id,checkout_intent_id,entitlement_key,resource_type,resource_ref,status,marketplace_free,metadata)
-  VALUES(p_actor,i.id,'marketplace:'||v.id,'marketplace_version',pid||':'||v.id,CASE WHEN requires THEN 'pending' ELSE 'active' END,NOT requires,jsonb_build_object('license',a.license)) RETURNING id INTO eid;
+  VALUES(p_actor,i.id,'marketplace:'||v.id||':'||a.id,'marketplace_version',pid||':'||v.id,CASE WHEN requires THEN 'pending' ELSE 'active' END,NOT requires,jsonb_build_object('license',a.license)) RETURNING id INTO eid;
   UPDATE public.marketplace_acquisitions SET entitlement_id=eid WHERE id=a.id;
   IF requires THEN
    SELECT owner_id INTO owner FROM public.projects WHERE id=pid;

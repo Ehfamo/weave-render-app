@@ -16,6 +16,7 @@ export const COMMERCE_ACTIONS = [
   "acquire",
   "approve",
   "resume",
+  "checkout",
   "refund",
   "refund_decide",
   "refund_submit",
@@ -60,6 +61,7 @@ export interface CommerceProviders {
   refund?: FinancialOperationProvider;
   payout?: FinancialOperationProvider;
   feeBps?: number;
+  checkoutReturnUrls?: { successUrl: string; cancelUrl: string };
 }
 export function validatePrice(value: unknown) {
   const x = value as Record<string, unknown>;
@@ -223,6 +225,19 @@ export class MarketplaceCommerce {
       ? this.providers.payment.id
       : "NOT_CONFIGURED";
     data._fee_bps = this.providers.feeBps ?? null;
+    if (action === "checkout") {
+      const pending = (await this.port.command("checkout_claim", data)) as Record<string, JsonValue>;
+      if (pending.claimed !== true) return pending;
+      const urls = this.providers.checkoutReturnUrls;
+      if (!urls) return { ...pending, provider_status: "NOT_CONFIGURED" };
+      try {
+        const session = await createBillingBoundary(this.providers.payment).createCheckoutSession({
+          userId: String(pending.user_id), productKey: String(pending.product_key),
+          idempotencyKey: String(pending.id), money: { amountMinor: Number(pending.amount_minor), currency: String(pending.currency) }, ...urls,
+        });
+        return this.port.command("checkout_reference", { id: pending.id, provider: session.provider, reference: session.providerSessionId, expires_at: session.expiresAt, checkout_url: session.checkoutUrl });
+      } catch { return { ...pending, provider_status: "UNAVAILABLE" }; }
+    }
     if (action === "refund_submit" || action === "payout_submit") {
       // Durable reservation is established before invoking any provider. Retry does not
       // repeat a possibly completed external request; reconciliation uses verified events.
@@ -253,11 +268,12 @@ export class MarketplaceCommerce {
   }
   /** Internal server adapter entry only. Browser actions cannot submit payment success. */
   async paymentEvent(rawBody: Uint8Array, headers: Record<string, string>) {
+    if (rawBody.byteLength > 80000) throw Error("INVALID_PROVIDER_EVENT");
     const event = await createBillingBoundary(this.providers.payment).verifyWebhook({
       rawBody,
       headers,
     });
-    if (event.payloadDigest !== (await sha256(new TextDecoder().decode(rawBody))))
+    if (event.payloadDigest !== (await sha256(new TextDecoder("utf-8", { fatal: true }).decode(rawBody))))
       throw Error("PAYLOAD_DIGEST_MISMATCH");
     if (!event.money) throw Error("EVENT_AMOUNT_REQUIRED");
     return this.port.command("payment_event", {
@@ -270,13 +286,14 @@ export class MarketplaceCommerce {
     rawBody: Uint8Array,
     headers: Record<string, string>,
   ) {
+    if (rawBody.byteLength > 80000) throw Error("INVALID_PROVIDER_EVENT");
     const provider = this.providers[kind];
     if (!provider?.configured) throw Error("NOT_CONFIGURED");
     const event = await provider.verify({ rawBody, headers });
     if (
       !event.signatureVerified ||
       event.provider !== provider.id ||
-      event.payloadDigest !== (await sha256(new TextDecoder().decode(rawBody))) ||
+      event.payloadDigest !== (await sha256(new TextDecoder("utf-8", { fatal: true }).decode(rawBody))) ||
       !["SETTLED", "FAILED"].includes(event.state) ||
       !Number.isSafeInteger(event.amountMinor) ||
       event.amountMinor < 0

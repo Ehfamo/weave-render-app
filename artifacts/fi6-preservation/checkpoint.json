@@ -1,0 +1,13 @@
+{
+  "repository": "Ehfamo/weave-render-app",
+  "source": "cba07c197f3278efec81d125c969f25a406fd958",
+  "branch": "feature/xeomx-fi6-product-enterprise-global-excellence-20260930",
+  "head": "dc75ccd275d1e70b72e59ad17f775a17f290056e",
+  "bundle_sha256": "cd68230b8babbdce24f5fc727a17b841f2d80a2cfa6915e0f6385a022136b955",
+  "bundle": "XEOMX_FI6_GROUP_1_20260930.bundle",
+  "label": "GROUP_1",
+  "status": "FI6_IN_PROGRESS",
+  "main_modified": false,
+  "production_modified": false,
+  "fi7_started": false
+}

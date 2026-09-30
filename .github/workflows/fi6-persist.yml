@@ -1,0 +1,29 @@
+name: Preserve exact FI6 progress
+on:
+  push:
+    branches: [preservation/xeomx-fi6-progress-20260930]
+    paths: [.github/workflows/fi6-persist.yml, 'artifacts/fi6-preservation/*.bundle']
+permissions:
+  contents: write
+jobs:
+  preserve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify bundle and normally advance only FI6
+        shell: bash
+        run: |
+          set -euo pipefail
+          bundle=artifacts/fi6-preservation/XEOMX_FI6_GROUP_1_20260930.bundle
+          expected=dc75ccd275d1e70b72e59ad17f775a17f290056e
+          target=refs/heads/feature/xeomx-fi6-product-enterprise-global-excellence-20260930
+          echo "cd68230b8babbdce24f5fc727a17b841f2d80a2cfa6915e0f6385a022136b955  $bundle" | sha256sum --check -
+          git bundle verify "$bundle"
+          test "$(git bundle list-heads "$bundle" "$target" | cut -d' ' -f1)" = "$expected"
+          git fetch "$bundle" "$target:refs/heads/recovered-fi6"
+          git merge-base --is-ancestor cba07c197f3278efec81d125c969f25a406fd958 "$expected"
+          git push origin "$expected:$target"
+          test "$(git ls-remote origin "$target" | cut -f1)" = "$expected"

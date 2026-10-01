@@ -4,6 +4,8 @@ import { defaultApprovalPolicy, type ApprovalStore } from "./approval.ts";
 import type { DurableApprovalAuthority } from "./durable-approval.ts";
 import type {
   AgentContext,
+  AgentPlanStep,
+  ToolDefinition,
   AgentCheckpoint,
   AgentCheckpointPort,
   AgentExecution,
@@ -16,6 +18,14 @@ import type {
 import { AgentRegistry } from "./registry.ts";
 import { DEFAULT_AGENTS, selectAgent } from "./runtimes.ts";
 
+export interface AgentGovernance {
+  authorize(
+    task: AgentTask,
+    agentId: string,
+    step?: AgentPlanStep,
+    tool?: ToolDefinition,
+  ): Promise<{ requireApproval?: boolean; contextChars?: number }>;
+}
 export interface OrchestratorLimits {
   maxSteps: number;
   maxToolCalls: number;
@@ -39,6 +49,7 @@ export class TaskOrchestrator {
     registry: AgentRegistry;
     approvals: ApprovalStore;
     durableApprovals?: DurableApprovalAuthority;
+    governance?: AgentGovernance;
     brain: ProjectBrainService;
     gateway: ModelGatewayPort;
     prepareContext?: (context: AgentContext) => Promise<AgentContext>;
@@ -50,6 +61,7 @@ export class TaskOrchestrator {
       registry: AgentRegistry;
       approvals: ApprovalStore;
       durableApprovals?: DurableApprovalAuthority;
+      governance?: AgentGovernance;
       brain: ProjectBrainService;
       gateway: ModelGatewayPort;
       prepareContext?: (context: AgentContext) => Promise<AgentContext>;
@@ -137,6 +149,13 @@ export class TaskOrchestrator {
       timer = setTimeout(() => controller.abort(), this.limits.timeoutMs);
     options.signal?.addEventListener("abort", () => controller.abort(), { once: true });
     try {
+      const authority = await this.deps.governance?.authorize(task, agent.definition.id);
+      const contextCeiling = Math.min(
+        32000,
+        this.limits.maxContextCharacters,
+        authority?.contextChars ?? Infinity,
+      );
+      if (contextCeiling < 1000) throw Error("GOVERNANCE_BLOCKED");
       setStatus("planning");
       const restored = await options.checkpoint?.load();
       if (
@@ -146,6 +165,8 @@ export class TaskOrchestrator {
           restored.context.task.userId !== task.userId)
       )
         throw new Error("CHECKPOINT_SCOPE_MISMATCH");
+      if (restored && (restored.context.boundedContext?.length ?? 0) > contextCeiling)
+        throw Error("GOVERNANCE_BLOCKED");
       if (restored?.inFlight?.consequential) throw new Error("ACTION_OUTCOME_UNKNOWN");
       const bounded = restored
         ? {
@@ -155,7 +176,7 @@ export class TaskOrchestrator {
           }
         : await this.deps.brain.buildContext(task.projectId, {
             conversationId: task.conversationId,
-            maxCharacters: Math.min(32000, this.limits.maxContextCharacters),
+            maxCharacters: contextCeiling,
           });
       const sections = (JSON.parse(bounded.text) as { sections: { kind: string; text: string }[] })
         .sections;
@@ -205,7 +226,14 @@ export class TaskOrchestrator {
         if (++calls > this.limits.maxToolCalls) throw new Error("TOOL_CALL_LIMIT_EXCEEDED");
         const tool = planned.toolId ? this.deps.registry.tool(planned.toolId) : undefined;
         if (!tool) throw new Error("TOOL_NOT_FOUND");
-        const approvalRequired = defaultApprovalPolicy.requiresApproval(tool.risk),
+        const policy = await this.deps.governance?.authorize(
+          task,
+          agent.definition.id,
+          planned,
+          tool,
+        );
+        const approvalRequired =
+            defaultApprovalPolicy.requiresApproval(tool.risk) || policy?.requireApproval === true,
           approvalId = `${task.id}:${planned.id}:${tool.id}`;
         let approved = false;
         if (approvalRequired && resumeApprovalId) {
@@ -263,6 +291,14 @@ export class TaskOrchestrator {
         event("tool", { toolId: tool.id, risk: tool.risk }, planned.id);
         let output: ToolResult = { ok: false, error: cleanError("TOOL_EXECUTION_FAILED") };
         do {
+          // A policy/membership change while waiting for approval must take effect now.
+          const current = await this.deps.governance?.authorize(
+            task,
+            agent.definition.id,
+            planned,
+            tool,
+          );
+          if (current?.requireApproval && !approved) throw Error("GOVERNANCE_BLOCKED");
           output = await this.deps.registry.invoke(
             { id: tool.id, taskId: task.id, stepId: planned.id, input: planned.input },
             {
@@ -305,6 +341,8 @@ export class TaskOrchestrator {
         error: cleanError(
           error instanceof Error &&
             [
+              "GOVERNANCE_BLOCKED",
+              "BUDGET_STOPPED",
               "STEP_LIMIT_EXCEEDED",
               "TOOL_CALL_LIMIT_EXCEEDED",
               "ACTION_OUTCOME_UNKNOWN",

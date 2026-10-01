@@ -3,6 +3,7 @@ import type { ModelDescriptor } from "./contracts.ts";
 import { CreativeHttpAdapter, creativeCapabilities } from "./providers/creative-http.ts";
 import { GroqAdapter } from "./providers/groq.ts";
 import { ProviderRegistry } from "./registry.ts";
+import type { RuntimePolicy } from "./runtime.ts";
 import { GatewayRuntime } from "./runtime.ts";
 
 /** Import only inside an authenticated server handler/tool. No public unauthenticated endpoint. */
@@ -12,6 +13,7 @@ export function createModelGatewayRuntime(
     XEOMX_CREATIVE_ENDPOINT?: string;
     XEOMX_CREATIVE_KEY?: string;
   } = process.env,
+  policy: RuntimePolicy = {},
 ) {
   const registry = new ProviderRegistry();
   // Model ID reused from existing generation worker. Scores are routing configuration,
@@ -22,7 +24,6 @@ export function createModelGatewayRuntime(
       capabilities: ["text"],
       quality: 0.5,
       estimatedLatencyMs: 1000,
-      estimatedCostPer1kTokensUsd: 1,
     },
   ];
   registry.register(new GroqAdapter({ apiKey: env.GROQ_API_KEY, models }));
@@ -38,5 +39,5 @@ export function createModelGatewayRuntime(
       })),
     }),
   );
-  return { registry, gateway: new GatewayRuntime(registry) };
+  return { registry, gateway: new GatewayRuntime(registry, policy) };
 }

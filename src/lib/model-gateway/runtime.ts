@@ -1,5 +1,6 @@
 import type {
   ModelIdentity,
+  ModelDescriptor,
   ModelRequest,
   ModelResponse,
   RoutingMode,
@@ -18,7 +19,18 @@ export type RuntimeResponse = ModelResponse & {
   attempts: GatewayAttempt[];
   fallbackOccurred: boolean;
 };
+export interface GatewayGovernance {
+  filter(models: readonly ModelDescriptor[], request: ModelRequest): Promise<ModelDescriptor[]>;
+  before(model: ModelDescriptor, request: ModelRequest, attempt: number): Promise<void>;
+  after(
+    model: ModelDescriptor,
+    request: ModelRequest,
+    attempt: number,
+    response: ModelResponse,
+  ): Promise<void>;
+}
 export interface RuntimePolicy {
+  governance?: GatewayGovernance;
   maxAttempts?: number;
   attemptTimeoutMs?: number;
 }
@@ -59,8 +71,10 @@ export class GatewayRuntime {
   private maxAttempts: number;
   private timeout: number;
   private registry: ProviderRegistry;
+  private governance?: GatewayGovernance;
   constructor(registry: ProviderRegistry, policy: RuntimePolicy = {}) {
     this.registry = registry;
+    this.governance = policy.governance;
     this.maxAttempts = policy.maxAttempts ?? 3;
     this.timeout = policy.attemptTimeoutMs ?? 25000;
     if (
@@ -101,10 +115,13 @@ export class GatewayRuntime {
     } catch {
       return fail("TIMEOUT");
     }
-    const candidates = rankModels(
-      snapshot.flatMap((p) => p.models),
-      request,
-    );
+    let models = snapshot.flatMap((p) => p.models);
+    try {
+      if (this.governance) models = await this.governance.filter(models, request);
+    } catch {
+      return fail("GOVERNANCE_BLOCKED");
+    }
+    const candidates = rankModels(models, request);
     if (!candidates.length) return fail("PROVIDER_UNAVAILABLE");
     // Try alternate eligible models first; retry the last eligible model only within the global attempt budget.
     let last: ModelResponse | undefined;
@@ -113,6 +130,16 @@ export class GatewayRuntime {
       const selected = candidates[Math.min(n, candidates.length - 1)];
       const adapter = this.registry.getAdapter(selected.identity.providerId);
       if (!adapter) return fail("PROVIDER_UNAVAILABLE");
+      // Fresh server authorization before EACH attempt, including every fallback.
+      try {
+        await this.governance?.before(selected, request, n);
+      } catch (error) {
+        return fail(
+          error instanceof Error && error.message === "BUDGET_STOPPED"
+            ? "BUDGET_STOPPED"
+            : "GOVERNANCE_BLOCKED",
+        );
+      }
       const begin = performance.now();
       try {
         last = await bounded(
@@ -140,6 +167,11 @@ export class GatewayRuntime {
           error: normalizeModelError(error),
         };
       }
+      try {
+        await this.governance?.after(selected, request, n, last);
+      } catch {
+        return fail("GOVERNANCE_BLOCKED");
+      } // Never retry a call whose durable accounting failed.
       attempts.push({
         model: { ...selected.identity },
         latencyMs: Math.max(0, performance.now() - begin),

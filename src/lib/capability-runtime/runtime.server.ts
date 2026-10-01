@@ -1,6 +1,7 @@
 import "@tanstack/react-start/server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabaseAdmin } from "../../integrations/supabase/client.server";
+import { governanceForRun } from "../governance/runtime.server.ts";
 import { providerSignals } from "../core-execution/runtime.server.ts";
 import { projectsForClient } from "../projects/runtime.server.ts";
 import { createSearchService } from "../global-search/runtime.server.ts";
@@ -35,7 +36,10 @@ export async function runtimeForActor(
     projectId: request.task.projectId,
     conversationId: request.task.conversationId,
   });
-  const { gateway, registry: providers } = createModelGatewayRuntime();
+  const governance = governanceForRun(client, userId, request.task.projectId, request.task.id);
+  const { gateway, registry: providers } = createModelGatewayRuntime(undefined, {
+    governance: governance.gateway,
+  });
   async function creativeAssets(projectId: string): Promise<CreativeAsset[]> {
     await store.authorize(projectId);
     const rows = await database(
@@ -182,6 +186,7 @@ export async function runtimeForActor(
     approvals,
     creative,
     providers: providerSignals(await providers.snapshot()),
+    governance: governance.agent,
   });
   return { ...runtime, store, creative, approvals, projects };
 }

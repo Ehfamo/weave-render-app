@@ -1,4 +1,5 @@
 import "@tanstack/react-start/server-only";
+import { governanceForRun } from "../governance/runtime.server.ts";
 import { InMemoryApprovalStore } from "../agents/approval.ts";
 import { TaskOrchestrator } from "../agents/orchestrator.ts";
 import { AgentRegistry } from "../agents/registry.ts";
@@ -126,7 +127,12 @@ export async function createCoreExecutionDependencies(input: {
         }),
       }
     : ephemeralServices(input.userId, projectId);
-  const model = createModelGatewayRuntime();
+  const runId = crypto.randomUUID();
+  const governance =
+    input.request.projectId && input.client
+      ? governanceForRun(input.client, input.userId, projectId, runId)
+      : undefined;
+  const model = createModelGatewayRuntime(undefined, { governance: governance?.gateway });
   const registry = new AgentRegistry();
   for (const tool of createCanonicalTools({
     search: contextual.search,
@@ -150,6 +156,7 @@ export async function createCoreExecutionDependencies(input: {
   const orchestrator = new TaskOrchestrator({
     registry,
     approvals: new InMemoryApprovalStore(),
+    governance: governance?.agent,
     brain: contextual.brain,
     gateway: model.gateway,
   });
@@ -157,6 +164,7 @@ export async function createCoreExecutionDependencies(input: {
     registry,
     inventory,
     projects,
+    id: () => runId,
     executeTask: (task, signal) => orchestrator.execute(task, { signal }),
   };
 }

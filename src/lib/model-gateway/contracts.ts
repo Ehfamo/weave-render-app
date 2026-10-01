@@ -39,6 +39,8 @@ export interface ModelUsage {
   totalTokens?: number;
 }
 export type ModelErrorCode =
+  | "GOVERNANCE_BLOCKED"
+  | "BUDGET_STOPPED"
   | "AUTH_ERROR"
   | "RATE_LIMIT"
   | "PROVIDER_UNAVAILABLE"

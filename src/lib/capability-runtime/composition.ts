@@ -19,6 +19,7 @@ import type { RuntimeRequest, RuntimeStore } from "./contracts.ts";
 import { RuntimeJobService } from "./service.ts";
 
 export function composeCapabilityRuntime(d: {
+  governance?: import("../agents/orchestrator.ts").AgentGovernance;
   store: RuntimeStore;
   request: RuntimeRequest;
   brain: ProjectBrainService;
@@ -36,6 +37,7 @@ export function composeCapabilityRuntime(d: {
     registry,
     approvals: new InMemoryApprovalStore(),
     durableApprovals: d.approvals,
+    governance: d.governance,
     brain: d.brain,
     gateway: d.gateway,
     async prepareContext(context) {

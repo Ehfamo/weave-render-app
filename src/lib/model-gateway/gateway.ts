@@ -10,6 +10,8 @@ import type {
 } from "./contracts.ts";
 
 const messages: Record<ModelErrorCode, string> = {
+  GOVERNANCE_BLOCKED: "Workspace policy blocks this request",
+  BUDGET_STOPPED: "Budget or concurrency limit prevents this request",
   AUTH_ERROR: "Provider authentication failed",
   RATE_LIMIT: "Provider rate limit reached",
   PROVIDER_UNAVAILABLE: "No eligible provider is available",

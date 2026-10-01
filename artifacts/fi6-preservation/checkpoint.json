@@ -1,13 +1,29 @@
 {
   "repository": "Ehfamo/weave-render-app",
-  "source": "cba07c197f3278efec81d125c969f25a406fd958",
-  "branch": "feature/xeomx-fi6-product-enterprise-global-excellence-20260930",
-  "head": "dc75ccd275d1e70b72e59ad17f775a17f290056e",
-  "bundle_sha256": "cd68230b8babbdce24f5fc727a17b841f2d80a2cfa6915e0f6385a022136b955",
-  "bundle": "XEOMX_FI6_GROUP_1_20260930.bundle",
-  "label": "GROUP_1",
+  "source_fi5_sha": "cba07c197f3278efec81d125c969f25a406fd958",
+  "checkpoint_head": "9a1e67ad933a0f72687430fbdf1571e0b5fe71a5",
+  "bundle_path": "artifacts/fi6-preservation/XEOMX_FI6_GROUP_2_20261001.bundle",
+  "bundle_sha256": "191c135921607bedecf10096bb9c411b0cf6861f947e1b28094a7bad3337e1cf",
   "status": "FI6_IN_PROGRESS",
   "main_modified": false,
   "production_modified": false,
-  "fi7_started": false
+  "hosted_migrations": "NOT_APPLIED",
+  "fi7_started": false,
+  "groups": {
+    "1": "COMPLETE",
+    "2": "COMPLETE",
+    "3": "NOT_STARTED",
+    "4": "NOT_STARTED",
+    "5": "NOT_STARTED"
+  },
+  "validation": {
+    "group2_affected": {
+      "passed": 71,
+      "failed": 0,
+      "skipped": 0
+    },
+    "typecheck": "PASS",
+    "targeted_lint": "PASS",
+    "diff_check": "PASS"
+  }
 }

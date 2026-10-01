@@ -2,7 +2,7 @@ name: Preserve exact FI6 progress
 on:
   push:
     branches: [preservation/xeomx-fi6-progress-20260930]
-    paths: [.github/workflows/fi6-persist.yml, 'artifacts/fi6-preservation/*.bundle']
+    paths: ['.github/workflows/fi6-persist.yml', 'artifacts/fi6-preservation/*.bundle']
 permissions:
   contents: write
 jobs:
@@ -17,10 +17,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          bundle=artifacts/fi6-preservation/XEOMX_FI6_GROUP_1_20260930.bundle
-          expected=dc75ccd275d1e70b72e59ad17f775a17f290056e
+          bundle=artifacts/fi6-preservation/XEOMX_FI6_GROUP_2_20261001.bundle
+          expected=9a1e67ad933a0f72687430fbdf1571e0b5fe71a5
           target=refs/heads/feature/xeomx-fi6-product-enterprise-global-excellence-20260930
-          echo "cd68230b8babbdce24f5fc727a17b841f2d80a2cfa6915e0f6385a022136b955  $bundle" | sha256sum --check -
+          echo '191c135921607bedecf10096bb9c411b0cf6861f947e1b28094a7bad3337e1cf  artifacts/fi6-preservation/XEOMX_FI6_GROUP_2_20261001.bundle' | sha256sum --check -
           git bundle verify "$bundle"
           test "$(git bundle list-heads "$bundle" "$target" | cut -d' ' -f1)" = "$expected"
           git fetch "$bundle" "$target:refs/heads/recovered-fi6"

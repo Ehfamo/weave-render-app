@@ -1,9 +1,9 @@
 {
   "repository": "Ehfamo/weave-render-app",
   "source_fi5_sha": "cba07c197f3278efec81d125c969f25a406fd958",
-  "checkpoint_head": "9a1e67ad933a0f72687430fbdf1571e0b5fe71a5",
-  "bundle_path": "artifacts/fi6-preservation/XEOMX_FI6_GROUP_2_20261001.bundle",
-  "bundle_sha256": "191c135921607bedecf10096bb9c411b0cf6861f947e1b28094a7bad3337e1cf",
+  "checkpoint_head": "d9a39faee5f41c00b8f33ef459cf24f059e0b393",
+  "bundle_path": "artifacts/fi6-preservation/XEOMX_FI6_GROUP_3_20261001.bundle",
+  "bundle_sha256": "2dcfbd3e918c85079347a84f82a53ae15214cbe132bfc9f4971c493684eb3fa3",
   "status": "FI6_IN_PROGRESS",
   "main_modified": false,
   "production_modified": false,
@@ -12,18 +12,28 @@
   "groups": {
     "1": "COMPLETE",
     "2": "COMPLETE",
-    "3": "NOT_STARTED",
+    "3": "COMPLETE",
     "4": "NOT_STARTED",
     "5": "NOT_STARTED"
   },
   "validation": {
-    "group2_affected": {
-      "passed": 71,
+    "group3_focus": {
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0
+    },
+    "group3_affected": {
+      "passed": 77,
       "failed": 0,
       "skipped": 0
     },
     "typecheck": "PASS",
     "targeted_lint": "PASS",
-    "diff_check": "PASS"
-  }
+    "diff_check": "PASS",
+    "secret_review": "PASS"
+  },
+  "deferred_external": [
+    "Identity provider, domain and session verification",
+    "Connector credential resolution and live transport"
+  ]
 }

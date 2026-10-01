@@ -148,7 +148,20 @@ export function sameScope(a: MemoryScope, b: MemoryScope): boolean {
 
 export class MemoryService {
   private adapter: MemoryAdapter;
-  constructor(adapter: MemoryAdapter) {
+  private governance?: (
+    operation: "read" | "write",
+    scope: MemoryScope,
+    type: import("./contracts.ts").MemoryType,
+  ) => Promise<boolean>;
+  constructor(
+    adapter: MemoryAdapter,
+    governance?: (
+      operation: "read" | "write",
+      scope: MemoryScope,
+      type: import("./contracts.ts").MemoryType,
+    ) => Promise<boolean>,
+  ) {
+    this.governance = governance;
     uuid(adapter.userId);
     this.adapter = adapter;
   }
@@ -175,6 +188,8 @@ export class MemoryService {
     const settings = await this.settings();
     if (!settings.enabled || settings.disabledTypes.includes(draft.type))
       throw new Error("MEMORY_DISABLED");
+    if (this.governance && !(await this.governance("write", draft.scope, draft.type)))
+      throw Error("MEMORY_DISABLED");
     const result = this.owned(await this.adapter.create(draft));
     if (!sameScope(result.scope, draft.scope)) throw new Error("MEMORY_SCOPE_MISMATCH");
     return result;
@@ -206,9 +221,13 @@ export class MemoryService {
     const query = querySchema.parse(input);
     const settings = await this.settings();
     if (!settings.enabled) return [];
-    const types = (query.types ?? [...MEMORY_TYPES]).filter(
+    let types = (query.types ?? [...MEMORY_TYPES]).filter(
       (t) => !settings.disabledTypes.includes(t),
     );
+    if (this.governance) {
+      const allowed = await Promise.all(types.map((t) => this.governance!("read", query.scope, t)));
+      types = types.filter((_, i) => allowed[i]);
+    }
     if (!types.length) return [];
     const rows = await this.list({ ...query, types, limit: 100 });
     // Bounded lexical retrieval; future semantic adapters must preserve actor/scope enforcement.

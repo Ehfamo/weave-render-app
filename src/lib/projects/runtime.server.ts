@@ -7,8 +7,7 @@ import {
   updateProject,
 } from "../backend/vertical-slice.server";
 import { projectBrainForClient } from "../project-brain/runtime.server.ts";
-import { MemoryService } from "../memory/service.ts";
-import { NativeMemoryAdapter } from "../memory/native-adapter.ts";
+import { governedMemory } from "../memory/governance.server.ts";
 import { ProjectsService, type ProjectActivity } from "./service.ts";
 
 export function projectsForClient(userId: string, client: SupabaseClient) {
@@ -22,9 +21,7 @@ export function projectsForClient(userId: string, client: SupabaseClient) {
     }
   }
   const brain = projectBrainForClient(userId, client);
-  const memory = new MemoryService(
-    new NativeMemoryAdapter(userId, { rpc: (name, args) => client.rpc(name, args) }),
-  );
+  const memory = governedMemory(userId, client);
   return new ProjectsService(
     {
       userId,

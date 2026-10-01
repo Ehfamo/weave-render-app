@@ -1,7 +1,6 @@
 import "@tanstack/react-start/server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { NativeMemoryAdapter } from "../memory/native-adapter.ts";
-import { MemoryService } from "../memory/service.ts";
+import { governedMemory } from "../memory/governance.server.ts";
 import { createProjectDomain } from "./native-domain.ts";
 import { ProjectBrainService } from "./service.ts";
 
@@ -83,10 +82,5 @@ export function projectBrainForClient(userId: string, client: SupabaseClient) {
     );
     return (rows as { id: string; role: string; content: string }[]).reverse();
   };
-  return new ProjectBrainService(
-    new MemoryService(
-      new NativeMemoryAdapter(userId, { rpc: (name, args) => client.rpc(name, args) }),
-    ),
-    domain,
-  );
+  return new ProjectBrainService(governedMemory(userId, client), domain);
 }

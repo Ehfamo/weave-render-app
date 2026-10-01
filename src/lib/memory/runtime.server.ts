@@ -1,7 +1,6 @@
 import "@tanstack/react-start/server-only";
 import { createClient } from "@supabase/supabase-js";
-import { NativeMemoryAdapter } from "./native-adapter.ts";
-import { MemoryService } from "./service.ts";
+import { governedMemory } from "./governance.server.ts";
 
 /** No service-role key. Fresh user authentication binds each service to its caller. */
 export async function createMemoryService(
@@ -16,9 +15,5 @@ export async function createMemoryService(
   });
   const { data, error } = await client.auth.getUser(token);
   if (error || !data.user) throw new Error("MEMORY_AUTH_REQUIRED");
-  return new MemoryService(
-    new NativeMemoryAdapter(data.user.id, {
-      rpc: (name, args) => client.rpc(name, args),
-    }),
-  );
+  return governedMemory(data.user.id, client);
 }
